@@ -1,0 +1,18 @@
+Library/
+Temp/
+Logs/
+Assets/Asset/TextMesh Pro/
+Debug/
+.vs/
+UserSettings/
+ProjectSettings/
+Assets/Plugins/
+Assets/TextMesh Pro/
+
+Plugins.meta
+TextMesh Pro.meta
+
+*.cache
+*.csproj
+*.sln
+Server/build/
