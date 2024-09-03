@@ -6,9 +6,7 @@ using System;
 public class FadeScreen : MonoBehaviour
 {
     [SerializeField] private CanvasGroup _cgSplashScreen = null;
-
     [Space(10)]
-
     [SerializeField] private float _minusValue = 0.01f;
 
     public void Initialize()

@@ -7,17 +7,15 @@ public class ToolProxy : MonoBehaviour
 {
     [Header("Fade")]
     [SerializeField] private GameObject _prefabFadeScreen = null;
-
     [SerializeField] private Transform _parentFadeScreen = null;
 
     [Header("SceneChanger")]
     [SerializeField] private GameObject _prefabSceneChanger = null;
-
     [SerializeField] private Transform _parentSceneChanger = null;
 
     public void Initialize()
     {
-        
+        this.gameObject.SetActive(true);
     }
 
     public void Fade(bool isIn, Action _onResultCallback)
@@ -29,7 +27,12 @@ public class ToolProxy : MonoBehaviour
 
         if (isIn == true)
         {
-            com.FadeIn(_onResultCallback);
+            com.FadeIn(() => 
+            { 
+                _onResultCallback?.Invoke();  
+                Destroy(obj); 
+            });
+
             return;
         }
 
