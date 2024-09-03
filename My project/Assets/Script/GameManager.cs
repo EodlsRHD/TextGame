@@ -19,12 +19,18 @@ public class GameManager : MonoBehaviour
     }
 
     [Header("Tool Proxy"), SerializeField] private ToolProxy _toolProxy = null;
+    [Header("Data Manager"), SerializeField] private DataManager _dataManager = null;
 
     #region GetSet
 
     public ToolProxy tools
     {
         get { return _toolProxy; }
+    }
+
+    public DataManager dataManager
+    {
+        get { return _dataManager; }
     }
 
     #endregion
@@ -35,5 +41,6 @@ public class GameManager : MonoBehaviour
         DontDestroyOnLoad(this.gameObject);
 
         _toolProxy.Initialize();
+        _dataManager.Initialize();
     }
 }
