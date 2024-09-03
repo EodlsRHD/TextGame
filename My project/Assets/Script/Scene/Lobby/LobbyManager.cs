@@ -25,6 +25,7 @@ public class LobbyManager : MonoBehaviour
 
     private void OnStart()
     {
+        Debug.LogWarning("TEST MODE ¿‘¥œ¥Ÿ.");
         int value = isTEST ? PlayerPrefs.GetInt(SAVE_DATA) : 0;
 
         if(value == 0) // no data
