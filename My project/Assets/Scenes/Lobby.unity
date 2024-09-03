@@ -1166,6 +1166,7 @@ MonoBehaviour:
   _buttonStart: {fileID: 826345065}
   _buttonSettings: {fileID: 312745791}
   _buttonDictionary: {fileID: 498178248}
+  isTEST: 1
 --- !u!1 &924360719
 GameObject:
   m_ObjectHideFlags: 0
