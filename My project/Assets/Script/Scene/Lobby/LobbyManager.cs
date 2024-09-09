@@ -22,7 +22,7 @@ public class LobbyManager : MonoBehaviour
         _buttonSettings.onClick.AddListener(OnSettings);
         _buttonDictionary.onClick.AddListener(OnDictionary);
 
-        _createCharacterProfile.Initialize();
+        _createCharacterProfile.Initialize(NewGame);
 
         GameManager.instance.dataManager.ReadGameData();
     }

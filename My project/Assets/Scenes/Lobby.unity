@@ -139,7 +139,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &67291935
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1313,7 +1313,6 @@ MonoBehaviour:
   _buttonStart: {fileID: 826345065}
   _buttonSettings: {fileID: 312745791}
   _buttonDictionary: {fileID: 498178248}
-  isTEST: 1
 --- !u!1 &924360719
 GameObject:
   m_ObjectHideFlags: 0

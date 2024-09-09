@@ -12,8 +12,15 @@ public class CreateCharacterProfile : MonoBehaviour
     [Header("Buttons")]
     [SerializeField] private Button _buttonSave = null;
 
-    public void Initialize()
+    private Action _onNewGameCallback = null;
+
+    public void Initialize(Action onNewGameCallback)
     {
+        if(onNewGameCallback != null)
+        {
+            _onNewGameCallback = onNewGameCallback;
+        }
+
         _buttonSave.onClick.AddListener(OnSave);
 
         this.gameObject.SetActive(false);

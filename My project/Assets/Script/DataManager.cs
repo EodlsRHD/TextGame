@@ -158,6 +158,8 @@ public class DataManager : MonoBehaviour
         PlayGamesPlatform.DebugLogEnabled = true;
         PlayGamesPlatform.Activate();
         PlayGamesPlatform.Instance.Authenticate((status) => { Debug.Log(status.ToString()); });
+
+        GooglePlayGamesRead(true);
     }
 
     public void GooglePlayGamesRead(bool isSave)
@@ -282,7 +284,7 @@ public class DataManager : MonoBehaviour
 
     public bool CheckSaveData()
     {
-        return CheckSaveData();
+        return (_saveData != null);
     }
 
     public void SaveData()
