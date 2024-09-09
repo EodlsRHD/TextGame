@@ -2,7 +2,8 @@ public enum eScene
 {
     SplashScene = 0,
     Ui,
-    Lobby
+    Lobby,
+    Game
 }
 
 public enum eCreatureData
