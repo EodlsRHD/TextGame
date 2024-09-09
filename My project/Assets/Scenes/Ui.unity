@@ -180,6 +180,9 @@ MonoBehaviour:
   _buttonMiddle: {fileID: 961216988}
   _buttonLeft: {fileID: 2096696796}
   _buttonRight: {fileID: 1507645404}
+  _textMiddle: {fileID: 110519511}
+  _textLeft: {fileID: 862817267}
+  _textRight: {fileID: 156138357}
 --- !u!1 &110519509
 GameObject:
   m_ObjectHideFlags: 0

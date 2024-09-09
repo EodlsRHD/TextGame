@@ -16,6 +16,11 @@ public class PopupGenerator : MonoBehaviour
     [SerializeField] private Button _buttonLeft = null;
     [SerializeField] private Button _buttonRight = null;
 
+    [Header("Button Text")]
+    [SerializeField] private TMP_Text _textMiddle = null;
+    [SerializeField] private TMP_Text _textLeft = null;
+    [SerializeField] private TMP_Text _textRight = null;
+
     private Action _onClosePopupCallback = null;
     private Action _onMiddleCallback = null;
     private Action _onLeftCallback = null;
@@ -47,7 +52,7 @@ public class PopupGenerator : MonoBehaviour
         _textTitle.text = title;
         _textContent.text = content;
 
-        _buttonMiddle.GetComponentInChildren<TMP_Text>().text = buttonText;
+        _textMiddle.text = buttonText;
 
         _buttonMiddle.gameObject.SetActive(true);
     }
@@ -67,8 +72,8 @@ public class PopupGenerator : MonoBehaviour
         _textTitle.text = title;
         _textContent.text = content;
 
-        _buttonLeft.GetComponentInChildren<TMP_Text>().text = leftButtonText;
-        _buttonRight.GetComponentInChildren<TMP_Text>().text = rightButtonText;
+        _textLeft.text = leftButtonText;
+        _textRight.text = rightButtonText;
 
         _buttonLeft.gameObject.SetActive(true);
         _buttonRight.gameObject.SetActive(true);
