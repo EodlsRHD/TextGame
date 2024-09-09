@@ -11,6 +11,6 @@ public class InitializeGame : MonoBehaviour
     {
         Application.targetFrameRate = _targetFrameRate;
 
-        GameManager.instance.tools.SceneChange(SceneIndex.Lobby, null);
+        GameManager.instance.tools.SceneChange(eScene.Lobby, null);
     }
 }

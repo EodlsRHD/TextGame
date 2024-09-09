@@ -13,7 +13,7 @@ public class SceneChanger : MonoBehaviour
         SceneManager.sceneLoaded += LoadedsceneEvent;
     }
 
-    public void ChangeScene(SceneIndex _scene, Action onResultCallback)
+    public void ChangeScene(eScene _scene, Action onResultCallback)
     {
         if(onResultCallback != null)
         {
@@ -21,7 +21,7 @@ public class SceneChanger : MonoBehaviour
         }
 
         SceneManager.LoadSceneAsync(_scene.ToString());
-        SceneManager.LoadScene(SceneIndex.Ui.ToString(), LoadSceneMode.Additive);
+        SceneManager.LoadScene(eScene.Ui.ToString(), LoadSceneMode.Additive);
     }
 
     private void LoadedsceneEvent(Scene scene, LoadSceneMode mode)

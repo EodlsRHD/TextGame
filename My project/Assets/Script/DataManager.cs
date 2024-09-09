@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Newtonsoft.Json;
 using System;
+using System.IO;
 
 public class DataManager : MonoBehaviour
 {
@@ -118,11 +119,40 @@ public class DataManager : MonoBehaviour
         public Map_Data mapData = null;
     }
 
-    private Save_Data saveData = null;
+    [Header("Data Path")]
+    [SerializeField] private string _saveDataPath = string.Empty;
+    [SerializeField] private string _creatureDataPath = string.Empty;
+    [SerializeField] private string _itemDataPath = string.Empty;
+    [SerializeField] private string _skillDataPath = string.Empty;
 
-    public void  Initialize()
+    private Save_Data _saveData = null;
+
+    private List<Creature_Data> _creatureDatas = null;
+    private List<Item_Data> _itemDatas = null;
+    private List<Skill_Data> _skillDatas = null;
+
+    public void Initialize()
     {
         this.gameObject.SetActive(true);
+    }
+
+    public void ReadGameData()
+    {
+        ReadCreaturesData();
+        ReadItemsData();
+        ReadSkillsData();
+    }
+
+    #region SaveData
+
+    public void CreateSaveData()
+    {
+        _saveData = new Save_Data();
+    }
+
+    public bool CheckSaveData()
+    {
+        return CheckData(_saveDataPath);
     }
 
     public void WriteSaveData()
@@ -135,13 +165,87 @@ public class DataManager : MonoBehaviour
         
     }
 
-    public void ChangeSaveData()
+    public void ChangePlayerData(string name)
+    {
+        _saveData.userData.data.name = name;
+
+        Debug.Log(_saveData.userData.data.name);
+    }
+
+    public void ChangePlayerData(eCreatureData dataType, ushort value)
     {
 
     }
 
-    public void CreateSaveData()
+    public void ChangePlayerData(Save_Data newData)
     {
-        saveData = new Save_Data();
+        _saveData = newData;
+    }
+
+    #endregion
+
+    #region Creature
+
+    private void ReadCreaturesData()
+    {
+        if(_creatureDatas != null)
+        {
+            _creatureDatas.Clear();
+        }
+
+        _creatureDatas = new List<Creature_Data>();
+
+        GetJsonFile<Creature_Data>(_creatureDataPath, (datas) =>
+        {
+            _creatureDatas = datas;
+        });
+    }
+
+    #endregion
+
+    #region Item
+
+    private void ReadItemsData()
+    {
+
+    }
+
+    #endregion
+
+    #region Skill
+
+    private void ReadSkillsData()
+    {
+
+    }
+
+    #endregion
+
+    private void GetJsonFile<T>(string path, Action<List<T>> callback)
+    {
+        path = Application.dataPath + "/Resources/" + path;
+        if (CheckData(path) == false)
+        {
+            Debug.LogWarning("Data Read False");
+            GameManager.instance.GameError();
+
+            return;
+        }
+
+        string json = File.ReadAllText(path + ".json");
+
+        var respons = new
+        {
+            datas = new List<T>()
+        };
+
+        var result = Newtonsoft.Json.JsonConvert.DeserializeAnonymousType(json, respons);
+
+        callback?.Invoke(respons.datas);
+    }
+
+    private bool CheckData(string path)
+    {
+        return File.Exists(path + ".json");
     }
 }

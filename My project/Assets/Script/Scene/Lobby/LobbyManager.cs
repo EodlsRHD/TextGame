@@ -5,14 +5,14 @@ using UnityEngine.UI;
 
 public class LobbyManager : MonoBehaviour
 {
+    [SerializeField] private CreateCharacterProfile _createCharacterProfile = null;
+
     [Header("UI")]
     [SerializeField] private Button _buttonStart = null;
     [SerializeField] private Button _buttonSettings = null;
     [SerializeField] private Button _buttonDictionary = null;
 
     private const string SAVE_DATA = "SAVE_DATA";
-
-    [Header("TEST"), SerializeField] private bool isTEST = false;
 
     private void Start()
     {
@@ -21,19 +21,29 @@ public class LobbyManager : MonoBehaviour
         _buttonStart.onClick.AddListener(OnStart);
         _buttonSettings.onClick.AddListener(OnSettings);
         _buttonDictionary.onClick.AddListener(OnDictionary);
+
+        _createCharacterProfile.Initialize();
+
+        GameManager.instance.dataManager.ReadGameData();
     }
 
     private void OnStart()
     {
-        Debug.LogWarning("TEST MODE ÀÔ´Ï´Ù.");
-        int value = isTEST ? PlayerPrefs.GetInt(SAVE_DATA) : 0;
-
-        if(value == 0) // no data
+        if(GameManager.instance.dataManager.CheckSaveData() == false)
         {
-            GameManager.instance.dataManager.CreateSaveData();
+            _createCharacterProfile.Open();
+
+            return;
         }
 
-        GameManager.instance.dataManager.ReadSaveData();
+        UiManager.instance.OpenPopup(string.Empty, "Saved data exists." + "\n" + " Would you like to continue?", string.Empty, string.Empty, () =>
+        {
+            GameManager.instance.dataManager.ReadSaveData();
+
+        }, () =>
+        {
+            _createCharacterProfile.Open();
+        });
     }
 
     private void OnSettings()

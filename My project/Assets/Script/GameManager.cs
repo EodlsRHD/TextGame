@@ -43,4 +43,9 @@ public class GameManager : MonoBehaviour
         _toolProxy.Initialize();
         _dataManager.Initialize();
     }
+
+    public void GameError()
+    {
+        Application.Quit();
+    }
 }

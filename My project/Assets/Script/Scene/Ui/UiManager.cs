@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
@@ -28,6 +28,9 @@ public class UiManager : MonoBehaviour
         _popupCanvas.Initialize(ClosePopup);
     }
 
+    /// <summary>
+    ///  If the button text is empty => "confirm"
+    /// </summary>
     public void OpenPopup(string title, string content, string buttonText, Action onButtonCallback)
     {
         _popupCanvas.OpenPopup(title, content, buttonText, onButtonCallback);
@@ -35,6 +38,9 @@ public class UiManager : MonoBehaviour
         _popupCanvas.gameObject.SetActive(true);
     }
 
+    /// <summary>
+    ///  If the button text is empty => Left "confirm", Right "cancel"
+    /// </summary>
     public void OpenPopup(string title, string content, string leftButtonText, string rightButtonText, Action onLeftButtonCallback, Action onRightButtonCallback)
     {
         _popupCanvas.OpenPopup(title, content, leftButtonText, rightButtonText, onLeftButtonCallback, onRightButtonCallback);

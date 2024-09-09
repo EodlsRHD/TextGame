@@ -39,7 +39,7 @@ public class ToolProxy : MonoBehaviour
         com.FadeOut(_onResultCallback);
     }
 
-    public void SceneChange(SceneIndex _scene, Action _onResultCallback)
+    public void SceneChange(eScene _scene, Action _onResultCallback)
     {
         var obj = Instantiate(_prefabSceneChanger, _parentSceneChanger);
         var com = obj.GetComponent<SceneChanger>();
