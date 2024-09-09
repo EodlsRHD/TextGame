@@ -42,7 +42,7 @@ public class PopupGenerator : MonoBehaviour
         _buttonRight.gameObject.SetActive(false);
     }
 
-    public void Open_OneButton(string title, string content, string buttonText = "confirm", Action onButtonCallback = null)
+    public void Open_OneButton(string title, string content, string buttonText, Action onButtonCallback = null)
     {
         if(onButtonCallback != null)
         {
@@ -52,12 +52,12 @@ public class PopupGenerator : MonoBehaviour
         _textTitle.text = title;
         _textContent.text = content;
 
-        _textMiddle.text = buttonText;
+        _textMiddle.text = (buttonText.Length == 0) ? "confirm" : buttonText;
 
         _buttonMiddle.gameObject.SetActive(true);
     }
 
-    public void Open_TwoButton(string title, string content, string leftButtonText = "confirm", string rightButtonText = "cancel", Action onLeftButtonCallback = null, Action onRightButtonCallback = null)
+    public void Open_TwoButton(string title, string content, string leftButtonText, string rightButtonText, Action onLeftButtonCallback = null, Action onRightButtonCallback = null)
     {
         if (onLeftButtonCallback != null)
         {
@@ -72,8 +72,8 @@ public class PopupGenerator : MonoBehaviour
         _textTitle.text = title;
         _textContent.text = content;
 
-        _textLeft.text = leftButtonText;
-        _textRight.text = rightButtonText;
+        _textLeft.text = (leftButtonText.Length == 0) ? "confirm" : leftButtonText;
+        _textRight.text = (rightButtonText.Length == 0) ? "cancel" : rightButtonText;
 
         _buttonLeft.gameObject.SetActive(true);
         _buttonRight.gameObject.SetActive(true);

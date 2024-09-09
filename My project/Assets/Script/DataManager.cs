@@ -155,6 +155,10 @@ public class DataManager : MonoBehaviour
 
     private void GooglePlayGamesLogin()
     {
+#if UNITY_EDITOR
+        return;
+#endif
+
         PlayGamesPlatform.DebugLogEnabled = true;
         PlayGamesPlatform.Activate();
         PlayGamesPlatform.Instance.Authenticate((status) => { Debug.Log(status.ToString()); });
@@ -273,9 +277,9 @@ public class DataManager : MonoBehaviour
         return Social.localUser.authenticated;
     }
 
-    #endregion
+#endregion
 
-    #region SaveData
+#region SaveData
 
     public void CreateSaveData()
     {
@@ -289,11 +293,19 @@ public class DataManager : MonoBehaviour
 
     public void SaveData()
     {
+#if UNITY_EDITOR
+        return;
+#endif
+
         GooglePlayGamesRead(true);
     }
 
     public void LoadData()
     {
+#if UNITY_EDITOR
+        return;
+#endif
+
         GooglePlayGamesRead(false);
     }
 
@@ -307,9 +319,9 @@ public class DataManager : MonoBehaviour
         _saveData = newData;
     }
 
-    #endregion
+#endregion
 
-    #region Creature
+#region Creature
 
     private void ReadCreaturesData()
     {
@@ -326,25 +338,25 @@ public class DataManager : MonoBehaviour
         });
     }
 
-    #endregion
+#endregion
 
-    #region Item
+#region Item
 
     private void ReadItemsData()
     {
 
     }
 
-    #endregion
+#endregion
 
-    #region Skill
+#region Skill
 
     private void ReadSkillsData()
     {
 
     }
 
-    #endregion
+#endregion
 
     private void GetJsonFile<T>(string path, Action<List<T>> callback)
     {

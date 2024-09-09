@@ -58,6 +58,6 @@ public class LobbyManager : MonoBehaviour
 
     private void NewGame()
     {
-
+        GameManager.instance.tools.SceneChange(eScene.Game);
     }
 }
