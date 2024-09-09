@@ -16,7 +16,7 @@ public class PopupCanvas : MonoBehaviour
             _onClosePopupCallback = null;
         }
 
-        _popupGenerator.Initialize(ClosePopup);
+        _popupGenerator.Initialize(Close);
 
         this.gameObject.SetActive(false);
     }
@@ -35,7 +35,7 @@ public class PopupCanvas : MonoBehaviour
         this.gameObject.SetActive(true);
     }
     
-    public void ClosePopup()
+    public void Close()
     {
         _popupGenerator.ClosePopup();
         this.gameObject.SetActive(false);

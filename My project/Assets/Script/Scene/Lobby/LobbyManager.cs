@@ -48,12 +48,12 @@ public class LobbyManager : MonoBehaviour
 
     private void OnSettings()
     {
-        UiManager.instance.OpenPopup("UI", "Settings is still in preparation.", string.Empty, null);
+        UiManager.instance.OpenSettings();
     }
 
     private void OnDictionary()
     {
-        UiManager.instance.OpenPopup("UI", "Dictionary is Still in preparation.", string.Empty, null);
+        UiManager.instance.OpenEncyclopedia();
     }
 
     private void NewGame()

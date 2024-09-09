@@ -19,23 +19,36 @@ public class UiManager : MonoBehaviour
         }
     }
 
+    [SerializeField] private GameObject _objBlocker = null;
+
     [Header("Popup"), SerializeField] private PopupCanvas _popupCanvas = null;
+    [Header("Game Menu"), SerializeField] private GameMenu _gameMenu = null;
 
     private void Awake()
     {
         _instance = this;
 
         _popupCanvas.Initialize(ClosePopup);
+        _gameMenu.Initialize(CloseMenu);
+
+        ActiveBlocker(false);
     }
+
+    private void ActiveBlocker(bool isActive)
+    {
+        _objBlocker.SetActive(isActive);
+    }
+
+    #region Popup
 
     /// <summary>
     ///  If the button text is empty => "confirm"
     /// </summary>
     public void OpenPopup(string title, string content, string buttonText, Action onButtonCallback)
     {
-        _popupCanvas.OpenPopup(title, content, buttonText, onButtonCallback);
+        ActiveBlocker(true);
 
-        _popupCanvas.gameObject.SetActive(true);
+        _popupCanvas.OpenPopup(title, content, buttonText, onButtonCallback);
     }
 
     /// <summary>
@@ -43,11 +56,67 @@ public class UiManager : MonoBehaviour
     /// </summary>
     public void OpenPopup(string title, string content, string leftButtonText, string rightButtonText, Action onLeftButtonCallback, Action onRightButtonCallback)
     {
+        ActiveBlocker(true);
+
         _popupCanvas.OpenPopup(title, content, leftButtonText, rightButtonText, onLeftButtonCallback, onRightButtonCallback);
     }
 
     private void ClosePopup()
-    {  
-        _popupCanvas.ClosePopup();
+    {
+        ActiveBlocker(false);
+
+        _popupCanvas.Close();
     }
+
+    #endregion
+
+    #region Game Menu
+
+    public void OpenGameMenu()
+    {
+        ActiveBlocker(true);
+
+        _gameMenu.Open();
+    }
+
+    private void CloseMenu()
+    {
+        ActiveBlocker(false);
+
+        _gameMenu.Close();
+    }
+
+    #endregion
+
+    #region Settings
+
+    public void OpenSettings()
+    {
+        //ActiveBlocker(true);
+
+        OpenPopup("UI", "Settings is still in preparation.", string.Empty, null);
+    }
+
+    private void ClsoeSettings()
+    {
+        ActiveBlocker(false);
+    }
+
+    #endregion
+
+    #region Encyclopedia
+
+    public void OpenEncyclopedia()
+    {
+        //ActiveBlocker(true);
+
+        OpenPopup("UI", "Dictionary is Still in preparation.", string.Empty, null);
+    }
+
+    private void CloseEncyclopedia()
+    {
+        ActiveBlocker(false);
+    }
+
+    #endregion
 }
