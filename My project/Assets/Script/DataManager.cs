@@ -1,9 +1,13 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Newtonsoft.Json;
 using System;
 using System.IO;
+using GooglePlayGames;
+using GooglePlayGames.BasicApi;
+using GooglePlayGames.BasicApi.SavedGame;
+using System.Text;
 
 public class DataManager : MonoBehaviour
 {
@@ -35,7 +39,7 @@ public class DataManager : MonoBehaviour
     {
         public Creature_Data data = null;
 
-        public ushort level = 0; // 1·¹º§ °æÇèÄ¡ * ·¹º§¼ö
+        public ushort level = 0; // 1ë ˆë²¨ ê²½í—˜ì¹˜ * ë ˆë²¨ìˆ˜
     }
 
     [Serializable]
@@ -133,6 +137,8 @@ public class DataManager : MonoBehaviour
 
     public void Initialize()
     {
+        GooglePlayGamesLogin();
+
         this.gameObject.SetActive(true);
     }
 
@@ -143,6 +149,130 @@ public class DataManager : MonoBehaviour
         ReadSkillsData();
     }
 
+    #region Google Play Game Services
+
+    //https://ljhyunstory.tistory.com/354
+
+    private void GooglePlayGamesLogin()
+    {
+        PlayGamesPlatform.DebugLogEnabled = true;
+        PlayGamesPlatform.Activate();
+        PlayGamesPlatform.Instance.Authenticate((status) => { Debug.Log(status.ToString()); });
+    }
+
+    public void GooglePlayGamesRead(bool isSave)
+    {
+        if (CheckLogin() == false)
+        {
+            GooglePlayGamesLogin();
+        }
+
+        ISavedGameClient savedGameClient = PlayGamesPlatform.Instance.SavedGame;
+
+        if (isSave  == true)
+        {
+            savedGameClient.OpenWithAutomaticConflictResolution("SaveData_TextGame", DataSource.ReadCacheOrNetwork, 
+                ConflictResolutionStrategy.UseLongestPlaytime, GooglePlayGamesSave);
+
+            return;
+        }
+
+        savedGameClient.OpenWithAutomaticConflictResolution("SaveData_TextGame",Â DataSource.ReadCacheOrNetwork,Â 
+            ConflictResolutionStrategy.UseLongestPlaytime, GooglePlayGamesLoad);
+    }
+
+    private void GooglePlayGamesSave(SavedGameRequestStatus status, ISavedGameMetadata game)
+    {
+        if(status != SavedGameRequestStatus.Success)
+        {
+            UiManager.instance.OpenPopup("System", "Save failed. \n Would you like to retry?", string.Empty, string.Empty, () =>
+            {
+                GooglePlayGamesRead(true);
+            }, null);
+
+            return;
+        }
+
+        GooglePlayGamesSaveData(game);
+    }
+
+    private void GooglePlayGamesSaveData(ISavedGameMetadata gameMetadata)
+    {
+        var json = Newtonsoft.Json.JsonConvert.SerializeObject(_saveData);
+        byte[] savedData = Encoding.UTF8.GetBytes(json);
+
+        ISavedGameClient savedGameClient = PlayGamesPlatform.Instance.SavedGame;
+        SavedGameMetadataUpdate.Builder builder = new SavedGameMetadataUpdate.Builder();
+        builder = builder.WithUpdatedDescription(DateTime.Now.ToString());
+
+        SavedGameMetadataUpdate updateMetadata = builder.Build();
+        savedGameClient.CommitUpdate(gameMetadata, updateMetadata, savedData, (status, gameMetadata) => 
+        {
+            if (status != SavedGameRequestStatus.Success)
+            {
+                UiManager.instance.OpenPopup("System", "Save failed. \n Would you like to retry?", string.Empty, string.Empty, () =>
+                {
+                    GooglePlayGamesRead(true);
+                }, null);
+
+                return;
+            }
+
+            UiManager.instance.OpenPopup("System", "Save was successful.", string.Empty, null);
+        });
+    }
+
+    private void GooglePlayGamesLoad(SavedGameRequestStatus status, ISavedGameMetadata game)
+    {
+        if (status != SavedGameRequestStatus.Success)
+        {
+            UiManager.instance.OpenPopup("System", "Load failed. \n Would you like to retry?", string.Empty, string.Empty, () =>
+            {
+                GooglePlayGamesRead(false);
+            }, null);
+
+            return;
+        }
+
+        GooglePlayGamesLoadData(game);
+    }
+
+    private void GooglePlayGamesLoadData(ISavedGameMetadata game)
+    {
+        ISavedGameClient savedGameClient = PlayGamesPlatform.Instance.SavedGame;
+        savedGameClient.ReadBinaryData(game, (status, saveDatas) =>
+        {
+            if (status != SavedGameRequestStatus.Success)
+            {
+                UiManager.instance.OpenPopup("System", "Load failed. \n Would you like to retry?", string.Empty, string.Empty, () =>
+                {
+                    GooglePlayGamesRead(false);
+                }, null);
+
+                return;
+            }
+
+            var respons = new
+            {
+                data = new Save_Data()
+            };
+
+            var json = Encoding.UTF8.GetString(saveDatas);
+            var result = Newtonsoft.Json.JsonConvert.DeserializeAnonymousType(json, respons);
+
+            _saveData = result.data;
+
+            UiManager.instance.OpenPopup("System", "Load was successful.", string.Empty, null);
+        });
+    }
+
+    private bool CheckLogin()
+    {
+        return Social.localUser.authenticated;
+    }
+
+    #endregion
+
     #region SaveData
 
     public void CreateSaveData()
@@ -152,29 +282,22 @@ public class DataManager : MonoBehaviour
 
     public bool CheckSaveData()
     {
-        return CheckData(_saveDataPath);
+        return CheckSaveData();
     }
 
-    public void WriteSaveData()
+    public void SaveData()
     {
-
+        GooglePlayGamesRead(true);
     }
 
-    public void ReadSaveData()
+    public void LoadData()
     {
-        
+        GooglePlayGamesRead(false);
     }
 
     public void ChangePlayerData(string name)
     {
         _saveData.userData.data.name = name;
-
-        Debug.Log(_saveData.userData.data.name);
-    }
-
-    public void ChangePlayerData(eCreatureData dataType, ushort value)
-    {
-
     }
 
     public void ChangePlayerData(Save_Data newData)
@@ -246,6 +369,6 @@ public class DataManager : MonoBehaviour
 
     private bool CheckData(string path)
     {
-        return File.Exists(path + ".json");
+        return File.Exists(path);
     }
 }
