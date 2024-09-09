@@ -11,6 +11,7 @@ public class CreateCharacterProfile : MonoBehaviour
 
     [Header("Buttons")]
     [SerializeField] private Button _buttonSave = null;
+    [SerializeField] private Button _buttonBack = null;
 
     private Action _onNewGameCallback = null;
 
@@ -22,6 +23,7 @@ public class CreateCharacterProfile : MonoBehaviour
         }
 
         _buttonSave.onClick.AddListener(OnSave);
+        _buttonBack.onClick.AddListener(OnBack);
 
         this.gameObject.SetActive(false);
     }
@@ -37,5 +39,12 @@ public class CreateCharacterProfile : MonoBehaviour
         {
             GameManager.instance.dataManager.ChangePlayerData(_inputfieldName.text);
         }, null);
+    }
+
+    private void OnBack()
+    {
+        this.gameObject.SetActive(false);
+
+        _inputfieldName.text = string.Empty;
     }
 }
