@@ -91,7 +91,7 @@ public class MapGenerator
                 _blockData[coord] = new BlockData();
                 _blockData[coord].x = (ushort)x;
                 _blockData[coord].y = (ushort)y;
-            } 
+            }
         }
 
         EnterExit();
@@ -105,7 +105,7 @@ public class MapGenerator
         int enterY = 0;
         int index = 0;
 
-        if(isX == true)
+        if (isX == true)
         {
             enterX = Random.Range(1, 9);
             enterY = Random.Range(0, 2) == 0 ? 1 : 8;
@@ -123,38 +123,147 @@ public class MapGenerator
         _blockData[index].isEnter = true;
         _blockData[63 - index].isExit = true;
 
-        Walkable();
+        for (int i = 0; i <= Random.Range(0, 2); i++)
+        {
+            Walkable();
+        }
+
+        ConnectToEnterAndExit();
+
+        View3D();
     }
 
     private void Walkable()
     {
-        for (int y = 1; y < 9; y++)
+        bool isX = Random.Range(0, 2) == 0 ? true : false;
+
+        int enterX = 0;
+        int enterY = 0;
+        int index = 0;
+
+        if (isX == true)
         {
-            for (int x = 1; x < 9; x++)
+            enterX = Random.Range(2, 8);
+            enterY = Random.Range(0, 2) == 0 ? 2 : 7;
+
+            index = (enterX + (enterY - 1) * 8) - 1;
+        }
+        else
+        {
+            enterX = Random.Range(0, 2) == 0 ? 2 : 7;
+            enterY = Random.Range(2, 8);
+
+            index = (enterY + (enterX - 1) * 8) - 1;
+        }
+
+        if (_blockData[index].isWalkAble == false)
+        {
+            Walkable();
+            return;
+        }
+
+        _blockData[index].isWalkAble = false;
+
+        SearchAround(index, 2);
+    }
+
+    private void SearchAround(int centerIndex, int a)
+    {
+        if(a == 0)
+        {
+            return;
+        }
+
+        List<int> indexs = new List<int>(4);
+        indexs.Add(centerIndex - 8);
+        indexs.Add(centerIndex + 8);
+        indexs.Add(centerIndex - 1);
+        indexs.Add(centerIndex + 1);
+
+        for (int i = 0; i < indexs.Count; i++)
+        {
+            if(0 > indexs[i])
             {
-                int coord = (x + (y - 1) * 8) - 1;
+                continue;
+            }
 
-                GameObject obj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                obj.transform.position = new Vector3(x, 0, y);
+            if(_blockData.Length - 1 < indexs[i])
+            {
+                continue;
+            }
 
-                if (_blockData[coord].isEnter == false && _blockData[coord].isExit == false)
+            if(_blockData[indexs[i]].isEnter == true || _blockData[indexs[i]].isExit == true)
+            {
+                _blockData[centerIndex].isWalkAble = true;
+                Walkable();
+
+                return;
+            }
+
+            if(_blockData[i].isWalkAble == false)
+            {
+                continue;
+            }
+
+            _blockData[indexs[i]].isWalkAble = Random.Range(0, 100) > 80 ? true : false;
+
+            SearchAround(indexs[i], a - 1);
+        }
+    }
+
+    private void ConnectToEnterAndExit()
+    {
+        bool isConnect = true;
+
+        for (int i = 0; i < _blockData.Length; i++)
+        {
+            //if()
+        }
+    }
+
+    private void View3D()
+    {
+        // Wall
+        for (int y = 0; y < 10; y++)
+        {
+            for (int x = 0; x < 10; x++)
+            {
+                if (y == 0 || y == 9)
                 {
-                    if (y == 1 || y == 8)
-                    {
-                        obj = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                        obj.transform.position = new Vector3(x, 0, y);
-
-                        _blockData[coord].isWalkAble = false;
-                    }
-
-                    if (x == 1 || x == 8)
-                    {
-                        obj = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                        obj.transform.position = new Vector3(x, 0, y);
-
-                        _blockData[coord].isWalkAble = false;
-                    }
+                    GameObject obj = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    obj.transform.position = new Vector3(x, 0, y);
                 }
+
+                if (x == 0 || x == 9)
+                {
+                    GameObject obj = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    obj.transform.position = new Vector3(x, 0, y);
+                }
+            }
+        }
+
+        //Game Station
+        for (int i = 0; i < _blockData.Length; i++)
+        {
+            if (_blockData[i].isEnter == true)
+            {
+                continue;
+            }
+
+            if (_blockData[i].isExit == true)
+            {
+                continue;
+            }
+
+            if (_blockData[i].isWalkAble == false)
+            {
+                GameObject obj = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                obj.transform.position = new Vector3(_blockData[i].x, 0, _blockData[i].y);
+            }
+            else
+            {
+                GameObject obj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                obj.transform.position = new Vector3(_blockData[i].x, 0, _blockData[i].y);
             }
         }
     }
