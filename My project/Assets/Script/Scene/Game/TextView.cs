@@ -1,18 +1,21 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 
 public class TextView : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    [Header("Template"), SerializeField] private TextViewTemplate _template = null;
+    [Header("Template Parant"), SerializeField] private Transform _trTemplateParant = null;
+
+    public void Initialize()
     {
-        
+        _template.Initialize();
     }
 
-    // Update is called once per frame
-    void Update()
+    public void SetText(eControl type, ushort value)
     {
-        
+
     }
 }

@@ -55,9 +55,9 @@ public class GameMenu : MonoBehaviour
 
     private void OnGotoMainMenu()
     {
-        UiManager.instance.OpenPopup("System", "저장하시겠습니까?", string.Empty, string.Empty, () =>
+        UiManager.instance.OpenPopup("시스템", "저장하시겠습니까?", string.Empty, string.Empty, () =>
         {
-            GameManager.instance.dataManager.SaveData(() => 
+            GameManager.instance.dataManager.SaveDataToCloud(() => 
             {
                 GameManager.instance.tools.SceneChange(eScene.Game);
             });

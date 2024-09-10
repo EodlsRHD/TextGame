@@ -94,7 +94,7 @@ public class UiManager : MonoBehaviour
     {
         //ActiveBlocker(true);
 
-        OpenPopup("UI", "Settings is still in preparation.", string.Empty, null);
+        OpenPopup("시스템", "아직 준비중입니다.", string.Empty, null);
     }
 
     private void ClsoeSettings()
@@ -110,7 +110,7 @@ public class UiManager : MonoBehaviour
     {
         //ActiveBlocker(true);
 
-        OpenPopup("UI", "Dictionary is Still in preparation.", string.Empty, null);
+        OpenPopup("시스템", "아직 준비중입니다.", string.Empty, null);
     }
 
     private void CloseEncyclopedia()

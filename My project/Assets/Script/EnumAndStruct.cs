@@ -6,15 +6,16 @@ public enum eScene
     Game
 }
 
-public enum eCreatureData
+public enum eControl
 {
     Non = -1,
-    coin,
-    hp,
-    mp,
-    ap,
-    exp,
-    attack,
-    defence,
-    skill
+    Up,
+    Left,
+    Right,
+    Down,
+    Attack,
+    Defence,
+    Info,
+    Skill,
+    Rest
 }

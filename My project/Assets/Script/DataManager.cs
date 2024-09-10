@@ -97,8 +97,6 @@ public class DataManager : MonoBehaviour
     public class Map_Data
     {
         public Block_Data[] blockDatas = null;
-
-        public Creature_Data userData = null;
         public Creature_Data[] monsterDatas = null;
     }
 
@@ -124,7 +122,6 @@ public class DataManager : MonoBehaviour
     }
 
     [Header("Data Path")]
-    [SerializeField] private string _saveDataPath = string.Empty;
     [SerializeField] private string _creatureDataPath = string.Empty;
     [SerializeField] private string _itemDataPath = string.Empty;
     [SerializeField] private string _skillDataPath = string.Empty;
@@ -231,7 +228,11 @@ public class DataManager : MonoBehaviour
                 return;
             }
 
-            UiManager.instance.OpenPopup("System", "Save was successful.", string.Empty, null);
+            UiManager.instance.OpenPopup("System", "Save was successful.", string.Empty, () =>
+            {
+                _onSaveOrLoadCallback?.Invoke();
+                _onSaveOrLoadCallback = null;
+            });
         });
     }
 
@@ -275,7 +276,11 @@ public class DataManager : MonoBehaviour
 
             _saveData = result.data;
 
-            UiManager.instance.OpenPopup("System", "Load was successful.", string.Empty, null);
+            UiManager.instance.OpenPopup("System", "Load was successful.", string.Empty, () => 
+            {
+                _onSaveOrLoadCallback?.Invoke();
+                _onSaveOrLoadCallback = null;
+            });
         });
     }
 
@@ -288,28 +293,48 @@ public class DataManager : MonoBehaviour
 
 #region SaveData
 
-    public void CreateSaveData()
+    public void CreateNewSaveData()
     {
         _saveData = new Save_Data();
+        _saveData.round = 0;
+
+        _saveData.userData = new User_Data();
+        _saveData.userData.data = new Creature_Data();
+
+        _saveData.mapData = new Map_Data();
+        _saveData.mapData.blockDatas = new Block_Data[] { };
+        _saveData.mapData.monsterDatas = new Creature_Data[] { };
+    }
+
+    public Save_Data CopySaveData()
+    {
+        return _saveData;
     }
 
     public bool CheckSaveData()
     {
+#if UNITY_EDITOR
+        return false;
+#endif
         return (_saveData != null);
     }
 
-    public void SaveData(Action onSaveOrLoadCallback = null)
+    public void SaveDataToCloud(Action onSaveOrLoadCallback = null)
     {
 #if UNITY_EDITOR
+        _saveData = new Save_Data();
+        onSaveOrLoadCallback?.Invoke();
+
         return;
 #endif
 
         GooglePlayGamesRead(true, onSaveOrLoadCallback);
     }
 
-    public void LoadData(Action onSaveOrLoadCallback = null)
+    public void LoadDataToCloud(Action onSaveOrLoadCallback = null)
     {
 #if UNITY_EDITOR
+        onSaveOrLoadCallback?.Invoke();
         return;
 #endif
 

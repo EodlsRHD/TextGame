@@ -46,7 +46,7 @@ public class GameManager : MonoBehaviour
 
     public void GameError()
     {
-        _dataManager.SaveData();
+        _dataManager.SaveDataToCloud();
         Application.Quit();
     }
 }

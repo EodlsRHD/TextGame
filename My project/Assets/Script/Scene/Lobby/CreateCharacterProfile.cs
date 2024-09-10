@@ -35,9 +35,19 @@ public class CreateCharacterProfile : MonoBehaviour
 
     private void OnSave()
     {
-        UiManager.instance.OpenPopup("Create Character", _inputfieldName.text + "\n" + "Do you want to start like this?", string.Empty, string.Empty, () =>
+        if(_inputfieldName.text.Length == 0)
         {
+            UiManager.instance.OpenPopup("캐릭터 생성", "닉네임은 비워둘 수 없습니다.", string.Empty, null);
+
+            return;
+        }
+
+        UiManager.instance.OpenPopup("캐릭터 생성", _inputfieldName.text + "\n" + "이대로 시작하시겠습니까?", string.Empty, string.Empty, () =>
+        {
+            GameManager.instance.dataManager.CreateNewSaveData();
             GameManager.instance.dataManager.ChangePlayerData(_inputfieldName.text);
+
+            GameManager.instance.tools.SceneChange(eScene.Game);
         }, null);
     }
 

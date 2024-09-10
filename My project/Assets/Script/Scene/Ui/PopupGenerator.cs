@@ -34,8 +34,8 @@ public class PopupGenerator : MonoBehaviour
         }
 
         _buttonMiddle.onClick.AddListener(OnMiddle);
-        _buttonLeft.onClick.AddListener(OnRight);
-        _buttonRight.onClick.AddListener(OnLeft);
+        _buttonLeft.onClick.AddListener(OnLeft);
+        _buttonRight.onClick.AddListener(OnRight);
 
         _buttonMiddle.gameObject.SetActive(false);
         _buttonLeft.gameObject.SetActive(false);
@@ -54,7 +54,7 @@ public class PopupGenerator : MonoBehaviour
         _textTitle.text = title;
         _textContent.text = content;
 
-        _textMiddle.text = (buttonText.Length == 0) ? "confirm" : buttonText;
+        _textMiddle.text = (buttonText.Length == 0) ? "확인" : buttonText;
 
         _buttonMiddle.gameObject.SetActive(true);
 
@@ -76,8 +76,8 @@ public class PopupGenerator : MonoBehaviour
         _textTitle.text = title;
         _textContent.text = content;
 
-        _textLeft.text = (leftButtonText.Length == 0) ? "confirm" : leftButtonText;
-        _textRight.text = (rightButtonText.Length == 0) ? "cancel" : rightButtonText;
+        _textLeft.text = (leftButtonText.Length == 0) ? "확인" : leftButtonText;
+        _textRight.text = (rightButtonText.Length == 0) ? "취소" : rightButtonText;
 
         _buttonLeft.gameObject.SetActive(true);
         _buttonRight.gameObject.SetActive(true);
