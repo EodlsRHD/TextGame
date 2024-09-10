@@ -135,6 +135,8 @@ public class DataManager : MonoBehaviour
     private List<Item_Data> _itemDatas = null;
     private List<Skill_Data> _skillDatas = null;
 
+    private Action _onSaveOrLoadCallback = null;
+
     public void Initialize()
     {
         GooglePlayGamesLogin();
@@ -163,11 +165,16 @@ public class DataManager : MonoBehaviour
         PlayGamesPlatform.Activate();
         PlayGamesPlatform.Instance.Authenticate((status) => { Debug.Log(status.ToString()); });
 
-        GooglePlayGamesRead(true);
+        GooglePlayGamesRead(true, null);
     }
 
-    public void GooglePlayGamesRead(bool isSave)
+    public void GooglePlayGamesRead(bool isSave, Action onSaveOrLoadCallback = null)
     {
+        if (onSaveOrLoadCallback != null)
+        {
+            _onSaveOrLoadCallback = onSaveOrLoadCallback;
+        }
+
         if (CheckLogin() == false)
         {
             GooglePlayGamesLogin();
@@ -291,22 +298,22 @@ public class DataManager : MonoBehaviour
         return (_saveData != null);
     }
 
-    public void SaveData()
+    public void SaveData(Action onSaveOrLoadCallback = null)
     {
 #if UNITY_EDITOR
         return;
 #endif
 
-        GooglePlayGamesRead(true);
+        GooglePlayGamesRead(true, onSaveOrLoadCallback);
     }
 
-    public void LoadData()
+    public void LoadData(Action onSaveOrLoadCallback = null)
     {
 #if UNITY_EDITOR
         return;
 #endif
 
-        GooglePlayGamesRead(false);
+        GooglePlayGamesRead(false, onSaveOrLoadCallback);
     }
 
     public void ChangePlayerData(string name)

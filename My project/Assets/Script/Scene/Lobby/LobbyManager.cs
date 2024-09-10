@@ -38,7 +38,10 @@ public class LobbyManager : MonoBehaviour
 
         UiManager.instance.OpenPopup(string.Empty, "Saved data exists." + "\n" + " Would you like to continue?", string.Empty, string.Empty, () =>
         {
-            GameManager.instance.dataManager.LoadData();
+            GameManager.instance.dataManager.LoadData(() => 
+            {
+                GameManager.instance.tools.SceneChange(eScene.Game);
+            });
 
         }, () =>
         {

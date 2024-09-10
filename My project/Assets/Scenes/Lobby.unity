@@ -178,7 +178,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _inputfieldName: {fileID: 1338840896}
   _buttonSave: {fileID: 1068535365}
-  _buttonBack: {fileID: 0}
+  _buttonBack: {fileID: 297946524}
 --- !u!1 &75867206
 GameObject:
   m_ObjectHideFlags: 0

@@ -45,16 +45,25 @@ public class GameMenu : MonoBehaviour
 
     private void OnSettings()
     {
-
+        UiManager.instance.OpenSettings();
     }
 
     private void OnEncyclopedia()
     {
-
+        UiManager.instance.OpenEncyclopedia();
     }
 
     private void OnGotoMainMenu()
     {
-
+        UiManager.instance.OpenPopup("System", "저장하시겠습니까?", string.Empty, string.Empty, () =>
+        {
+            GameManager.instance.dataManager.SaveData(() => 
+            {
+                GameManager.instance.tools.SceneChange(eScene.Game);
+            });
+        }, () => 
+        {
+            GameManager.instance.tools.SceneChange(eScene.Game);
+        });
     }
 }

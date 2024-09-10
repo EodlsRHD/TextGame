@@ -40,6 +40,8 @@ public class PopupGenerator : MonoBehaviour
         _buttonMiddle.gameObject.SetActive(false);
         _buttonLeft.gameObject.SetActive(false);
         _buttonRight.gameObject.SetActive(false);
+
+        this.gameObject.SetActive(false);
     }
 
     public void Open_OneButton(string title, string content, string buttonText, Action onButtonCallback = null)
@@ -55,6 +57,8 @@ public class PopupGenerator : MonoBehaviour
         _textMiddle.text = (buttonText.Length == 0) ? "confirm" : buttonText;
 
         _buttonMiddle.gameObject.SetActive(true);
+
+        this.gameObject.SetActive(true);
     }
 
     public void Open_TwoButton(string title, string content, string leftButtonText, string rightButtonText, Action onLeftButtonCallback = null, Action onRightButtonCallback = null)
@@ -77,6 +81,8 @@ public class PopupGenerator : MonoBehaviour
 
         _buttonLeft.gameObject.SetActive(true);
         _buttonRight.gameObject.SetActive(true);
+
+        this.gameObject.SetActive(true);
     }
 
     public void ClosePopup()
@@ -87,6 +93,8 @@ public class PopupGenerator : MonoBehaviour
         _buttonMiddle.gameObject.SetActive(false);
         _buttonLeft.gameObject.SetActive(false);
         _buttonRight.gameObject.SetActive(false);
+
+        this.gameObject.SetActive(false);
     }
 
     private void onClosePopup()
@@ -96,19 +104,22 @@ public class PopupGenerator : MonoBehaviour
 
     private void OnMiddle()
     {
-        _onMiddleCallback?.Invoke();
         onClosePopup();
+
+        _onMiddleCallback?.Invoke();
     }
 
     private void OnLeft()
     {
-        _onLeftCallback?.Invoke();
         onClosePopup();
+
+        _onLeftCallback?.Invoke();
     }
 
     private void OnRight()
     {
-        _onRightCallback?.Invoke();
         onClosePopup();
+
+        _onRightCallback?.Invoke();
     }
 }

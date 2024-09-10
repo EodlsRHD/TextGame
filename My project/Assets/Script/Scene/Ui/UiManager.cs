@@ -21,14 +21,14 @@ public class UiManager : MonoBehaviour
 
     [SerializeField] private GameObject _objBlocker = null;
 
-    [Header("Popup"), SerializeField] private PopupCanvas _popupCanvas = null;
+    [Header("Popup"), SerializeField] private PopupGenerator _popupGenerator = null;
     [Header("Game Menu"), SerializeField] private GameMenu _gameMenu = null;
 
     private void Awake()
     {
         _instance = this;
 
-        _popupCanvas.Initialize(ClosePopup);
+        _popupGenerator.Initialize(ClosePopup);
         _gameMenu.Initialize(CloseMenu);
 
         ActiveBlocker(false);
@@ -48,7 +48,7 @@ public class UiManager : MonoBehaviour
     {
         ActiveBlocker(true);
 
-        _popupCanvas.OpenPopup(title, content, buttonText, onButtonCallback);
+        _popupGenerator.Open_OneButton(title, content, buttonText, onButtonCallback);
     }
 
     /// <summary>
@@ -58,14 +58,14 @@ public class UiManager : MonoBehaviour
     {
         ActiveBlocker(true);
 
-        _popupCanvas.OpenPopup(title, content, leftButtonText, rightButtonText, onLeftButtonCallback, onRightButtonCallback);
+        _popupGenerator.Open_TwoButton(title, content, leftButtonText, rightButtonText, onLeftButtonCallback, onRightButtonCallback);
     }
 
     private void ClosePopup()
     {
         ActiveBlocker(false);
 
-        _popupCanvas.Close();
+        _popupGenerator.ClosePopup();
     }
 
     #endregion
@@ -99,7 +99,7 @@ public class UiManager : MonoBehaviour
 
     private void ClsoeSettings()
     {
-        ActiveBlocker(false);
+        //ActiveBlocker(false);
     }
 
     #endregion
@@ -115,7 +115,7 @@ public class UiManager : MonoBehaviour
 
     private void CloseEncyclopedia()
     {
-        ActiveBlocker(false);
+        //ActiveBlocker(false);
     }
 
     #endregion
