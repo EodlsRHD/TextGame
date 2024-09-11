@@ -62,7 +62,7 @@ public class DataManager : MonoBehaviour
         public short attackPercentIncreased = 0;
         public short defence = 0;
         public short defencePercentIncreased = 0;
-        public ushort duration = 0;
+        public string duration = string.Empty;
     }
 
     [Serializable]
@@ -72,7 +72,6 @@ public class DataManager : MonoBehaviour
 
         public string name = string.Empty;
         public string description = string.Empty;
-        public ushort price = 0;
 
         public short hp = 0;
         public short mp = 0;
@@ -469,25 +468,21 @@ public class DataManager : MonoBehaviour
 
         _creatureDatas = new List<Creature_Data>();
 
-        GetJsonFile<Creature_Data>(_creatureDataPath, (datas) =>
+        string json = Resources.Load<TextAsset>(_creatureDataPath).text;
+
+        var respons = new
         {
-            _creatureDatas = datas;
-        });
+            datas = new List<Creature_Data>()
+        };
+
+        var result = JsonConvert.DeserializeAnonymousType(json, respons);
+
+        _creatureDatas = result.datas;
     }
 
-    private Creature_Data GetCreatureData(int index)
+    public Creature_Data GetCreatureData(int index)
     {
-        foreach (var item in _creatureDatas)
-        {
-            if(item.index != index)
-            {
-                continue;
-            }
-
-            return item;
-        }
-
-        return null;
+        return _creatureDatas.Find(x => x.index == (index + 101));
     }
 
 #endregion
@@ -503,25 +498,21 @@ public class DataManager : MonoBehaviour
 
         _itemDatas = new List<Item_Data>();
 
-        GetJsonFile<Item_Data>(_itemDataPath, (datas) =>
+        string json = Resources.Load<TextAsset>(_itemDataPath).text;
+
+        var respons = new
         {
-            _itemDatas = datas;
-        });
+            datas = new List<Item_Data>()
+        };
+
+        var result = JsonConvert.DeserializeAnonymousType(json, respons);
+
+        _itemDatas = result.datas;
     }
 
-    private Item_Data GetItemData(int index)
+    public Item_Data GetItemData(int index)
     {
-        foreach (var item in _itemDatas)
-        {
-            if (item.index != index)
-            {
-                continue;
-            }
-
-            return item;
-        }
-
-        return null;
+        return _itemDatas.Find(x => x.index == (index + 501));
     }
 
     #endregion
@@ -537,60 +528,22 @@ public class DataManager : MonoBehaviour
 
         _skillDatas = new List<Skill_Data>();
 
-        GetJsonFile<Skill_Data>(_skillDataPath, (datas) =>
-        {
-            _skillDatas = datas;
-        });
-    }
-
-    private Skill_Data GetskillData(int index)
-    {
-        foreach (var item in _skillDatas)
-        {
-            if (item.index != index)
-            {
-                continue;
-            }
-
-            return item;
-        }
-
-        return null;
-    }
-
-    #endregion
-
-    private void GetJsonFile<T>(string path, Action<List<T>> callback)
-    {
-        //path = Application.dataPath + "/Resources/" + path;
-        //Debug.LogError(path);
-
-        //if (CheckData(path) == false)
-        //{
-        //    Debug.LogWarning("Data Read False");
-        //    GameManager.instance.GameError();
-
-        //    return;
-        //}
-
-        //string json = File.ReadAllText(path + ".json");
-
-        string json = Resources.Load<TextAsset>(path).text;
-
-        Debug.Log(path + "\n" + json);
+        string json = Resources.Load<TextAsset>(_skillDataPath).text;
 
         var respons = new
         {
-            datas = new List<T>()
+            datas = new List<Skill_Data>()
         };
 
-        var result = Newtonsoft.Json.JsonConvert.DeserializeAnonymousType(json, respons);
+        var result = JsonConvert.DeserializeAnonymousType(json, respons);
 
-        callback?.Invoke(respons.datas);
+        _skillDatas = result.datas;
     }
 
-    private bool CheckData(string path)
+    public Skill_Data GetskillData(int index)
     {
-        return File.Exists(path);
+        return _skillDatas.Find(x => x.index == (index + 301));
     }
+
+    #endregion
 }

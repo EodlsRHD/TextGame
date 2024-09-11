@@ -393,9 +393,9 @@ public class MapGenerator
 
         int monsterCount = Random.Range(1, maxMonsterCount + 1);
 
-        
+        var monster = GameManager.instance.dataManager.GetCreatureData(0);
 
-        Debug.LogError(monsterCount);
+        Debug.LogError(monster.name);
     }
 
     private void SetMapData()
