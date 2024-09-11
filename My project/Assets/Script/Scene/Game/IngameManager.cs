@@ -82,7 +82,7 @@ public class MapGenerator
         public bool isEnter = false;
         public bool isExit = false;
 
-        public ushort CreatureID = 0;
+        public DataManager.Creature_Data creature = null;
     }
 
     private DataManager.Map_Data _mapData = null;
@@ -391,11 +391,24 @@ public class MapGenerator
             maxMonsterCount = 2;
         }
 
+        Debug.Log("Select Monster /// TEST MODE");
+        int minValue = _round - 3 < 0 ? 0 : _round - 3;
+        int maxValue = _round + 1 > 10 ? 10 : _round + 1;
+
         int monsterCount = Random.Range(1, maxMonsterCount + 1);
+        List<DataManager.Creature_Data> monsters = new List<DataManager.Creature_Data>(monsterCount);
 
-        var monster = GameManager.instance.dataManager.GetCreatureData(0);
+        for (int i = 0; i < monsterCount; i++)
+        {
+            monsters.Add(GameManager.instance.dataManager.GetCreatureData(Random.Range(minValue, maxValue + 1)));
+        }
 
-        Debug.LogError(monster.name);
+        SelectMonsterPosition(ref monsters);
+    }
+
+    private void SelectMonsterPosition(ref List<DataManager.Creature_Data> monsters)
+    {
+        //_blockData
     }
 
     private void SetMapData()

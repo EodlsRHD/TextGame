@@ -172,9 +172,9 @@ public class DataManager : MonoBehaviour
 
     private void GooglePlayGamesLogin()
     {
-#if UNITY_EDITOR
+    #if UNITY_EDITOR
         return;
-#endif
+    #endif
 
         PlayGamesPlatform.DebugLogEnabled = true;
         PlayGamesPlatform.Activate();
@@ -307,9 +307,9 @@ public class DataManager : MonoBehaviour
         return Social.localUser.authenticated;
     }
 
-#endregion
+    #endregion
 
-#region SaveData
+    #region SaveData
 
     public void CreateNewSaveData()
     {
@@ -338,15 +338,15 @@ public class DataManager : MonoBehaviour
 
     public bool CheckSaveData()
     {
-#if UNITY_EDITOR
+    #if UNITY_EDITOR
         return false;
-#endif
+    #endif
         return (_saveData != null);
     }
 
     public void SaveDataToCloud(Save_Data saveData = null, Action onSaveOrLoadCallback = null)
     {
-#if UNITY_EDITOR
+    #if UNITY_EDITOR
         if(saveData != null)
         {
             _saveData = saveData;
@@ -355,7 +355,7 @@ public class DataManager : MonoBehaviour
         onSaveOrLoadCallback?.Invoke();
 
         return;
-#endif
+    #endif
         if (saveData != null)
         {
             _saveData = saveData;
@@ -366,10 +366,10 @@ public class DataManager : MonoBehaviour
 
     public void LoadDataToCloud(Action onSaveOrLoadCallback = null)
     {
-#if UNITY_EDITOR
+    #if UNITY_EDITOR
         onSaveOrLoadCallback?.Invoke();
         return;
-#endif
+    #endif
 
         GooglePlayGamesRead(false, onSaveOrLoadCallback);
     }
@@ -455,7 +455,7 @@ public class DataManager : MonoBehaviour
         }
     }
 
-#endregion
+    #endregion
 
     #region Creature
 
@@ -485,9 +485,9 @@ public class DataManager : MonoBehaviour
         return _creatureDatas.Find(x => x.index == (index + 101));
     }
 
-#endregion
+    #endregion
 
-#region Item
+    #region Item
 
     private void ReadItemsData()
     {
