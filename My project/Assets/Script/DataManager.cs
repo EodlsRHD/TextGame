@@ -31,7 +31,7 @@ public class DataManager : MonoBehaviour
 
         public bool useSkill = false;
         public ushort[] skillIndexs = null;
-        public Skill_Data[] skillDatas = null;
+        public List<Skill_Data> skillDatas = null;
     }
 
     [Serializable]
@@ -96,8 +96,12 @@ public class DataManager : MonoBehaviour
     [Serializable]
     public class Map_Data
     {
-        public Block_Data[] blockDatas = null;
-        public Creature_Data[] monsterDatas = null;
+        public int enterBlockIndex = 0;
+        public int exitBlockIndex = 0;
+
+        public List<Block_Data> blockDatas = null;
+        public List<Creature_Data> monsterDatas = null;
+        public List<Item_Data> itemDatas = null;
     }
 
     [Serializable]
@@ -113,12 +117,27 @@ public class DataManager : MonoBehaviour
     #endregion
 
     [Serializable]
+    public class Encyclopedia_Data
+    {
+        public string maxRoundDate = string.Empty;
+        public int maxRound = 0;
+
+        public string maxLevelDate = string.Empty;
+        public int maxLevel = 0;
+
+        public List<Creature_Data> creatureDatas = null;
+        public List<Item_Data> itemDatas = null;
+        public List<Skill_Data> skillData = null;
+    }
+
+    [Serializable]
     public class Save_Data
     {
         public ushort round = 0;
 
         public User_Data userData = null;
         public Map_Data mapData = null;
+        public Encyclopedia_Data encyclopediaData = null;
     }
 
     [Header("Data Path")]
@@ -300,10 +319,17 @@ public class DataManager : MonoBehaviour
 
         _saveData.userData = new User_Data();
         _saveData.userData.data = new Creature_Data();
+        _saveData.userData.data.skillDatas = new List<Skill_Data>();
 
         _saveData.mapData = new Map_Data();
-        _saveData.mapData.blockDatas = new Block_Data[] { };
-        _saveData.mapData.monsterDatas = new Creature_Data[] { };
+        _saveData.mapData.blockDatas = new List<Block_Data>();
+        _saveData.mapData.monsterDatas = new List<Creature_Data>();
+
+        _saveData.encyclopediaData = new Encyclopedia_Data();
+        _saveData.encyclopediaData.creatureDatas = new List<Creature_Data>();
+        _saveData.encyclopediaData.itemDatas = new List<Item_Data>();
+        _saveData.encyclopediaData.skillData = new List<Skill_Data>();
+
     }
 
     public Save_Data CopySaveData()
@@ -319,14 +345,22 @@ public class DataManager : MonoBehaviour
         return (_saveData != null);
     }
 
-    public void SaveDataToCloud(Action onSaveOrLoadCallback = null)
+    public void SaveDataToCloud(Save_Data saveData = null, Action onSaveOrLoadCallback = null)
     {
 #if UNITY_EDITOR
-        _saveData = new Save_Data();
+        if(saveData != null)
+        {
+            _saveData = saveData;
+        }
+
         onSaveOrLoadCallback?.Invoke();
 
         return;
 #endif
+        if (saveData != null)
+        {
+            _saveData = saveData;
+        } 
 
         GooglePlayGamesRead(true, onSaveOrLoadCallback);
     }
@@ -341,6 +375,23 @@ public class DataManager : MonoBehaviour
         GooglePlayGamesRead(false, onSaveOrLoadCallback);
     }
 
+    public void FailGame(Save_Data saveData)
+    {
+        OrganizeEncyclopedia(saveData);
+
+        _saveData.round = 0;
+
+        _saveData.userData = new User_Data();
+        _saveData.userData.data = new Creature_Data();
+        _saveData.userData.data.skillDatas = new List<Skill_Data>();
+
+        _saveData.mapData = new Map_Data();
+        _saveData.mapData.blockDatas = new List<Block_Data>();
+        _saveData.mapData.monsterDatas = new List<Creature_Data>();
+
+        SaveDataToCloud(_saveData);
+    }
+
     public void ChangePlayerData(string name)
     {
         _saveData.userData.data.name = name;
@@ -351,9 +402,63 @@ public class DataManager : MonoBehaviour
         _saveData = newData;
     }
 
+    private void OrganizeEncyclopedia(Save_Data lastData)
+    {
+        if (_saveData.encyclopediaData.maxLevel < lastData.userData.level)
+        {
+            _saveData.encyclopediaData.maxLevel = lastData.userData.level;
+            _saveData.encyclopediaData.maxLevelDate = DateTime.Now.ToString("yyyy-MM-d HH:m:ss:fff");
+        }
+
+        if (_saveData.encyclopediaData.maxRound < lastData.round)
+        {
+            _saveData.encyclopediaData.maxRound = lastData.round;
+            _saveData.encyclopediaData.maxRoundDate = DateTime.Now.ToString("yyyy-MM-d HH:m:ss:fff");
+        }
+
+        foreach (var saveCreature in _saveData.encyclopediaData.creatureDatas)
+        {
+            foreach (var lastCreature in lastData.encyclopediaData.creatureDatas)
+            {
+                if(saveCreature.index == lastCreature.index)
+                {
+                    continue;
+                }
+
+                _saveData.encyclopediaData.creatureDatas.Add(lastCreature);
+            }
+        }
+
+        foreach (var saveItem in _saveData.encyclopediaData.itemDatas)
+        {
+            foreach (var lastItem in lastData.encyclopediaData.itemDatas)
+            {
+                if (saveItem.index == lastItem.index)
+                {
+                    continue;
+                }
+
+                _saveData.encyclopediaData.itemDatas.Add(lastItem);
+            }
+        }
+
+        foreach (var saveSkill in _saveData.encyclopediaData.skillData)
+        {
+            foreach (var lastSkill in lastData.encyclopediaData.skillData)
+            {
+                if (saveSkill.index == lastSkill.index)
+                {
+                    continue;
+                }
+
+                _saveData.encyclopediaData.skillData.Add(lastSkill);
+            }
+        }
+    }
+
 #endregion
 
-#region Creature
+    #region Creature
 
     private void ReadCreaturesData()
     {
@@ -370,38 +475,109 @@ public class DataManager : MonoBehaviour
         });
     }
 
+    private Creature_Data GetCreatureData(int index)
+    {
+        foreach (var item in _creatureDatas)
+        {
+            if(item.index != index)
+            {
+                continue;
+            }
+
+            return item;
+        }
+
+        return null;
+    }
+
 #endregion
 
 #region Item
 
     private void ReadItemsData()
     {
+        if (_itemDatas != null)
+        {
+            _itemDatas.Clear();
+        }
 
+        _itemDatas = new List<Item_Data>();
+
+        GetJsonFile<Item_Data>(_itemDataPath, (datas) =>
+        {
+            _itemDatas = datas;
+        });
     }
 
-#endregion
+    private Item_Data GetItemData(int index)
+    {
+        foreach (var item in _itemDatas)
+        {
+            if (item.index != index)
+            {
+                continue;
+            }
 
-#region Skill
+            return item;
+        }
+
+        return null;
+    }
+
+    #endregion
+
+    #region Skill
 
     private void ReadSkillsData()
     {
+        if(_skillDatas != null)
+        {
+            _skillDatas.Clear();
+        }
 
+        _skillDatas = new List<Skill_Data>();
+
+        GetJsonFile<Skill_Data>(_skillDataPath, (datas) =>
+        {
+            _skillDatas = datas;
+        });
     }
 
-#endregion
+    private Skill_Data GetskillData(int index)
+    {
+        foreach (var item in _skillDatas)
+        {
+            if (item.index != index)
+            {
+                continue;
+            }
+
+            return item;
+        }
+
+        return null;
+    }
+
+    #endregion
 
     private void GetJsonFile<T>(string path, Action<List<T>> callback)
     {
-        path = Application.dataPath + "/Resources/" + path;
-        if (CheckData(path) == false)
-        {
-            Debug.LogWarning("Data Read False");
-            GameManager.instance.GameError();
+        //path = Application.dataPath + "/Resources/" + path;
+        //Debug.LogError(path);
 
-            return;
-        }
+        //if (CheckData(path) == false)
+        //{
+        //    Debug.LogWarning("Data Read False");
+        //    GameManager.instance.GameError();
 
-        string json = File.ReadAllText(path + ".json");
+        //    return;
+        //}
+
+        //string json = File.ReadAllText(path + ".json");
+
+        string json = Resources.Load<TextAsset>(path).text;
+
+        Debug.Log(path + "\n" + json);
 
         var respons = new
         {

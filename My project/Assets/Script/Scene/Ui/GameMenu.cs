@@ -57,7 +57,7 @@ public class GameMenu : MonoBehaviour
     {
         UiManager.instance.OpenPopup("시스템", "저장하시겠습니까?", string.Empty, string.Empty, () =>
         {
-            GameManager.instance.dataManager.SaveDataToCloud(() => 
+            GameManager.instance.dataManager.SaveDataToCloud(null, () => 
             {
                 GameManager.instance.tools.SceneChange(eScene.Game);
             });

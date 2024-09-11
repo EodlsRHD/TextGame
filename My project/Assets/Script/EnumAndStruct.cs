@@ -19,3 +19,11 @@ public enum eControl
     Skill,
     Rest
 }
+
+public enum eRoundClear
+{
+    Non = -1,
+    First,
+    Success,
+    Fail
+}

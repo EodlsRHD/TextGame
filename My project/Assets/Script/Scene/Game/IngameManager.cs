@@ -15,11 +15,45 @@ public class IngameManager : MonoBehaviour
     {
         _saveData = GameManager.instance.dataManager.CopySaveData();
 
-        _ingameUI.Initialize();
+        _ingameUI.Initialize(GetMap, OpenNextRound);
         _textView.Initialize();
         _control.Initialize(Move, Action);
 
-        SetMap();
+        _ingameUI.OpenNextRoundWindow(eRoundClear.First);
+
+        this.gameObject.SetActive(true);
+    }
+
+    private void GetMap(System.Action<DataManager.Map_Data> onResultCallback)
+    {
+        onResultCallback?.Invoke(_saveData.mapData);
+    }
+
+    private void OpenNextRound(eRoundClear type)
+    {
+        if(type == eRoundClear.Fail)
+        {
+            GameManager.instance.tools.SceneChange(eScene.Lobby, () => 
+            {
+                GameManager.instance.dataManager.FailGame(_saveData);
+            });
+
+            return;
+        }
+
+        _saveData.round++;
+        _ingameUI.SetRoundText(_saveData.round);
+
+        GameManager.instance.dataManager.SaveDataToCloud(_saveData, () => 
+        {
+            GenarateMap();
+        });
+    }
+
+    private void GenarateMap()
+    {
+        _mapGenerator = new MapGenerator((mapData) => { _saveData.mapData = mapData; });
+        _mapGenerator.Start(_saveData.round);
     }
 
     private void Move(eControl type)
@@ -32,35 +66,25 @@ public class IngameManager : MonoBehaviour
 
     }
 
-    private void SetMap()
-    {
-        _mapGenerator = new MapGenerator(ASD);
-
-        _mapGenerator.Start(_saveData.round);
-    }
-
-    private void ASD(DataManager.Map_Data mapData)
-    {
-
-    }
-}
-
-public class BlockData
-{
-    public ushort x = 0;
-    public ushort y = 0;
-
-    public bool isWalkAble = true;
-    public bool isCreatureExist = false;
-
-    public bool isEnter = false;
-    public bool isExit = false;
-
-    public ushort CreatureID = 0;
+    // 만난 적, 획득한 아이템 저장 하는 기능 필요
 }
 
 public class MapGenerator
 {
+    public class BlockData
+    {
+        public ushort x = 0;
+        public ushort y = 0;
+
+        public bool isWalkAble = true;
+        public bool isCreatureExist = false;
+
+        public bool isEnter = false;
+        public bool isExit = false;
+
+        public ushort CreatureID = 0;
+    }
+
     private DataManager.Map_Data _mapData = null;
     private BlockData[] _blockData = null;
     private int _round = 0;
@@ -79,9 +103,20 @@ public class MapGenerator
     public void Start(ushort round)
     {
         _mapData = new DataManager.Map_Data();
+        _mapData.blockDatas = new List<DataManager.Block_Data>();
+        _mapData.monsterDatas = new List<DataManager.Creature_Data>();
+        _mapData.itemDatas = new List<DataManager.Item_Data>();
+
         _blockData = new BlockData[64];
         _round = round;
 
+        GenarateMap();
+        GenerateCreature();
+        SetMapData();
+    }
+
+    private void GenarateMap()
+    {
         for (int y = 1; y < 9; y++)
         {
             for (int x = 1; x < 9; x++)
@@ -94,11 +129,6 @@ public class MapGenerator
             }
         }
 
-        EnterExit();
-    }
-
-    private void EnterExit()
-    {
         bool isX = Random.Range(0, 2) == 0 ? true : false;
 
         int enterX = 0;
@@ -123,17 +153,19 @@ public class MapGenerator
         _blockData[index].isEnter = true;
         _blockData[63 - index].isExit = true;
 
-        for (int i = 0; i <= Random.Range(0, 2); i++)
+        _mapData.enterBlockIndex = index;
+        _mapData.exitBlockIndex = 63 - index;
+
+        int blocker = Random.Range(0, 2);
+        for (int i = 0; i <= blocker; i++)
         {
-            Walkable();
+            SpawnBlocker();
         }
 
-        ConnectToEnterAndExit();
-
-        View3D();
+        ShortestDistance();
     }
 
-    private void Walkable()
+    private void SpawnBlocker()
     {
         bool isX = Random.Range(0, 2) == 0 ? true : false;
 
@@ -158,18 +190,18 @@ public class MapGenerator
 
         if (_blockData[index].isWalkAble == false)
         {
-            Walkable();
+            SpawnBlocker();
             return;
         }
 
         _blockData[index].isWalkAble = false;
 
-        SearchAround(index, 2);
+        SpawnBlocker_SearchAround(index, 2);
     }
 
-    private void SearchAround(int centerIndex, int a)
+    private void SpawnBlocker_SearchAround(int centerIndex, int a)
     {
-        if(a == 0)
+        if (a == 0)
         {
             return;
         }
@@ -192,79 +224,192 @@ public class MapGenerator
                 continue;
             }
 
-            if(_blockData[indexs[i]].isEnter == true || _blockData[indexs[i]].isExit == true)
+            if (_blockData[indexs[i]].isWalkAble == false)
+            {
+                continue;
+            }
+
+            if (_blockData[indexs[i]].isEnter == true || _blockData[indexs[i]].isExit == true)
             {
                 _blockData[centerIndex].isWalkAble = true;
-                Walkable();
 
-                return;
-            }
-
-            if(_blockData[i].isWalkAble == false)
-            {
                 continue;
             }
 
-            _blockData[indexs[i]].isWalkAble = Random.Range(0, 100) > 80 ? true : false;
+            _blockData[indexs[i]].isWalkAble = false;
 
-            SearchAround(indexs[i], a - 1);
+            SpawnBlocker_SearchAround(indexs[i], a - 1);
         }
     }
 
-    private void ConnectToEnterAndExit()
+    public class Node
     {
-        bool isConnect = true;
+        public bool isPass = false;
 
-        for (int i = 0; i < _blockData.Length; i++)
+        public int passIndex = 0;
+        public int _x = 0;
+        public int _y = 0;
+
+        private int _costG = 0;
+        private int _costH = 0;
+
+        public int costF
         {
-            //if()
+            get { return _costG + _costH; }
+        }
+
+        public Node(BlockData data, BlockData endData)
+        {
+            _x = data.x;
+            _y = data.y;
+
+            _costH = (int)(Mathf.Pow(_x - endData.x, 2) + Mathf.Pow(_y - endData.y, 2));
+        }
+
+        public void SetCost(int currentG)
+        {
+            _costG = currentG + 1;
         }
     }
 
-    private void View3D()
+    private void ShortestDistance()
     {
-        // Wall
-        for (int y = 0; y < 10; y++)
-        {
-            for (int x = 0; x < 10; x++)
-            {
-                if (y == 0 || y == 9)
-                {
-                    GameObject obj = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                    obj.transform.position = new Vector3(x, 0, y);
-                }
+        bool isDone = false;
 
-                if (x == 0 || x == 9)
-                {
-                    GameObject obj = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                    obj.transform.position = new Vector3(x, 0, y);
-                }
-            }
-        }
+        List<Node> _nodes = new List<Node>(_blockData.Length);
+        List<Node> _passNodes = new List<Node>();
 
-        //Game Station
         for (int i = 0; i < _blockData.Length; i++)
         {
-            if (_blockData[i].isEnter == true)
-            {
-                continue;
-            }
-
-            if (_blockData[i].isExit == true)
-            {
-                continue;
-            }
-
-            if (_blockData[i].isWalkAble == false)
-            {
-                GameObject obj = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                obj.transform.position = new Vector3(_blockData[i].x, 0, _blockData[i].y);
-            }
-            else
-            {
-                GameObject obj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                obj.transform.position = new Vector3(_blockData[i].x, 0, _blockData[i].y);
-            }
+            _nodes.Add(new Node(_blockData[i], _blockData[_mapData.exitBlockIndex]));
         }
+
+        _nodes[_mapData.enterBlockIndex].SetCost(0);
+
+        SearchAroundNonBlocker(_mapData.enterBlockIndex, ref _nodes, ref _passNodes, ref isDone);
+
+        if(isDone == false)
+        {
+            CheckCloseNode(ref _passNodes);
+        }
+    }
+
+    private void SearchAroundNonBlocker(int centerIndex, ref List<Node> nodes, ref List<Node> passNodes, ref bool isDone)
+    {
+        if (isDone == true)
+        {
+            return;
+        }
+
+        List<int> indexs = new List<int>(4);
+        indexs.Add(centerIndex - 8);
+        indexs.Add(centerIndex + 8);
+        indexs.Add(centerIndex - 1);
+        indexs.Add(centerIndex + 1);
+
+        int minCostIndex = centerIndex;
+
+        for (int i = 0; i < indexs.Count; i++)
+        {
+            if (0 > indexs[i])
+            {
+                continue;
+            }
+
+            if (nodes.Count - 1 < indexs[i])
+            {
+                continue;
+            }
+
+            nodes[indexs[i]].SetCost(0);
+
+            if (nodes[minCostIndex].costF <= nodes[indexs[i]].costF)
+            {
+                continue;
+            }
+
+            minCostIndex = indexs[i];
+
+            if (nodes[minCostIndex].isPass == false)
+            {
+                if (indexs[i] == _mapData.exitBlockIndex)
+                {
+                    isDone = true;
+
+                    return;
+                }
+
+                nodes[minCostIndex].passIndex = minCostIndex;
+                nodes[minCostIndex].isPass = true;
+                passNodes.Add(nodes[minCostIndex]);
+            }
+
+            SearchAroundNonBlocker(minCostIndex, ref nodes, ref passNodes, ref isDone);
+        }
+    }
+
+    private void CheckCloseNode(ref List<Node> passNodes)
+    {
+        for (int i = 0; i < passNodes.Count; i++)
+        {
+            List<int> indexs = new List<int>(4);
+            indexs.Add(passNodes[i].passIndex - 8);
+            indexs.Add(passNodes[i].passIndex + 8);
+            indexs.Add(passNodes[i].passIndex - 1);
+            indexs.Add(passNodes[i].passIndex + 1);
+
+            for (int j = 0; j < indexs.Count; j++)
+            {
+                if (0 > indexs[j])
+                {
+                    continue;
+                }
+
+                if (_blockData.Length - 1 < indexs[j])
+                {
+                    continue;
+                }
+
+                if(_blockData[indexs[j]].isWalkAble == true)
+                {
+                    continue;
+                }
+
+                _blockData[indexs[j]].isWalkAble = Random.Range(0, 100) > 80 ? true : false;
+            }
+
+            _blockData[passNodes[i].passIndex].isWalkAble = true;
+        }
+    }
+
+    private void GenerateCreature()
+    {
+        int maxMonsterCount = 3;
+
+        if(_round > 10)
+        {
+            maxMonsterCount = 2;
+        }
+
+        int monsterCount = Random.Range(1, maxMonsterCount + 1);
+
+        
+
+        Debug.LogError(monsterCount);
+    }
+
+    private void SetMapData()
+    {
+        for (int i = 0; i < _blockData.Length; i++)
+        {
+            _mapData.blockDatas.Add(new DataManager.Block_Data());
+
+            _mapData.blockDatas[i].x = _blockData[i].x;
+            _mapData.blockDatas[i].y = _blockData[i].y;
+            _mapData.blockDatas[i].isWalkable = _blockData[i].isWalkAble;
+            _mapData.blockDatas[i].isCreatureExist = _blockData[i].isCreatureExist;
+        }
+
+        _onResultCallback(_mapData);
     }
 }
