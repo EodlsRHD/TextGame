@@ -27,3 +27,10 @@ public enum eRoundClear
     Success,
     Fail
 }
+
+public enum eDoorway
+{
+    Non = -1,
+    Enter,
+    Exit
+}

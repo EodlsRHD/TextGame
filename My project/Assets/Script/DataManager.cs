@@ -32,6 +32,8 @@ public class DataManager : MonoBehaviour
         public bool useSkill = false;
         public ushort[] skillIndexs = null;
         public List<Skill_Data> skillDatas = null;
+
+        public int blockIndex = 0;
     }
 
     [Serializable]
@@ -110,7 +112,8 @@ public class DataManager : MonoBehaviour
         public ushort y = 0;
 
         public bool isWalkable = false;
-        public bool isCreatureExist = false;
+        public bool isMonster = false;
+        public bool isUser = false;
     }
 
     #endregion

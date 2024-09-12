@@ -18,12 +18,12 @@ public class IngameUI : MonoBehaviour
     [SerializeField] private Button _buttonNextRound = null;
     [SerializeField] private TMP_Text _textButtonLabel = null;
 
-    private Action<Action<DataManager.Map_Data>> _onViewMapCallback = null;
+    private Action<Action> _onViewMapCallback = null;
     private Action<eRoundClear> _OnNextRoundCallback = null;
 
     private eRoundClear _type = eRoundClear.Non;
 
-    public void Initialize(Action<Action<DataManager.Map_Data>> onViewMapCallback, Action<eRoundClear> OnNextRoundCallback)
+    public void Initialize(Action<Action> onViewMapCallback, Action<eRoundClear> OnNextRoundCallback)
     {
         if(onViewMapCallback != null)
         {
@@ -42,18 +42,16 @@ public class IngameUI : MonoBehaviour
         _objNextRound.SetActive(false);
         this.gameObject.SetActive(true);
     }
+    private void OnMap()
+    {
+        _buttonViewMap.gameObject.SetActive(false);
+
+        _onViewMapCallback?.Invoke(() => { _buttonViewMap.gameObject.SetActive(true); });
+    }
 
     private void OnOpenGameMenu()
     {
         UiManager.instance.OpenGameMenu();
-    }
-
-    private void OnMap()
-    {
-        _onViewMapCallback?.Invoke((mapData) => 
-        {
-            
-        });
     }
 
     private void OnNextRound()
