@@ -78,7 +78,7 @@ public class MapGenerator
         public ushort x = 0;
         public ushort y = 0;
 
-        public bool isWalkAble = true;
+        public bool isWalkable = true;
         public bool isCreatureExist = false;
 
         public bool isEnter = false;
@@ -195,18 +195,18 @@ public class MapGenerator
             index = (enterY + (enterX - 1) * 8) - 1;
         }
 
-        if (_blockData[index].isWalkAble == false)
+        if (_blockData[index].isWalkable == false)
         {
             SpawnBlocker();
             return;
         }
 
-        _blockData[index].isWalkAble = false;
+        _blockData[index].isWalkable = false;
 
         SpawnBlocker_SearchAround(index, 2);
     }
 
-    private List<int> GetNearbyBlocks(int centerIndex)
+    private List<int> GetNearbyBlocks(int centerIndex, List<Node> nodes = null)
     {
         if(0 > centerIndex && centerIndex > _blockData.Length)
         {
@@ -226,18 +226,44 @@ public class MapGenerator
         O = X + ((Y + 1) * n); // À§
         if (O < _blockData.Length && O > 0)
         {
-            if(centerBlock.y + 1 == _blockData[O].y)
+            if(nodes != null)
             {
-                result.Add(O);
+                if(nodes[O].isWalkable == true)
+                {
+                    if(centerBlock.y + 1 == _blockData[O].y)
+                    {
+                        result.Add(O);
+                    }
+                }
+            }
+            else
+            {
+                if (centerBlock.y + 1 == _blockData[O].y)
+                {
+                    result.Add(O);
+                }
             }
         }
 
         O = X + (Y * n) - 1; // ÁÂ
         if (O < _blockData.Length && O > 0)
         {
-            if (centerBlock.y == _blockData[O].y)
+            if(nodes != null)
             {
-                result.Add(O);
+                if (nodes[O].isWalkable == true)
+                {
+                    if (centerBlock.y == _blockData[O].y)
+                    {
+                        result.Add(O);
+                    }
+                }
+            }
+            else
+            {
+                if (centerBlock.y == _blockData[O].y)
+                {
+                    result.Add(O);
+                }
             }
         }
 
@@ -245,9 +271,22 @@ public class MapGenerator
         O = X + (Y * n) + 1; // ¿ì
         if (O < _blockData.Length && O > 0)
         {
-            if (centerBlock.y == _blockData[O].y)
+            if(nodes != null)
             {
-                result.Add(O);
+                if (nodes[O].isWalkable == true)
+                {
+                    if (centerBlock.y == _blockData[O].y)
+                    {
+                        result.Add(O);
+                    }
+                }
+            }
+            else
+            {
+                if (centerBlock.y == _blockData[O].y)
+                {
+                    result.Add(O);
+                }
             }
         }
 
@@ -256,9 +295,22 @@ public class MapGenerator
         O = X + ((Y - 1) * n); // ¾Æ·¡
         if (O > 0)
         {
-            if(centerBlock.y - 1 == _blockData[O].y)
+            if(nodes != null)
             {
-                result.Add(O);
+                if (nodes[O].isWalkable == true)
+                {
+                    if (centerBlock.y - 1 == _blockData[O].y)
+                    {
+                        result.Add(O);
+                    }
+                }
+            }
+            else
+            {
+                if (centerBlock.y - 1 == _blockData[O].y)
+                {
+                    result.Add(O);
+                }
             }
         }
 
@@ -272,7 +324,7 @@ public class MapGenerator
             return;
         }
 
-        List<int> indexs = GetNearbyBlocks(centerIndex);
+        List<int> indexs = GetNearbyBlocks(centerIndex, null);
 
         if (indexs == null)
         {
@@ -291,19 +343,19 @@ public class MapGenerator
                 continue;
             }
 
-            if (_blockData[indexs[i]].isWalkAble == false)
+            if (_blockData[indexs[i]].isWalkable == false)
             {
                 continue;
             }
 
             if (_blockData[indexs[i]].isEnter == true || _blockData[indexs[i]].isExit == true)
             {
-                _blockData[centerIndex].isWalkAble = true;
+                _blockData[centerIndex].isWalkable = true;
 
                 continue;
             }
 
-            _blockData[indexs[i]].isWalkAble = Random.Range(0, 4) > 2 ? true : false;
+            _blockData[indexs[i]].isWalkable = Random.Range(0, 4) > 2 ? true : false;
 
             SpawnBlocker_SearchAround(indexs[i], a - 1);
         }
@@ -312,6 +364,7 @@ public class MapGenerator
     public class Node
     {
         public bool isPass = false;
+        public bool isWalkable = false;
 
         public int passIndex = 0;
         public int _x = 0;
@@ -327,6 +380,8 @@ public class MapGenerator
 
         public Node(BlockData data, BlockData startData, BlockData endData)
         {
+            isWalkable = data.isWalkable;
+
             _x = data.x;
             _y = data.y;
 
@@ -341,7 +396,8 @@ public class MapGenerator
         int count = 0;
 
         List<Node> _nodes = new List<Node>(_blockData.Length);
-        List<Node> _passNodes = new List<Node>();
+        List<int> _passNodes = new List<int>();
+        _passNodes.Add(_mapData.enterBlockIndex);
 
         for (int i = 0; i < _blockData.Length; i++)
         {
@@ -350,7 +406,14 @@ public class MapGenerator
 
         PathFinding_aStar(_mapData.enterBlockIndex, ref _nodes, ref _passNodes, ref isDone, ref count);
 
-        Debug.Log("isDone            " + isDone + "         _passNodes   " + _passNodes.Count);
+        Debug.Log("isDone            " + isDone + "         _passNodes   " + _passNodes.Count + "        count    " + count);
+
+        string log = string.Empty;
+        for (int i = 0; i < _passNodes.Count; i++)
+        {
+            log += "    " + _passNodes[i];
+        }
+        Debug.Log("_passNodes     " + log);
 
         if (isDone == false)
         {
@@ -360,30 +423,32 @@ public class MapGenerator
         CheckStuckNode();
     }
 
-    private void PathFinding_aStar(int centerIndex, ref List<Node> nodes, ref List<Node> passNodes, ref bool isDone, ref int count)
+    private void PathFinding_aStar(int centerIndex, ref List<Node> nodes, ref List<int> passNodes, ref bool isDone, ref int count)
     {
         if (isDone == true)
         {
+            Debug.Log("return");
             return;
         }
 
-        if(count > 40)
+        if(count > 50)
         {
             isDone = false;
 
+            Debug.Log("return");
             return;
         }
-
+        
         count++;
 
-        List<int> indexs = GetNearbyBlocks(centerIndex);
+        List<int> indexs = GetNearbyBlocks(centerIndex, nodes);
 
         if (indexs == null)
         {
+            Debug.Log("return");
             return;
         }
 
-        bool select = false;
         int minCostIndex = indexs[0];
 
         for (int i = 0; i < indexs.Count; i++)
@@ -398,20 +463,15 @@ public class MapGenerator
                 continue;
             }
 
-            Debug.LogWarning(centerIndex + "        " + i +
-                "        " + indexs[i] +
-                "    isWalkAble    " + _blockData[indexs[i]].isWalkAble +
-                "     isPass   " + nodes[indexs[i]].isPass +
-                "     x   " + nodes[indexs[i]]._x +
-                "     y   " + nodes[indexs[i]]._y +
-                "     costG   " + nodes[indexs[i]]._costG +
-                "     costH   " + nodes[indexs[i]]._costH +
-                "     costF   " + nodes[indexs[i]].costF +
-                "     minCostIndex costF   " + nodes[minCostIndex].costF +
-                "     minCostIndex   " + minCostIndex +
-                "     select   " + (nodes[indexs[i]].costF < nodes[minCostIndex].costF));
+            Debug.LogWarning("centerIndex    " + centerIndex +
+                                "  |   indexs[i]    " + indexs[i] +
+                                "  |   isWalkAble    " + _blockData[indexs[i]].isWalkable +
+                                "  |   _costH   " + nodes[indexs[i]]._costH +
+                                "  |   isPass   " + (nodes[indexs[i]].isPass) +
+                                "  |   enterBlockIndex   " + (indexs[i] == _mapData.enterBlockIndex) +
+                                "  |   exitBlockIndex   " + (indexs[i] == _mapData.exitBlockIndex));
 
-            if (_blockData[indexs[i]].isWalkAble == false)
+            if (indexs[i] == _mapData.enterBlockIndex)
             {
                 continue;
             }
@@ -420,36 +480,50 @@ public class MapGenerator
             {
                 isDone = true;
 
-                return;
+                break;
             }
 
-            if(nodes[indexs[i]].costF < nodes[minCostIndex].costF)
+            if (nodes[indexs[i]]._costH < nodes[minCostIndex]._costH)
             {
-                if (nodes[indexs[i]].isPass == true)
-                {
-                    continue;
-                }
-
-                select = true;
                 minCostIndex = indexs[i];
             }
         }
 
-        if(select == true)
+        if (nodes[minCostIndex].isPass == true)
         {
-            nodes[minCostIndex].passIndex = minCostIndex;
-            nodes[minCostIndex].isPass = true;
-            passNodes.Add(nodes[minCostIndex]);
+            PathFinding_aStar(minCostIndex, ref nodes, ref passNodes, ref isDone, ref count);
+
+            return;
+        }
+
+        nodes[minCostIndex].isPass = true;
+        nodes[minCostIndex].passIndex = minCostIndex;
+
+        foreach (var item in passNodes)
+        {
+            if(item == minCostIndex)
+            {
+                break;
+            }
+
+            passNodes.Add(minCostIndex);
+            break;
+        }
+
+        if(isDone == true)
+        {
+            Debug.Log("return");
+            return;
         }
 
         PathFinding_aStar(minCostIndex, ref nodes, ref passNodes, ref isDone, ref count);
     }
 
-    private void CheckClosePassNode(ref List<Node> passNodes)
+    private void CheckClosePassNode(ref List<int> passNodes)
     {
         for (int i = 0; i < passNodes.Count; i++)
         {
-            List<int> indexs = GetNearbyBlocks(passNodes[i].passIndex);
+            List<int> indexs = GetNearbyBlocks(passNodes[i]);
 
             if (indexs == null)
             {
@@ -468,15 +542,15 @@ public class MapGenerator
                     continue;
                 }
 
-                if(_blockData[indexs[j]].isWalkAble == true)
+                if(_blockData[indexs[j]].isWalkable == true)
                 {
                     continue;
                 }
 
-                _blockData[indexs[j]].isWalkAble = Random.Range(0, 4) >= 2 ? true : false;
+                _blockData[indexs[j]].isWalkable = Random.Range(0, 4) >= 2 ? true : false;
             }
 
-            _blockData[passNodes[i].passIndex].isWalkAble = true;
+            _blockData[passNodes[i]].isWalkable = true;
         }
     }
 
@@ -484,7 +558,7 @@ public class MapGenerator
     {
         for (int i = 0; i < _blockData.Length; i++)
         {
-            if(_blockData[i].isWalkAble == false)
+            if(_blockData[i].isWalkable == false)
             {
                 continue;
             }
@@ -510,7 +584,7 @@ public class MapGenerator
                     continue;
                 }
 
-                if(_blockData[i].isWalkAble == false)
+                if(_blockData[i].isWalkable == false)
                 {
                     continue;
                 }
@@ -520,7 +594,7 @@ public class MapGenerator
 
             if (isNotStuck == false)
             {
-                _blockData[i].isWalkAble = false;
+                _blockData[i].isWalkable = false;
             }
         }
     }
@@ -562,7 +636,7 @@ public class MapGenerator
 
             _mapData.blockDatas[i].x = _blockData[i].x;
             _mapData.blockDatas[i].y = _blockData[i].y;
-            _mapData.blockDatas[i].isWalkable = _blockData[i].isWalkAble;
+            _mapData.blockDatas[i].isWalkable = _blockData[i].isWalkable;
             _mapData.blockDatas[i].isMonster = _blockData[i].isCreatureExist;
         }
 
