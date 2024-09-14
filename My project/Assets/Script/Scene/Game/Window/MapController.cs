@@ -40,7 +40,7 @@ public class MapController : MonoBehaviour
         {
             var template = _pool[i];
 
-            if(i == saveData.mapData.enterBlockIndex)
+            if (i == saveData.mapData.enterBlockIndex)
             {
                 template.EnterOrExit(i, eDoorway.Enter);
 
@@ -53,7 +53,7 @@ public class MapController : MonoBehaviour
 
                 continue;
             }
-
+            
             template.SetTemplate(i, blockData[i]);
         }
     }

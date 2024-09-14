@@ -17,14 +17,7 @@ public class BlockTemplate : MonoBehaviour
     {
         _text.text = index.ToString();
 
-        if (blockData.isWalkable == false)
-        {
-            SetColor(Color.black);
-        }
-        else
-        {
-            SetColor(Color.white);
-        }
+        SetColor(blockData.isWalkable == true ? Color.white : Color.black);
 
         if (blockData.isMonster == true)
         {

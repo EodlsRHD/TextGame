@@ -221,95 +221,97 @@ public class MapGenerator
         int X = centerBlock.x;
         int Y = centerBlock.y;
 
-        int O = 0;
-
-        O = X + ((Y + 1) * n); // 위
-        if (O < _blockData.Length && O > 0)
+        int coordUp = X + ((Y + 1) * n); // 위
+        if (coordUp < _blockData.Length && coordUp > 0)
         {
-            if(nodes != null)
+            if(Y + 1 == _blockData[coordUp].y)
             {
-                if(nodes[O].isWalkable == true)
+                if (nodes != null)
                 {
-                    if(centerBlock.y + 1 == _blockData[O].y)
+                    Debug.Log(centerIndex + "           " + coordUp + "       isWalkable    " + nodes[coordUp].isWalkable + "        isPass   " + nodes[coordUp].isPass);
+                    if (nodes[coordUp].isWalkable == true)
                     {
-                        result.Add(O);
+                        if(nodes[coordUp].isPass == false)
+                        {
+                            result.Add(coordUp);
+                        }
                     }
                 }
-            }
-            else
-            {
-                if (centerBlock.y + 1 == _blockData[O].y)
+                else
                 {
-                    result.Add(O);
+                    result.Add(coordUp);
                 }
             }
         }
 
-        O = X + (Y * n) - 1; // 좌
-        if (O < _blockData.Length && O > 0)
+        int coordLeft = X + (Y * n) - 1; // 좌
+        if (coordLeft < _blockData.Length && coordLeft > 0)
         {
-            if(nodes != null)
+            if(Y == _blockData[coordLeft].y)
             {
-                if (nodes[O].isWalkable == true)
+                if (nodes != null)
                 {
-                    if (centerBlock.y == _blockData[O].y)
+                    Debug.Log(centerIndex + "           " + coordLeft + "       isWalkable    " + nodes[coordLeft].isWalkable + "        isPass   " + nodes[coordLeft].isPass);
+                    if (nodes[coordLeft].isWalkable == true)
                     {
-                        result.Add(O);
+                        if (nodes[coordLeft].isPass == false)
+                        {
+                            result.Add(coordLeft);
+                        }
                     }
                 }
-            }
-            else
-            {
-                if (centerBlock.y == _blockData[O].y)
+                else
                 {
-                    result.Add(O);
-                }
-            }
-        }
-
-
-        O = X + (Y * n) + 1; // 우
-        if (O < _blockData.Length && O > 0)
-        {
-            if(nodes != null)
-            {
-                if (nodes[O].isWalkable == true)
-                {
-                    if (centerBlock.y == _blockData[O].y)
-                    {
-                        result.Add(O);
-                    }
-                }
-            }
-            else
-            {
-                if (centerBlock.y == _blockData[O].y)
-                {
-                    result.Add(O);
+                    result.Add(coordLeft);
                 }
             }
         }
 
 
-
-        O = X + ((Y - 1) * n); // 아래
-        if (O > 0)
+        int coordRight = X + (Y * n) + 1; // 우
+        if (coordRight < _blockData.Length && coordRight > 0)
         {
-            if(nodes != null)
+            if(Y == _blockData[coordRight].y)
             {
-                if (nodes[O].isWalkable == true)
+                if (nodes != null)
                 {
-                    if (centerBlock.y - 1 == _blockData[O].y)
+                    Debug.Log(centerIndex + "           " + coordRight + "       isWalkable    " + nodes[coordRight].isWalkable + "        isPass   " + nodes[coordRight].isPass);
+                    if (nodes[coordRight].isWalkable == true)
                     {
-                        result.Add(O);
+                        if (nodes[coordRight].isPass == false)
+                        {
+                            result.Add(coordRight);
+                        }
                     }
                 }
-            }
-            else
-            {
-                if (centerBlock.y - 1 == _blockData[O].y)
+                else
                 {
-                    result.Add(O);
+                    result.Add(coordRight);
+                }
+            }
+        }
+
+
+
+        int coordDown = X + ((Y - 1) * n); // 아래
+        if (coordDown > 0)
+        {
+            if (Y - 1 == _blockData[coordDown].y)
+            {
+                if (nodes != null)
+                {
+                    Debug.Log(centerIndex + "           " + coordDown + "       isWalkable    " + nodes[coordDown].isWalkable + "        isPass   " + nodes[coordDown].isPass);
+                    if (nodes[coordDown].isWalkable == true)
+                    {
+                        if (nodes[coordDown].isPass == false)
+                        {
+                            result.Add(coordDown);
+                        }
+                    }
+                }
+                else
+                {
+                    result.Add(coordDown);
                 }
             }
         }
@@ -401,12 +403,14 @@ public class MapGenerator
 
         for (int i = 0; i < _blockData.Length; i++)
         {
+            if(_blockData[i].isWalkable == false)
+            {
+                Debug.Log(i + "           " + _blockData[i].x + "           " + _blockData[i].y);
+            }
             _nodes.Add(new Node(_blockData[i], _blockData[_mapData.enterBlockIndex], _blockData[_mapData.exitBlockIndex]));
         }
 
         PathFinding_aStar(_mapData.enterBlockIndex, ref _nodes, ref _passNodes, ref isDone, ref count);
-
-        Debug.Log("isDone            " + isDone + "         _passNodes   " + _passNodes.Count + "        count    " + count);
 
         string log = string.Empty;
         for (int i = 0; i < _passNodes.Count; i++)
@@ -427,7 +431,6 @@ public class MapGenerator
     {
         if (isDone == true)
         {
-            Debug.Log("return");
             return;
         }
 
@@ -435,7 +438,6 @@ public class MapGenerator
         {
             isDone = false;
 
-            Debug.Log("return");
             return;
         }
         
@@ -445,7 +447,11 @@ public class MapGenerator
 
         if (indexs == null)
         {
-            Debug.Log("return");
+            return;
+        }
+
+        if (indexs.Count == 0)
+        {
             return;
         }
 
@@ -463,13 +469,13 @@ public class MapGenerator
                 continue;
             }
 
-            Debug.LogWarning("centerIndex    " + centerIndex +
-                                "  |   indexs[i]    " + indexs[i] +
-                                "  |   isWalkAble    " + _blockData[indexs[i]].isWalkable +
-                                "  |   _costH   " + nodes[indexs[i]]._costH +
-                                "  |   isPass   " + (nodes[indexs[i]].isPass) +
-                                "  |   enterBlockIndex   " + (indexs[i] == _mapData.enterBlockIndex) +
-                                "  |   exitBlockIndex   " + (indexs[i] == _mapData.exitBlockIndex));
+            //Debug.LogWarning("centerIndex    " + centerIndex +
+            //                    "  |   indexs[i]    " + indexs[i] +
+            //                    "  |   isWalkAble    " + _blockData[indexs[i]].isWalkable +
+            //                    "  |   _costH   " + nodes[indexs[i]]._costH +
+            //                    "  |   isPass   " + (nodes[indexs[i]].isPass) +
+            //                    "  |   enterBlockIndex   " + (indexs[i] == _mapData.enterBlockIndex) +
+            //                    "  |   exitBlockIndex   " + (indexs[i] == _mapData.exitBlockIndex));
 
             if (indexs[i] == _mapData.enterBlockIndex)
             {
@@ -479,21 +485,23 @@ public class MapGenerator
             if (indexs[i] == _mapData.exitBlockIndex)
             {
                 isDone = true;
+                passNodes.Add(_mapData.exitBlockIndex);
 
                 break;
             }
 
             if (nodes[indexs[i]]._costH < nodes[minCostIndex]._costH)
             {
+                if (indexs[i] == _mapData.exitBlockIndex)
+                {
+                    isDone = true;
+                    passNodes.Add(_mapData.exitBlockIndex);
+
+                    break;
+                }
+
                 minCostIndex = indexs[i];
             }
-        }
-
-        if (nodes[minCostIndex].isPass == true)
-        {
-            PathFinding_aStar(minCostIndex, ref nodes, ref passNodes, ref isDone, ref count);
-
-            return;
         }
 
         nodes[minCostIndex].isPass = true;
@@ -505,6 +513,10 @@ public class MapGenerator
             {
                 break;
             }
+            if(minCostIndex == _mapData.enterBlockIndex)
+            {
+                passNodes = new List<int>();
+            }
 
             passNodes.Add(minCostIndex);
             break;
@@ -512,7 +524,6 @@ public class MapGenerator
 
         if(isDone == true)
         {
-            Debug.Log("return");
             return;
         }
 
@@ -521,37 +532,11 @@ public class MapGenerator
 
     private void CheckClosePassNode(ref List<int> passNodes)
     {
-        for (int i = 0; i < passNodes.Count; i++)
-        {
-            List<int> indexs = GetNearbyBlocks(passNodes[i]);
+        // 원인
+        // 1. 못 걷는 노드 표기를 잘못하고 있다.ㅇ
+        // -> CheckClosePassNode 를 통과하면서 바뀜
 
-            if (indexs == null)
-            {
-                continue;
-            }
-
-            for (int j = 0; j < indexs.Count; j++)
-            {
-                if (0 > indexs[j])
-                {
-                    continue;
-                }
-
-                if (_blockData.Length - 1 < indexs[j])
-                {
-                    continue;
-                }
-
-                if(_blockData[indexs[j]].isWalkable == true)
-                {
-                    continue;
-                }
-
-                _blockData[indexs[j]].isWalkable = Random.Range(0, 4) >= 2 ? true : false;
-            }
-
-            _blockData[passNodes[i]].isWalkable = true;
-        }
+        // 이 함수의 역할 : 길이 막혔을 경우 도착지점까지의 길을 뚫어줘야함
     }
 
     private void CheckStuckNode()
