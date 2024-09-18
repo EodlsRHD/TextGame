@@ -33,7 +33,7 @@ public class DataManager : MonoBehaviour
         public ushort[] skillIndexs = null;
         public List<Skill_Data> skillDatas = null;
 
-        public int blockIndex = 0;
+        public int currentBlockIndex = 0;
     }
 
     [Serializable]

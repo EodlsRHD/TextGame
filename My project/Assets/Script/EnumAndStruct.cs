@@ -20,6 +20,13 @@ public enum eControl
     Rest
 }
 
+public enum eAction
+{
+    Non = -1,
+    MeetMonster,
+    MeetItem
+}
+
 public enum eRoundClear
 {
     Non = -1,

@@ -6,11 +6,15 @@ public class IngameManager : MonoBehaviour
 {
     [Header("Ingame UI"), SerializeField] private IngameUI _ingameUI = null;
     [Header("TextView"), SerializeField] private TextView _textView = null;
-    [Header("Control"), SerializeField] private Control _control = null;
+    [Header("Control"), SerializeField] private ControlPad _controlPad = null;
     [Header("MapController"), SerializeField] private MapController _mapController = null;
+    [Header("Ingame Popup"), SerializeField] private IngamePopup _ingamePopup = null;
 
     private DataManager.Save_Data _saveData = null;
     private MapGenerator _mapGenerator = null;
+
+    private bool _isPlayerTurn = false;
+    private bool _isMonsterDead = true;
 
     void Start()
     {
@@ -18,8 +22,9 @@ public class IngameManager : MonoBehaviour
 
         _ingameUI.Initialize(OpenMap, OpenNextRound);
         _textView.Initialize();
-        _control.Initialize(Move, Action);
+        _controlPad.Initialize(Move, Action);
         _mapController.Initialize();
+        _ingamePopup.Initialize();
 
         _ingameUI.OpenNextRoundWindow(eRoundClear.First);
 
@@ -52,20 +57,126 @@ public class IngameManager : MonoBehaviour
             {
                 _saveData.mapData = mapData;
                 _mapController.SetMap(_saveData);
+                
+                if(_saveData.mapData.monsterDatas.Count > 0)
+                {
+                    _isMonsterDead = false;
+                }
             });
 
             _mapGenerator.Start(_saveData.round);
-        });
+        }); 
     }
 
     private void Move(eControl type)
     {
+        if(_isPlayerTurn == false)
+        {
+            _ingamePopup.UpdateText(_saveData.userData.data.name + "의 순서가 아닙니다.");
 
+            return;
+        }
+
+        if (_saveData.userData.data.ap >= 0)
+        {
+            _ingamePopup.UpdateText("ap가 부족합니다.");
+
+            return;
+        }
+
+        int nearbyBlockIndex = SearchNearbyBlock(type, _saveData.userData.data.currentBlockIndex);
+        
+        if(_saveData.mapData.blockDatas[nearbyBlockIndex].isMonster == true)
+        {
+            _textView.UpdateText("몬스터를 만났습니다.");
+
+            PlayerTurn(false);
+
+            return;
+        }
+
+        _saveData.userData.data.currentBlockIndex = nearbyBlockIndex;
+        _saveData.userData.data.ap -= 1;
+
+        UpdateData();
+    }
+
+    private int SearchNearbyBlock(eControl type, int currentBlockIndex)
+    {
+        DataManager.Block_Data currentBlockData = _saveData.mapData.blockDatas[currentBlockIndex];
+
+        int n = 8;
+
+        int X = currentBlockData.x;
+        int Y = currentBlockData.y;
+
+        int result = -1;
+
+        switch (type)
+        {
+            case eControl.Up:
+                int up = X + ((Y + 1) * n);
+                CheckBlock(up, Y + 1, ref _saveData.mapData.blockDatas, ref result);
+                break;
+
+            case eControl.Left:
+                int left = X + X + (Y * n) - 1;
+                CheckBlock(left, Y + 1, ref _saveData.mapData.blockDatas, ref result);
+                break;
+
+            case eControl.Right:
+                int right = X + (Y * n) + 1;
+                CheckBlock(right, Y + 1, ref _saveData.mapData.blockDatas, ref result);
+                break;
+
+            case eControl.Down:
+                int down = X + ((Y - 1) * n);
+                CheckBlock(down, Y + 1, ref _saveData.mapData.blockDatas, ref result);
+                break;
+        }
+
+        return result;
+    }
+
+    private void CheckBlock(int index, int Y, ref List<DataManager.Block_Data> blockDAtas, ref int result)
+    {
+        if (0 < index && index < blockDAtas.Count)
+        {
+            if(Y == blockDAtas.Count)
+            {
+                if(blockDAtas[index].isWalkable == true)
+                {
+                    result = index;
+                }
+            }
+        }
     }
 
     private void Action(eControl type)
     {
 
+    }
+
+    private void UpdateData()
+    {
+        _mapController.UpdateData(_saveData);
+    }
+
+    private void PlayerTurn(bool isTurn)
+    {
+        _isPlayerTurn = isTurn;
+    }
+
+    private void MonsterTurn()
+    {
+        if(_isMonsterDead == true)
+        {
+            return;
+        }
+
+        List<DataManager.Creature_Data> monsters = _saveData.mapData.monsterDatas;
+
+        PlayerTurn(true);
     }
 
     // 만난 적, 획득한 아이템 저장 하는 기능 필요
@@ -228,7 +339,6 @@ public class MapGenerator
             {
                 if (nodes != null)
                 {
-                    Debug.Log(centerIndex + "           " + coordUp + "       isWalkable    " + nodes[coordUp].isWalkable + "        isPass   " + nodes[coordUp].isPass);
                     if (nodes[coordUp].isWalkable == true)
                     {
                         if(nodes[coordUp].isPass == false)
@@ -251,7 +361,6 @@ public class MapGenerator
             {
                 if (nodes != null)
                 {
-                    Debug.Log(centerIndex + "           " + coordLeft + "       isWalkable    " + nodes[coordLeft].isWalkable + "        isPass   " + nodes[coordLeft].isPass);
                     if (nodes[coordLeft].isWalkable == true)
                     {
                         if (nodes[coordLeft].isPass == false)
@@ -275,7 +384,6 @@ public class MapGenerator
             {
                 if (nodes != null)
                 {
-                    Debug.Log(centerIndex + "           " + coordRight + "       isWalkable    " + nodes[coordRight].isWalkable + "        isPass   " + nodes[coordRight].isPass);
                     if (nodes[coordRight].isWalkable == true)
                     {
                         if (nodes[coordRight].isPass == false)
@@ -300,7 +408,6 @@ public class MapGenerator
             {
                 if (nodes != null)
                 {
-                    Debug.Log(centerIndex + "           " + coordDown + "       isWalkable    " + nodes[coordDown].isWalkable + "        isPass   " + nodes[coordDown].isPass);
                     if (nodes[coordDown].isWalkable == true)
                     {
                         if (nodes[coordDown].isPass == false)
@@ -403,26 +510,10 @@ public class MapGenerator
 
         for (int i = 0; i < _blockData.Length; i++)
         {
-            if(_blockData[i].isWalkable == false)
-            {
-                Debug.Log(i + "           " + _blockData[i].x + "           " + _blockData[i].y);
-            }
             _nodes.Add(new Node(_blockData[i], _blockData[_mapData.enterBlockIndex], _blockData[_mapData.exitBlockIndex]));
         }
 
         PathFinding_aStar(_mapData.enterBlockIndex, ref _nodes, ref _passNodes, ref isDone, ref count);
-
-        string log = string.Empty;
-        for (int i = 0; i < _passNodes.Count; i++)
-        {
-            log += "    " + _passNodes[i];
-        }
-        Debug.Log("_passNodes     " + log);
-
-        if (isDone == false)
-        {
-            CheckClosePassNode(ref _passNodes);
-        }
 
         CheckStuckNode();
     }
@@ -468,14 +559,6 @@ public class MapGenerator
             {
                 continue;
             }
-
-            //Debug.LogWarning("centerIndex    " + centerIndex +
-            //                    "  |   indexs[i]    " + indexs[i] +
-            //                    "  |   isWalkAble    " + _blockData[indexs[i]].isWalkable +
-            //                    "  |   _costH   " + nodes[indexs[i]]._costH +
-            //                    "  |   isPass   " + (nodes[indexs[i]].isPass) +
-            //                    "  |   enterBlockIndex   " + (indexs[i] == _mapData.enterBlockIndex) +
-            //                    "  |   exitBlockIndex   " + (indexs[i] == _mapData.exitBlockIndex));
 
             if (indexs[i] == _mapData.enterBlockIndex)
             {
@@ -528,15 +611,6 @@ public class MapGenerator
         }
 
         PathFinding_aStar(minCostIndex, ref nodes, ref passNodes, ref isDone, ref count);
-    }
-
-    private void CheckClosePassNode(ref List<int> passNodes)
-    {
-        // 원인
-        // 1. 못 걷는 노드 표기를 잘못하고 있다.ㅇ
-        // -> CheckClosePassNode 를 통과하면서 바뀜
-
-        // 이 함수의 역할 : 길이 막혔을 경우 도착지점까지의 길을 뚫어줘야함
     }
 
     private void CheckStuckNode()

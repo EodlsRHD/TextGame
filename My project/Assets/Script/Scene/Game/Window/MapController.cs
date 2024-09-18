@@ -58,7 +58,7 @@ public class MapController : MonoBehaviour
         }
     }
 
-    public void ChangeData(DataManager.Save_Data saveData)
+    public void UpdateData(DataManager.Save_Data saveData)
     {
 
     }

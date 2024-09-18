@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System;
 
-public class Control : MonoBehaviour
+public class ControlPad : MonoBehaviour
 {
     [Header("Move")]
     [SerializeField] private Button _buttomUp = null;
