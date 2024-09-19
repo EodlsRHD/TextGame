@@ -1119,8 +1119,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _ingameUI: {fileID: 1037030123}
   _textView: {fileID: 2033365083}
-  _controlPad: {fileID: 0}
+  _controlPad: {fileID: 453098887}
   _mapController: {fileID: 2079520307}
+  _ingamePopup: {fileID: 379885572}
 --- !u!4 &264511981
 Transform:
   m_ObjectHideFlags: 0
@@ -1128,9 +1129,9 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 264511979}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 553.74744, y: 962.45807, z: -22.492573}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 553.74744, y: 962.458, z: -22.49257}
+  m_LocalScale: {x: 0.99999994, y: 0.99999994, z: 0.99999994}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -1304,6 +1305,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 379885571}
+  - component: {fileID: 379885572}
   m_Layer: 5
   m_Name: ImgamePopup
   m_TagString: Untagged
@@ -1331,6 +1333,18 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &379885572
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 379885570}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 92843d0fa5d76954597d217e47a3be9e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &410896578
 GameObject:
   m_ObjectHideFlags: 0
@@ -4808,7 +4822,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -1990.6066}
+  m_AnchoredPosition: {x: 0, y: -1996.0005}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &1820622972
