@@ -62,7 +62,7 @@ public class IngameManager : MonoBehaviour
                 {
                     _isMonsterDead = false;
                 }
-            }, 8, _saveData);
+            }, 9, _saveData);
 
             _mapGenerator.Start();
         }); 
@@ -187,6 +187,7 @@ public class MapGenerator
     private class Node
     {
         public bool isVisit = false;
+        public bool isWalkable = false;
 
         public int _index = 0;
         public int _x = 0;
@@ -223,11 +224,14 @@ public class MapGenerator
             _onResultCallback = onResultCallback;
         }
 
+        _mapSize = mapSize;
         _saveData = saveData;
     }
 
     public void Start()
     {
+        _nodes = new List<Node>();
+
         for (int y = 0; y < _mapSize; y++)
         {
             for (int x = 0; x < _mapSize; x++)
@@ -238,13 +242,47 @@ public class MapGenerator
             }
         }
 
+        GenerateBlocker();
         SelectEnterBlock();
         SelectExitBlock();
     }
 
     private void GenerateBlocker()
     {
+        List<int> middlePoints = new List<int>();
 
+        int middleMapSize = _mapSize / 3;
+
+        for (int y = 0; y < middleMapSize; y++)
+        {
+            for (int x = 0; x < middleMapSize; x++)
+            {
+                int middleX = 1 + (3 * x);
+                int middleY = 1 + (3 * y);
+                int middleCoord = middleX + (middleY * _mapSize);
+
+                if (middleCoord == (Mathf.Pow(_mapSize, 2) - 1) * 0.5f)
+                {
+                    continue;
+                }
+
+                middlePoints.Add(middleCoord);
+            }
+        }
+
+        List<int> ranbomBlockerIndexs = RandomIndex(middlePoints.Count, 3);
+
+        for (int r = 0; r < ranbomBlockerIndexs.Count; r++)
+        {
+            Debug.LogWarning(middlePoints[ranbomBlockerIndexs[r]]);
+
+            List<int> nearbyBlocks = GetNearbyBlocks_Diagonal(middlePoints[ranbomBlockerIndexs[r]]);
+
+            for (int n = 0; n < nearbyBlocks.Count; n++)
+            {
+                _nodes[nearbyBlocks[n]].isWalkable = false;
+            }
+        }
     }
 
     private void SelectEnterBlock()
@@ -254,6 +292,60 @@ public class MapGenerator
 
     private void SelectExitBlock()
     {
+        float centerIndex = (Mathf.Pow(_mapSize, 2) - 1) * 0.5f;
+    }
 
+    private List<int> RandomIndex(int listCount, int value)
+    {
+        List<int> result = new List<int>();
+
+        int count = 0;
+
+        while(count < value)
+        {
+            int num = UnityEngine.Random.Range(0, listCount);
+            bool isSelect = false;
+
+            for (int i = 0; i < result.Count; i++)
+            {
+                if(result[i] == num)
+                {
+                    isSelect = true;
+                    break;
+                }
+            }
+
+            if(isSelect == true)
+            {
+                continue;
+            }
+
+            result.Add(num);
+            count++;
+        }
+
+        return result;
+    }
+
+    int[] dx = new int[] { -1, 0, 1 };
+    int[] dy = new int[] { -1, 0, 1 };
+
+    private List<int> GetNearbyBlocks_Diagonal(int index)
+    {
+        List<int> result = new List<int>();
+
+        for (int y = 0; y < dy.Length; y++)
+        {
+            for (int x = 0; x < dx.Length; x++)
+            {
+                int nearbyX = (index % _mapSize) + dx[x];
+                int nearbyY = (index / _mapSize) + dy[y];
+                int resultIndex = nearbyX + (nearbyY * _mapSize);
+
+                 result.Add(resultIndex);
+            }
+        }
+
+        return result;
     }
 }
