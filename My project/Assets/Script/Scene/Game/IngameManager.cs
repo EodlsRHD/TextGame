@@ -538,7 +538,6 @@ public class CreatureGenerator
         }
 
         int monsterSpawnCount = Random.Range(2, openNodeCount / _saveData.mapData.mapSize);
-        Debug.LogError(monsterSpawnCount);
 
         for (int i = 0; i < monsterSpawnCount; i++)
         {
@@ -553,8 +552,6 @@ public class CreatureGenerator
 
             _saveData.mapData.monsterDatas.Add(creature);
         }
-
-        Debug.LogError(_saveData.mapData.monsterDatas.Count);
     }
 
     private void MonsterStats(ref DataManager.Creature_Data creature)
