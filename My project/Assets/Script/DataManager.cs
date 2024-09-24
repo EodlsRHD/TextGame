@@ -33,7 +33,7 @@ public class DataManager : MonoBehaviour
         public ushort[] skillIndexs = null;
         public List<Skill_Data> skillDatas = null;
 
-        public int currentBlockIndex = 0;
+        public int currentNodeIndex = 0;
     }
 
     [Serializable]
@@ -97,16 +97,16 @@ public class DataManager : MonoBehaviour
     [Serializable]
     public class Map_Data
     {
-        public int enterBlockIndex = 0;
-        public int exitBlockIndex = 0;
+        public int enterNodeIndex = 0;
+        public int exitNodeIndex = 0;
 
-        public List<Block_Data> blockDatas = null;
+        public List<Node_Data> nodeDatas = null;
         public List<Creature_Data> monsterDatas = null;
         public List<Item_Data> itemDatas = null;
     }
 
     [Serializable]
-    public class Block_Data
+    public class Node_Data
     {
         public ushort x = 0;
         public ushort y = 0;
@@ -324,7 +324,7 @@ public class DataManager : MonoBehaviour
         _saveData.userData.data.skillDatas = new List<Skill_Data>();
 
         _saveData.mapData = new Map_Data();
-        _saveData.mapData.blockDatas = new List<Block_Data>();
+        _saveData.mapData.nodeDatas = new List<Node_Data>();
         _saveData.mapData.monsterDatas = new List<Creature_Data>();
 
         _saveData.encyclopediaData = new Encyclopedia_Data();
@@ -388,7 +388,7 @@ public class DataManager : MonoBehaviour
         _saveData.userData.data.skillDatas = new List<Skill_Data>();
 
         _saveData.mapData = new Map_Data();
-        _saveData.mapData.blockDatas = new List<Block_Data>();
+        _saveData.mapData.nodeDatas = new List<Node_Data>();
         _saveData.mapData.monsterDatas = new List<Creature_Data>();
 
         SaveDataToCloud(_saveData);

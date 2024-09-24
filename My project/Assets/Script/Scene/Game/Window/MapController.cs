@@ -34,20 +34,20 @@ public class MapController : MonoBehaviour
 
     public void SetMap(DataManager.Save_Data saveData)
     {
-        var blockData = saveData.mapData.blockDatas;
+        var blockData = saveData.mapData.nodeDatas;
 
         for (int i = 0; i < blockData.Count; i++)
         {
             var template = _pool[i];
 
-            if (i == saveData.mapData.enterBlockIndex)
+            if (i == saveData.mapData.enterNodeIndex)
             {
                 template.EnterOrExit(i, eDoorway.Enter);
 
                 continue;
             }
 
-            if (i == saveData.mapData.exitBlockIndex)
+            if (i == saveData.mapData.exitNodeIndex)
             {
                 template.EnterOrExit(i, eDoorway.Exit);
 

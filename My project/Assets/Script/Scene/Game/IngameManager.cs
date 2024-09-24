@@ -84,9 +84,9 @@ public class IngameManager : MonoBehaviour
             return;
         }
 
-        int nearbyBlockIndex = SearchNearbyBlock(type, _saveData.userData.data.currentBlockIndex);
+        int nearbyBlockIndex = SearchNearbyBlock(type, _saveData.userData.data.currentNodeIndex);
         
-        if(_saveData.mapData.blockDatas[nearbyBlockIndex].isMonster == true)
+        if(_saveData.mapData.nodeDatas[nearbyBlockIndex].isMonster == true)
         {
             _textView.UpdateText("몬스터를 만났습니다.");
 
@@ -95,7 +95,7 @@ public class IngameManager : MonoBehaviour
             return;
         }
 
-        _saveData.userData.data.currentBlockIndex = nearbyBlockIndex;
+        _saveData.userData.data.currentNodeIndex = nearbyBlockIndex;
         _saveData.userData.data.ap -= 1;
 
         UpdateData();
@@ -103,7 +103,7 @@ public class IngameManager : MonoBehaviour
 
     private int SearchNearbyBlock(eControl type, int currentBlockIndex)
     {
-        DataManager.Block_Data currentBlockData = _saveData.mapData.blockDatas[currentBlockIndex];
+        DataManager.Node_Data currentBlockData = _saveData.mapData.nodeDatas[currentBlockIndex];
 
         int n = 8;
 
@@ -116,29 +116,29 @@ public class IngameManager : MonoBehaviour
         {
             case eControl.Up:
                 int up = X + ((Y + 1) * n);
-                CheckBlock(up, Y + 1, ref _saveData.mapData.blockDatas, ref result);
+                CheckBlock(up, Y + 1, ref _saveData.mapData.nodeDatas, ref result);
                 break;
 
             case eControl.Left:
                 int left = X + X + (Y * n) - 1;
-                CheckBlock(left, Y + 1, ref _saveData.mapData.blockDatas, ref result);
+                CheckBlock(left, Y + 1, ref _saveData.mapData.nodeDatas, ref result);
                 break;
 
             case eControl.Right:
                 int right = X + (Y * n) + 1;
-                CheckBlock(right, Y + 1, ref _saveData.mapData.blockDatas, ref result);
+                CheckBlock(right, Y + 1, ref _saveData.mapData.nodeDatas, ref result);
                 break;
 
             case eControl.Down:
                 int down = X + ((Y - 1) * n);
-                CheckBlock(down, Y + 1, ref _saveData.mapData.blockDatas, ref result);
+                CheckBlock(down, Y + 1, ref _saveData.mapData.nodeDatas, ref result);
                 break;
         }
 
         return result;
     }
 
-    private void CheckBlock(int index, int Y, ref List<DataManager.Block_Data> blockDAtas, ref int result)
+    private void CheckBlock(int index, int Y, ref List<DataManager.Node_Data> blockDAtas, ref int result)
     {
         if (0 < index && index < blockDAtas.Count)
         {
@@ -186,6 +186,9 @@ public class MapGenerator
 {
     private class Node
     {
+        public bool isEnter = false;
+        public bool isExit = false;
+
         public bool isVisit = false;
         public bool isWalkable = false;
 
@@ -200,7 +203,7 @@ public class MapGenerator
             get { return _g + _h; }
         }
 
-        public Node(int index, int x, int y, DataManager.Block_Data enterBlock, DataManager.Block_Data exitBlock)
+        public Node(int index, int x, int y, DataManager.Node_Data enterBlock, DataManager.Node_Data exitBlock)
         {
             _index = index;
             _x = x;
@@ -243,8 +246,8 @@ public class MapGenerator
         }
 
         GenerateBlocker();
-        SelectEnterBlock();
         SelectExitBlock();
+        Done();
     }
 
     private void GenerateBlocker()
@@ -270,29 +273,106 @@ public class MapGenerator
             }
         }
 
-        List<int> ranbomBlockerIndexs = RandomIndex(middlePoints.Count, 3);
+        List<int> randomBlockerIndexs = RandomIndex(middlePoints.Count, 3);
 
-        for (int r = 0; r < ranbomBlockerIndexs.Count; r++)
+        for (int r = 0; r < randomBlockerIndexs.Count; r++)
         {
-            Debug.LogWarning(middlePoints[ranbomBlockerIndexs[r]]);
-
-            List<int> nearbyBlocks = GetNearbyBlocks_Diagonal(middlePoints[ranbomBlockerIndexs[r]]);
+            List<int> nearbyBlocks = GetNearbyBlocks_Diagonal(middlePoints[randomBlockerIndexs[r]]);
 
             for (int n = 0; n < nearbyBlocks.Count; n++)
             {
                 _nodes[nearbyBlocks[n]].isWalkable = false;
             }
         }
+
+        CheckStuckBlocker(ref middlePoints, ref randomBlockerIndexs);
+        SelectEnterBlock(ref middlePoints);
     }
 
-    private void SelectEnterBlock()
+    private void CheckStuckBlocker(ref List<int> middlePoints, ref List<int> randomBlockerIndex)
     {
+        for (int i = 0; i < randomBlockerIndex.Count; i++)
+        {
+            List<int> NearbyMiddlePoints = NearbyMiddlePoint(middlePoints[randomBlockerIndex[i]]);
 
+            if (_nodes[middlePoints[randomBlockerIndex[i]]].isWalkable == false)
+            {
+                continue;
+            }
+
+            bool isStuck = false;
+
+            for (int n = 0; n < NearbyMiddlePoints.Count; n++)
+            {
+                if (_nodes[n].isWalkable == true)
+                {
+                    isStuck = false;
+                    break;
+                }
+            }
+
+            if (isStuck == true)
+            {
+                List<int> nearbyBlocks = GetNearbyBlocks_Diagonal(middlePoints[randomBlockerIndex[i]]);
+
+                for (int n = 0; n < nearbyBlocks.Count; n++)
+                {
+                    _nodes[nearbyBlocks[n]].isWalkable = false;
+                }
+            }
+        }
+    }
+
+    private void SelectEnterBlock(ref List<int> middlePoints)
+    {
+        List<int> openMiddlePoints = new List<int>();
+
+        for (int i = 0; i < middlePoints.Count; i++)
+        {
+            if(_nodes[middlePoints[i]].isWalkable == false)
+            {
+                continue;
+            }
+
+            openMiddlePoints.Add(middlePoints[i]);
+        }
+
+        _nodes[openMiddlePoints[Random.Range(0, openMiddlePoints.Count)]].isEnter = true;
     }
 
     private void SelectExitBlock()
     {
-        float centerIndex = (Mathf.Pow(_mapSize, 2) - 1) * 0.5f;
+        int centerIndex = (int)((Mathf.Pow(_mapSize, 2) - 1) * 0.5f);
+
+        _nodes[centerIndex].isExit = true;
+    }
+
+    private void Done()
+    {
+        _saveData.mapData = new DataManager.Map_Data();
+        _saveData.mapData.nodeDatas = new List<DataManager.Node_Data>();
+
+        for (int n = 0; n < _nodes.Count; n++)
+        {
+            DataManager.Node_Data node = new DataManager.Node_Data();
+            node.x = (ushort)_nodes[n]._x;
+            node.y = (ushort)_nodes[n]._y;
+            node.isWalkable = _nodes[n].isWalkable;
+
+            if(_nodes[n].isEnter == true)
+            {
+                _saveData.mapData.enterNodeIndex = n;
+            }
+
+            if (_nodes[n].isExit == true)
+            {
+                _saveData.mapData.exitNodeIndex = n;
+            }
+
+            _saveData.mapData.nodeDatas.Add(node);
+        }
+
+        _onResultCallback?.Invoke(_saveData.mapData);
     }
 
     private List<int> RandomIndex(int listCount, int value)
@@ -342,7 +422,55 @@ public class MapGenerator
                 int nearbyY = (index / _mapSize) + dy[y];
                 int resultIndex = nearbyX + (nearbyY * _mapSize);
 
-                 result.Add(resultIndex);
+                if(0 <= resultIndex && resultIndex < (_mapSize * _mapSize))
+                {
+                    result.Add(resultIndex);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    int[] mdx = new int[] { -3, 0, 3 };
+    int[] mdy = new int[] { -3, 0, 3 };
+
+    private List<int> NearbyMiddlePoint(int index)
+    {
+        List<int> result = new List<int>();
+
+        for (int y = 0; y < mdy.Length; y++)
+        {
+            for (int x = 0; x < mdx.Length; x++)
+            {
+                if(((mdy[y] == -3 || mdy[y] == 3) && mdx[x] == 0) || (mdy[y] == 0 && (mdx[x] == 3 || mdx[x] == -3)))
+                {
+                    int nearbyX = (index % _mapSize) + mdx[x];
+
+                    if (nearbyX < 0 || _mapSize <= nearbyX)
+                    {
+                        continue;
+                    }
+
+                    int nearbyY = (index / _mapSize) + mdy[y];
+
+                    if (nearbyY < 0 || _mapSize <= nearbyY)
+                    {
+                        continue;
+                    }
+
+                    int resultIndex = nearbyX + (nearbyY * _mapSize);
+
+                    if (index == resultIndex)
+                    {
+                        continue;
+                    }
+
+                    if (0 <= resultIndex && resultIndex < (_mapSize * _mapSize))
+                    {
+                        result.Add(resultIndex);
+                    }
+                }
             }
         }
 

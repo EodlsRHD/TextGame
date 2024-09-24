@@ -13,7 +13,7 @@ public class BlockTemplate : MonoBehaviour
         this.gameObject.SetActive(false);
     }
 
-    public void SetTemplate(int index, DataManager.Block_Data blockData)
+    public void SetTemplate(int index, DataManager.Node_Data blockData)
     {
         _text.text = index.ToString();
 
