@@ -12,9 +12,10 @@ public class IngameManager : MonoBehaviour
 
     private DataManager.Save_Data _saveData = null;
     private MapGenerator _mapGenerator = null;
+    private CreatureGenerator _creatureGenerator = null;
 
     private bool _isPlayerTurn = false;
-    private bool _isMonsterDead = true;
+    private bool _isAllMonsterDead = true;
 
     void Start()
     {
@@ -23,7 +24,7 @@ public class IngameManager : MonoBehaviour
         _ingameUI.Initialize(OpenMap, OpenNextRound);
         _textView.Initialize();
         _controlPad.Initialize(Move, Action);
-        _mapController.Initialize();
+        _mapController.Initialize(_saveData.mapData.mapSize);
         _ingamePopup.Initialize();
 
         _ingameUI.OpenNextRoundWindow(eRoundClear.First);
@@ -51,21 +52,27 @@ public class IngameManager : MonoBehaviour
         GameManager.instance.dataManager.SaveDataToCloud(_saveData, () => 
         {
             _saveData.round++;
-            _ingameUI.SetRoundText(_saveData.round);
-
-            _mapGenerator = new MapGenerator((mapData) => 
-            {
-                _saveData.mapData = mapData;
-                _mapController.SetMap(_saveData);
-                
-                if(_saveData.mapData.monsterDatas.Count > 0)
-                {
-                    _isMonsterDead = false;
-                }
-            }, 9, _saveData);
-
-            _mapGenerator.Start();
+            
+            _mapGenerator = new MapGenerator(GenerateMap, _saveData);
         }); 
+    }
+
+    private void GenerateMap(DataManager.Map_Data mapData)
+    {
+        _saveData.mapData = mapData;
+        
+        RoundSet();
+    }
+     
+    private void RoundSet()
+    {
+        _ingameUI.SetRoundText(_saveData.round);
+        _mapController.SetMap(_saveData);
+
+        if (_saveData.mapData.monsterDatas.Count > 0)
+        {
+            _isAllMonsterDead = false;
+        }
     }
 
     private void Move(eControl type)
@@ -169,7 +176,7 @@ public class IngameManager : MonoBehaviour
 
     private void MonsterTurn()
     {
-        if(_isMonsterDead == true)
+        if(_isAllMonsterDead == true)
         {
             return;
         }
@@ -190,7 +197,7 @@ public class MapGenerator
         public bool isExit = false;
 
         public bool isVisit = false;
-        public bool isWalkable = false;
+        public bool isWalkable = true;
 
         public int _index = 0;
         public int _x = 0;
@@ -220,18 +227,20 @@ public class MapGenerator
 
     private int _mapSize = 0;
 
-    public MapGenerator(System.Action<DataManager.Map_Data> onResultCallback, int mapSize, DataManager.Save_Data saveData)
+    public MapGenerator(System.Action<DataManager.Map_Data> onResultCallback, DataManager.Save_Data saveData)
     {
         if(onResultCallback != null)
         {
             _onResultCallback = onResultCallback;
         }
 
-        _mapSize = mapSize;
+        _mapSize = saveData.mapData.mapSize;
         _saveData = saveData;
+
+        Start();
     }
 
-    public void Start()
+    private void Start()
     {
         _nodes = new List<Node>();
 
@@ -350,11 +359,13 @@ public class MapGenerator
     private void Done()
     {
         _saveData.mapData = new DataManager.Map_Data();
+        _saveData.mapData.mapSize = _mapSize;
         _saveData.mapData.nodeDatas = new List<DataManager.Node_Data>();
 
         for (int n = 0; n < _nodes.Count; n++)
         {
             DataManager.Node_Data node = new DataManager.Node_Data();
+            node.index = _nodes[n]._index;
             node.x = (ushort)_nodes[n]._x;
             node.y = (ushort)_nodes[n]._y;
             node.isWalkable = _nodes[n].isWalkable;
@@ -371,6 +382,14 @@ public class MapGenerator
 
             _saveData.mapData.nodeDatas.Add(node);
         }
+
+        CreatureGenerator _creatureGenerator = new CreatureGenerator(GenerateCreature, _saveData);
+    }
+
+    private void GenerateCreature(DataManager.Creature_Data playerData, List<DataManager.Creature_Data> monsterData)
+    {
+        _saveData.userData.data = playerData;
+        _saveData.mapData.monsterDatas = monsterData;
 
         _onResultCallback?.Invoke(_saveData.mapData);
     }
@@ -475,5 +494,115 @@ public class MapGenerator
         }
 
         return result;
+    }
+}
+
+public class CreatureGenerator
+{
+    private System.Action<DataManager.Creature_Data, List<DataManager.Creature_Data>> _onResultCallback = null;
+    private DataManager.Save_Data _saveData = null;
+
+    public CreatureGenerator(System.Action<DataManager.Creature_Data, List<DataManager.Creature_Data>> onResultCallback, DataManager.Save_Data saveData)
+    {
+        if(onResultCallback != null)
+        {
+            _onResultCallback = onResultCallback;
+        }
+
+        _saveData = saveData;
+
+        Start();
+    }
+
+    private void Start()
+    {
+        GenerateMonster();
+        GeneratePlayer();
+        Done();
+    }
+
+    private void GenerateMonster()
+    {
+        _saveData.mapData.monsterDatas = new List<DataManager.Creature_Data>();
+
+        int openNodeCount = 0;
+
+        for (int i = 0; i < _saveData.mapData.nodeDatas.Count; i++)
+        {
+            if(_saveData.mapData.nodeDatas[i].isWalkable == false)
+            {
+                continue;
+            }
+
+            openNodeCount++;
+        }
+
+        int monsterSpawnCount = Random.Range(2, openNodeCount / _saveData.mapData.mapSize);
+        Debug.LogError(monsterSpawnCount);
+
+        for (int i = 0; i < monsterSpawnCount; i++)
+        {
+            DataManager.Node_Data node = new DataManager.Node_Data();
+            SpawnMonsterNodeSelect(Random.Range(0, _saveData.mapData.nodeDatas.Count), ref node);
+
+            DataManager.Creature_Data creature = GameManager.instance.dataManager.GetCreatureData(_saveData.round + i);
+            creature.currentNodeIndex = node.index;
+            _saveData.mapData.nodeDatas[node.index].isMonster = true; 
+
+            MonsterStats(ref creature);
+
+            _saveData.mapData.monsterDatas.Add(creature);
+        }
+
+        Debug.LogError(_saveData.mapData.monsterDatas.Count);
+    }
+
+    private void MonsterStats(ref DataManager.Creature_Data creature)
+    {
+        float increasePoint = (_saveData.round * 0.1f);
+
+        creature.coin *= (ushort)increasePoint;
+        creature.hp *= (ushort)increasePoint;
+        creature.exp *= (ushort)increasePoint;
+        creature.attack *= (ushort)increasePoint;
+        creature.defence *= (ushort)increasePoint;
+    }
+
+    private void GeneratePlayer()
+    {
+        _saveData.userData.data.currentNodeIndex = _saveData.mapData.enterNodeIndex;
+    }
+
+    private void Done()
+    {
+        _onResultCallback?.Invoke(_saveData.userData.data, _saveData.mapData.monsterDatas);
+    }
+
+    private void SpawnMonsterNodeSelect(int index, ref DataManager.Node_Data node)
+    {
+        if (_saveData.mapData.nodeDatas[index].isWalkable == true && _saveData.mapData.nodeDatas[index].isMonster == false)
+        {
+            node = _saveData.mapData.nodeDatas[index];
+
+            return;
+        }
+
+        int newIndex = 0;
+
+        if(_saveData.mapData.nodeDatas[index].isWalkable == false)
+        {
+            newIndex = index + 1;
+        }
+        else if(_saveData.mapData.nodeDatas[index].isMonster == true)
+        {
+            newIndex = index + 5;
+        }
+
+        if(newIndex >= _saveData.mapData.nodeDatas.Count)
+        {
+            newIndex -= _saveData.mapData.nodeDatas.Count;
+        }
+
+        SpawnMonsterNodeSelect(newIndex, ref node);
     }
 }

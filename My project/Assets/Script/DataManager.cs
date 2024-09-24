@@ -97,6 +97,8 @@ public class DataManager : MonoBehaviour
     [Serializable]
     public class Map_Data
     {
+        public int mapSize = 0;
+
         public int enterNodeIndex = 0;
         public int exitNodeIndex = 0;
 
@@ -108,6 +110,7 @@ public class DataManager : MonoBehaviour
     [Serializable]
     public class Node_Data
     {
+        public int index = 0;
         public ushort x = 0;
         public ushort y = 0;
 
@@ -146,6 +149,7 @@ public class DataManager : MonoBehaviour
     [SerializeField] private string _creatureDataPath = string.Empty;
     [SerializeField] private string _itemDataPath = string.Empty;
     [SerializeField] private string _skillDataPath = string.Empty;
+    [Header("Map Size"), Tooltip("3의 배수이되 홀수여야함"), SerializeField] private int _mapSize = 9;
 
     private Save_Data _saveData = null;
 
@@ -324,6 +328,7 @@ public class DataManager : MonoBehaviour
         _saveData.userData.data.skillDatas = new List<Skill_Data>();
 
         _saveData.mapData = new Map_Data();
+        _saveData.mapData.mapSize = 9;
         _saveData.mapData.nodeDatas = new List<Node_Data>();
         _saveData.mapData.monsterDatas = new List<Creature_Data>();
 
@@ -485,6 +490,11 @@ public class DataManager : MonoBehaviour
 
     public Creature_Data GetCreatureData(int index)
     {
+        if(index>= _creatureDatas.Count)
+        {
+            index -= _creatureDatas.Count;
+        }
+
         return _creatureDatas.Find(x => x.index == (index + 101));
     }
 

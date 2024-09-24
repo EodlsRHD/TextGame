@@ -15,13 +15,13 @@ public class MapController : MonoBehaviour
 
     private Action _onCloseCallback = null;
 
-    public void Initialize()
+    public void Initialize(int mapSize)
     {
         _buttonCloseViewMap?.onClick.AddListener(CloseMap);
 
         _tempalte.Initialize();
 
-        for (int i = 0; i < 64; i++)
+        for (int i = 0; i < mapSize * mapSize; i++)
         {
             var obj = Instantiate(_tempalte, _trTemplateParant);
             var com = obj.GetComponent<BlockTemplate>();
