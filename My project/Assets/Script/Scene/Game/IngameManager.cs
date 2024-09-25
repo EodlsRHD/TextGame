@@ -69,6 +69,8 @@ public class IngameManager : MonoBehaviour
         _ingameUI.SetRoundText(_saveData.round);
         _mapController.SetMap(_saveData);
 
+        _isPlayerTurn = true;
+
         if (_saveData.mapData.monsterDatas.Count > 0)
         {
             _isAllMonsterDead = false;
@@ -84,79 +86,48 @@ public class IngameManager : MonoBehaviour
             return;
         }
 
-        if (_saveData.userData.data.ap >= 0)
+        if (_saveData.userData.data.ap <= 0)
         {
             _ingamePopup.UpdateText("ap가 부족합니다.");
 
             return;
         }
 
-        int nearbyBlockIndex = SearchNearbyBlock(type, _saveData.userData.data.currentNodeIndex);
-        
-        if(_saveData.mapData.nodeDatas[nearbyBlockIndex].isMonster == true)
+        int nearbyBlockIndex = MoveType(type, _saveData.userData.data.currentNodeIndex);
+        Debug.LogError(nearbyBlockIndex);
+        if (nearbyBlockIndex == -1) // -1 : out of map
         {
-            _textView.UpdateText("몬스터를 만났습니다.");
+            return;
+        }
 
-            PlayerTurn(false);
+        if (nearbyBlockIndex == -2) // -2 : blocker
+        {
+            _ingamePopup.UpdateText("이동할 수 없습니다.");
 
             return;
         }
+
+        if(nearbyBlockIndex == -3) // -3 : monster
+        {
+            _textView.UpdateText("몬스터를 만났습니다.");
+
+            return;
+        }
+
+        if (nearbyBlockIndex == -3) // -4 : exit
+        {
+            _textView.UpdateText("출구입니다.");
+
+            return;
+        }
+
+        _saveData.mapData.nodeDatas[_saveData.userData.data.currentNodeIndex].isUser = false;
+        _saveData.mapData.nodeDatas[nearbyBlockIndex].isUser = true;
 
         _saveData.userData.data.currentNodeIndex = nearbyBlockIndex;
         _saveData.userData.data.ap -= 1;
 
         UpdateData();
-    }
-
-    private int SearchNearbyBlock(eControl type, int currentBlockIndex)
-    {
-        DataManager.Node_Data currentBlockData = _saveData.mapData.nodeDatas[currentBlockIndex];
-
-        int n = 8;
-
-        int X = currentBlockData.x;
-        int Y = currentBlockData.y;
-
-        int result = -1;
-
-        switch (type)
-        {
-            case eControl.Up:
-                int up = X + ((Y + 1) * n);
-                CheckBlock(up, Y + 1, ref _saveData.mapData.nodeDatas, ref result);
-                break;
-
-            case eControl.Left:
-                int left = X + X + (Y * n) - 1;
-                CheckBlock(left, Y + 1, ref _saveData.mapData.nodeDatas, ref result);
-                break;
-
-            case eControl.Right:
-                int right = X + (Y * n) + 1;
-                CheckBlock(right, Y + 1, ref _saveData.mapData.nodeDatas, ref result);
-                break;
-
-            case eControl.Down:
-                int down = X + ((Y - 1) * n);
-                CheckBlock(down, Y + 1, ref _saveData.mapData.nodeDatas, ref result);
-                break;
-        }
-
-        return result;
-    }
-
-    private void CheckBlock(int index, int Y, ref List<DataManager.Node_Data> blockDAtas, ref int result)
-    {
-        if (0 < index && index < blockDAtas.Count)
-        {
-            if(Y == blockDAtas.Count)
-            {
-                if(blockDAtas[index].isWalkable == true)
-                {
-                    result = index;
-                }
-            }
-        }
     }
 
     private void Action(eControl type)
@@ -169,11 +140,6 @@ public class IngameManager : MonoBehaviour
         _mapController.UpdateData(_saveData);
     }
 
-    private void PlayerTurn(bool isTurn)
-    {
-        _isPlayerTurn = isTurn;
-    }
-
     private void MonsterTurn()
     {
         if(_isAllMonsterDead == true)
@@ -182,11 +148,98 @@ public class IngameManager : MonoBehaviour
         }
 
         List<DataManager.Creature_Data> monsters = _saveData.mapData.monsterDatas;
-
-        PlayerTurn(true);
     }
 
     // 만난 적, 획득한 아이템 저장 하는 기능 필요
+
+    private int MoveType(eControl type, int currentIndex)
+    {
+        int x = 0;
+        int y = 0;
+
+        switch (type)
+        {
+            case eControl.Up:
+                x = 0;
+                y = 1;
+                break;
+
+            case eControl.Left:
+                x = -1;
+                y = 0;
+                break;
+
+            case eControl.Right:
+                x = 1;
+                y = 0;
+                break;
+
+            case eControl.Down:
+                x = 0;
+                y = -1;
+                break;
+        }
+
+        int result = GetNearbyBlocks(x, y, currentIndex);
+
+        if (result == -1)
+        {
+            return -1;
+        }
+
+        if (_saveData.mapData.nodeDatas[result].isWalkable == false)
+        {
+            return -2;
+        }
+
+        if (_saveData.mapData.nodeDatas[result].isMonster == false)
+        {
+            return -3;
+        }
+
+        if (_saveData.mapData.exitNodeIndex == result)
+        {
+            return -4;
+        }
+
+        return result;
+    }
+
+    private int GetNearbyBlocks(int x, int y, int index)
+    {
+        int result = 0;
+
+        if (((y == -1 || y == 1) && x == 0) || (y == 0 && (x == 1 || x == -1)))
+        {
+            int nearbyX = (index % _saveData.mapData.mapSize) + x;
+
+            if (nearbyX < 0 || _saveData.mapData.mapSize <= nearbyX)
+            {
+                return -1;
+            }
+
+            int nearbyY = (index / _saveData.mapData.mapSize) + y;
+
+            if (nearbyY < 0 || _saveData.mapData.mapSize <= nearbyY)
+            {
+                return -1;
+            }
+
+            int resultIndex = nearbyX + (nearbyY * _saveData.mapData.mapSize);
+
+            if (index == resultIndex)
+            {
+                return -1;
+            }
+
+            if (0 <= resultIndex && resultIndex < (_saveData.mapData.mapSize * _saveData.mapData.mapSize))
+            {
+                result = resultIndex;
+            }
+        }
+
+        return result;
+    }
 }
 
 public class MapGenerator
@@ -287,6 +340,7 @@ public class MapGenerator
         for (int r = 0; r < randomBlockerIndexs.Count; r++)
         {
             List<int> nearbyBlocks = GetNearbyBlocks_Diagonal(middlePoints[randomBlockerIndexs[r]]);
+            _nodes[middlePoints[randomBlockerIndexs[r]]].isWalkable = false;
 
             for (int n = 0; n < nearbyBlocks.Count; n++)
             {
@@ -300,29 +354,29 @@ public class MapGenerator
 
     private void CheckStuckBlocker(ref List<int> middlePoints, ref List<int> randomBlockerIndex)
     {
-        for (int i = 0; i < randomBlockerIndex.Count; i++)
+        for (int m = 0; m < middlePoints.Count; m++)
         {
-            List<int> NearbyMiddlePoints = NearbyMiddlePoint(middlePoints[randomBlockerIndex[i]]);
-
-            if (_nodes[middlePoints[randomBlockerIndex[i]]].isWalkable == false)
+            if (_nodes[middlePoints[m]].isWalkable == false)
             {
                 continue;
             }
 
-            bool isStuck = false;
+            List<int> NearbyMiddlePoints = NearbyMiddlePoint(middlePoints[m]);
+            bool isStuck = true;
 
             for (int n = 0; n < NearbyMiddlePoints.Count; n++)
             {
-                if (_nodes[n].isWalkable == true)
+                if (_nodes[NearbyMiddlePoints[n]].isWalkable == true)
                 {
                     isStuck = false;
                     break;
                 }
             }
 
-            if (isStuck == true)
+            if(isStuck == true)
             {
-                List<int> nearbyBlocks = GetNearbyBlocks_Diagonal(middlePoints[randomBlockerIndex[i]]);
+                List<int> nearbyBlocks = GetNearbyBlocks_Diagonal(middlePoints[m]);
+                _nodes[middlePoints[m]].isWalkable = false;
 
                 for (int n = 0; n < nearbyBlocks.Count; n++)
                 {
@@ -568,6 +622,7 @@ public class CreatureGenerator
     private void GeneratePlayer()
     {
         _saveData.userData.data.currentNodeIndex = _saveData.mapData.enterNodeIndex;
+        _saveData.mapData.nodeDatas[_saveData.userData.data.currentNodeIndex].isUser = true;
     }
 
     private void Done()

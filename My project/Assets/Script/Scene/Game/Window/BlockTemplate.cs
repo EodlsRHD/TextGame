@@ -32,14 +32,9 @@ public class BlockTemplate : MonoBehaviour
         this.gameObject.SetActive(true);
     }
 
-    public void EnterOrExit(int index, eDoorway doorway)
+    public void Exit(int index, eDoorway doorway)
     {
         _text.text = index.ToString();
-
-        if (doorway == eDoorway.Enter)
-        {
-            SetColor(Color.blue);
-        }
 
         if (doorway == eDoorway.Exit)
         {
@@ -47,6 +42,12 @@ public class BlockTemplate : MonoBehaviour
         }
 
         this.gameObject.SetActive(true);
+    }
+
+    public void RemoveTemplate()
+    {
+        SetColor(Color.white);
+        this.gameObject.SetActive(false);
     }
 
     private void SetColor(Color color)

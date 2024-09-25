@@ -40,16 +40,9 @@ public class MapController : MonoBehaviour
         {
             var template = _pool[i];
 
-            if (i == saveData.mapData.enterNodeIndex)
-            {
-                template.EnterOrExit(i, eDoorway.Enter);
-
-                continue;
-            }
-
             if (i == saveData.mapData.exitNodeIndex)
             {
-                template.EnterOrExit(i, eDoorway.Exit);
+                template.Exit(i, eDoorway.Exit);
 
                 continue;
             }
@@ -60,7 +53,8 @@ public class MapController : MonoBehaviour
 
     public void UpdateData(DataManager.Save_Data saveData)
     {
-
+        RemoveTemplate();
+        SetMap(saveData);
     }
 
     public void OpenMap(Action onCallback)
@@ -77,5 +71,13 @@ public class MapController : MonoBehaviour
     {
         this.gameObject.SetActive(false);
         _onCloseCallback?.Invoke();
+    }
+
+    private void RemoveTemplate()
+    {
+        for (int i = 0; i < _pool.Count; i++)
+        {
+            _pool[i].RemoveTemplate();
+        }
     }
 }
