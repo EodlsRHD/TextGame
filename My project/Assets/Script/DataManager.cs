@@ -28,6 +28,7 @@ public class DataManager : MonoBehaviour
         public ushort exp = 0;
         public ushort attack = 0;
         public ushort defence = 0;
+        public ushort vision = 3;
 
         public bool useSkill = false;
         public ushort[] skillIndexs = null;
@@ -325,6 +326,13 @@ public class DataManager : MonoBehaviour
 
         _saveData.userData = new User_Data();
         _saveData.userData.data = new Creature_Data();
+        Debug.Log("TEST Stat Set");
+        _saveData.userData.data.hp = 10;
+        _saveData.userData.data.mp = 10;
+        _saveData.userData.data.ap = 100;
+        _saveData.userData.data.attack = 10;
+        _saveData.userData.data.defence = 10;
+        _saveData.userData.data.vision = 2;
         _saveData.userData.data.skillDatas = new List<Skill_Data>();
 
         _saveData.mapData = new Map_Data();

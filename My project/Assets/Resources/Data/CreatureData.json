@@ -12,6 +12,7 @@
       "exp": 10,
       "attack": 1,
       "defence": 1,
+      "vision": 3,
       "useSkill": "FALSE",
       "skillIndex": ""
     },
@@ -26,6 +27,7 @@
       "exp": 10,
       "attack": 1,
       "defence": 1,
+      "vision": 3,
       "useSkill": "FALSE",
       "skillIndex": ""
     },
@@ -40,6 +42,7 @@
       "exp": 10,
       "attack": 1,
       "defence": 1,
+      "vision": 3,
       "useSkill": "FALSE",
       "skillIndex": ""
     },
@@ -54,6 +57,7 @@
       "exp": 10,
       "attack": 1,
       "defence": 1,
+      "vision": 3,
       "useSkill": "FALSE",
       "skillIndex": ""
     },
@@ -68,6 +72,7 @@
       "exp": 10,
       "attack": 1,
       "defence": 1,
+      "vision": 3,
       "useSkill": "FALSE",
       "skillIndex": ""
     },
@@ -82,6 +87,7 @@
       "exp": 10,
       "attack": 1,
       "defence": 1,
+      "vision": 3,
       "useSkill": "FALSE",
       "skillIndex": ""
     },
@@ -96,6 +102,7 @@
       "exp": 10,
       "attack": 1,
       "defence": 1,
+      "vision": 3,
       "useSkill": "FALSE",
       "skillIndex": ""
     },
@@ -110,6 +117,7 @@
       "exp": 10,
       "attack": 1,
       "defence": 1,
+      "vision": 3,
       "useSkill": "FALSE",
       "skillIndex": ""
     },
@@ -124,6 +132,7 @@
       "exp": 10,
       "attack": 1,
       "defence": 1,
+      "vision": 3,
       "useSkill": "FALSE",
       "skillIndex": ""
     },
@@ -138,6 +147,7 @@
       "exp": 10,
       "attack": 1,
       "defence": 1,
+      "vision": 3,
       "useSkill": "FALSE",
       "skillIndex": ""
     }
