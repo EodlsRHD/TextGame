@@ -50,13 +50,9 @@ public class ControlPad : MonoBehaviour
         _buttomDown.onClick.AddListener(() => { OnMove(eControl.Down); });
 
         _buttomAttack.onClick.AddListener(() => { OnAction(eControl.Attack); });
-
         _buttomDefence.onClick.AddListener(() => { OnAction(eControl.Defence); });
-
         _buttomInfo.onClick.AddListener(() => { OnAction(eControl.Info); });
-
         _buttomSkill.onClick.AddListener(() => { OnAction(eControl.Skill); });
-
         _buttomRest.onClick.AddListener(() => { OnAction(eControl.Rest); });
 
     }
@@ -68,27 +64,6 @@ public class ControlPad : MonoBehaviour
 
     private void OnAction(eControl type)
     {
-        switch (type)
-        {
-            case eControl.Attack:
-
-                break;
-
-            case eControl.Defence:
-
-                break;
-
-            case eControl.Info:
-
-                break;
-
-            case eControl.Skill:
-
-                break;
-
-            case eControl.Rest:
-
-                break;
-        }
+        _onActionCallback?.Invoke(type);
     }
 }

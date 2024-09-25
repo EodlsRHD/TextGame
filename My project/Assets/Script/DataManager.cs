@@ -8,6 +8,7 @@ using GooglePlayGames;
 using GooglePlayGames.BasicApi;
 using GooglePlayGames.BasicApi.SavedGame;
 using System.Text;
+using System.Runtime.Serialization.Formatters.Binary;
 
 public class DataManager : MonoBehaviour
 {
@@ -349,7 +350,7 @@ public class DataManager : MonoBehaviour
 
     public Save_Data CopySaveData()
     {
-        return _saveData;
+        return _saveData.DeepCopy();
     }
 
     public bool CheckSaveData()
@@ -498,12 +499,12 @@ public class DataManager : MonoBehaviour
 
     public Creature_Data GetCreatureData(int index)
     {
-        if(index>= _creatureDatas.Count)
+        if (index >= _creatureDatas.Count)
         {
-            index -= _creatureDatas.Count;
+            index %= _creatureDatas.Count;
         }
 
-        return _creatureDatas.Find(x => x.index == (index + 101));
+        return _creatureDatas.Find(x => x.index == index + 101).DeepCopy();
     }
 
     #endregion
@@ -567,4 +568,36 @@ public class DataManager : MonoBehaviour
     }
 
     #endregion
+}
+
+public static class Extensions
+{
+    public static T DeepCopy<T>(this T source) where T : new()
+    {
+        if (!typeof(T).IsSerializable)
+        {
+            // fail
+            return source;
+        }
+
+        try
+        {
+            object result = null;
+            using (var ms = new MemoryStream())
+            {
+                var formatter = new BinaryFormatter();
+                formatter.Serialize(ms, source);
+                ms.Position = 0;
+                result = (T)formatter.Deserialize(ms);
+                ms.Close();
+            }
+
+            return (T)result;
+        }
+        catch (Exception)
+        {
+            // fail
+            return new T();
+        }
+    }
 }
