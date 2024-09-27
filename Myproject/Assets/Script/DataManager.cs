@@ -369,6 +369,9 @@ public class DataManager : MonoBehaviour
     public void SaveDataToCloud(Save_Data saveData = null, Action onSaveOrLoadCallback = null)
     {
 #if UNITY_EDITOR
+        _saveData = new Save_Data();
+        onSaveOrLoadCallback?.Invoke();
+
         return;
 #endif
 
@@ -383,7 +386,7 @@ public class DataManager : MonoBehaviour
     public void LoadDataToCloud(Action onSaveOrLoadCallback = null)
     {
 #if UNITY_EDITOR
-        _saveData = new Save_Data();
+        onSaveOrLoadCallback?.Invoke();
 
         return;
 #endif
