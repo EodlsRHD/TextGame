@@ -15,9 +15,9 @@ public enum eControl
     Down,
     Attack,
     Defence,
-    Info,
     Skill,
-    Rest
+    Rest,
+    Item
 }
 
 public enum eRoundClear

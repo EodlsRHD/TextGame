@@ -19,7 +19,7 @@ public class ControlPad : MonoBehaviour
     [SerializeField] private Button _buttomDefence = null;
 
     [Header("Info")]
-    [SerializeField] private Button _buttomInfo = null;
+    [SerializeField] private Button _buttomItem = null;
 
     [Header("Skill")]
     [SerializeField] private Button _buttomSkill = null;
@@ -28,6 +28,9 @@ public class ControlPad : MonoBehaviour
     [SerializeField] private Button _buttomRest = null;
 
     [Space(20)]
+
+    [SerializeField] private SkillPad _skillPad = null;
+    [SerializeField] private ItemPad _itemPad = null;
 
     private Action<eControl> _onMoveCallback = null;
     private Action<eControl> _onActionCallback = null;
@@ -51,10 +54,12 @@ public class ControlPad : MonoBehaviour
 
         _buttomAttack.onClick.AddListener(() => { OnAction(eControl.Attack); });
         _buttomDefence.onClick.AddListener(() => { OnAction(eControl.Defence); });
-        _buttomInfo.onClick.AddListener(() => { OnAction(eControl.Info); });
+        _buttomItem.onClick.AddListener(() => { OnAction(eControl.Item); });
         _buttomSkill.onClick.AddListener(() => { OnAction(eControl.Skill); });
         _buttomRest.onClick.AddListener(() => { OnAction(eControl.Rest); });
 
+        _skillPad.Initialize();
+        _itemPad.Initialize();
     }
 
     private void OnMove(eControl type)
@@ -65,5 +70,29 @@ public class ControlPad : MonoBehaviour
     private void OnAction(eControl type)
     {
         _onActionCallback?.Invoke(type);
+    }
+
+    public void Attack()
+    {
+
+    }
+
+    public void Defence()
+    {
+
+    }
+
+    public void Skill(Action<int> _onResultCallback)
+    {
+        int result = 0;
+
+        _onResultCallback?.Invoke(result);
+    }
+
+    public void Item(Action<int> _onResultCallback)
+    {
+        int result = 0;
+
+        _onResultCallback?.Invoke(result);
     }
 }

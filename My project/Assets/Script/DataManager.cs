@@ -17,7 +17,7 @@ public class DataManager : MonoBehaviour
     [Serializable]
     public class Creature_Data
     {
-        public ushort index = 0;
+        public ushort id = 0;
 
         public string name = string.Empty;
         public string description = string.Empty;
@@ -49,7 +49,7 @@ public class DataManager : MonoBehaviour
     [Serializable]
     public class Skill_Data
     {
-        public ushort index = 0;
+        public ushort id = 0;
 
         public string name = string.Empty;
         public string description = string.Empty;
@@ -72,7 +72,7 @@ public class DataManager : MonoBehaviour
     [Serializable]
     public class Item_Data
     {
-        public ushort index = 0;
+        public ushort id = 0;
 
         public string name = string.Empty;
         public string description = string.Empty;
@@ -437,7 +437,7 @@ public class DataManager : MonoBehaviour
         {
             foreach (var lastCreature in lastData.encyclopediaData.creatureDatas)
             {
-                if(saveCreature.index == lastCreature.index)
+                if(saveCreature.id == lastCreature.id)
                 {
                     continue;
                 }
@@ -450,7 +450,7 @@ public class DataManager : MonoBehaviour
         {
             foreach (var lastItem in lastData.encyclopediaData.itemDatas)
             {
-                if (saveItem.index == lastItem.index)
+                if (saveItem.id == lastItem.id)
                 {
                     continue;
                 }
@@ -463,7 +463,7 @@ public class DataManager : MonoBehaviour
         {
             foreach (var lastSkill in lastData.encyclopediaData.skillData)
             {
-                if (saveSkill.index == lastSkill.index)
+                if (saveSkill.id == lastSkill.id)
                 {
                     continue;
                 }
@@ -505,7 +505,7 @@ public class DataManager : MonoBehaviour
             index %= _creatureDatas.Count;
         }
 
-        return _creatureDatas.Find(x => x.index == index + 101).DeepCopy();
+        return _creatureDatas.Find(x => x.id == index + 101).DeepCopy();
     }
 
     #endregion
@@ -535,7 +535,7 @@ public class DataManager : MonoBehaviour
 
     public Item_Data GetItemData(int index)
     {
-        return _itemDatas.Find(x => x.index == (index + 501));
+        return _itemDatas.Find(x => x.id == (index + 501));
     }
 
     #endregion
@@ -565,7 +565,7 @@ public class DataManager : MonoBehaviour
 
     public Skill_Data GetskillData(int index)
     {
-        return _skillDatas.Find(x => x.index == (index + 301));
+        return _skillDatas.Find(x => x.id == (index + 301));
     }
 
     #endregion

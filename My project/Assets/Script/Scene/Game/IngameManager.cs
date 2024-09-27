@@ -23,7 +23,7 @@ public class IngameManager : MonoBehaviour
 
         _ingameUI.Initialize(OpenMap, OpenNextRound);
         _textView.Initialize();
-        _controlPad.Initialize(Move, Action);
+        _controlPad.Initialize(PlayerMove, PlayerAction);
         _mapController.Initialize(_roundOriginSaveData.mapData.mapSize);
         _ingamePopup.Initialize();
 
@@ -89,7 +89,7 @@ public class IngameManager : MonoBehaviour
 
 
 
-    private void Move(eControl type)
+    private void PlayerMove(eControl type)
     {
         if(_isPlayerTurn == false)
         {
@@ -105,7 +105,7 @@ public class IngameManager : MonoBehaviour
             return;
         }
 
-        int nearbyBlockIndex = MoveType(type, _saveData.userData.data.currentNodeIndex);
+        int nearbyBlockIndex = PlayerMoveType(type, _saveData.userData.data.currentNodeIndex);
 
         if (nearbyBlockIndex == -1)
         {
@@ -125,7 +125,7 @@ public class IngameManager : MonoBehaviour
         UpdateData();
     }
 
-    private int MoveType(eControl type, int currentIndex)
+    private int PlayerMoveType(eControl type, int currentIndex)
     {
         int x = 0;
         int y = 0;
@@ -187,7 +187,7 @@ public class IngameManager : MonoBehaviour
         return result;
     }
 
-    private void Action(eControl type)
+    private void PlayerAction(eControl type)
     {
         if(_isPlayerTurn == false)
         {
@@ -196,18 +196,45 @@ public class IngameManager : MonoBehaviour
             return;
         }
 
-        if(type == eControl.Rest)
+        switch(type)
         {
-            UiManager.instance.OpenPopup(string.Empty, "휴식하시겠습니까?", "확인", "취소", () =>
-            {
-                PlayerTurnOut();
-                MonsterTurn();
-            }, null);
+            case eControl.Attack :
+                {
+                    _controlPad.Attack();
+                }
+                break;
 
-            return;
+            case eControl.Defence:
+                {
+                    UiManager.instance.OpenPopup(string.Empty, "방어하시겠습니까? 남은 행동력을 모두 소진합니다.", "확인", "취소", () =>
+                    {
+                        _controlPad.Defence();
+                    }, null);
+                }
+                break;
+
+            case eControl.Skill:
+                {
+                    _controlPad.Skill(Skill);
+                }
+                break;
+
+            case eControl.Item:
+                {
+                    _controlPad.Item(Item);
+                }
+                break;
+
+            case eControl.Rest:
+                {
+                    UiManager.instance.OpenPopup(string.Empty, "휴식하시겠습니까?", "확인", "취소", () =>
+                    {
+                        PlayerTurnOut();
+                        MonsterTurn();
+                    }, null);
+                }
+                break;
         }
-
-
     }
 
     private void PlayerTurn()
@@ -319,7 +346,7 @@ public class IngameManager : MonoBehaviour
 
             if(isFindPlayer == true)
             {
-                TargetPlayer(m);
+                MonsterTargetPlayer(m);
 
                 continue;
             }
@@ -339,10 +366,10 @@ public class IngameManager : MonoBehaviour
             return;
         }
 
-        SelectMonsterMoveBlock(m, ap, ref nearbyBlocks);
+        MonsterSelectMoveBlock(m, ap, ref nearbyBlocks);
     }
 
-    private void SelectMonsterMoveBlock(int m, int ap, ref List<int> nearbyBlocks)
+    private void MonsterSelectMoveBlock(int m, int ap, ref List<int> nearbyBlocks)
     {
         if (ap <= 0)
         {
@@ -354,21 +381,21 @@ public class IngameManager : MonoBehaviour
         if (_saveData.mapData.nodeDatas[nearbyBlocks[randomIndex]].isUser == true)
         {
             ap -= 1;
-            TargetPlayer(m);
+            MonsterTargetPlayer(m);
 
             return;
         }
 
         if (_saveData.mapData.nodeDatas[nearbyBlocks[randomIndex]].isWalkable == false)
         {
-            SelectMonsterMoveBlock(m, ap, ref nearbyBlocks);
+            MonsterSelectMoveBlock(m, ap, ref nearbyBlocks);
 
             return;
         }
 
         if (_saveData.mapData.nodeDatas[nearbyBlocks[randomIndex]].isMonster == true)
         {
-            SelectMonsterMoveBlock(m, ap, ref nearbyBlocks);
+            MonsterSelectMoveBlock(m, ap, ref nearbyBlocks);
 
             return;
         }
@@ -379,10 +406,10 @@ public class IngameManager : MonoBehaviour
         _saveData.mapData.monsterDatas[m].currentNodeIndex = nearbyBlocks[randomIndex];
         ap -= 1;
 
-        SelectMonsterMoveBlock(m, ap, ref nearbyBlocks);
+        MonsterSelectMoveBlock(m, ap, ref nearbyBlocks);
     }
 
-    private void TargetPlayer(int m)
+    private void MonsterTargetPlayer(int m)
     {
         DataManager.Creature_Data player = _saveData.userData.data;
 
@@ -405,7 +432,7 @@ public class IngameManager : MonoBehaviour
                     break;
                 }
 
-                if(_roundOriginSaveData.mapData.monsterDatas[i].index == _saveData.mapData.monsterDatas[j].index)
+                if(_roundOriginSaveData.mapData.monsterDatas[i].id == _saveData.mapData.monsterDatas[j].id)
                 {
                     _saveData.mapData.monsterDatas[j].ap = _roundOriginSaveData.mapData.monsterDatas[j].ap;
                 }
@@ -418,14 +445,14 @@ public class IngameManager : MonoBehaviour
 
 
 
-    private void Skill()
+    private void Skill(int id)
     {
 
     }
 
 
 
-    private void Item()
+    private void Item(int id)
     {
 
     }
@@ -1029,7 +1056,7 @@ public class CreatureGenerator
 
             if(creature != null)
             {
-                creature.index = (ushort)i;
+                creature.id = (ushort)i;
                 creature.currentNodeIndex = node.index;
                 _saveData.mapData.nodeDatas[node.index].isMonster = true;
 
