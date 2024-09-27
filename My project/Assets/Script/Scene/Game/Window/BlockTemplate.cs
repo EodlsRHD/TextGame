@@ -6,47 +6,88 @@ using UnityEngine.UI;
 public class BlockTemplate : MonoBehaviour
 {
     [SerializeField] private Image _imageBlock = null;
-    [SerializeField] private TMPro.TMP_Text _text = null;
+
+    private bool _isRresrarch = false;
 
     public void Initialize()
     {
+        _isRresrarch = false;
+
         this.gameObject.SetActive(false);
     }
 
-    public void SetTemplate(int index, DataManager.Node_Data blockData)
+    public void SetTemplate(bool isNearby, bool isExit, DataManager.Node_Data blockData)
     {
-        _text.text = index.ToString();
-
-        SetColor(blockData.isWalkable == true ? Color.white : Color.black);
-
-        if (blockData.isMonster == true)
+        if(isNearby == true)
         {
-            SetColor(Color.red);
+            _isRresrarch = true;
+        }
+
+        Color color = new Color();
+
+        if (isNearby == false && _isRresrarch == false)
+        {
+            color = Color.gray;
+            color.a = 1f;
+        }
+        else if(isNearby == false && _isRresrarch == true)
+        {
+            if (blockData.isWalkable == true)
+            {
+                color = Color.white;
+                color.a = 0.5f;
+            }
+            else if (blockData.isWalkable == false)
+            {
+                color = Color.black;
+                color.a = 0.5f;
+            }
+
+            if (isExit == true)
+            {
+                color = Color.magenta;
+                color.a = 0.5f;
+            }
+        }
+        else if(isNearby == true && isNearby == true)
+        {
+            if (blockData.isWalkable == true)
+            {
+                color = Color.white;
+                color.a = 1f;
+            }
+            else if (blockData.isWalkable == false)
+            {
+                color = Color.black;
+                color.a = 1f;
+            }
+
+            if (blockData.isMonster == true)
+            {
+                color = Color.red;
+                color.a = 1f;
+            }
+
+            if (isExit == true)
+            {
+                color = Color.magenta;
+                color.a = 1f;
+            }
         }
 
         if (blockData.isUser == true)
         {
-            SetColor(Color.green);
+            color = Color.green;
+            color.a = 255f;
         }
 
-        this.gameObject.SetActive(true);
-    }
-
-    public void Exit(int index, eDoorway doorway)
-    {
-        _text.text = index.ToString();
-
-        if (doorway == eDoorway.Exit)
-        {
-            SetColor(Color.magenta);
-        }
-
+        SetColor(color);
         this.gameObject.SetActive(true);
     }
 
     public void RemoveTemplate()
     {
-        SetColor(Color.white);
+        _isRresrarch = false;
         this.gameObject.SetActive(false);
     }
 

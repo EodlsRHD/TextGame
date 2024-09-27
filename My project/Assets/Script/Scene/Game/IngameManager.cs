@@ -12,6 +12,7 @@ public class IngameManager : MonoBehaviour
 
     private DataManager.Save_Data _roundOriginSaveData = null;
     private DataManager.Save_Data _saveData = null;
+    private MapGenerator _mapGenerator = null;
 
     private bool _isPlayerTurn = false;
     private bool _isAllMonsterDead = true;
@@ -38,6 +39,8 @@ public class IngameManager : MonoBehaviour
 
     private void OpenNextRound(eRoundClear type)
     {
+        _textView.DeleteTemplate();
+
         if(type == eRoundClear.Fail)
         {
             GameManager.instance.tools.SceneChange(eScene.Lobby, () => 
@@ -52,7 +55,7 @@ public class IngameManager : MonoBehaviour
         {
             _roundOriginSaveData.round++;
 
-            MapGenerator _mapGenerator = new MapGenerator(GenerateMap, _roundOriginSaveData);
+            _mapGenerator = new MapGenerator(GenerateMap, _roundOriginSaveData);
         }); 
     }
 
@@ -67,10 +70,10 @@ public class IngameManager : MonoBehaviour
     {
         _saveData = _roundOriginSaveData.DeepCopy();
 
+        _textView.UpdateText(_saveData.mapData.nodeDatas[_saveData.userData.data.currentNodeIndex]);
         _ingameUI.SetRoundText(_saveData.round);
-        _mapController.SetMap(_saveData);
 
-        _isPlayerTurn = true;
+        PlayerTurn();
 
         if (_saveData.mapData.monsterDatas.Count > 0)
         {
@@ -80,8 +83,11 @@ public class IngameManager : MonoBehaviour
 
     private void RoundClear()
     {
+        _mapController.RemoveTemplate();
         OpenNextRound(eRoundClear.Success);
     }
+
+
 
     private void Move(eControl type)
     {
@@ -101,35 +107,12 @@ public class IngameManager : MonoBehaviour
 
         int nearbyBlockIndex = MoveType(type, _saveData.userData.data.currentNodeIndex);
 
-        if (nearbyBlockIndex == -1) // -1 : out of map
+        if (nearbyBlockIndex == -1)
         {
             return;
         }
 
-        if (nearbyBlockIndex == -2) // -2 : blocker
-        {
-            _ingamePopup.UpdateText("이동할 수 없습니다.");
-
-            return;
-        }
-
-        if(nearbyBlockIndex == -3) // -3 : monster
-        {
-            _textView.UpdateText("몬스터를 만났습니다.");
-
-            return;
-        }
-
-        if (nearbyBlockIndex == -4) // -4 : exit
-        {
-            _textView.UpdateText("출구입니다.");
-            UiManager.instance.OpenPopup(string.Empty, "다음 라운드로 넘어가시겠습니까?", string.Empty, string.Empty, () =>
-            {
-                RoundClear();
-            }, null);
-
-            return;
-        }
+        _textView.UpdateText(_saveData.mapData.nodeDatas[nearbyBlockIndex]);
 
         _saveData.mapData.nodeDatas[_saveData.userData.data.currentNodeIndex].isUser = false;
         _saveData.mapData.nodeDatas[nearbyBlockIndex].isUser = true;
@@ -137,159 +120,9 @@ public class IngameManager : MonoBehaviour
         _saveData.userData.data.currentNodeIndex = nearbyBlockIndex;
         _saveData.userData.data.ap -= 1;
 
-        UpdateData();
-    }
-
-    private void Action(eControl type)
-    {
-        if(_isPlayerTurn == false)
-        {
-            _ingamePopup.UpdateText(_saveData.userData.data.name + "의 순서가 아닙니다.");
-
-            return;
-        }
-
-        if(type == eControl.Rest)
-        {
-            PlayerTurnOut();
-            MonsterTurn();
-
-            return;
-        }
-
-
-    }
-
-    private void PlayerTurnOut()
-    {
-        _isPlayerTurn = false;
-
-        _saveData.userData.data.ap = _roundOriginSaveData.userData.data.ap;
-    }
-
-    private void MonsterTurn()
-    {
-        if(_isAllMonsterDead == true)
-        {
-            _isPlayerTurn = true;
-            return;
-        }
-
-        for (int m = 0; m < _saveData.mapData.monsterDatas.Count; m++)
-        {
-            if(_saveData.mapData.monsterDatas[m].ap == 0)
-            {
-                Debug.LogError("00");
-                continue;
-            }
-
-            List<int> dx = new List<int>();
-            List<int> dy = new List<int>();
-
-            for (int i = -_saveData.mapData.monsterDatas[m].vision; i <= _saveData.mapData.monsterDatas[m].vision; i++)
-            {
-                dx.Add(i);
-                dy.Add(i);
-            }
-
-            bool isFindPlayer = false;
-            List<int> NearbyIndexs = GetNearbyBlocks_Diagonal(dx, dy, _saveData.mapData.monsterDatas[m].currentNodeIndex);
-
-            for (int i = 0; i < NearbyIndexs.Count; i++)
-            {
-                if (_saveData.userData.data.currentNodeIndex == NearbyIndexs[i])
-                {
-                    isFindPlayer = true;
-
-                    break;
-                }
-            }
-
-            if(isFindPlayer == true)
-            {
-                Debug.LogError("11");
-                continue;
-            }
-
-            MonsterMove(m, _saveData.mapData.monsterDatas[m].ap);
-        }
-
-        MonsterTurnOut();
-    }
-
-    private void MonsterMove(int m, int ap)
-    {
-        if (ap < 0)
-        {
-            Debug.LogError("-1");
-            return;
-        }
-
-        List<int> nearbyBlocks = GetNearbyBlocks(_saveData.mapData.monsterDatas[m].currentNodeIndex);
-
-        if(nearbyBlocks.Count == 0)
-        {
-            Debug.LogError("0");
-            return;
-        }
-
-        int randomIndex = Random.Range(0, nearbyBlocks.Count);
-
-        if (_saveData.mapData.nodeDatas[nearbyBlocks[randomIndex]].isWalkable == false)
-        {
-            Debug.LogError("1     " + nearbyBlocks[randomIndex]);
-            MonsterMove(m, ap);
-            return;
-        }
-
-        if (_saveData.mapData.nodeDatas[nearbyBlocks[randomIndex]].isUser == true)
-        {
-            Debug.LogError("2     " + nearbyBlocks[randomIndex]);
-            MonsterMove(m, ap);
-            return;
-        }
-
-        if (_saveData.mapData.nodeDatas[nearbyBlocks[randomIndex]].isMonster == true)
-        {
-            Debug.LogError("3     " + nearbyBlocks[randomIndex]);
-            MonsterMove(m, ap);
-            return;
-        }
-
-        _saveData.mapData.nodeDatas[_saveData.mapData.monsterDatas[m].currentNodeIndex].isMonster = false;
-        _saveData.mapData.nodeDatas[nearbyBlocks[randomIndex]].isMonster = true;
-
-        _saveData.mapData.monsterDatas[m].currentNodeIndex = nearbyBlocks[randomIndex];
-        _saveData.mapData.monsterDatas[m].ap -= 1;
-
-        MonsterMove(m, _saveData.mapData.monsterDatas[m].ap);
-    }
-
-    private void MonsterTurnOut()
-    {
-        for (int i = 0; i < _roundOriginSaveData.mapData.monsterDatas.Count; i++)
-        {
-            for (int j = 0; j < _saveData.mapData.monsterDatas.Count; j++)
-            {
-                if(_saveData.mapData.monsterDatas[j].hp <= 0)
-                {
-                    break;
-                }
-
-                if(_roundOriginSaveData.mapData.monsterDatas[i].index == _saveData.mapData.monsterDatas[j].index)
-                {
-                    _saveData.mapData.monsterDatas[j].ap = _roundOriginSaveData.mapData.monsterDatas[j].ap;
-                }
-            }
-        }
+        _textView.UpdateText("행동력이 " + _saveData.userData.data.ap + "만큼 남았습니다.");
 
         UpdateData();
-        _isPlayerTurn = true;
-    }
-
-    private void UpdateData()
-    {
-        _mapController.UpdateData(_saveData);
     }
 
     private int MoveType(eControl type, int currentIndex)
@@ -324,25 +157,284 @@ public class IngameManager : MonoBehaviour
 
         if (result == -1)
         {
-            return -1;
+            return result;
         }
 
         if (_saveData.mapData.nodeDatas[result].isWalkable == false)
         {
-            return -2;
+            _ingamePopup.UpdateText("이동할 수 없습니다.");
+
+            return -1;
         }
 
         if (_saveData.mapData.nodeDatas[result].isMonster == true)
         {
-            return -3;
+            _textView.UpdateText(_saveData.mapData.monsterDatas.Find(x => x.currentNodeIndex == result), _saveData.mapData.nodeDatas[result]);
+
+            return -1;
         }
 
         if (_saveData.mapData.exitNodeIndex == result)
         {
-            return -4;
+            UiManager.instance.OpenPopup(string.Empty, "다음 라운드로 넘어가시겠습니까?", string.Empty, string.Empty, () =>
+            {
+                RoundClear();
+            }, null);
+
+            return -1;
         }
 
         return result;
+    }
+
+    private void Action(eControl type)
+    {
+        if(_isPlayerTurn == false)
+        {
+            _ingamePopup.UpdateText(_saveData.userData.data.name + "의 순서가 아닙니다.");
+
+            return;
+        }
+
+        if(type == eControl.Rest)
+        {
+            UiManager.instance.OpenPopup(string.Empty, "휴식하시겠습니까?", "확인", "취소", () =>
+            {
+                PlayerTurnOut();
+                MonsterTurn();
+            }, null);
+
+            return;
+        }
+
+
+    }
+
+    private void PlayerTurn()
+    {
+        _isPlayerTurn = true;
+
+        _textView.UpdateText("행동력이 " + _saveData.userData.data.ap + "만큼 남았습니다.");
+
+        List<int> NearbyIndexs = PlayerVision();
+
+        for (int i = 0; i < NearbyIndexs.Count; i++)
+        {
+            int index = NearbyIndexs[i];
+
+            if (_saveData.mapData.exitNodeIndex == index)
+            {
+                _textView.UpdateText(eFind.Exit, _saveData.mapData.nodeDatas[index], _saveData.mapData.nodeDatas[_saveData.userData.data.currentNodeIndex]);
+
+                continue;
+            }
+
+            if (_saveData.mapData.nodeDatas[index].isItem == true)
+            {
+                _textView.UpdateText(eFind.Item, _saveData.mapData.nodeDatas[index], _saveData.mapData.nodeDatas[_saveData.userData.data.currentNodeIndex]);
+
+                continue;
+            }
+
+            if (_saveData.mapData.nodeDatas[index].isMonster == true)
+            {
+                _textView.UpdateText(eFind.Monster, _saveData.mapData.nodeDatas[index], _saveData.mapData.nodeDatas[_saveData.userData.data.currentNodeIndex]);
+
+                continue;
+            }
+        }
+
+        _mapController.SetMap(_saveData, NearbyIndexs);
+    }
+
+    private List<int> PlayerVision()
+    {
+        List<int> dx = new List<int>();
+        List<int> dy = new List<int>();
+
+        for (int i = -_saveData.userData.data.vision; i <= _saveData.userData.data.vision; i++)
+        {
+            dx.Add(i);
+            dy.Add(i);
+        }
+
+        return GetNearbyBlocks_Diagonal(dx, dy, _saveData.userData.data.currentNodeIndex);
+    }
+
+    private void PlayerTurnOut()
+    {
+        _isPlayerTurn = false;
+
+        _saveData.userData.data.ap = _roundOriginSaveData.userData.data.ap;
+    }
+
+
+
+    private void MonsterTurn()
+    {
+        if(_isAllMonsterDead == true)
+        {
+            _isPlayerTurn = true;
+            return;
+        }
+
+        for (int m = 0; m < _saveData.mapData.monsterDatas.Count; m++)
+        {
+            if(_saveData.mapData.monsterDatas[m].ap == 0)
+            {
+                continue;
+            }
+
+            List<int> dx = new List<int>();
+            List<int> dy = new List<int>();
+
+            for (int i = -_saveData.mapData.monsterDatas[m].vision; i <= _saveData.mapData.monsterDatas[m].vision; i++)
+            {
+                dx.Add(i);
+                dy.Add(i);
+            }
+
+            bool isFindPlayer = false;
+            List<int> NearbyIndexs = GetNearbyBlocks_Diagonal(dx, dy, _saveData.mapData.monsterDatas[m].currentNodeIndex);
+
+            for (int i = 0; i < NearbyIndexs.Count; i++)
+            {
+                if (_saveData.mapData.nodeDatas[NearbyIndexs[i]].isWalkable == false)
+                {
+                    continue;
+                }
+
+                if (_saveData.mapData.nodeDatas[NearbyIndexs[i]].isMonster == true)
+                {
+                    continue;
+                }
+
+                if (_saveData.userData.data.currentNodeIndex == NearbyIndexs[i])
+                {
+                    isFindPlayer = true;
+
+                    break;
+                }
+            }
+
+            if(isFindPlayer == true)
+            {
+                TargetPlayer(m);
+
+                continue;
+            }
+
+            MonsterMove(m, 1);
+        }
+
+        MonsterTurnOut();
+    }
+
+    private void MonsterMove(int m, int ap)
+    {
+        List<int> nearbyBlocks = GetNearbyBlocks(_saveData.mapData.monsterDatas[m].currentNodeIndex);
+
+        if(nearbyBlocks.Count == 0)
+        {
+            return;
+        }
+
+        SelectMonsterMoveBlock(m, ap, ref nearbyBlocks);
+    }
+
+    private void SelectMonsterMoveBlock(int m, int ap, ref List<int> nearbyBlocks)
+    {
+        if (ap <= 0)
+        {
+            return;
+        }
+
+        int randomIndex = Random.Range(0, nearbyBlocks.Count);
+
+        if (_saveData.mapData.nodeDatas[nearbyBlocks[randomIndex]].isUser == true)
+        {
+            ap -= 1;
+            TargetPlayer(m);
+
+            return;
+        }
+
+        if (_saveData.mapData.nodeDatas[nearbyBlocks[randomIndex]].isWalkable == false)
+        {
+            SelectMonsterMoveBlock(m, ap, ref nearbyBlocks);
+
+            return;
+        }
+
+        if (_saveData.mapData.nodeDatas[nearbyBlocks[randomIndex]].isMonster == true)
+        {
+            SelectMonsterMoveBlock(m, ap, ref nearbyBlocks);
+
+            return;
+        }
+
+        _saveData.mapData.nodeDatas[_saveData.mapData.monsterDatas[m].currentNodeIndex].isMonster = false;
+        _saveData.mapData.nodeDatas[nearbyBlocks[randomIndex]].isMonster = true;
+
+        _saveData.mapData.monsterDatas[m].currentNodeIndex = nearbyBlocks[randomIndex];
+        ap -= 1;
+
+        SelectMonsterMoveBlock(m, ap, ref nearbyBlocks);
+    }
+
+    private void TargetPlayer(int m)
+    {
+        DataManager.Creature_Data player = _saveData.userData.data;
+
+        int result = _mapGenerator.PathFinding(ref _saveData.mapData, _saveData.mapData.monsterDatas[m].currentNodeIndex, player.currentNodeIndex);
+
+        _saveData.mapData.nodeDatas[_saveData.mapData.monsterDatas[m].currentNodeIndex].isMonster = false;
+        _saveData.mapData.nodeDatas[result].isMonster = true;
+
+        _saveData.mapData.monsterDatas[m].currentNodeIndex = result;
+    }
+
+    private void MonsterTurnOut()
+    {
+        for (int i = 0; i < _roundOriginSaveData.mapData.monsterDatas.Count; i++)
+        {
+            for (int j = 0; j < _saveData.mapData.monsterDatas.Count; j++)
+            {
+                if(_saveData.mapData.monsterDatas[j].hp <= 0)
+                {
+                    break;
+                }
+
+                if(_roundOriginSaveData.mapData.monsterDatas[i].index == _saveData.mapData.monsterDatas[j].index)
+                {
+                    _saveData.mapData.monsterDatas[j].ap = _roundOriginSaveData.mapData.monsterDatas[j].ap;
+                }
+            }
+        }
+
+        UpdateData();
+        PlayerTurn();
+    }
+
+
+
+    private void Skill()
+    {
+
+    }
+
+
+
+    private void Item()
+    {
+
+    }
+
+
+
+    private void UpdateData()
+    {
+        _mapController.UpdateData(_saveData, PlayerVision());
     }
 
     private int GetNearbyBlocks(int x, int y, int index)
@@ -414,16 +506,6 @@ public class IngameManager : MonoBehaviour
                         continue;
                     }
 
-                    if (_saveData.mapData.nodeDatas[resultIndex].isWalkable == false)
-                    {
-                        continue;
-                    }
-
-                    if (_saveData.mapData.nodeDatas[resultIndex].isMonster == true)
-                    {
-                        continue;
-                    }
-
                     if (resultIndex == _saveData.mapData.exitNodeIndex)
                     {
                         continue;
@@ -472,16 +554,6 @@ public class IngameManager : MonoBehaviour
                         continue;
                     }
 
-                    if (_saveData.mapData.nodeDatas[resultIndex].isWalkable == false)
-                    {
-                        continue;
-                    }
-
-                    if (_saveData.mapData.nodeDatas[resultIndex].isMonster == true)
-                    {
-                        continue;
-                    }
-
                     if (0 <= resultIndex && resultIndex < (_saveData.mapData.mapSize * _saveData.mapData.mapSize))
                     {
                         result.Add(resultIndex);
@@ -515,13 +587,17 @@ public class MapGenerator
             get { return _g + _h; }
         }
 
-        public Node(int index, int x, int y, DataManager.Node_Data enterBlock, DataManager.Node_Data exitBlock)
+        public Node(int index, int x, int y)
         {
             _index = index;
             _x = x;
             _y = y;
+        }
 
-            //_g = Mathf.Abs(Mathf.)
+        public void SetStartEnd(Node startNode, Node endNode)
+        {
+            _g = (int)Mathf.Sqrt(Mathf.Pow(Mathf.Abs(_x - startNode._x), 2) + Mathf.Pow(Mathf.Abs(_y - startNode._y), 2));
+            _h = (int)Mathf.Sqrt(Mathf.Pow(Mathf.Abs(_x - endNode._x), 2) + Mathf.Pow(Mathf.Abs(_y - endNode._y), 2));
         }
     }
 
@@ -553,7 +629,7 @@ public class MapGenerator
         {
             for (int x = 0; x < _mapSize; x++)
             {
-                Node node = new Node((y * _mapSize) + x, x, y, null, null);
+                Node node = new Node((y * _mapSize) + x, x, y);
 
                 _nodes.Add(node);
             }
@@ -600,11 +676,11 @@ public class MapGenerator
             }
         }
 
-        CheckStuckBlocker(ref middlePoints, ref randomBlockerIndexs);
+        CheckStuckBlocker(ref middlePoints);
         SelectEnterBlock(ref middlePoints);
     }
 
-    private void CheckStuckBlocker(ref List<int> middlePoints, ref List<int> randomBlockerIndex)
+    private void CheckStuckBlocker(ref List<int> middlePoints)
     {
         for (int m = 0; m < middlePoints.Count; m++)
         {
@@ -747,9 +823,56 @@ public class MapGenerator
                 int nearbyY = (index / _mapSize) + dy[y];
                 int resultIndex = nearbyX + (nearbyY * _mapSize);
 
-                if(0 <= resultIndex && resultIndex < (_mapSize * _mapSize))
+                if (index == resultIndex)
+                {
+                    continue;
+                }
+
+                if (0 <= resultIndex && resultIndex < (_mapSize * _mapSize))
                 {
                     result.Add(resultIndex);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    private List<int> GetNearbyBlocks(int index)
+    {
+        List<int> result = new List<int>();
+
+        for (int y = 0; y < dy.Length; y++)
+        {
+            for (int x = 0; x < dx.Length; x++)
+            {
+                if(((dy[y] == -1 || dy[y] == 1) && dx[x] == 0) || (dy[y] == 0 && (dx[x] == 1 || dx[x] == -1)))
+                {
+                    int nearbyX = (index % _mapSize) + dx[x];
+
+                    if (nearbyX < 0 || _mapSize <= nearbyX)
+                    {
+                        continue;
+                    }
+
+                    int nearbyY = (index / _mapSize) + dy[y];
+
+                    if (nearbyY < 0 || _mapSize <= nearbyY)
+                    {
+                        continue;
+                    }
+
+                    int resultIndex = nearbyX + (nearbyY * _mapSize);
+
+                    if (index == resultIndex)
+                    {
+                        continue;
+                    }
+
+                    if (0 <= resultIndex && resultIndex < (_mapSize * _mapSize))
+                    {
+                        result.Add(resultIndex);
+                    }
                 }
             }
         }
@@ -796,6 +919,58 @@ public class MapGenerator
                         result.Add(resultIndex);
                     }
                 }
+            }
+        }
+
+        return result;
+    }
+
+    public int PathFinding(ref DataManager.Map_Data mapData, int startNodeIndex, int endNodeIndex)
+    {
+        int result = startNodeIndex;
+
+        foreach (var node in _nodes)
+        {
+            node.SetStartEnd(_nodes[startNodeIndex], _nodes[endNodeIndex]);
+        }
+
+        List<int> nearbyNodeIndexs = GetNearbyBlocks(startNodeIndex);
+
+        int f = 9999;
+
+        for (int i = 0; i < nearbyNodeIndexs.Count; i++)
+        {
+            int index = nearbyNodeIndexs[i];
+
+            if (_nodes[index].f < f)
+            {
+                if(mapData.nodeDatas[index].isMonster == true)
+                {
+                    continue;
+                }
+
+                if (mapData.nodeDatas[index].isWalkable == false)
+                {
+                    continue;
+                }
+
+                if (mapData.nodeDatas[index].isUser == true)
+                {
+                    continue;
+                }
+
+                if (index == mapData.enterNodeIndex)
+                {
+                    continue;
+                }
+
+                if (index == mapData.exitNodeIndex)
+                {
+                    continue;
+                }
+
+                result = index;
+                f = _nodes[index].f;
             }
         }
 
@@ -896,21 +1071,31 @@ public class CreatureGenerator
             return;
         }
 
-        int newIndex = 0;
+        int newIndex = index;
 
         if(_saveData.mapData.nodeDatas[index].isWalkable == false)
         {
-            newIndex = index + 1;
+            newIndex += 1;
         }
         
-        if(_saveData.mapData.nodeDatas[index].isMonster == true || _saveData.mapData.nodeDatas[index].isUser == true)
+        if(_saveData.mapData.nodeDatas[index].isMonster == true)
         {
-            newIndex = index + 5;
+            newIndex += 5;
+        }
+
+        if(_saveData.mapData.nodeDatas[index].isUser == true)
+        {
+            newIndex += 5;
         }
         
-        if(index == _saveData.mapData.enterNodeIndex || index == _saveData.mapData.exitNodeIndex)
+        if(index == _saveData.mapData.enterNodeIndex)
         {
-            newIndex = index + 2;
+            newIndex += 2;
+        }
+
+        if(index == _saveData.mapData.exitNodeIndex)
+        {
+            newIndex += 2;
         }
 
         if(newIndex >= _saveData.mapData.nodeDatas.Count)

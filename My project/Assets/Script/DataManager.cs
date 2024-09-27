@@ -119,6 +119,7 @@ public class DataManager : MonoBehaviour
         public bool isWalkable = false;
         public bool isMonster = false;
         public bool isUser = false;
+        public bool isItem = false;
     }
 
     #endregion
@@ -333,7 +334,7 @@ public class DataManager : MonoBehaviour
         _saveData.userData.data.ap = 100;
         _saveData.userData.data.attack = 10;
         _saveData.userData.data.defence = 10;
-        _saveData.userData.data.vision = 2;
+        _saveData.userData.data.vision = 3;
         _saveData.userData.data.skillDatas = new List<Skill_Data>();
 
         _saveData.mapData = new Map_Data();

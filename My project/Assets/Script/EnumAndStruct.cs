@@ -20,13 +20,6 @@ public enum eControl
     Rest
 }
 
-public enum eAction
-{
-    Non = -1,
-    MeetMonster,
-    MeetItem
-}
-
 public enum eRoundClear
 {
     Non = -1,
@@ -35,9 +28,10 @@ public enum eRoundClear
     Fail
 }
 
-public enum eDoorway
+public enum eFind
 {
     Non = -1,
-    Enter,
+    Monster,
+    Item,
     Exit
 }

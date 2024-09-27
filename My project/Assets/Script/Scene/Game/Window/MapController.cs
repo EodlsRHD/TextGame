@@ -26,35 +26,39 @@ public class MapController : MonoBehaviour
             var obj = Instantiate(_tempalte, _trTemplateParant);
             var com = obj.GetComponent<BlockTemplate>();
 
+            com.Initialize();
             _pool.Add(com);
         }
 
         this.gameObject.SetActive(false);
     }
 
-    public void SetMap(DataManager.Save_Data saveData)
+    public void SetMap(DataManager.Save_Data saveData, List<int> nearbyIndexs)
     {
         var blockData = saveData.mapData.nodeDatas;
 
         for (int i = 0; i < blockData.Count; i++)
         {
             var template = _pool[i];
+            bool same = false;
 
-            if (i == saveData.mapData.exitNodeIndex)
+            for (int j = 0; j < nearbyIndexs.Count; j++)
             {
-                template.Exit(i, eDoorway.Exit);
-
-                continue;
+                if(i == nearbyIndexs[j])
+                {
+                    same = true;
+                    
+                    break;
+                }
             }
-            
-            template.SetTemplate(i, blockData[i]);
+
+            template.SetTemplate(same, i == saveData.mapData.exitNodeIndex, blockData[i]);
         }
     }
 
-    public void UpdateData(DataManager.Save_Data saveData)
+    public void UpdateData(DataManager.Save_Data saveData, List<int> nearbyIndexs)
     {
-        RemoveTemplate();
-        SetMap(saveData);
+        SetMap(saveData, nearbyIndexs);
     }
 
     public void OpenMap(Action onCallback)
@@ -73,7 +77,7 @@ public class MapController : MonoBehaviour
         _onCloseCallback?.Invoke();
     }
 
-    private void RemoveTemplate()
+    public void RemoveTemplate()
     {
         for (int i = 0; i < _pool.Count; i++)
         {
