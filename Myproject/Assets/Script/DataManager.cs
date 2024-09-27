@@ -178,22 +178,29 @@ public class DataManager : MonoBehaviour
 
     #region Google Play Game Services
 
-    //https://ljhyunstory.tistory.com/354
+    //https://toytvstory.tistory.com/2497
 
     private void GooglePlayGamesLogin()
     {
-    #if UNITY_EDITOR
+#if UNITY_EDITOR
         return;
-    #endif
+#endif
 
         PlayGamesPlatform.DebugLogEnabled = true;
         PlayGamesPlatform.Activate();
-        PlayGamesPlatform.Instance.Authenticate((status) => { Debug.Log(status.ToString()); });
+        PlayGamesPlatform.Instance.Authenticate((status) => 
+        {
+            Debug.Log(status.ToString());
 
-        GooglePlayGamesRead(true, null);
+            if (status == SignInStatus.Success)
+            {
+                GooglePlayGamesRead(false, null);
+                return;
+            }
+        });
     }
 
-    public void GooglePlayGamesRead(bool isSave, Action onSaveOrLoadCallback = null)
+    private void GooglePlayGamesRead(bool isSave, Action onSaveOrLoadCallback = null)
     {
         if (onSaveOrLoadCallback != null)
         {
@@ -338,7 +345,7 @@ public class DataManager : MonoBehaviour
         _saveData.userData.data.skillDatas = new List<Skill_Data>();
 
         _saveData.mapData = new Map_Data();
-        _saveData.mapData.mapSize = 9;
+        _saveData.mapData.mapSize = _mapSize;
         _saveData.mapData.nodeDatas = new List<Node_Data>();
         _saveData.mapData.monsterDatas = new List<Creature_Data>();
 
@@ -356,38 +363,30 @@ public class DataManager : MonoBehaviour
 
     public bool CheckSaveData()
     {
-    #if UNITY_EDITOR
-        return false;
-    #endif
         return (_saveData != null);
     }
 
     public void SaveDataToCloud(Save_Data saveData = null, Action onSaveOrLoadCallback = null)
     {
-    #if UNITY_EDITOR
-        if(saveData != null)
-        {
-            _saveData = saveData;
-        }
-
-        onSaveOrLoadCallback?.Invoke();
-
+#if UNITY_EDITOR
         return;
-    #endif
+#endif
+
         if (saveData != null)
         {
             _saveData = saveData;
-        } 
+        }
 
         GooglePlayGamesRead(true, onSaveOrLoadCallback);
     }
 
     public void LoadDataToCloud(Action onSaveOrLoadCallback = null)
     {
-    #if UNITY_EDITOR
-        onSaveOrLoadCallback?.Invoke();
+#if UNITY_EDITOR
+        _saveData = new Save_Data();
+
         return;
-    #endif
+#endif
 
         GooglePlayGamesRead(false, onSaveOrLoadCallback);
     }

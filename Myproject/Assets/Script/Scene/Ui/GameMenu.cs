@@ -59,7 +59,7 @@ public class GameMenu : MonoBehaviour
         {
             GameManager.instance.dataManager.SaveDataToCloud(null, () => 
             {
-                GameManager.instance.tools.SceneChange(eScene.Game);
+                GameManager.instance.tools.SceneChange(eScene.Lobby);
             });
         }, () => 
         {

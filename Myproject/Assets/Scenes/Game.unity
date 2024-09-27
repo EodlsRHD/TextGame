@@ -342,7 +342,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1294686209}
   m_Direction: 2
   m_Value: 0
-  m_Size: 1
+  m_Size: 0.99986124
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -1716,11 +1716,11 @@ MonoBehaviour:
   _buttomDown: {fileID: 140931654}
   _buttomAttack: {fileID: 1390105189}
   _buttomDefence: {fileID: 2035147194}
-  _buttomItem: {fileID: 0}
+  _buttomItem: {fileID: 688458512}
   _buttomSkill: {fileID: 910503272}
   _buttomRest: {fileID: 1703018674}
-  _skillPad: {fileID: 0}
-  _itemPad: {fileID: 0}
+  _skillPad: {fileID: 1611151199}
+  _itemPad: {fileID: 1611151198}
 --- !u!1 &516969083
 GameObject:
   m_ObjectHideFlags: 0

@@ -16,10 +16,11 @@ TextMesh Pro.meta
 *.csproj
 *.sln
 Server/build/
-My project/Assets/TextMesh Pro/
-My project/Build/
-My project/Assets/ExternalDependencyManager/
-My project/Assets/GooglePlayGames/
-My project/Assets/Plugins/
-My project/Assets/ExternalDependencyManager.meta
-My project/Assets/GooglePlayGames.meta
+Myproject/Assets/TextMesh Pro/
+Myproject/Build/
+Myproject/Assets/ExternalDependencyManager/
+Myproject/Assets/GooglePlayGames/
+Myproject/Assets/Plugins/
+Myproject/Assets/ExternalDependencyManager.meta
+Myproject/Assets/GooglePlayGames.meta
+Myproject/Key/user.keystore
