@@ -17,7 +17,8 @@ public enum eControl
     Defence,
     Skill,
     Rest,
-    Item
+    Bag,
+    SearchNearby
 }
 
 public enum eRoundClear
@@ -34,4 +35,19 @@ public enum eFind
     Monster,
     Item,
     Exit
+}
+
+
+public enum eStats
+{
+    Non = -1,
+    Level,
+    HP,
+    MP,
+    AP,
+    EXP,
+    Attack,
+    Defence,
+    Vision,
+    AttackRange
 }

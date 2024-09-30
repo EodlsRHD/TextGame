@@ -29,10 +29,12 @@ public class DataManager : MonoBehaviour
         public ushort exp = 0;
         public ushort attack = 0;
         public ushort defence = 0;
-        public ushort vision = 3;
+        public ushort vision = 0;
+        public ushort attackRange = 0;
 
         public bool useSkill = false;
-        public ushort[] skillIndexs = null;
+        public List<ushort> skillIndexs = null;
+        public List<ushort> itemIndexs = null;
         public List<Skill_Data> skillDatas = null;
 
         public int currentNodeIndex = 0;
@@ -43,7 +45,102 @@ public class DataManager : MonoBehaviour
     {
         public Creature_Data data = null;
 
-        public ushort level = 0; // 1레벨 경험치 * 레벨수
+        public ushort level = 1; // 1레벨 (경험치 * 0.4) * 레벨수
+
+        private ushort _defultHP = 10;
+        private ushort _defultMP = 10;
+        private ushort _defultAP = 10;
+        private ushort _defultEXP = 15;
+        private ushort _defultATTACK = 10;
+        private ushort _defultDEFENCE = 4;
+        private ushort _defultVISION = 1;
+        private ushort _defultATTACKRANGE = 1;
+
+        public ushort currentHP = 10;
+        public ushort currentMP = 10;
+        public ushort currentAP = 10;
+        public ushort currentEXP = 0;
+        public ushort currentATTACK = 10;
+        public ushort currentDEFENCE = 10;
+        public ushort currentVISION = 3;
+        public ushort currentATTACKRANGE = 10;
+
+        public List<Item_Data> itemDatas = null;
+
+
+        public ushort maximumHP
+        {
+            get { return (ushort)(_defultHP * data.hp); }
+            set { data.hp = (ushort)value; }
+        }
+
+        public ushort maximumMP
+        {
+            get { return (ushort)(_defultMP * data.mp); }
+            set { data.mp = (ushort)value; }
+        }
+
+        public ushort maximumAP
+        {
+            get { return (ushort)(_defultAP * data.ap); }
+            set { data.ap = (ushort)value; }
+        }
+
+        public ushort maximumEXP
+        {
+            get { return (ushort)(level * _defultEXP); }
+        }
+
+        public ushort maximumATTACK
+        {
+            get { return (ushort)(_defultATTACK * data.attack); }
+            set { data.attack = (ushort)value; }
+        }
+
+        public ushort maximumDEFENCE
+        {
+            get { return (ushort)(_defultDEFENCE * data.defence); }
+            set { data.defence = (ushort)value; }
+        }
+
+        public ushort maximumVISION
+        {
+            get { return (ushort)(_defultVISION * data.vision); }
+            set 
+            { 
+                if(value > 5)
+                {
+                    return;
+                }
+
+                data.vision = (ushort)value; 
+            }
+        }
+
+        public ushort maximumATTACKRANGE
+        {
+            get { return (ushort)(_defultATTACKRANGE * data.attackRange); }
+            set
+            {
+                if (value > 5)
+                {
+                    return;
+                }
+
+                data.attackRange = (ushort)value;
+            }
+        }
+
+        public void Reset()
+        {
+            currentHP = maximumHP;
+            currentMP = maximumMP;
+            currentAP = maximumAP;
+            currentATTACK = maximumATTACK;
+            currentDEFENCE = maximumDEFENCE;
+            currentVISION = maximumVISION;
+            currentATTACKRANGE = maximumATTACKRANGE;
+        }
     }
 
     [Serializable]
@@ -330,18 +427,21 @@ public class DataManager : MonoBehaviour
 
     public void CreateNewSaveData()
     {
+        Debug.Log("TEST Stat Set");
+
         _saveData = new Save_Data();
         _saveData.round = 0;
 
         _saveData.userData = new User_Data();
+        _saveData.userData.itemDatas = new List<Item_Data>();
         _saveData.userData.data = new Creature_Data();
-        Debug.Log("TEST Stat Set");
-        _saveData.userData.data.hp = 10;
-        _saveData.userData.data.mp = 10;
-        _saveData.userData.data.ap = 100;
-        _saveData.userData.data.attack = 10;
-        _saveData.userData.data.defence = 10;
-        _saveData.userData.data.vision = 3;
+        _saveData.userData.data.hp = 1;
+        _saveData.userData.data.mp = 1;
+        _saveData.userData.data.ap = 10;
+        _saveData.userData.data.attack = 1;
+        _saveData.userData.data.defence = 0;
+        _saveData.userData.data.vision = 1;
+        _saveData.userData.data.attackRange = 1;
         _saveData.userData.data.skillDatas = new List<Skill_Data>();
 
         _saveData.mapData = new Map_Data();
@@ -507,7 +607,7 @@ public class DataManager : MonoBehaviour
             index %= _creatureDatas.Count;
         }
 
-        return _creatureDatas.Find(x => x.id == index + 101).DeepCopy();
+        return _creatureDatas.Find(x => x.id == (index + 101)).DeepCopy();
     }
 
     #endregion
@@ -537,7 +637,7 @@ public class DataManager : MonoBehaviour
 
     public Item_Data GetItemData(int index)
     {
-        return _itemDatas.Find(x => x.id == (index + 501));
+        return _itemDatas.Find(x => x.id == (index + 501)).DeepCopy();
     }
 
     #endregion
@@ -567,7 +667,7 @@ public class DataManager : MonoBehaviour
 
     public Skill_Data GetskillData(int index)
     {
-        return _skillDatas.Find(x => x.id == (index + 301));
+        return _skillDatas.Find(x => x.id == (index + 301)).DeepCopy();
     }
 
     #endregion
