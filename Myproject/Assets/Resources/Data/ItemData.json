@@ -2,7 +2,7 @@
   "datas":
   [
     {
-      "index": 301,
+      "id": 301,
       "name": "아이템 1",
       "description": "골드 획득",
       "hp": 0,
@@ -19,7 +19,7 @@
       "duration": 0
     },
     {
-      "index": 302,
+      "id": 302,
       "name": "아이템 2",
       "description": "골드 획득량 증가",
       "hp": 0,
@@ -36,7 +36,7 @@
       "duration": 2
     },
     {
-      "index": 303,
+      "id": 303,
       "name": "아이템 3",
       "description": "공격력 증가",
       "hp": 0,
@@ -53,7 +53,7 @@
       "duration": 0
     },
     {
-      "index": 304,
+      "id": 304,
       "name": "아이템 4",
       "description": "공격력 확률 증가",
       "hp": 0,
@@ -70,7 +70,7 @@
       "duration": 2
     },
     {
-      "index": 305,
+      "id": 305,
       "name": "아이템 5",
       "description": "경험치 증가",
       "hp": 0,
@@ -87,7 +87,7 @@
       "duration": 0
     },
     {
-      "index": 306,
+      "id": 306,
       "name": "아이템 6",
       "description": "경험치 확률 증가",
       "hp": 0,
@@ -104,7 +104,7 @@
       "duration": 2
     },
     {
-      "index": 307,
+      "id": 307,
       "name": "아이템 7",
       "description": "체력 증가",
       "hp": 10,
@@ -121,7 +121,7 @@
       "duration": 0
     },
     {
-      "index": 308,
+      "id": 308,
       "name": "아이템 8",
       "description": "마나 소비 및 체력 증가",
       "hp": 10,
@@ -138,7 +138,7 @@
       "duration": 0
     },
     {
-      "index": 309,
+      "id": 309,
       "name": "아이템 9",
       "description": "행동력 증가",
       "hp": 0,
@@ -155,7 +155,7 @@
       "duration": 0
     },
     {
-      "index": 310,
+      "id": 310,
       "name": "아이템 10",
       "description": "경험치 감소량 및 공격력 증가",
       "hp": 0,
