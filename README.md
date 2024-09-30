@@ -6,4 +6,4 @@ use Asset
 3. GPGS | in google dirve (eodls0810.dev@gmail.com)
 
 use font
-1. 우아한 형제들 : 배민 도현체.OTF | https://www.woowahan.com/fonts
+1. NeoDunggeunmoPro-Regular SDF
