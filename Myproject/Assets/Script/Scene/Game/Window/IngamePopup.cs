@@ -39,7 +39,7 @@ public class IngamePopup : MonoBehaviour
         {
             timer -= 0.1f;
 
-            yield return 0.1f;
+            yield return new WaitForSeconds(0.1f);
         }
 
         _currentTemplate.RemoveLabel();

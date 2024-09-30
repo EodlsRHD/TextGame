@@ -56,14 +56,14 @@ public class MapController : MonoBehaviour
         }
     }
 
-    public void UpdateData(DataManager.Save_Data saveData, List<int> nearbyIndexs)
+    public void UpdateMapData(DataManager.Save_Data saveData, List<int> nearbyIndexs)
     {
         SetMap(saveData, nearbyIndexs);
     }
 
     public void OpenMap(Action onCallback)
     {
-        if(onCallback != null)
+        if (onCallback != null)
         {
             _onCloseCallback = onCallback;
         }

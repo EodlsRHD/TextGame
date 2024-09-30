@@ -10,7 +10,6 @@ public class IngameManager : MonoBehaviour
     [Header("MapController"), SerializeField] private MapController _mapController = null;
     [Header("Ingame Popup"), SerializeField] private IngamePopup _ingamePopup = null;
 
-    private DataManager.Save_Data _roundOriginSaveData = null;
     private DataManager.Save_Data _saveData = null;
     private MapGenerator _mapGenerator = null;
 
@@ -19,12 +18,12 @@ public class IngameManager : MonoBehaviour
 
     void Start()
     {
-        _roundOriginSaveData = GameManager.instance.dataManager.CopySaveData();
+        _saveData = GameManager.instance.dataManager.CopySaveData();
 
         _ingameUI.Initialize(OpenMap, OpenNextRound);
         _textView.Initialize();
         _controlPad.Initialize(PlayerMove, PlayerAction);
-        _mapController.Initialize(_roundOriginSaveData.mapData.mapSize);
+        _mapController.Initialize(_saveData.mapData.mapSize);
         _ingamePopup.Initialize();
 
         _ingameUI.OpenNextRoundWindow(eRoundClear.First);
@@ -53,23 +52,25 @@ public class IngameManager : MonoBehaviour
 
         GameManager.instance.dataManager.SaveDataToCloud(_saveData, () => 
         {
-            _roundOriginSaveData.round++;
+            _saveData.round++;
+            _saveData.userData.Reset();
 
-            _mapGenerator = new MapGenerator(GenerateMap, _roundOriginSaveData);
+            _mapGenerator = new MapGenerator(GenerateMap, _saveData);
+
+            _ingameUI.UpdatePlayerInfo(_saveData.userData);
         }); 
     }
 
     private void GenerateMap(DataManager.Map_Data mapData)
     {
-        _roundOriginSaveData.mapData = mapData;
+        _ingameUI.StartGame();
+        _saveData.mapData = mapData;
         
         RoundSet();
     }
      
     private void RoundSet()
     {
-        _saveData = _roundOriginSaveData.DeepCopy();
-
         _textView.UpdateText(_saveData.mapData.nodeDatas[_saveData.userData.data.currentNodeIndex]);
         _ingameUI.SetRoundText(_saveData.round);
 
@@ -87,7 +88,7 @@ public class IngameManager : MonoBehaviour
         OpenNextRound(eRoundClear.Success);
     }
 
-
+    #region Player
 
     private void PlayerMove(eControl type)
     {
@@ -98,7 +99,7 @@ public class IngameManager : MonoBehaviour
             return;
         }
 
-        if (_saveData.userData.data.ap <= 0)
+        if (_saveData.userData.currentAP <= 0)
         {
             _ingamePopup.UpdateText("ap가 부족합니다.");
 
@@ -118,9 +119,9 @@ public class IngameManager : MonoBehaviour
         _saveData.mapData.nodeDatas[nearbyBlockIndex].isUser = true;
 
         _saveData.userData.data.currentNodeIndex = nearbyBlockIndex;
-        _saveData.userData.data.ap -= 1;
+        _saveData.userData.currentAP -= 1;
 
-        _textView.UpdateText("행동력이 " + _saveData.userData.data.ap + "만큼 남았습니다.");
+        _ingameUI.UpdatePlayerInfo(eStats.AP, _saveData.userData);
 
         UpdateData();
     }
@@ -157,6 +158,8 @@ public class IngameManager : MonoBehaviour
 
         if (result == -1)
         {
+            _ingamePopup.UpdateText("이동할 수 없습니다.");
+
             return result;
         }
 
@@ -169,13 +172,21 @@ public class IngameManager : MonoBehaviour
 
         if (_saveData.mapData.nodeDatas[result].isMonster == true)
         {
-            _textView.UpdateText(_saveData.mapData.monsterDatas.Find(x => x.currentNodeIndex == result), _saveData.mapData.nodeDatas[result]);
+            _textView.UpdateText(_saveData.mapData.monsterDatas.Find(x => x.currentNodeIndex == result));
+            Attack(result);
 
             return -1;
         }
 
         if (_saveData.mapData.exitNodeIndex == result)
         {
+            if(_isAllMonsterDead == false)
+            {
+                _textView.UpdateText("--- 남아있는 몬스터가 있습니다.");
+
+                return -1;
+            }
+
             UiManager.instance.OpenPopup(string.Empty, "다음 라운드로 넘어가시겠습니까?", string.Empty, string.Empty, () =>
             {
                 RoundClear();
@@ -198,30 +209,24 @@ public class IngameManager : MonoBehaviour
 
         switch(type)
         {
-            case eControl.Attack :
-                {
-                    _controlPad.Attack();
-                }
-                break;
-
             case eControl.Defence:
                 {
-                    UiManager.instance.OpenPopup(string.Empty, "방어하시겠습니까? 남은 행동력을 모두 소진합니다.", "확인", "취소", () =>
+                    UiManager.instance.OpenPopup(string.Empty, "방어력을 높히시겠습니까? 남은 행동력을 모두 소진합니다.", "확인", "취소", () =>
                     {
-                        _controlPad.Defence();
+                        Defence();
                     }, null);
                 }
                 break;
 
             case eControl.Skill:
                 {
-                    _controlPad.Skill(Skill);
+                    _controlPad.Skill(_saveData.userData, Skill);
                 }
                 break;
 
-            case eControl.Item:
+            case eControl.Bag:
                 {
-                    _controlPad.Item(Item);
+                    _controlPad.Bag(_saveData.userData, Bag);
                 }
                 break;
 
@@ -230,8 +235,14 @@ public class IngameManager : MonoBehaviour
                     UiManager.instance.OpenPopup(string.Empty, "휴식하시겠습니까?", "확인", "취소", () =>
                     {
                         PlayerTurnOut();
-                        MonsterTurn();
+                        StartCoroutine(Co_MonsterTurn());
                     }, null);
+                }
+                break;
+
+            case eControl.SearchNearby:
+                {
+                    PlayerSearchNearby();
                 }
                 break;
         }
@@ -241,35 +252,12 @@ public class IngameManager : MonoBehaviour
     {
         _isPlayerTurn = true;
 
-        _textView.UpdateText("행동력이 " + _saveData.userData.data.ap + "만큼 남았습니다.");
+        _saveData.userData.currentAP = _saveData.userData.maximumAP;
+        _ingameUI.UpdatePlayerInfo(eStats.AP, _saveData.userData);
 
-        List<int> NearbyIndexs = PlayerVision();
+        _textView.UpdateText("행동력이 " + _saveData.userData.currentAP + "만큼 남았습니다.");
 
-        for (int i = 0; i < NearbyIndexs.Count; i++)
-        {
-            int index = NearbyIndexs[i];
-
-            if (_saveData.mapData.exitNodeIndex == index)
-            {
-                _textView.UpdateText(eFind.Exit, _saveData.mapData.nodeDatas[index], _saveData.mapData.nodeDatas[_saveData.userData.data.currentNodeIndex]);
-
-                continue;
-            }
-
-            if (_saveData.mapData.nodeDatas[index].isItem == true)
-            {
-                _textView.UpdateText(eFind.Item, _saveData.mapData.nodeDatas[index], _saveData.mapData.nodeDatas[_saveData.userData.data.currentNodeIndex]);
-
-                continue;
-            }
-
-            if (_saveData.mapData.nodeDatas[index].isMonster == true)
-            {
-                _textView.UpdateText(eFind.Monster, _saveData.mapData.nodeDatas[index], _saveData.mapData.nodeDatas[_saveData.userData.data.currentNodeIndex]);
-
-                continue;
-            }
-        }
+        List<int> NearbyIndexs = PlayerSearchNearby();
 
         _mapController.SetMap(_saveData, NearbyIndexs);
     }
@@ -279,7 +267,7 @@ public class IngameManager : MonoBehaviour
         List<int> dx = new List<int>();
         List<int> dy = new List<int>();
 
-        for (int i = -_saveData.userData.data.vision; i <= _saveData.userData.data.vision; i++)
+        for (int i = -_saveData.userData.currentVISION; i <= _saveData.userData.currentVISION; i++)
         {
             dx.Add(i);
             dy.Add(i);
@@ -288,32 +276,129 @@ public class IngameManager : MonoBehaviour
         return GetNearbyBlocks_Diagonal(dx, dy, _saveData.userData.data.currentNodeIndex);
     }
 
+    private List<int> PlayerSearchNearby()
+    {
+        List<System.Action> actions = new List<System.Action>();
+        List<int> NearbyIndexs = PlayerVision();
+
+        bool Non = false;
+
+        for (int i = 0; i < NearbyIndexs.Count; i++)
+        {
+            int index = NearbyIndexs[i];
+
+            if (_saveData.mapData.exitNodeIndex == index)
+            {
+                actions.Add(() => 
+                {
+                    _textView.UpdateText(eFind.Exit, _saveData.mapData.nodeDatas[index], _saveData.mapData.nodeDatas[_saveData.userData.data.currentNodeIndex]);
+                });
+
+                Non = true;
+
+                continue;
+            }
+
+            if (_saveData.mapData.nodeDatas[index].isItem == true)
+            {
+                actions.Add(() =>
+                {
+                    _textView.UpdateText(eFind.Item, _saveData.mapData.nodeDatas[index], _saveData.mapData.nodeDatas[_saveData.userData.data.currentNodeIndex]);
+                });
+
+                Non = true;
+
+                continue;
+            }
+
+            if (_saveData.mapData.nodeDatas[index].isMonster == true)
+            {
+                actions.Add(() =>
+                {
+                    _textView.UpdateText(eFind.Monster, _saveData.mapData.nodeDatas[index], _saveData.mapData.nodeDatas[_saveData.userData.data.currentNodeIndex]);
+                });
+
+                Non = true;
+
+                continue;
+            }
+        }
+
+        if (Non == false)
+        {
+            _textView.UpdateText("--- 주변에 발견된게 없습니다.");
+
+            return NearbyIndexs;
+        }
+
+        _textView.UpdateText("--- 주변 검색을 시작합니다.");
+
+        foreach (var action in actions)
+        {
+            action?.Invoke();
+        }
+
+        _textView.UpdateText("--- 주변 검색이 끝났습니다.");
+
+        return NearbyIndexs;
+    }
+
     private void PlayerTurnOut()
     {
         _isPlayerTurn = false;
-
-        _saveData.userData.data.ap = _roundOriginSaveData.userData.data.ap;
     }
 
+    #endregion
 
+    #region Monster
 
-    private void MonsterTurn()
+    IEnumerator Co_MonsterTurn()
     {
-        if(_isAllMonsterDead == true)
+        if (_isAllMonsterDead == true)
         {
-            _isPlayerTurn = true;
-            return;
+            _textView.UpdateText("--- 살아있는 몬스터가 없습니다.");
+            PlayerTurn();
+
+            yield break;
         }
+
+        _textView.UpdateText("--- 몬스터의 순서입니다.");
 
         for (int m = 0; m < _saveData.mapData.monsterDatas.Count; m++)
         {
-            if(_saveData.mapData.monsterDatas[m].ap == 0)
+            yield return new WaitForSeconds(0.5f);
+
+            List<int> dx = new List<int>();
+            List<int> dy = new List<int>();
+
+            for (int i = -_saveData.mapData.monsterDatas[m].attackRange; i <= _saveData.mapData.monsterDatas[m].attackRange; i++)
+            {
+                dx.Add(i);
+                dy.Add(i);
+            }
+
+            bool isAttack = false;
+            List<int> NearbyIndexs = GetNearbyBlocks_Diagonal(dx, dy, _saveData.mapData.monsterDatas[m].currentNodeIndex);
+
+            for (int i = 0; i < NearbyIndexs.Count; i++)
+            {
+                if (_saveData.userData.data.currentNodeIndex == NearbyIndexs[i])
+                {
+                    Hit(_saveData.mapData.monsterDatas[m]);
+                    isAttack = true;
+
+                    break;
+                }
+            }
+
+            if (isAttack == true)
             {
                 continue;
             }
 
-            List<int> dx = new List<int>();
-            List<int> dy = new List<int>();
+            dx.Clear();
+            dy.Clear();
+            NearbyIndexs.Clear();
 
             for (int i = -_saveData.mapData.monsterDatas[m].vision; i <= _saveData.mapData.monsterDatas[m].vision; i++)
             {
@@ -322,7 +407,7 @@ public class IngameManager : MonoBehaviour
             }
 
             bool isFindPlayer = false;
-            List<int> NearbyIndexs = GetNearbyBlocks_Diagonal(dx, dy, _saveData.mapData.monsterDatas[m].currentNodeIndex);
+            NearbyIndexs = GetNearbyBlocks_Diagonal(dx, dy, _saveData.mapData.monsterDatas[m].currentNodeIndex);
 
             for (int i = 0; i < NearbyIndexs.Count; i++)
             {
@@ -344,7 +429,7 @@ public class IngameManager : MonoBehaviour
                 }
             }
 
-            if(isFindPlayer == true)
+            if (isFindPlayer == true)
             {
                 MonsterTargetPlayer(m);
 
@@ -354,7 +439,29 @@ public class IngameManager : MonoBehaviour
             MonsterMove(m, 1);
         }
 
-        MonsterTurnOut();
+        for (int i = 0; i < _saveData.mapData.monsterDatas.Count; i++)
+        {
+            for (int j = 0; j < _saveData.mapData.monsterDatas.Count; j++)
+            {
+                if (_saveData.mapData.monsterDatas[j].hp <= 0)
+                {
+                    break;
+                }
+
+                if (_saveData.mapData.monsterDatas[i].id == _saveData.mapData.monsterDatas[j].id)
+                {
+                    _saveData.mapData.monsterDatas[j].ap = _saveData.mapData.monsterDatas[j].ap;
+                }
+            }
+        }
+
+        _textView.UpdateText("--- 몬스터의 순서가 종료되었습니다.");
+
+        UpdateData();
+
+        yield return new WaitForSeconds(0.5f);
+
+        PlayerTurn();
     }
 
     private void MonsterMove(int m, int ap)
@@ -367,6 +474,15 @@ public class IngameManager : MonoBehaviour
         }
 
         MonsterSelectMoveBlock(m, ap, ref nearbyBlocks);
+    }
+
+    private void MonsterDead(DataManager.Creature_Data monster)
+    {
+        _saveData.mapData.nodeDatas[monster.currentNodeIndex].isMonster = false;
+
+        _saveData.mapData.monsterDatas.Remove(_saveData.mapData.monsterDatas.Find(x => x.id == monster.id));
+
+        UpdateData();
     }
 
     private void MonsterSelectMoveBlock(int m, int ap, ref List<int> nearbyBlocks)
@@ -421,47 +537,178 @@ public class IngameManager : MonoBehaviour
         _saveData.mapData.monsterDatas[m].currentNodeIndex = result;
     }
 
-    private void MonsterTurnOut()
+    #endregion
+
+    #region Action
+
+    private void Attack(int monsterIndex)
     {
-        for (int i = 0; i < _roundOriginSaveData.mapData.monsterDatas.Count; i++)
+        DataManager.Creature_Data monster = _saveData.mapData.monsterDatas.Find(x => x.currentNodeIndex == monsterIndex);
+
+        _saveData.userData.currentAP -= 1;
+        _ingameUI.UpdatePlayerInfo(eStats.AP, _saveData.userData);
+
+        _ingameUI.Attack(monster, (result) => 
         {
-            for (int j = 0; j < _saveData.mapData.monsterDatas.Count; j++)
+            if(result == false)
             {
-                if(_saveData.mapData.monsterDatas[j].hp <= 0)
-                {
-                    break;
-                }
+                _textView.UpdateText("--- 공격에 실패하였습니다.");
 
-                if(_roundOriginSaveData.mapData.monsterDatas[i].id == _saveData.mapData.monsterDatas[j].id)
-                {
-                    _saveData.mapData.monsterDatas[j].ap = _roundOriginSaveData.mapData.monsterDatas[j].ap;
-                }
+                return;
             }
-        }
 
-        UpdateData();
-        PlayerTurn();
+            int damage = Mathf.Abs(monster.defence - _saveData.userData.currentATTACK);
+
+            if(damage <= 0)
+            {
+                _textView.UpdateText(monster.name + " 의 방어도에 막혔습니다.");
+
+                return;
+            }
+            else
+            {
+                _textView.UpdateText("방어도를 제외한 " + damage + " 의 데미지를 가했습니다.");
+
+                monster.hp -= (ushort)damage;
+
+                if (monster.hp >= 60000 || monster.hp == 0)
+                {
+                    _saveData.mapData.monsterDatas.Find(x => x.currentNodeIndex == monsterIndex).hp = 0;
+
+                    _textView.UpdateText(monster.name + " (을)를 처치하였습니다");
+                    _textView.UpdateText("--- 경험치 " + monster.exp + " , 코인 " + monster.coin + "을 획득했습니다");
+                    
+                    if(monster.itemIndexs != null)
+                    {
+                        if(monster.itemIndexs.Count > 0)
+                        {
+                            _textView.UpdateText("--- 아이템 " + monster.itemIndexs.Count + " 개를 획득했습니다.");
+                        }
+                    }
+                     
+                    _saveData.userData.data.coin += monster.coin;
+                    _saveData.userData.currentEXP += monster.exp;
+
+                    if (_saveData.userData.maximumEXP <= _saveData.userData.currentEXP)
+                    {
+                        _textView.UpdateText("레벨이 증가했습니다 !");
+
+                        _saveData.userData.level += 1;
+                        _saveData.userData.currentEXP = (ushort)Mathf.Abs(_saveData.userData.maximumEXP - _saveData.userData.currentEXP);
+
+                        _ingameUI.UpdatePlayerInfo(eStats.EXP, _saveData.userData);
+                        _ingameUI.UpdatePlayerInfo(eStats.Level, _saveData.userData);
+
+                        _ingameUI.OpneLevelPoint(_saveData.userData, (newData) => 
+                        {
+                            _saveData.userData.data.hp = newData.data.hp;
+                            _saveData.userData.data.mp = newData.data.mp;
+                            _saveData.userData.data.ap = newData.data.ap;
+                            _saveData.userData.data.attack = newData.data.attack;
+                            _saveData.userData.data.defence = newData.data.defence;
+                            _saveData.userData.data.vision = newData.data.vision;
+                            _saveData.userData.data.attackRange = newData.data.attackRange;
+
+                            _ingameUI.UpdatePlayerInfo(_saveData.userData);
+                        });
+                    }
+
+                    MonsterDead(monster);
+                }
+                else
+                {
+                    _textView.UpdateText(monster.name + "의 체력이 " + monster.hp + " 만큼 남았습니다.");
+
+                    _saveData.mapData.monsterDatas.Find(x => x.currentNodeIndex == monsterIndex).hp = monster.hp;
+                }
+
+                if(_saveData.mapData.monsterDatas.Count == 0)
+                {
+                    _isAllMonsterDead = true;
+                }
+
+                UpdateData();
+            }
+        });
     }
 
+    private void Defence()
+    {
+        if (_saveData.userData.currentAP == 0)
+        {
+            _textView.UpdateText("--- 남아있는 행동력이 없습니다.");
 
+            return;
+        }
+
+        ushort ap = _saveData.userData.currentAP;
+        _saveData.userData.currentDEFENCE += ap;
+
+        _textView.UpdateText("행동력을 모두 소진하여 방어도가 " + ap + "만큼 증가했습니다.");
+
+        _ingameUI.UpdatePlayerInfo(eStats.AP, _saveData.userData);
+    }
+
+    private void Hit(DataManager.Creature_Data monster)
+    {
+        int userHP = _saveData.userData.currentHP;
+        int userDefence = _saveData.userData.currentDEFENCE;
+        int monsterAttack = monster.attack;
+
+        int remainderDefence = (userDefence - monsterAttack);
+        int remainderHP = userHP + remainderDefence;
+
+        if (remainderHP <= 0)
+        {
+            OpenNextRound(eRoundClear.Fail);
+        }
+
+        _textView.UpdateText(monster.name + " (이)가 " + monster.attack + " 의 데미지로 공격하였습니다.");
+
+        if(remainderDefence >= 0)
+        {
+            _textView.UpdateText("방어도를 소진하여 몬스터의 공격을 막았습니다.");
+        }
+        else
+        {
+            _textView.UpdateText("체력이 " + (userHP - remainderHP) + " 만큼 줄었습니다.");
+        }
+
+        _saveData.userData.currentHP = (ushort)(userHP - (userHP - remainderHP));
+        _saveData.userData.currentDEFENCE = _saveData.userData.maximumDEFENCE;
+
+        _ingameUI.UpdatePlayerInfo(eStats.HP, _saveData.userData);
+
+        UpdateData();
+    }
 
     private void Skill(int id)
     {
 
+
+
+        _ingameUI.UpdatePlayerInfo(eStats.MP, _saveData.userData);
     }
 
-
-
-    private void Item(int id)
+    private void Bag(int id)
     {
+        eStats type = eStats.Non;
+        int value = 0;
+        int maxValue = 0;
 
+
+
+        _ingameUI.UpdatePlayerInfo(type, _saveData.userData);
     }
 
+    #endregion
 
+    #region Function
 
     private void UpdateData()
     {
-        _mapController.UpdateData(_saveData, PlayerVision());
+        _ingameUI.UpdatePlayerInfo(_saveData.userData);
+        _mapController.UpdateMapData(_saveData, PlayerVision());
     }
 
     private int GetNearbyBlocks(int x, int y, int index)
@@ -551,7 +798,7 @@ public class IngameManager : MonoBehaviour
 
     private List<int> GetNearbyBlocks_Diagonal(List<int> dx, List<int> dy, int index)
     {
-        List<int> result = new List<int>(); ;
+        List<int> result = new List<int>();
 
         for (int y = 0; y < dy.Count; y++)
         {
@@ -591,6 +838,8 @@ public class IngameManager : MonoBehaviour
 
         return result;
     }
+
+    #endregion
 }
 
 public class MapGenerator
@@ -1024,8 +1273,8 @@ public class CreatureGenerator
 
     private void Start()
     {
-        GenerateMonster();
         GeneratePlayer();
+        GenerateMonster();
         Done();
     }
 
@@ -1053,8 +1302,8 @@ public class CreatureGenerator
             SpawnMonsterNodeSelect(Random.Range(0, _saveData.mapData.nodeDatas.Count), ref node);
 
             DataManager.Creature_Data creature = GameManager.instance.dataManager.GetCreatureData(_saveData.round + i);
-
-            if(creature != null)
+            
+            if (creature != null)
             {
                 creature.id = (ushort)i;
                 creature.currentNodeIndex = node.index;
@@ -1071,11 +1320,11 @@ public class CreatureGenerator
     {
         float increasePoint = (_saveData.round * 0.1f);
 
-        creature.coin *= (ushort)increasePoint;
-        creature.hp *= (ushort)increasePoint;
-        creature.exp *= (ushort)increasePoint;
-        creature.attack *= (ushort)increasePoint;
-        creature.defence *= (ushort)increasePoint;
+        creature.coin += (ushort)(creature.coin * increasePoint);
+        creature.hp += (ushort)(creature.hp * increasePoint);
+        creature.exp += (ushort)(creature.exp * increasePoint);
+        creature.attack += (ushort)(creature.attack * increasePoint);
+        creature.defence += (ushort)(creature.defence * (increasePoint * 0.5f));
     }
 
     private void GeneratePlayer()
@@ -1117,12 +1366,12 @@ public class CreatureGenerator
         
         if(index == _saveData.mapData.enterNodeIndex)
         {
-            newIndex += 2;
+            newIndex += 4;
         }
 
         if(index == _saveData.mapData.exitNodeIndex)
         {
-            newIndex += 2;
+            newIndex += 4;
         }
 
         if(newIndex >= _saveData.mapData.nodeDatas.Count)

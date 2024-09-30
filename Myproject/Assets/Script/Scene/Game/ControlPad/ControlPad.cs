@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System;
+using TMPro;
 
 public class ControlPad : MonoBehaviour
 {
@@ -11,9 +12,6 @@ public class ControlPad : MonoBehaviour
     [SerializeField] private Button _buttomLeft = null;
     [SerializeField] private Button _buttomRight = null;
     [SerializeField] private Button _buttomDown = null;
-
-    [Header("Attack")]
-    [SerializeField] private Button _buttomAttack = null;
 
     [Header("Defence")]
     [SerializeField] private Button _buttomDefence = null;
@@ -27,13 +25,29 @@ public class ControlPad : MonoBehaviour
     [Header("Rest")]
     [SerializeField] private Button _buttomRest = null;
 
+    [Header("Search nearby")]
+    [SerializeField] private Button _buttomSearchNearby = null;
+
     [Space(20)]
 
+    [SerializeField] private GameObject _objControlPad = null;
+    [SerializeField] private TMP_Text _textTitle = null;
+    [SerializeField] private Button _buttonCloseSecControlPad = null;
+    [SerializeField] private Button _buttonUseSecControlPad = null;
+
+    [Space(10)]
+
     [SerializeField] private SkillPad _skillPad = null;
-    [SerializeField] private ItemPad _itemPad = null;
+    [SerializeField] private BagPad _BagPad = null;
 
     private Action<eControl> _onMoveCallback = null;
     private Action<eControl> _onActionCallback = null;
+
+    private Action<int> _onResultCallback = null;
+
+    private DataManager.User_Data _data;
+
+    private eControl _eOpenPad = eControl.Non;
 
     public void Initialize(Action<eControl> onMoveCallback, Action<eControl> onActionCallback)
     {
@@ -52,14 +66,18 @@ public class ControlPad : MonoBehaviour
         _buttomRight.onClick.AddListener(() => { OnMove(eControl.Right); });
         _buttomDown.onClick.AddListener(() => { OnMove(eControl.Down); });
 
-        _buttomAttack.onClick.AddListener(() => { OnAction(eControl.Attack); });
         _buttomDefence.onClick.AddListener(() => { OnAction(eControl.Defence); });
-        _buttomItem.onClick.AddListener(() => { OnAction(eControl.Item); });
+        _buttomItem.onClick.AddListener(() => { OnAction(eControl.Bag); });
         _buttomSkill.onClick.AddListener(() => { OnAction(eControl.Skill); });
         _buttomRest.onClick.AddListener(() => { OnAction(eControl.Rest); });
+        _buttomSearchNearby.onClick.AddListener(() => OnAction(eControl.SearchNearby));
 
+        _buttonCloseSecControlPad.onClick.AddListener(OnCloseSecControlPad);
+        _buttonUseSecControlPad.onClick.AddListener(OnUseSecControlPad);
+
+        _objControlPad.SetActive(false);
         _skillPad.Initialize();
-        _itemPad.Initialize();
+        _BagPad.Initialize();
     }
 
     private void OnMove(eControl type)
@@ -71,28 +89,85 @@ public class ControlPad : MonoBehaviour
     {
         _onActionCallback?.Invoke(type);
     }
-
-    public void Attack()
+    
+    public void Skill(DataManager.User_Data data, Action<int> onSkillResultCallback)
     {
+        _data = data;
 
+        if(onSkillResultCallback != null)
+        {
+            _onResultCallback = onSkillResultCallback;
+        }
+
+        OnOpenSecContolPad(eControl.Skill);
     }
 
-    public void Defence()
+    public void Bag(DataManager.User_Data data, Action<int> onBagResultCallback)
     {
+        _data = data;
 
+        if (onBagResultCallback != null)
+        {
+            _onResultCallback = onBagResultCallback;
+        }
+
+        OnOpenSecContolPad(eControl.Bag);
     }
 
-    public void Skill(Action<int> _onResultCallback)
+    private void OnOpenSecContolPad(eControl type)
     {
-        int result = 0;
+        _textTitle.text = type.ToString();
+        _eOpenPad = type;
 
-        _onResultCallback?.Invoke(result);
+        switch (type)
+        {
+            case eControl.Skill:
+                _skillPad.Open(_data);
+                break;
+
+            case eControl.Bag:
+                _BagPad.Open(_data);
+                break;
+        } 
+
+        _objControlPad.SetActive(true);
     }
 
-    public void Item(Action<int> _onResultCallback)
+    private void OnUseSecControlPad()
     {
-        int result = 0;
+        int value = -1;
 
-        _onResultCallback?.Invoke(result);
+        switch (_eOpenPad)
+        {
+            case eControl.Skill:
+                value = _skillPad.Use();
+                break;
+
+            case eControl.Bag:
+                value = _BagPad.Use();
+                break;
+        }
+
+        _onResultCallback?.Invoke(value);
+        _onResultCallback = null;
+    }
+
+    private void OnCloseSecControlPad()
+    {
+        _objControlPad.SetActive(false);
+
+        switch (_eOpenPad)
+        {
+            case eControl.Skill:
+                _skillPad.Close();
+                break;
+
+            case eControl.Bag:
+                _BagPad.Close();
+                break;
+        }
+
+        _textTitle.text = string.Empty;
+        _eOpenPad = eControl.Non;
     }
 }

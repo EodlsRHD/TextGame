@@ -7,6 +7,9 @@ using System;
 
 public class IngameUI : MonoBehaviour
 {
+    [SerializeField] private int _maxLevelPoint = 5;
+    [SerializeField] private GameObject _objBlocker = null;
+
     [Header("Top")]
     [SerializeField] private Button _buttonViewMap = null;
     [SerializeField] private Button _buttonGameMenu = null;
@@ -17,6 +20,19 @@ public class IngameUI : MonoBehaviour
     [SerializeField] private TMP_Text _textLabel = null;
     [SerializeField] private Button _buttonNextRound = null;
     [SerializeField] private TMP_Text _textButtonLabel = null;
+
+    [Header("Player Infomation")]
+    [SerializeField] private TMP_Text _textLevel = null;
+    [SerializeField] private TMP_Text _textHP = null;
+    [SerializeField] private TMP_Text _textMP = null;
+    [SerializeField] private TMP_Text _textAP = null;
+    [SerializeField] private TMP_Text _textEXP = null;
+
+    [Header("Attack")]
+    [SerializeField] private GameObject _objAttack = null;
+
+    [Header("Level Point")]
+    [SerializeField] private LevelPoint _levelPoint = null;
 
     private Action<Action> _onViewMapCallback = null;
     private Action<eRoundClear> _OnNextRoundCallback = null;
@@ -35,13 +51,27 @@ public class IngameUI : MonoBehaviour
             _OnNextRoundCallback = OnNextRoundCallback;
         }
 
+        _levelPoint.Initialize(CloseLevelPoint);
+
         _buttonViewMap.onClick.AddListener(OnMap);
         _buttonGameMenu.onClick.AddListener(OnOpenGameMenu);
         _buttonNextRound.onClick.AddListener(OnNextRound);
 
+        _buttonViewMap.gameObject.SetActive(false);
+
         _objNextRound.SetActive(false);
+        _objAttack.SetActive(false);
+
+        _objBlocker.SetActive(false);
+
         this.gameObject.SetActive(true);
     }
+
+    public void StartGame()
+    {
+        _buttonViewMap.gameObject.SetActive(true);
+    }
+
     private void OnMap()
     {
         _buttonViewMap.gameObject.SetActive(false);
@@ -90,5 +120,67 @@ public class IngameUI : MonoBehaviour
         }
 
         _objNextRound.SetActive(true);
+    }
+
+    public void UpdatePlayerInfo(DataManager.User_Data UserData)
+    {
+        _textLevel.text = UserData.level.ToString();
+        _textHP.text = UserData.currentHP + " / " + UserData.maximumHP;
+        _textMP.text = UserData.currentMP + " / " + UserData.maximumMP;
+        _textAP.text = UserData.currentAP + " / " + UserData.maximumAP;
+        _textEXP.text = UserData.currentEXP + " / " + UserData.maximumEXP;
+    }
+
+    public void UpdatePlayerInfo(eStats type, DataManager.User_Data userData)
+    {
+        switch(type)
+        {
+            case eStats.Level:
+                _textLevel.text = userData.level.ToString();
+                break;
+
+            case eStats.HP:
+                _textHP.text = userData.currentHP + " / " + userData.maximumHP;
+                break;
+
+            case eStats.MP:
+                _textMP.text = userData.currentMP + " / " + userData.maximumMP;
+                break;
+
+            case eStats.AP:
+                _textAP.text = userData.currentAP + " / " + userData.maximumAP;
+                break;
+
+            case eStats.EXP:
+                _textEXP.text = userData.currentHP + " / " + userData.maximumEXP;
+                break;
+        }
+    }
+
+    public void Attack(DataManager.Creature_Data monster, Action<bool> onResultCallback)
+    {
+        bool result = true;
+
+        MakeAttack();
+        _objAttack.SetActive(true);
+
+        onResultCallback?.Invoke(result);
+    }
+
+    private void MakeAttack()
+    {
+
+    }
+
+    public void OpneLevelPoint(DataManager.User_Data userData, Action<DataManager.User_Data> onResultCallback)
+    {
+        _objBlocker.SetActive(true);
+        _levelPoint.Open(_maxLevelPoint, userData, onResultCallback);
+    }
+
+    private void CloseLevelPoint()
+    {
+        _objBlocker.SetActive(false);
+        _levelPoint.Close();
     }
 }
