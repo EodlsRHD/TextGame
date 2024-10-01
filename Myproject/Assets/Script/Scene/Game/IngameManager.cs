@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class IngameManager : MonoBehaviour
@@ -235,7 +236,7 @@ public class IngameManager : MonoBehaviour
                     UiManager.instance.OpenPopup(string.Empty, "휴식하시겠습니까?", "확인", "취소", () =>
                     {
                         PlayerTurnOut();
-                        StartCoroutine(Co_MonsterTurn());
+                        StartCoroutine(MonsterTurn());
                     }, null);
                 }
                 break;
@@ -352,7 +353,7 @@ public class IngameManager : MonoBehaviour
 
     #region Monster
 
-    IEnumerator Co_MonsterTurn()
+    IEnumerator MonsterTurn()
     {
         if (_isAllMonsterDead == true)
         {
@@ -364,111 +365,122 @@ public class IngameManager : MonoBehaviour
 
         _textView.UpdateText("--- 몬스터의 순서입니다.");
 
+        int attackMonsterIndex = 0;
+        bool isAttack = false;
+
         for (int m = 0; m < _saveData.mapData.monsterDatas.Count; m++)
         {
             yield return new WaitForSeconds(0.5f);
 
-            List<int> dx = new List<int>();
-            List<int> dy = new List<int>();
-
-            for (int i = -_saveData.mapData.monsterDatas[m].attackRange; i <= _saveData.mapData.monsterDatas[m].attackRange; i++)
+            if(isAttack == false)
             {
-                dx.Add(i);
-                dy.Add(i);
-            }
-
-            bool isAttack = false;
-            List<int> NearbyIndexs = GetNearbyBlocks_Diagonal(dx, dy, _saveData.mapData.monsterDatas[m].currentNodeIndex);
-
-            for (int i = 0; i < NearbyIndexs.Count; i++)
-            {
-                if (_saveData.userData.data.currentNodeIndex == NearbyIndexs[i])
+                if (MonsterAttack(m) == true)
                 {
-                    Hit(_saveData.mapData.monsterDatas[m]);
+                    attackMonsterIndex = m;
+
                     isAttack = true;
-
-                    break;
                 }
             }
 
-            if (isAttack == true)
-            {
-                continue;
-            }
-
-            dx.Clear();
-            dy.Clear();
-            NearbyIndexs.Clear();
-
-            for (int i = -_saveData.mapData.monsterDatas[m].vision; i <= _saveData.mapData.monsterDatas[m].vision; i++)
-            {
-                dx.Add(i);
-                dy.Add(i);
-            }
-
-            bool isFindPlayer = false;
-            NearbyIndexs = GetNearbyBlocks_Diagonal(dx, dy, _saveData.mapData.monsterDatas[m].currentNodeIndex);
-
-            for (int i = 0; i < NearbyIndexs.Count; i++)
-            {
-                if (_saveData.mapData.nodeDatas[NearbyIndexs[i]].isWalkable == false)
-                {
-                    continue;
-                }
-
-                if (_saveData.mapData.nodeDatas[NearbyIndexs[i]].isMonster == true)
-                {
-                    continue;
-                }
-
-                if (_saveData.userData.data.currentNodeIndex == NearbyIndexs[i])
-                {
-                    isFindPlayer = true;
-
-                    break;
-                }
-            }
-
-            if (isFindPlayer == true)
-            {
-                MonsterTargetPlayer(m);
-
-                continue;
-            }
-
+            _textView.UpdateText("몬스터가 이동하였습니다.");
             MonsterMove(m, 1);
         }
 
-        for (int i = 0; i < _saveData.mapData.monsterDatas.Count; i++)
+        if(isAttack == true)
         {
-            for (int j = 0; j < _saveData.mapData.monsterDatas.Count; j++)
+            Attack(_saveData.mapData.monsterDatas[attackMonsterIndex].currentNodeIndex, () =>
             {
-                if (_saveData.mapData.monsterDatas[j].hp <= 0)
-                {
-                    break;
-                }
+                _textView.UpdateText("--- 몬스터의 순서가 종료되었습니다.");
 
-                if (_saveData.mapData.monsterDatas[i].id == _saveData.mapData.monsterDatas[j].id)
-                {
-                    _saveData.mapData.monsterDatas[j].ap = _saveData.mapData.monsterDatas[j].ap;
-                }
-            }
+                UpdateData();
+                PlayerTurn();
+            });
+
+            yield break;
         }
 
         _textView.UpdateText("--- 몬스터의 순서가 종료되었습니다.");
 
         UpdateData();
-
-        yield return new WaitForSeconds(0.5f);
-
         PlayerTurn();
+    }
+
+    private bool MonsterAttack(int m)
+    {
+        List<int> dx = new List<int>();
+        List<int> dy = new List<int>();
+
+        for (int i = -_saveData.mapData.monsterDatas[m].attackRange; i <= _saveData.mapData.monsterDatas[m].attackRange; i++)
+        {
+            dx.Add(i);
+            dy.Add(i);
+        }
+
+        bool isAttack = false;
+        List<int> NearbyIndexs = GetNearbyBlocks(_saveData.mapData.monsterDatas[m].currentNodeIndex);
+
+        for (int i = 0; i < NearbyIndexs.Count; i++)
+        {
+            if (_saveData.userData.data.currentNodeIndex == NearbyIndexs[i])
+            {
+                isAttack = true;
+
+                break;
+            }
+        }
+
+        if (isAttack == true)
+        {
+            return isAttack;
+        }
+
+        return isAttack;
     }
 
     private void MonsterMove(int m, int ap)
     {
+        List<int> dx = new List<int>();
+        List<int> dy = new List<int>();
+
+        for (int i = -_saveData.mapData.monsterDatas[m].vision; i <= _saveData.mapData.monsterDatas[m].vision; i++)
+        {
+            dx.Add(i);
+            dy.Add(i);
+        }
+
+        bool isFindPlayer = false;
+        List<int> NearbyIndexs = GetNearbyBlocks_Diagonal(dx, dy, _saveData.mapData.monsterDatas[m].currentNodeIndex);
+
+        for (int i = 0; i < NearbyIndexs.Count; i++)
+        {
+            if (_saveData.mapData.nodeDatas[NearbyIndexs[i]].isWalkable == false)
+            {
+                continue;
+            }
+
+            if (_saveData.mapData.nodeDatas[NearbyIndexs[i]].isMonster == true)
+            {
+                continue;
+            }
+
+            if (_saveData.userData.data.currentNodeIndex == NearbyIndexs[i])
+            {
+                isFindPlayer = true;
+
+                break;
+            }
+        }
+
+        if (isFindPlayer == true)
+        {
+            MonsterTargetPlayer(m);
+
+            return;
+        }
+
         List<int> nearbyBlocks = GetNearbyBlocks(_saveData.mapData.monsterDatas[m].currentNodeIndex);
 
-        if(nearbyBlocks.Count == 0)
+        if (nearbyBlocks.Count == 0)
         {
             return;
         }
@@ -541,25 +553,27 @@ public class IngameManager : MonoBehaviour
 
     #region Action
 
-    private void Attack(int monsterIndex)
+    private void Attack(int nodeMonsterIndex, System.Action onLastCallback = null)
     {
-        DataManager.Creature_Data monster = _saveData.mapData.monsterDatas.Find(x => x.currentNodeIndex == monsterIndex);
+        DataManager.Creature_Data monster = _saveData.mapData.monsterDatas.Find(x => x.currentNodeIndex == nodeMonsterIndex);
 
         _saveData.userData.currentAP -= 1;
         _ingameUI.UpdatePlayerInfo(eStats.AP, _saveData.userData);
 
-        _ingameUI.Attack(monster, (result) => 
+        _ingameUI.CallAttacker(_saveData.userData, monster, onLastCallback, (result, damage) => 
         {
             if(result == false)
             {
-                _textView.UpdateText("--- 공격에 실패하였습니다.");
+                _textView.UpdateText("--- " + monster.name + "가 승리했습니다.");
 
                 return;
             }
 
-            int damage = Mathf.Abs(monster.defence - _saveData.userData.currentATTACK);
+            _textView.UpdateText("--- " + _saveData.userData.data.name + " (이)가 승리했습니다.");
 
-            if(damage <= 0)
+            int _damage = Mathf.Abs(monster.defence - _saveData.userData.currentATTACK);
+
+            if(_damage <= 0)
             {
                 _textView.UpdateText(monster.name + " 의 방어도에 막혔습니다.");
 
@@ -567,13 +581,13 @@ public class IngameManager : MonoBehaviour
             }
             else
             {
-                _textView.UpdateText("방어도를 제외한 " + damage + " 의 데미지를 가했습니다.");
+                _textView.UpdateText("방어도를 제외한 " + _damage + " 의 데미지를 가했습니다.");
 
-                monster.hp -= (ushort)damage;
+                monster.hp -= (ushort)_damage;
 
                 if (monster.hp >= 60000 || monster.hp == 0)
                 {
-                    _saveData.mapData.monsterDatas.Find(x => x.currentNodeIndex == monsterIndex).hp = 0;
+                    _saveData.mapData.monsterDatas.Find(x => x.currentNodeIndex == nodeMonsterIndex).hp = 0;
 
                     _textView.UpdateText(monster.name + " (을)를 처치하였습니다");
                     _textView.UpdateText("--- 경험치 " + monster.exp + " , 코인 " + monster.coin + "을 획득했습니다");
@@ -609,6 +623,10 @@ public class IngameManager : MonoBehaviour
                             _saveData.userData.data.vision = newData.data.vision;
                             _saveData.userData.data.attackRange = newData.data.attackRange;
 
+                            _saveData.userData.currentHP = _saveData.userData.maximumHP;
+                            _saveData.userData.currentMP = _saveData.userData.maximumMP;
+                            _saveData.userData.currentAP = _saveData.userData.maximumAP;
+
                             _ingameUI.UpdatePlayerInfo(_saveData.userData);
                         });
                     }
@@ -619,7 +637,7 @@ public class IngameManager : MonoBehaviour
                 {
                     _textView.UpdateText(monster.name + "의 체력이 " + monster.hp + " 만큼 남았습니다.");
 
-                    _saveData.mapData.monsterDatas.Find(x => x.currentNodeIndex == monsterIndex).hp = monster.hp;
+                    _saveData.mapData.monsterDatas.Find(x => x.currentNodeIndex == nodeMonsterIndex).hp = monster.hp;
                 }
 
                 if(_saveData.mapData.monsterDatas.Count == 0)
@@ -647,39 +665,6 @@ public class IngameManager : MonoBehaviour
         _textView.UpdateText("행동력을 모두 소진하여 방어도가 " + ap + "만큼 증가했습니다.");
 
         _ingameUI.UpdatePlayerInfo(eStats.AP, _saveData.userData);
-    }
-
-    private void Hit(DataManager.Creature_Data monster)
-    {
-        int userHP = _saveData.userData.currentHP;
-        int userDefence = _saveData.userData.currentDEFENCE;
-        int monsterAttack = monster.attack;
-
-        int remainderDefence = (userDefence - monsterAttack);
-        int remainderHP = userHP + remainderDefence;
-
-        if (remainderHP <= 0)
-        {
-            OpenNextRound(eRoundClear.Fail);
-        }
-
-        _textView.UpdateText(monster.name + " (이)가 " + monster.attack + " 의 데미지로 공격하였습니다.");
-
-        if(remainderDefence >= 0)
-        {
-            _textView.UpdateText("방어도를 소진하여 몬스터의 공격을 막았습니다.");
-        }
-        else
-        {
-            _textView.UpdateText("체력이 " + (userHP - remainderHP) + " 만큼 줄었습니다.");
-        }
-
-        _saveData.userData.currentHP = (ushort)(userHP - (userHP - remainderHP));
-        _saveData.userData.currentDEFENCE = _saveData.userData.maximumDEFENCE;
-
-        _ingameUI.UpdatePlayerInfo(eStats.HP, _saveData.userData);
-
-        UpdateData();
     }
 
     private void Skill(int id)
@@ -1278,6 +1263,12 @@ public class CreatureGenerator
         Done();
     }
 
+    private void GeneratePlayer()
+    {
+        _saveData.userData.data.currentNodeIndex = _saveData.mapData.enterNodeIndex;
+        _saveData.mapData.nodeDatas[_saveData.userData.data.currentNodeIndex].isUser = true;
+    }
+
     private void GenerateMonster()
     {
         _saveData.mapData.monsterDatas = new List<DataManager.Creature_Data>();
@@ -1327,12 +1318,6 @@ public class CreatureGenerator
         creature.defence += (ushort)(creature.defence * (increasePoint * 0.5f));
     }
 
-    private void GeneratePlayer()
-    {
-        _saveData.userData.data.currentNodeIndex = _saveData.mapData.enterNodeIndex;
-        _saveData.mapData.nodeDatas[_saveData.userData.data.currentNodeIndex].isUser = true;
-    }
-
     private void Done()
     {
         _onResultCallback?.Invoke(_saveData.userData.data, _saveData.mapData.monsterDatas);
@@ -1340,7 +1325,9 @@ public class CreatureGenerator
 
     private void SpawnMonsterNodeSelect(int index, ref DataManager.Node_Data node)
     {
-        if (_saveData.mapData.nodeDatas[index].isWalkable == true && _saveData.mapData.nodeDatas[index].isMonster == false)
+        if (_saveData.mapData.nodeDatas[index].isWalkable == true 
+            && _saveData.mapData.nodeDatas[index].isMonster == false 
+            && _saveData.mapData.nodeDatas[index].isUser == false)
         {
             node = _saveData.mapData.nodeDatas[index];
 

@@ -427,7 +427,7 @@ public class DataManager : MonoBehaviour
 
     public void CreateNewSaveData()
     {
-        Debug.Log("TEST Stat Set");
+        Debug.LogWarning("TEST Stat Set");
 
         _saveData = new Save_Data();
         _saveData.round = 0;
