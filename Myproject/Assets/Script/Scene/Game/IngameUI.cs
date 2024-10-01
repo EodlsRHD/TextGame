@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System;
+using System.Threading.Tasks;
 
 public class IngameUI : MonoBehaviour
 {
@@ -29,7 +30,7 @@ public class IngameUI : MonoBehaviour
     [SerializeField] private TMP_Text _textEXP = null;
 
     [Header("Attack")]
-    [SerializeField] private GameObject _objAttack = null;
+    [SerializeField] private Attacker _Attacker = null;
 
     [Header("Level Point")]
     [SerializeField] private LevelPoint _levelPoint = null;
@@ -52,6 +53,7 @@ public class IngameUI : MonoBehaviour
         }
 
         _levelPoint.Initialize(CloseLevelPoint);
+        _Attacker.Initialize(CloseAttacker);
 
         _buttonViewMap.onClick.AddListener(OnMap);
         _buttonGameMenu.onClick.AddListener(OnOpenGameMenu);
@@ -60,7 +62,6 @@ public class IngameUI : MonoBehaviour
         _buttonViewMap.gameObject.SetActive(false);
 
         _objNextRound.SetActive(false);
-        _objAttack.SetActive(false);
 
         _objBlocker.SetActive(false);
 
@@ -157,30 +158,27 @@ public class IngameUI : MonoBehaviour
         }
     }
 
-    public void Attack(DataManager.Creature_Data monster, Action<bool> onResultCallback)
+    public void CallAttacker(DataManager.User_Data userData, DataManager.Creature_Data monster, Action onLastCallback, Action<bool, int> onResultCallback)
     {
-        bool result = true;
-
-        MakeAttack();
-        _objAttack.SetActive(true);
-
-        onResultCallback?.Invoke(result);
+        _Attacker.CallAttacker(userData, monster, onLastCallback, onResultCallback);
     }
 
-    private void MakeAttack()
+    private void CloseAttacker()
     {
-
+        _Attacker.Close();
     }
 
     public void OpneLevelPoint(DataManager.User_Data userData, Action<DataManager.User_Data> onResultCallback)
     {
         _objBlocker.SetActive(true);
+
         _levelPoint.Open(_maxLevelPoint, userData, onResultCallback);
     }
 
     private void CloseLevelPoint()
     {
         _objBlocker.SetActive(false);
+
         _levelPoint.Close();
     }
 }

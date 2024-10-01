@@ -51,3 +51,21 @@ public enum eStats
     Vision,
     AttackRange
 }
+
+public enum eCardShape
+{
+    Non = -1,
+    Spade,
+    Diamond,
+    Heart,
+    Clover
+}
+
+public enum eBattleAction
+{
+    Non = -1,
+    Bat,
+    Raise,
+    Allin,
+    Fold
+}
