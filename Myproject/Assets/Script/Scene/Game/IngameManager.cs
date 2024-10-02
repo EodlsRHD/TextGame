@@ -562,16 +562,29 @@ public class IngameManager : MonoBehaviour
 
         _ingameUI.CallAttacker(_saveData.userData, monster, onLastCallback, (result, damage) => 
         {
-            if(result == false)
+            if(result == eWinorLose.Lose)
             {
                 _textView.UpdateText("--- " + monster.name + "가 승리했습니다.");
+
+                _saveData.userData.currentHP -= (ushort)damage;
+
+                UpdateData();
+
+                return;
+            }
+
+            if(result == eWinorLose.Draw)
+            {
+                _textView.UpdateText("--- 무승부입니다.");
+
+                UpdateData();
 
                 return;
             }
 
             _textView.UpdateText("--- " + _saveData.userData.data.name + " (이)가 승리했습니다.");
 
-            int _damage = Mathf.Abs(monster.defence - _saveData.userData.currentATTACK);
+            int _damage = Mathf.Abs(monster.defence - (damage + _saveData.userData.currentATTACK));
 
             if(_damage <= 0)
             {

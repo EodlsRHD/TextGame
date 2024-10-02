@@ -55,10 +55,25 @@ public enum eStats
 public enum eCardShape
 {
     Non = -1,
-    Spade,
-    Diamond,
+    Clob,
     Heart,
-    Clover
+    Diamond,
+    Spade
+}
+
+public enum ePedigree
+{
+    Non = -1,
+    HighCard,
+    OnePair,
+    TwoPair,
+    ThreeofaKind, //
+    Straight, //
+    Flush, //
+    FullHouse, //
+    FourofaKind, //
+    StraightFlush, //
+    RoyalStraightFlush //
 }
 
 public enum eBattleAction
@@ -68,4 +83,12 @@ public enum eBattleAction
     Raise,
     Allin,
     Fold
+}
+
+public enum eWinorLose
+{
+    Non = -1,
+    Win,
+    Lose,
+    Draw
 }

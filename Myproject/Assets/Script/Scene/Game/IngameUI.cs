@@ -158,7 +158,7 @@ public class IngameUI : MonoBehaviour
         }
     }
 
-    public void CallAttacker(DataManager.User_Data userData, DataManager.Creature_Data monster, Action onLastCallback, Action<bool, int> onResultCallback)
+    public void CallAttacker(DataManager.User_Data userData, DataManager.Creature_Data monster, Action onLastCallback, Action<eWinorLose, int> onResultCallback)
     {
         _Attacker.CallAttacker(userData, monster, onLastCallback, onResultCallback);
     }

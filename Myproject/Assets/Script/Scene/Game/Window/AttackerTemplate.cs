@@ -14,11 +14,22 @@ public class AttackerTemplate : MonoBehaviour
     private eCardShape _shapeType = eCardShape.Non;
     private int _num = 0;
 
+    public eCardShape Shape
+    {
+        get { return _shapeType; }
+    }
+
+    public int Num
+    {
+        get { return _num; }
+    }
+
     public void Initialize()
     {
         _imageBack.gameObject.SetActive(false);
         this.gameObject.SetActive(false);
     }
+
     public void Set(eCardShape shapeType, string shape, int num)
     {
         _shapeType = shapeType;
@@ -28,6 +39,7 @@ public class AttackerTemplate : MonoBehaviour
 
         if(num == 1)
         {
+            _num = 14;
             _textNum.text = "A";
         }
         else if(num == 11)
@@ -47,7 +59,7 @@ public class AttackerTemplate : MonoBehaviour
             _textNum.text = num.ToString();
         }
 
-        if(shapeType == eCardShape.Spade || shapeType == eCardShape.Clover)
+        if(shapeType == eCardShape.Spade || shapeType == eCardShape. Clob)
         {
             _textShape.color = Color.black;
             _textNum.color = Color.black;
