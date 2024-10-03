@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class IngameManager : MonoBehaviour
 {
+    [Header("Tutorial"), SerializeField] private Tutorial _tutorial = null;
     [Header("Ingame UI"), SerializeField] private IngameUI _ingameUI = null;
     [Header("TextView"), SerializeField] private TextView _textView = null;
     [Header("Control"), SerializeField] private ControlPad _controlPad = null;
@@ -21,7 +22,8 @@ public class IngameManager : MonoBehaviour
     {
         _saveData = GameManager.instance.dataManager.CopySaveData();
 
-        _ingameUI.Initialize(OpenMap, OpenNextRound);
+        _tutorial.Initialize();
+        _ingameUI.Initialize(OpenMap, OpenNextRound, _textView.UpdateText);
         _textView.Initialize();
         _controlPad.Initialize(PlayerMove, PlayerAction);
         _mapController.Initialize(_saveData.mapData.mapSize);
@@ -29,7 +31,19 @@ public class IngameManager : MonoBehaviour
 
         _ingameUI.OpenNextRoundWindow(eRoundClear.First);
 
+        FirstSet_Tutorial();
+
         this.gameObject.SetActive(true);
+    }
+
+    private void FirstSet_Tutorial()
+    {
+        if(_saveData.round > 0)
+        {
+            return;
+        }
+
+        //_tutorial.Open();
     }
 
     private void OpenMap(System.Action onCallback)
@@ -564,9 +578,9 @@ public class IngameManager : MonoBehaviour
         {
             if(result == eWinorLose.Lose)
             {
-                _textView.UpdateText("--- " + monster.name + "가 승리했습니다.");
+                _textView.UpdateText("--- " + monster.name + " (이)가 승리했습니다.");
 
-                _saveData.userData.currentHP -= (ushort)damage;
+                _saveData.userData.currentHP -= (ushort)(_saveData.userData.currentDEFENCE - damage);
 
                 UpdateData();
 
