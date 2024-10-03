@@ -6,25 +6,32 @@ using TMPro;
 public class SkillPad : MonoBehaviour
 {
     [SerializeField] private Transform _trTemplateParant = null;
-    [SerializeField] private SkillPadTemplate _template = null;
+    [SerializeField] private PadTemplate _template = null;
 
     [SerializeField] private TMP_Text _textName = null;
     [SerializeField] private TMP_Text _textDescription = null;
+
+    [SerializeField] private GameObject _objEmptyLabel = null;
+
+    private DataManager.User_Data _data = null;
 
     private int _id = -1;
 
     public void Initialize()
     {
-        _template.Initialize(-1, ViewInfo);
+        _template.Initialize(ViewInfo);
 
         _textName.text = string.Empty;
         _textDescription.text = string.Empty;
 
+        _objEmptyLabel.SetActive(false);
         this.gameObject.SetActive(false);
     }
 
     public void Open(DataManager.User_Data data)
     {
+        _data = data;
+
         MakeList();
 
         this.gameObject.SetActive(true);
@@ -47,7 +54,18 @@ public class SkillPad : MonoBehaviour
 
     private void MakeList()
     {
+        if(_data.skillDataIndexs.Count == 0)
+        {
+            _objEmptyLabel.SetActive(true);
+        }
 
+        foreach (var id in _data.skillDataIndexs)
+        {
+            var obj = Instantiate(_template, _trTemplateParant);
+            var com = obj.GetComponent<PadTemplate>();
+
+            com.Set(GameManager.instance.dataManager.GetskillData(id));
+        }
     }
 
     public void DeleteTemplate()

@@ -36,24 +36,30 @@ public class IngameUI : MonoBehaviour
     [SerializeField] private LevelPoint _levelPoint = null;
 
     private Action<Action> _onViewMapCallback = null;
-    private Action<eRoundClear> _OnNextRoundCallback = null;
+    private Action<eRoundClear> _onNextRoundCallback = null;
+    private Action<string> _onUpdateTextCallback = null;
 
     private eRoundClear _type = eRoundClear.Non;
 
-    public void Initialize(Action<Action> onViewMapCallback, Action<eRoundClear> OnNextRoundCallback)
+    public void Initialize(Action<Action> onViewMapCallback, Action<eRoundClear> onNextRoundCallback, Action<string> onUpdateTextCallback)
     {
         if(onViewMapCallback != null)
         {
             _onViewMapCallback = onViewMapCallback;
         }
 
-        if(OnNextRoundCallback != null)
+        if(onNextRoundCallback != null)
         {
-            _OnNextRoundCallback = OnNextRoundCallback;
+            _onNextRoundCallback = onNextRoundCallback;
+        }
+
+        if(onUpdateTextCallback != null)
+        {
+            _onUpdateTextCallback = onUpdateTextCallback;
         }
 
         _levelPoint.Initialize(CloseLevelPoint);
-        _Attacker.Initialize(CloseAttacker);
+        _Attacker.Initialize(CloseAttacker, _onUpdateTextCallback);
 
         _buttonViewMap.onClick.AddListener(OnMap);
         _buttonGameMenu.onClick.AddListener(OnOpenGameMenu);
@@ -87,7 +93,7 @@ public class IngameUI : MonoBehaviour
 
     private void OnNextRound()
     {
-        _OnNextRoundCallback?.Invoke(_type);
+        _onNextRoundCallback?.Invoke(_type);
         _objNextRound.SetActive(false);
 
         _type = eRoundClear.Non;

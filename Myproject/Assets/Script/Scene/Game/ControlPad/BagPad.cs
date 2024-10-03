@@ -1,11 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class BagPad : MonoBehaviour
 {
     [SerializeField] private Transform _trTemplateParant = null;
-    [SerializeField] private BagPadTemplate _template = null;
+    [SerializeField] private PadTemplate _template = null;
+
+    [SerializeField] private TMP_Text _textName = null;
+    [SerializeField] private TMP_Text _textDescription = null;
 
     private int _id = -1;
 

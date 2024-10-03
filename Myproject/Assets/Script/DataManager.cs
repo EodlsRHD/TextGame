@@ -35,7 +35,6 @@ public class DataManager : MonoBehaviour
         public bool useSkill = false;
         public List<ushort> skillIndexs = null;
         public List<ushort> itemIndexs = null;
-        public List<Skill_Data> skillDatas = null;
 
         public int currentNodeIndex = 0;
     }
@@ -65,8 +64,8 @@ public class DataManager : MonoBehaviour
         public ushort currentVISION = 3;
         public ushort currentATTACKRANGE = 10;
 
-        public List<Item_Data> itemDatas = null;
-
+        public List<ushort> itemDataIndexs = null;
+        public List<ushort> skillDataIndexs = null;
 
         public ushort maximumHP
         {
@@ -433,7 +432,8 @@ public class DataManager : MonoBehaviour
         _saveData.round = 0;
 
         _saveData.userData = new User_Data();
-        _saveData.userData.itemDatas = new List<Item_Data>();
+        _saveData.userData.itemDataIndexs = new List<ushort>();
+        _saveData.userData.skillDataIndexs = new List<ushort>();
         _saveData.userData.data = new Creature_Data();
         _saveData.userData.data.hp = 1;
         _saveData.userData.data.mp = 1;
@@ -442,7 +442,6 @@ public class DataManager : MonoBehaviour
         _saveData.userData.data.defence = 0;
         _saveData.userData.data.vision = 1;
         _saveData.userData.data.attackRange = 1;
-        _saveData.userData.data.skillDatas = new List<Skill_Data>();
 
         _saveData.mapData = new Map_Data();
         _saveData.mapData.mapSize = _mapSize;
@@ -502,7 +501,8 @@ public class DataManager : MonoBehaviour
 
         _saveData.userData = new User_Data();
         _saveData.userData.data = new Creature_Data();
-        _saveData.userData.data.skillDatas = new List<Skill_Data>();
+        _saveData.userData.skillDataIndexs = new List<ushort>();
+        _saveData.userData.itemDataIndexs = new List<ushort>();
 
         _saveData.mapData = new Map_Data();
         _saveData.mapData.nodeDatas = new List<Node_Data>();
