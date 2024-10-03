@@ -24,7 +24,7 @@ public class TextViewTemplate : MonoBehaviour
 
     public void SetTemplate(string label)
     {
-        _textTime.text = "[" + DateTime.Now.ToString("HH:mm") + "]";
+        _textTime.text = "[" + DateTime.Now.ToString("HH:mm:ss") + "]";
         _textLabel.text = label;
 
         this.gameObject.SetActive(true);
