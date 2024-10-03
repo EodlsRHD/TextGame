@@ -24,6 +24,10 @@ public class Attacker : MonoBehaviour
     [SerializeField] private TMP_Text _textBat = null;
     [SerializeField] private TMP_Text _textTotal = null;
 
+    [SerializeField] private TMP_Text _textPlayerNameLabel = null;
+    [SerializeField] private TMP_Text _textPlayerCard = null;
+    [SerializeField] private TMP_Text _textCommunityCard = null;
+
     [Space(10)]
 
     [SerializeField] private GameObject _objButtons = null;
@@ -35,6 +39,7 @@ public class Attacker : MonoBehaviour
     private Action _onCloseCallback = null;
     private Action _onLastCallback = null;
     private Action<eWinorLose, int> _onResultCallback = null;
+    private Action<string> _onUpdateTextCallback = null;
 
     private List<AttackerTemplate> _cards = null;
     private List<int> _fieldCardIndex = new List<int>();
@@ -55,15 +60,24 @@ public class Attacker : MonoBehaviour
     private eBattleAction _playerBattleAction = eBattleAction.Non;
     private eBattleAction _monsterBattleAction = eBattleAction.Non;
 
-    public void Initialize(Action onCloseCallback)
+    public void Initialize(Action onCloseCallback, Action<string> onUpdateTextCallback)
     {
         if(onCloseCallback != null)
         {
             _onCloseCallback = onCloseCallback;
         }
 
+        if(onUpdateTextCallback != null)
+        {
+            _onUpdateTextCallback = onUpdateTextCallback;
+        }
+
         _popup.Initialize();
         _template.Initialize();
+
+        _textPlayerNameLabel.text = string.Empty;
+        _textPlayerCard.text = string.Empty;
+        _textCommunityCard.text = string.Empty;
 
         _buttonBat.onClick.AddListener(() => { OnBat(true, ref _playerCoinCount, ref _batCount); });
         _buttonRaise.onClick.AddListener(() => { OnRaise(true, ref _playerCoinCount, ref _batCount); });
@@ -94,8 +108,14 @@ public class Attacker : MonoBehaviour
         _monsterCoinCount = monster.hp;
 
         _batCount = 1;
+
+        _textPlayerNameLabel.text = userData.data.name;
+
         _textCoin.text = _playerCoinCount.ToString();
         _textBat.text = _batCount.ToString();
+
+        _onUpdateTextCallback?.Invoke(_monster.name + " 과 전투를 시작합니다!");
+        _onUpdateTextCallback?.Invoke("--- " + (_turnCount + 1) + "번째 턴");
 
         CardDistribution();
 
@@ -141,7 +161,7 @@ public class Attacker : MonoBehaviour
         }
 
         string str_name = isPlayer == true ? _userData.data.name : _monster.name;
-        _popup.UpdateText(str_name + " (이)가 " + bat + " 만큼 배팅 하셨습니다.");
+        _onUpdateTextCallback?.Invoke(str_name + " (이)가 " + bat + " 만큼 Call 했습니다.");
 
         coin -= bat;
         _totalCount += bat;
@@ -176,7 +196,7 @@ public class Attacker : MonoBehaviour
         }
 
         string str_name = isPlayer == true ? _userData.data.name : _monster.name;
-        _popup.UpdateText(str_name + " (이)가 베팅액을 2배로 올려 " + (coin * 2) + " 만큼 배팅하셨습니다.");
+        _onUpdateTextCallback?.Invoke(str_name + " (이)가 Raise를 했습니다.");
 
         bat *= 2;
         coin -= bat;
@@ -202,7 +222,7 @@ public class Attacker : MonoBehaviour
     private void OnAllin(bool isPlayer, ref int coin, ref int bat)
     {
         string str_name = isPlayer == true ? _userData.data.name : _monster.name;
-        _popup.UpdateText(str_name + "   ALL IN");
+        _onUpdateTextCallback?.Invoke(str_name + "   ALL IN");
         
         _totalCount += coin;
         bat = coin;
@@ -228,7 +248,7 @@ public class Attacker : MonoBehaviour
     private void OnFold(bool isPlayer, ref int coin, ref int bat)
     {
         string str_name = isPlayer == true ? _userData.data.name : _monster.name;
-        _popup.UpdateText(str_name + " (이)가 Fold 했습니다.");
+        _onUpdateTextCallback?.Invoke(str_name + " (이)가 Fold 했습니다.");
 
         if (isPlayer == true)
         {
@@ -326,23 +346,41 @@ public class Attacker : MonoBehaviour
     private void CardOpen()
     {
         _turnCount++;
+        _onUpdateTextCallback?.Invoke("--- " + (_turnCount + 1) + "번째 턴");
+
+        string str = _textCommunityCard.text;
 
         if (_turnCount == 1)
         {
-            _cards[_fieldCardIndex[2]].HideAndSeek(false);
-            _cards[_fieldCardIndex[3]].HideAndSeek(false);
-            _cards[_fieldCardIndex[4]].HideAndSeek(false);
+            string s1 = _cards[_fieldCardIndex[2]].Name;
+            s1 += _cards[_fieldCardIndex[3]].Name + " ";
+            s1 += _cards[_fieldCardIndex[4]].Name + " ";
+
+            str = s1 + "** **";
         }
 
         if (_turnCount == 2)
         {
-            _cards[_fieldCardIndex[5]].HideAndSeek(false);
+            string s1 = _cards[_fieldCardIndex[2]].Name;
+            s1 += _cards[_fieldCardIndex[3]].Name + " ";
+            s1 += _cards[_fieldCardIndex[4]].Name + " ";
+            s1 += _cards[_fieldCardIndex[5]].Name + " ";
+
+            str = s1 + "**";
         }
 
         if (_turnCount == 3)
         {
-            _cards[_fieldCardIndex[6]].HideAndSeek(false);
+            string s1 = _cards[_fieldCardIndex[2]].Name;
+            s1 += _cards[_fieldCardIndex[3]].Name + " ";
+            s1 += _cards[_fieldCardIndex[4]].Name + " ";
+            s1 += _cards[_fieldCardIndex[5]].Name + " ";
+            s1 += _cards[_fieldCardIndex[6]].Name;
+
+            str = s1;
         }
+
+        _textCommunityCard.text = str;
 
         if (_turnCount == 4)
         {
@@ -386,7 +424,10 @@ public class Attacker : MonoBehaviour
 
         ePedigree monsterPedigree = Pedigree(Sort(nums));
 
-        if(playerPedigree > monsterPedigree)
+        _onUpdateTextCallback?.Invoke(_userData.data.name + " 의 결과 : " + playerPedigree);
+        _onUpdateTextCallback?.Invoke(_monster.name + " 의 결과 : " + monsterPedigree);
+
+        if (playerPedigree > monsterPedigree)
         {
             _isPlayerWin = eWinorLose.Win;
         }
@@ -486,21 +527,24 @@ public class Attacker : MonoBehaviour
 
             if(i < 2)
             {
-                _cards[index].ChangePositionAndActive(_trMyParant, true);
+                //_cards[index].ChangePositionAndActive(_trMyParant, true);
+                _textPlayerCard.text += _cards[index].Name + " ";
 
                 continue;
             }
 
             if(6 < i)
             {
-                _cards[index].ChangePositionAndActive(_trEnemyParant, true);
-                _cards[index].HideAndSeek(true);
+                //_cards[index].ChangePositionAndActive(_trEnemyParant, true);
+                //_cards[index].HideAndSeek(true);
 
                 continue;
             }
 
-            _cards[index].ChangePositionAndActive(_trCommunityParant, true);
-            _cards[index].HideAndSeek(true);
+            //_cards[index].ChangePositionAndActive(_trCommunityParant, true);
+            //_cards[index].HideAndSeek(true);
+
+            _textCommunityCard.text += "** ";
         }
     }
 

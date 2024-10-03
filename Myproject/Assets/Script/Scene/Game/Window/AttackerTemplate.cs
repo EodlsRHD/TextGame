@@ -24,6 +24,11 @@ public class AttackerTemplate : MonoBehaviour
         get { return _num; }
     }
 
+    public string Name
+    {
+        get { return _textShape.text + _textNum.text; }
+    }
+
     public void Initialize()
     {
         _imageBack.gameObject.SetActive(false);
