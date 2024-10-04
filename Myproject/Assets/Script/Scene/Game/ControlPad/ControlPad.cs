@@ -40,6 +40,11 @@ public class ControlPad : MonoBehaviour
     [SerializeField] private SkillPad _skillPad = null;
     [SerializeField] private BagPad _BagPad = null;
 
+    [Header("Information")]
+    [SerializeField] private GameObject _objInformation = null;
+    [SerializeField] private TMP_Text _textName = null;
+    [SerializeField] private TMP_Text _textDescription = null;
+
     private Action<eControl> _onMoveCallback = null;
     private Action<eControl> _onActionCallback = null;
 
@@ -75,8 +80,13 @@ public class ControlPad : MonoBehaviour
         _buttonCloseSecControlPad.onClick.AddListener(OnCloseSecControlPad);
         _buttonUseSecControlPad.onClick.AddListener(OnUseSecControlPad);
 
+        _objInformation.SetActive(false);
+        _textName.text = string.Empty;
+        _textDescription.text = string.Empty;
+
         _objControlPad.SetActive(false);
-        _skillPad.Initialize();
+
+        _skillPad.Initialize(OpenInformation);
         _BagPad.Initialize();
     }
 
@@ -156,6 +166,8 @@ public class ControlPad : MonoBehaviour
     {
         _objControlPad.SetActive(false);
 
+        CloseInformation();
+
         switch (_eOpenPad)
         {
             case eControl.Skill:
@@ -169,5 +181,21 @@ public class ControlPad : MonoBehaviour
 
         _textTitle.text = string.Empty;
         _eOpenPad = eControl.Non;
+    }
+
+    private void OpenInformation(string name, string description)
+    {
+        _textName.text = name;
+        _textDescription.text = description;
+
+        _objInformation.SetActive(true);
+    }
+
+    private void CloseInformation()
+    {
+        _objInformation.SetActive(false);
+
+        _textName.text = string.Empty;
+        _textDescription.text = string.Empty;
     }
 }

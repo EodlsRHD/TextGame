@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class LobbyManager : MonoBehaviour
 {
@@ -11,6 +12,7 @@ public class LobbyManager : MonoBehaviour
     [SerializeField] private Button _buttonStart = null;
     [SerializeField] private Button _buttonSettings = null;
     [SerializeField] private Button _buttonDictionary = null;
+    [SerializeField] private TMP_Text _textVersion = null;
 
     private const string SAVE_DATA = "SAVE_DATA";
 
@@ -23,6 +25,8 @@ public class LobbyManager : MonoBehaviour
         _buttonDictionary.onClick.AddListener(OnDictionary);
 
         _createCharacterProfile.Initialize(NewGame);
+
+        _textVersion.text = Application.version;
 
         GameManager.instance.dataManager.ReadGameData();
     }

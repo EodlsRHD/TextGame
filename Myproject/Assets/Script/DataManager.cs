@@ -64,24 +64,43 @@ public class DataManager : MonoBehaviour
         public ushort currentVISION = 3;
         public ushort currentATTACKRANGE = 10;
 
+        public short HP_Effect = 0;
+        public short MP_Effect = 0;
+        public short AP_Effect = 0;
+        public short EXP_Effect = 0;
+        public short Attack_Effect = 0;
+        public short Defence_Effect = 0;
+        public short Coin_Effect = 0;
+
+        public short Attack_Effect_Per = 0;
+        public short Defence_Effect_Per = 0;
+
+        public short EXP_Effect_Per = 0;
+        public short Coin_Effect_Per = 0;
+
         public List<ushort> itemDataIndexs = null;
         public List<ushort> skillDataIndexs = null;
 
+        public List<Skill_Duration> useSkill = null;
+        public List<Skill_CoolDown> coolDownSkill = null;
+
+        #region GetSet
+
         public ushort maximumHP
         {
-            get { return (ushort)(_defultHP * data.hp); }
+            get { return (ushort)(_defultHP * data.hp + HP_Effect); }
             set { data.hp = (ushort)value; }
         }
 
         public ushort maximumMP
         {
-            get { return (ushort)(_defultMP * data.mp); }
+            get { return (ushort)(_defultMP * data.mp + MP_Effect); }
             set { data.mp = (ushort)value; }
         }
 
         public ushort maximumAP
         {
-            get { return (ushort)(_defultAP * data.ap); }
+            get { return (ushort)(_defultAP * data.ap + AP_Effect); }
             set { data.ap = (ushort)value; }
         }
 
@@ -92,13 +111,13 @@ public class DataManager : MonoBehaviour
 
         public ushort maximumATTACK
         {
-            get { return (ushort)(_defultATTACK * data.attack); }
+            get { return (ushort)((_defultATTACK * data.attack) + ((_defultATTACK * data.attack) * 0.01f * Attack_Effect_Per)); }
             set { data.attack = (ushort)value; }
         }
 
         public ushort maximumDEFENCE
         {
-            get { return (ushort)(_defultDEFENCE * data.defence); }
+            get { return (ushort)(_defultDEFENCE * data.defence + ((_defultDEFENCE * data.defence) * 0.01f * Defence_Effect_Per)); }
             set { data.defence = (ushort)value; }
         }
 
@@ -130,6 +149,8 @@ public class DataManager : MonoBehaviour
             }
         }
 
+        #endregion
+
         public void Reset()
         {
             currentHP = maximumHP;
@@ -149,6 +170,9 @@ public class DataManager : MonoBehaviour
 
         public string name = string.Empty;
         public string description = string.Empty;
+
+        public short coolDown = 0;
+        public short usemp = 0;
 
         public short hp = 0;
         public short mp = 0;
@@ -186,6 +210,27 @@ public class DataManager : MonoBehaviour
         public short defence = 0;
         public short defencePercentIncreased = 0;
         public ushort duration = 0;
+    }
+
+    public class Skill_Duration
+    {
+        public int skill_ID = 0;
+        public string name = string.Empty;
+
+        public int remaindDuration = 0;
+
+        public eStats stats = eStats.Non;
+        public eSkill_IncreaseDecrease inDe = eSkill_IncreaseDecrease.Non;
+        public bool isPercent = false;
+        public int value;
+    }
+
+    public class Skill_CoolDown
+    {
+        public int id = 0;
+        public string name = string.Empty;
+
+        public int coolDown = 0;
     }
 
     #endregion
@@ -426,14 +471,21 @@ public class DataManager : MonoBehaviour
 
     public void CreateNewSaveData()
     {
-        Debug.LogWarning("TEST Stat Set");
+        Debug.Log("TEST Stat Set");
 
         _saveData = new Save_Data();
-        _saveData.round = 0;
+        _saveData.round = 1;
 
         _saveData.userData = new User_Data();
         _saveData.userData.itemDataIndexs = new List<ushort>();
+        _saveData.userData.itemDataIndexs.Add(501);
+
         _saveData.userData.skillDataIndexs = new List<ushort>();
+        _saveData.userData.skillDataIndexs.Add(301);
+
+        _saveData.userData.useSkill = new List<Skill_Duration>();
+        _saveData.userData.coolDownSkill = new List<Skill_CoolDown>();
+
         _saveData.userData.data = new Creature_Data();
         _saveData.userData.data.hp = 1;
         _saveData.userData.data.mp = 1;
@@ -452,12 +504,11 @@ public class DataManager : MonoBehaviour
         _saveData.encyclopediaData.creatureDatas = new List<Creature_Data>();
         _saveData.encyclopediaData.itemDatas = new List<Item_Data>();
         _saveData.encyclopediaData.skillData = new List<Skill_Data>();
-
     }
 
     public Save_Data CopySaveData()
     {
-        return _saveData.DeepCopy();
+        return _saveData;
     }
 
     public bool CheckSaveData()

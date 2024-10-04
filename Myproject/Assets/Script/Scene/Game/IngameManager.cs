@@ -29,20 +29,21 @@ public class IngameManager : MonoBehaviour
         _mapController.Initialize(_saveData.mapData.mapSize);
         _ingamePopup.Initialize();
 
-        _ingameUI.OpenNextRoundWindow(eRoundClear.First);
-
-        FirstSet_Tutorial();
+        FirstSet();
 
         this.gameObject.SetActive(true);
     }
 
-    private void FirstSet_Tutorial()
+    private void FirstSet()
     {
-        if(_saveData.round > 0)
+        if(_saveData.round > 1)
         {
+            _ingameUI.OpenNextRoundWindow(eRoundClear.Load);
+
             return;
         }
 
+        _ingameUI.OpenNextRoundWindow(eRoundClear.First);
         //_tutorial.Open();
     }
 
@@ -55,7 +56,13 @@ public class IngameManager : MonoBehaviour
     {
         _textView.DeleteTemplate();
 
-        if(type == eRoundClear.Fail)
+        if (type == eRoundClear.Load)
+        {
+            _ingameUI.UpdatePlayerInfo(_saveData.userData);
+            return;
+        }
+
+        if (type == eRoundClear.Fail)
         {
             GameManager.instance.tools.SceneChange(eScene.Lobby, () => 
             {
@@ -67,7 +74,6 @@ public class IngameManager : MonoBehaviour
 
         GameManager.instance.dataManager.SaveDataToCloud(_saveData, () => 
         {
-            _saveData.round++;
             _saveData.userData.Reset();
 
             _mapGenerator = new MapGenerator(GenerateMap, _saveData);
@@ -100,6 +106,8 @@ public class IngameManager : MonoBehaviour
     private void RoundClear()
     {
         _mapController.RemoveTemplate();
+        _saveData.round++;
+
         OpenNextRound(eRoundClear.Success);
     }
 
@@ -187,7 +195,6 @@ public class IngameManager : MonoBehaviour
 
         if (_saveData.mapData.nodeDatas[result].isMonster == true)
         {
-            _textView.UpdateText(_saveData.mapData.monsterDatas.Find(x => x.currentNodeIndex == result));
             Attack(result);
 
             return -1;
@@ -361,6 +368,10 @@ public class IngameManager : MonoBehaviour
     private void PlayerTurnOut()
     {
         _isPlayerTurn = false;
+
+        SkillRemindDuration();
+
+        _textView.UpdateText("--- " + _saveData.userData.data.name + "의 순서가 종료됩니다.");
     }
 
     #endregion
@@ -371,7 +382,7 @@ public class IngameManager : MonoBehaviour
     {
         if (_isAllMonsterDead == true)
         {
-            _textView.UpdateText("--- 살아있는 몬스터가 없습니다.");
+            _textView.UpdateText("--- 살아있는 몬스터가 없습니다. 순서를 건너뜁니다.");
             PlayerTurn();
 
             yield break;
@@ -396,7 +407,6 @@ public class IngameManager : MonoBehaviour
                 }
             }
 
-            _textView.UpdateText("몬스터가 이동하였습니다.");
             MonsterMove(m, 1);
         }
 
@@ -404,15 +414,17 @@ public class IngameManager : MonoBehaviour
         {
             Attack(_saveData.mapData.monsterDatas[attackMonsterIndex].currentNodeIndex, () =>
             {
-                _textView.UpdateText("--- 몬스터의 순서가 종료되었습니다.");
-
-                UpdateData();
-                PlayerTurn();
+                MonsterTurnOut();
             });
 
             yield break;
         }
 
+        MonsterTurnOut();
+    }
+
+    private void MonsterTurnOut()
+    {
         _textView.UpdateText("--- 몬스터의 순서가 종료되었습니다.");
 
         UpdateData();
@@ -580,7 +592,20 @@ public class IngameManager : MonoBehaviour
             {
                 _textView.UpdateText("--- " + monster.name + " (이)가 승리했습니다.");
 
-                _saveData.userData.currentHP -= (ushort)(_saveData.userData.currentDEFENCE - damage);
+                int monsterAttack = damage + monster.attack;
+
+                _textView.UpdateText("--- " + monster.name + " (이)가 " + monsterAttack + " 의 공격력으로 공격합니다.");
+
+                int playerDef = _saveData.userData.currentDEFENCE + (int)(_saveData.userData.currentDEFENCE * (0.01f * _saveData.userData.Defence_Effect_Per)) + _saveData.userData.Defence_Effect;
+                ushort resultDamage = (ushort)Mathf.Abs((playerDef - monsterAttack));
+                _saveData.userData.currentHP -= resultDamage;
+
+                _textView.UpdateText("--- " + resultDamage + " 의 피해를 입었습니다.");
+
+                if(_saveData.userData.currentHP > 60000)
+                {
+                    _saveData.userData.currentHP = 0;
+                }
 
                 UpdateData();
 
@@ -598,9 +623,10 @@ public class IngameManager : MonoBehaviour
 
             _textView.UpdateText("--- " + _saveData.userData.data.name + " (이)가 승리했습니다.");
 
-            int _damage = Mathf.Abs(monster.defence - (damage + _saveData.userData.currentATTACK));
+            int playerDamage = damage + (int)(damage * (0.01f * _saveData.userData.Attack_Effect_Per)) + _saveData.userData.Attack_Effect;
+            int _damage = monster.defence - playerDamage;
 
-            if(_damage <= 0)
+            if(_damage >= 0)
             {
                 _textView.UpdateText(monster.name + " 의 방어도에 막혔습니다.");
 
@@ -608,9 +634,10 @@ public class IngameManager : MonoBehaviour
             }
             else
             {
-                _textView.UpdateText("방어도를 제외한 " + _damage + " 의 데미지를 가했습니다.");
+                _textView.UpdateText("--- " + _saveData.userData.data.name + " (이)가 " + playerDamage + " 의 공격력으로 공격합니다.");
+                _textView.UpdateText("방어도를 제외한 " + Mathf.Abs(_damage) + " 의 데미지를 가했습니다.");
 
-                monster.hp -= (ushort)_damage;
+                monster.hp -= (ushort)Mathf.Abs(_damage);
 
                 if (monster.hp >= 60000 || monster.hp == 0)
                 {
@@ -627,8 +654,8 @@ public class IngameManager : MonoBehaviour
                         }
                     }
                      
-                    _saveData.userData.data.coin += monster.coin;
-                    _saveData.userData.currentEXP += monster.exp;
+                    _saveData.userData.data.coin += (ushort)(monster.coin + (monster.coin * 0.01f * _saveData.userData.Coin_Effect_Per));
+                    _saveData.userData.currentEXP += (ushort)(monster.exp + (monster.exp * 0.01f * _saveData.userData.EXP_Effect_Per));
 
                     if (_saveData.userData.maximumEXP <= _saveData.userData.currentEXP)
                     {
@@ -696,10 +723,279 @@ public class IngameManager : MonoBehaviour
 
     private void Skill(int id)
     {
+        int reCooldown = 0;
+        if(SkillCheckCoolDown(id, ref reCooldown) == false)
+        {
+            _textView.UpdateText("대기순서가 " + reCooldown  + "만큼 남았습니다.");
 
+            return;
+        }
 
+        DataManager.Skill_Data data = GameManager.instance.dataManager.GetskillData(id);
 
-        _ingameUI.UpdatePlayerInfo(eStats.MP, _saveData.userData);
+        DataManager.Skill_CoolDown cooldown = new DataManager.Skill_CoolDown();
+        cooldown.id = data.id;
+        cooldown.name = data.name;
+        cooldown.coolDown = data.coolDown;
+        _saveData.userData.coolDownSkill.Add(cooldown);
+
+        int useMP = data.usemp;
+        int reMP = _saveData.userData.currentMP - useMP;
+        _saveData.userData.currentMP = (ushort)(reMP < 0 ? 0 : reMP);
+
+        SkillConsumptionCheck(data, eStats.HP, data.hp);
+        SkillConsumptionCheck(data, eStats.MP, data.mp);
+        SkillConsumptionCheck(data, eStats.AP, data.ap);
+
+        SkillConsumptionCheck(data, eStats.EXP, data.exp);
+        SkillConsumptionCheck(data, eStats.EXP, data.expPercentIncreased, true);
+
+        SkillConsumptionCheck(data, eStats.Coin, data.coin);
+        SkillConsumptionCheck(data, eStats.Coin, data.coinPercentIncreased, true);
+
+        SkillConsumptionCheck(data, eStats.Attack, data.attack);
+        SkillConsumptionCheck(data, eStats.Attack, data.attackPercentIncreased, true);
+
+        SkillConsumptionCheck(data, eStats.Defence, data.defence);
+        SkillConsumptionCheck(data, eStats.Defence, data.defencePercentIncreased, true);
+
+        _textView.UpdateText("스킬 " + data.name + " (을)를 발동하셨습니다.");
+    }
+
+    private bool SkillCheckCoolDown(int id, ref int cooldown)
+    {
+        for (int i = 0; i < _saveData.userData.coolDownSkill.Count; i++)
+        {
+            if (_saveData.userData.coolDownSkill[i].id == id)
+            {
+                cooldown = _saveData.userData.coolDownSkill[i].coolDown;
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private void SkillConsumptionCheck(DataManager.Skill_Data data, eStats type, int useValue, bool isPercent = false)
+    {
+        eSkill_IncreaseDecrease result = eSkill_IncreaseDecrease.Non;
+
+        if (useValue == 0)
+        {
+            return;
+        }
+
+        if (useValue < 0)
+        {
+            result = eSkill_IncreaseDecrease.Decrease;
+        }
+
+        if (useValue == -9999)
+        {
+            result = eSkill_IncreaseDecrease.ALLDecrease;
+        }
+
+        if (useValue > 0)
+        {
+            result = eSkill_IncreaseDecrease.Increase;
+        }
+
+        DataManager.Skill_Duration temp = new DataManager.Skill_Duration();
+        temp.skill_ID = data.id;
+        temp.name = data.name;
+        temp.stats = type;
+        temp.inDe = result;
+        temp.isPercent = isPercent;
+        temp.value = useValue;
+
+        _saveData.userData.useSkill.Add(temp);
+    }
+
+    private void SkillRemindDuration()
+    {
+        for (int i = _saveData.userData.useSkill.Count - 1; i >= 0; i--)
+        {
+            if(_saveData.userData.useSkill[i].remaindDuration == 0)
+            {
+                _textView.UpdateText(_saveData.userData.useSkill[i].name + " 의 효과가 끝났습니다.");
+                SkillRemoveEffect(_saveData.userData.useSkill[i]);
+
+                _saveData.userData.useSkill.Remove(_saveData.userData.useSkill[i]);
+
+                continue;
+            }
+
+            SkillApplyEffect(_saveData.userData.useSkill[i]);
+            _saveData.userData.useSkill[i].remaindDuration -= 1;
+        }
+
+        for (int i = _saveData.userData.coolDownSkill.Count - 1; i >= 0; i--)
+        {
+            if(_saveData.userData.coolDownSkill[i].coolDown == 0)
+            {
+                _textView.UpdateText(_saveData.userData.coolDownSkill[i].name + " (을)를 다시 사용 할 수 있습니다.");
+
+                _saveData.userData.coolDownSkill.Remove(_saveData.userData.coolDownSkill[i]);
+
+                continue;
+            }
+
+            _saveData.userData.coolDownSkill[i].coolDown -= 1;
+        }
+
+        _ingameUI.UpdatePlayerInfo(_saveData.userData);
+    }
+
+    private void SkillRemoveEffect(DataManager.Skill_Duration useSkill)
+    {
+        switch (useSkill.stats)
+        {
+            case eStats.HP:
+                {
+                    _saveData.userData.HP_Effect -= (short)(useSkill.inDe == eSkill_IncreaseDecrease.Increase ? useSkill.value : (useSkill.value * -1));
+                }
+                break;
+
+            case eStats.MP:
+                {
+                    _saveData.userData.MP_Effect -= (short)(useSkill.inDe == eSkill_IncreaseDecrease.Increase ? useSkill.value : (useSkill.value * -1));
+                }
+                break;
+
+            case eStats.AP:
+                {
+                    _saveData.userData.AP_Effect -= (short)(useSkill.inDe == eSkill_IncreaseDecrease.Increase ? useSkill.value : (useSkill.value * -1));
+                }
+                break;
+
+            case eStats.EXP:
+                {
+                    if (useSkill.isPercent == true)
+                    {
+                        _saveData.userData.EXP_Effect_Per -= (short)(useSkill.inDe == eSkill_IncreaseDecrease.Increase ? useSkill.value : (useSkill.value * -1));
+
+                        return;
+                    }
+
+                    _saveData.userData.EXP_Effect -= (short)(useSkill.inDe == eSkill_IncreaseDecrease.Increase ? useSkill.value : (useSkill.value * -1));
+                }
+                break;
+
+            case eStats.Coin:
+                {
+                    if (useSkill.isPercent == true)
+                    {
+                        _saveData.userData.Coin_Effect_Per -= (short)(useSkill.inDe == eSkill_IncreaseDecrease.Increase ? useSkill.value : (useSkill.value * -1));
+
+                        return;
+                    }
+
+                    _saveData.userData.Coin_Effect -= (short)(useSkill.inDe == eSkill_IncreaseDecrease.Increase ? useSkill.value : (useSkill.value * -1));
+                }
+                break;
+
+            case eStats.Attack:
+                {
+                    if (useSkill.isPercent == true)
+                    {
+                        _saveData.userData.Attack_Effect_Per -= (short)(useSkill.inDe == eSkill_IncreaseDecrease.Increase ? useSkill.value : (useSkill.value * -1));
+
+                        return;
+                    }
+
+                    _saveData.userData.Attack_Effect -= (short)(useSkill.inDe == eSkill_IncreaseDecrease.Increase ? useSkill.value : (useSkill.value * -1));
+                }
+                break;
+
+            case eStats.Defence:
+                {
+                    if (useSkill.isPercent == true)
+                    {
+                        _saveData.userData.Defence_Effect_Per -= (short)(useSkill.inDe == eSkill_IncreaseDecrease.Increase ? useSkill.value : (useSkill.value * -1));
+
+                        return;
+                    }
+
+                    _saveData.userData.Defence_Effect -= (short)(useSkill.inDe == eSkill_IncreaseDecrease.Increase ? useSkill.value : (useSkill.value * -1));
+                }
+                break;
+        }
+    }
+
+    private void SkillApplyEffect(DataManager.Skill_Duration useSkill)
+    {
+        switch(useSkill.stats)
+        {
+            case eStats.HP:
+                {
+                    _saveData.userData.HP_Effect += (short)(useSkill.inDe == eSkill_IncreaseDecrease.Increase ? useSkill.value : (useSkill.value * -1));
+                }
+                break;
+
+            case eStats.MP:
+                {
+                    _saveData.userData.MP_Effect += (short)(useSkill.inDe == eSkill_IncreaseDecrease.Increase ? useSkill.value : (useSkill.value * -1));
+                }
+                break;
+
+            case eStats.AP:
+                {
+                    _saveData.userData.AP_Effect += (short)(useSkill.inDe == eSkill_IncreaseDecrease.Increase ? useSkill.value : (useSkill.value * -1));
+                }
+                break;
+
+            case eStats.EXP:
+                {
+                    if(useSkill.isPercent == true)
+                    {
+                        _saveData.userData.EXP_Effect_Per += (short)(useSkill.inDe == eSkill_IncreaseDecrease.Increase ? useSkill.value : (useSkill.value * -1));
+
+                        return;
+                    }
+
+                    _saveData.userData.EXP_Effect += (short)(useSkill.inDe == eSkill_IncreaseDecrease.Increase ? useSkill.value : (useSkill.value * -1));
+                }
+                break;
+
+            case eStats.Coin:
+                {
+                    if (useSkill.isPercent == true)
+                    {
+                        _saveData.userData.Coin_Effect_Per += (short)(useSkill.inDe == eSkill_IncreaseDecrease.Increase ? useSkill.value : (useSkill.value * -1));
+
+                        return;
+                    }
+
+                    _saveData.userData.Coin_Effect += (short)(useSkill.inDe == eSkill_IncreaseDecrease.Increase ? useSkill.value : (useSkill.value * -1));
+                }
+                break;
+
+            case eStats.Attack:
+                {
+                    if (useSkill.isPercent == true)
+                    {
+                        _saveData.userData.Attack_Effect_Per += (short)(useSkill.inDe == eSkill_IncreaseDecrease.Increase ? useSkill.value : (useSkill.value * -1));
+
+                        return;
+                    }
+
+                    _saveData.userData.Attack_Effect += (short)(useSkill.inDe == eSkill_IncreaseDecrease.Increase ? useSkill.value : (useSkill.value * -1));
+                }
+                break;
+
+            case eStats.Defence:
+                {
+                    if (useSkill.isPercent == true)
+                    {
+                        _saveData.userData.Defence_Effect_Per += (short)(useSkill.inDe == eSkill_IncreaseDecrease.Increase ? useSkill.value : (useSkill.value * -1));
+
+                        return;
+                    }
+
+                    _saveData.userData.Defence_Effect += (short)(useSkill.inDe == eSkill_IncreaseDecrease.Increase ? useSkill.value : (useSkill.value * -1));
+                }
+                break;
+        }
     }
 
     private void Bag(int id)
@@ -720,6 +1016,14 @@ public class IngameManager : MonoBehaviour
     private void UpdateData()
     {
         _ingameUI.UpdatePlayerInfo(_saveData.userData);
+
+        if(_saveData.userData.currentHP == 0)
+        {
+            OpenNextRound(eRoundClear.Fail);
+
+            return;
+        }
+
         _mapController.UpdateMapData(_saveData, PlayerVision());
     }
 

@@ -115,6 +115,11 @@ public class IngameUI : MonoBehaviour
                 _textButtonLabel.text = "시작";
                 break;
 
+            case eRoundClear.Load:
+                _textLabel.text = "직전 라운드 이어하기";
+                _textButtonLabel.text = "시작";
+                break;
+
             case eRoundClear.Success:
                 _textLabel.text = "라운드를 돌파하셨습니다.";
                 _textButtonLabel.text = "다음 라운드로";

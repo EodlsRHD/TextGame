@@ -25,6 +25,7 @@ public enum eRoundClear
 {
     Non = -1,
     First,
+    Load,
     Success,
     Fail
 }
@@ -49,7 +50,8 @@ public enum eStats
     Attack,
     Defence,
     Vision,
-    AttackRange
+    AttackRange,
+    Coin
 }
 
 public enum eCardShape
@@ -67,13 +69,13 @@ public enum ePedigree
     HighCard,
     OnePair,
     TwoPair,
-    ThreeofaKind, //
-    Straight, //
-    Flush, //
-    FullHouse, //
-    FourofaKind, //
-    StraightFlush, //
-    RoyalStraightFlush //
+    ThreeofaKind,
+    Straight,
+    Flush,
+    FullHouse,
+    FourofaKind,
+    StraightFlush,
+    RoyalStraightFlush
 }
 
 public enum eBattleAction
@@ -81,7 +83,7 @@ public enum eBattleAction
     Non = -1,
     Bat,
     Raise,
-    Allin,
+    ALLin,
     Fold
 }
 
@@ -91,4 +93,12 @@ public enum eWinorLose
     Win,
     Lose,
     Draw
+}
+
+public enum eSkill_IncreaseDecrease
+{
+    Non = -1,
+    Increase,
+    Decrease,
+    ALLDecrease
 }

@@ -103,14 +103,6 @@ public class TextView : MonoBehaviour
         InstantiateTemplate(content);
     }
 
-    /// <summary>
-    ///  Meet Monster
-    /// </summary>
-    public void UpdateText(DataManager.Creature_Data creature)
-    {
-        InstantiateTemplate(creature.name + " (을)를 만났습니다");
-    }
-
     public void DeleteTemplate()
     {
         var child = _trTemplateParant.transform.GetComponentsInChildren<Transform>();

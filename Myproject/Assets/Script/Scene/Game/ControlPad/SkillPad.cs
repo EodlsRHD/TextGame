@@ -2,27 +2,29 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using System;
 
 public class SkillPad : MonoBehaviour
 {
     [SerializeField] private Transform _trTemplateParant = null;
     [SerializeField] private PadTemplate _template = null;
 
-    [SerializeField] private TMP_Text _textName = null;
-    [SerializeField] private TMP_Text _textDescription = null;
-
     [SerializeField] private GameObject _objEmptyLabel = null;
 
     private DataManager.User_Data _data = null;
 
+    private Action<string, string> _onOpenInformationCallback = null;
+
     private int _id = -1;
 
-    public void Initialize()
+    public void Initialize(Action<string, string> onOpenInformationCallback)
     {
-        _template.Initialize(ViewInfo);
+        if(onOpenInformationCallback != null)
+        {
+            _onOpenInformationCallback = onOpenInformationCallback;
+        }
 
-        _textName.text = string.Empty;
-        _textDescription.text = string.Empty;
+        _template.Initialize(ViewInfo);
 
         _objEmptyLabel.SetActive(false);
         this.gameObject.SetActive(false);
@@ -47,9 +49,6 @@ public class SkillPad : MonoBehaviour
         this.gameObject.SetActive(false);
 
         DeleteTemplate();
-
-        _textName.text = string.Empty;
-        _textDescription.text = string.Empty;
     }
 
     private void MakeList()
@@ -83,8 +82,8 @@ public class SkillPad : MonoBehaviour
         _trTemplateParant.transform.DetachChildren();
     }
 
-    private void ViewInfo(int id)
+    private void ViewInfo(string name, string des)
     {
-        _id = id;
+        _onOpenInformationCallback?.Invoke(name, des);
     }
 }

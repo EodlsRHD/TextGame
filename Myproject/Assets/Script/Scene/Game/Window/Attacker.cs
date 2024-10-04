@@ -52,6 +52,8 @@ public class Attacker : MonoBehaviour
     private int _batCount = 0;
     private int _totalCount = 0;
 
+    private int _playerBat = 0;
+
     private int _turnCount = 0;
 
     private eWinorLose _isPlayerWin = eWinorLose.Non;
@@ -127,6 +129,10 @@ public class Attacker : MonoBehaviour
     {
         this.gameObject.SetActive(false);
 
+        _textPlayerNameLabel.text = string.Empty;
+        _textPlayerCard.text = string.Empty;
+        _textCommunityCard.text = string.Empty;
+
         _turnCount = 0;
         _playerBattleAction = eBattleAction.Non;
 
@@ -168,6 +174,7 @@ public class Attacker : MonoBehaviour
 
         if(isPlayer == true)
         {
+            _playerBat += bat;
             _playerBattleAction = eBattleAction.Bat;
 
             _textCoin.text = coin.ToString();
@@ -204,6 +211,7 @@ public class Attacker : MonoBehaviour
 
         if(isPlayer == true)
         {
+            _playerBat += bat;
             _playerBattleAction = eBattleAction.Raise;
 
             _textCoin.text = coin.ToString();
@@ -230,13 +238,14 @@ public class Attacker : MonoBehaviour
 
         if (isPlayer == true)
         {
-            _playerBattleAction = eBattleAction.Allin;
+            _playerBat += bat;
+            _playerBattleAction = eBattleAction.ALLin;
 
             _textCoin.text = coin.ToString();
         }
         else
         {
-            _monsterBattleAction = eBattleAction.Allin;
+            _monsterBattleAction = eBattleAction.ALLin;
         }
 
         _textBat.text = bat.ToString();
@@ -264,7 +273,7 @@ public class Attacker : MonoBehaviour
 
     private void Check(bool isPlayer)
     {
-        if(isPlayer == true)
+        if (isPlayer == true)
         {
             _objButtons.SetActive(false);
 
@@ -282,20 +291,27 @@ public class Attacker : MonoBehaviour
             return;
         }
 
-        if(_turnCount < 4 && _playerCoinCount == 0)
+        if (_monsterBattleAction == eBattleAction.Fold)
         {
-            _isPlayerWin = eWinorLose.Lose;
+            _isPlayerWin = eWinorLose.Win;
 
             SettleUp(false);
 
             return;
         }
 
-        if(_monsterBattleAction == eBattleAction.Fold)
-        {
-            _isPlayerWin = eWinorLose.Win;
+        _turnCount++;
 
-            SettleUp(false);
+        if (_turnCount < 4)
+        {
+            _onUpdateTextCallback?.Invoke("--- " + (_turnCount + 1) + "번째 턴");
+        }
+
+        if (_turnCount < 4 && _playerCoinCount == 0)
+        {
+            _onUpdateTextCallback?.Invoke("남은 Hp가 없어 Call할 수 없습니다.");
+
+            StartCoroutine(Co_EnemyTurn());
 
             return;
         }
@@ -310,7 +326,109 @@ public class Attacker : MonoBehaviour
 
         yield return new WaitForSecondsRealtime(0.7f);
 
-        OnBat(false, ref _monsterCoinCount, ref _batCount);
+        List<int> nums = new List<int>(6);
+
+        for (int i = 2; i < _fieldCardIndex.Count; i++)
+        {
+            nums.Add(_fieldCardIndex[i]);
+        }
+
+        ePedigree monsterPedigree = Pedigree(Sort(nums));
+
+        if ((int)monsterPedigree == 1)
+        {
+            bool result = Probability(50);
+
+            if (result == true)
+            {
+                OnBat(false, ref _monsterCoinCount, ref _batCount);
+            }
+            else
+            {
+                OnFold(false, ref _monsterCoinCount, ref _batCount);
+            }
+        }
+
+        if ((int)monsterPedigree == 2)
+        {
+            bool result = Probability(42);
+
+            if(result == true)
+            {
+                OnBat(false, ref _monsterCoinCount, ref _batCount);
+            }
+            else
+            {
+                OnFold(false, ref _monsterCoinCount, ref _batCount);
+            } 
+        }
+
+        if(2 <= (int)monsterPedigree && (int)monsterPedigree < 4)
+        {
+            bool result = Probability(65);
+
+            if (result == true)
+            {
+                OnBat(false, ref _monsterCoinCount, ref _batCount);
+            }
+            else
+            {
+                bool result_1 = Probability(10);
+
+                if (result_1 == true)
+                {
+                    OnRaise(false, ref _monsterCoinCount, ref _batCount);
+                }
+                else
+                {
+                    OnFold(false, ref _monsterCoinCount, ref _batCount);
+                }
+            }
+        }
+
+        if (4 <= (int)monsterPedigree && (int)monsterPedigree < 8)
+        {
+            bool result = Probability(70);
+
+            if (result == true)
+            {
+                OnBat(false, ref _monsterCoinCount, ref _batCount);
+            }
+            else
+            {
+                OnRaise(false, ref _monsterCoinCount, ref _batCount);
+            }
+        }
+
+        if ((int)monsterPedigree == 8)
+        {
+            bool result = Probability(80);
+
+            if (result == true)
+            {
+                OnBat(false, ref _monsterCoinCount, ref _batCount);
+            }
+            else
+            {
+                OnRaise(false, ref _monsterCoinCount, ref _batCount);
+            }
+        }
+
+        if ((int)monsterPedigree == 9)
+        {
+            bool result = Probability(90);
+
+            if (result == true)
+            {
+                OnRaise(false, ref _monsterCoinCount, ref _batCount);
+            }
+            else
+            {
+                OnBat(false, ref _monsterCoinCount, ref _batCount);
+            }
+        }
+
+        yield return new WaitForSecondsRealtime(0.3f);
     }
 
     private void ButtonControl()
@@ -345,9 +463,6 @@ public class Attacker : MonoBehaviour
 
     private void CardOpen()
     {
-        _turnCount++;
-        _onUpdateTextCallback?.Invoke("--- " + (_turnCount + 1) + "번째 턴");
-
         string str = _textCommunityCard.text;
 
         if (_turnCount == 1)
@@ -406,6 +521,8 @@ public class Attacker : MonoBehaviour
     {
         yield return new WaitForSecondsRealtime(1f);
 
+        _onUpdateTextCallback?.Invoke("--- 전투가 종료되었습니다.");
+
         List<int> nums = new List<int>(6);
 
         for (int i = 0; i <= 6; i++)
@@ -424,21 +541,28 @@ public class Attacker : MonoBehaviour
 
         ePedigree monsterPedigree = Pedigree(Sort(nums));
 
-        _onUpdateTextCallback?.Invoke(_userData.data.name + " 의 결과 : " + playerPedigree);
-        _onUpdateTextCallback?.Invoke(_monster.name + " 의 결과 : " + monsterPedigree);
+        _onUpdateTextCallback?.Invoke("--- " + _userData.data.name + " 의 결과 : " + playerPedigree);
+        _onUpdateTextCallback?.Invoke("--- " + _monster.name + " 의 결과 : " + monsterPedigree);
+
+        _resultDamage = _totalCount;
 
         if (playerPedigree > monsterPedigree)
         {
             _isPlayerWin = eWinorLose.Win;
+            _resultDamage = _playerBat;
         }
         else if(playerPedigree < monsterPedigree)
         {
             _isPlayerWin = eWinorLose.Lose;
+            _resultDamage -= _playerBat;
         }
         else if(playerPedigree == monsterPedigree)
         {
             _isPlayerWin = eWinorLose.Draw;
+            _resultDamage = 0;
         }
+
+        yield return new WaitForSecondsRealtime(1f);
 
         OnClose();
     }
@@ -446,7 +570,6 @@ public class Attacker : MonoBehaviour
     private void Done(eWinorLose isPlayerWin)
     {
         _isPlayerWin = isPlayerWin;
-        _resultDamage = _totalCount;
 
         OnClose();
     }
@@ -722,5 +845,10 @@ public class Attacker : MonoBehaviour
         }
 
         return result;
+    }
+
+    private bool Probability(int value)
+    {
+        return (UnityEngine.Random.Range(0, 100) < value);
     }
 }
