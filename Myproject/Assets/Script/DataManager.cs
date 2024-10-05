@@ -79,6 +79,8 @@ public class DataManager : MonoBehaviour
         public List<ushort> skillDataIndexs = null;
 
         public List<Skill_Duration> useSkill = null;
+        public List<Item_Duration> useItem = null;
+
         public List<Skill_CoolDown> coolDownSkill = null;
 
         #region GetSet
@@ -228,6 +230,19 @@ public class DataManager : MonoBehaviour
         public string name = string.Empty;
 
         public int coolDown = 0;
+    }
+
+    public class Item_Duration
+    {
+        public int Item_ID = 0;
+        public string name = string.Empty;
+
+        public int remaindDuration = 0;
+
+        public eStats stats = eStats.Non;
+        public eSkill_IncreaseDecrease inDe = eSkill_IncreaseDecrease.Non;
+        public bool isPercent = false;
+        public int value;
     }
 
     #endregion
@@ -414,6 +429,7 @@ public class DataManager : MonoBehaviour
         _saveData.userData.skillDataIndexs.Add(301);
 
         _saveData.userData.useSkill = new List<Skill_Duration>();
+        _saveData.userData.useItem = new List<Item_Duration>();
         _saveData.userData.coolDownSkill = new List<Skill_CoolDown>();
 
         _saveData.userData.data = new Creature_Data();

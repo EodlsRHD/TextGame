@@ -371,6 +371,7 @@ public class IngameManager : MonoBehaviour
         _isPlayerTurn = false;
 
         SkillRemindDuration();
+        ItemRemindDuration();
 
         _textView.UpdateText("--- " + _saveData.userData.data.name + "의 순서가 종료됩니다.");
     }
@@ -1032,10 +1033,104 @@ public class IngameManager : MonoBehaviour
 
     private void Bag(int id)
     {
+        for (int i = _saveData.userData.itemDataIndexs.Count -  1; i >= 0; i--)
+        {
+            if(_saveData.userData.itemDataIndexs[i] == id)
+            {
+                _saveData.userData.itemDataIndexs.Remove(_saveData.userData.itemDataIndexs[i]);
 
+                break;
+            }
+        }
 
+        _controlPad.UpdateData(_saveData.userData);
+
+        DataManager.Item_Data data = GameManager.instance.dataManager.GetItemData(id);
+
+        ItemConsumptionCheck(data, eStats.HP, data.hp);
+        ItemConsumptionCheck(data, eStats.MP, data.mp);
+        ItemConsumptionCheck(data, eStats.AP, data.ap);
+
+        ItemConsumptionCheck(data, eStats.EXP, data.exp);
+        ItemConsumptionCheck(data, eStats.EXP, data.expPercentIncreased, true);
+
+        ItemConsumptionCheck(data, eStats.Coin, data.coin);
+        ItemConsumptionCheck(data, eStats.Coin, data.coinPercentIncreased, true);
+
+        ItemConsumptionCheck(data, eStats.Attack, data.attack);
+        ItemConsumptionCheck(data, eStats.Attack, data.attackPercentIncreased, true);
+
+        ItemConsumptionCheck(data, eStats.Defence, data.defence);
+        ItemConsumptionCheck(data, eStats.Defence, data.defencePercentIncreased, true);
 
         UpdateData();
+    }
+
+    private void ItemConsumptionCheck(DataManager.Item_Data data, eStats type, int useValue, bool isPercent = false)
+    {
+        eSkill_IncreaseDecrease result = eSkill_IncreaseDecrease.Non;
+
+        if (useValue == 0)
+        {
+            return;
+        }
+
+        if (useValue < 0)
+        {
+            result = eSkill_IncreaseDecrease.Decrease;
+        }
+
+        if (useValue == -9999)
+        {
+            result = eSkill_IncreaseDecrease.ALLDecrease;
+        }
+
+        if (useValue > 0)
+        {
+            result = eSkill_IncreaseDecrease.Increase;
+        }
+
+        DataManager.Item_Duration temp = new DataManager.Item_Duration();
+        temp.Item_ID = data.id;
+        temp.name = data.name;
+        temp.stats = type;
+        temp.inDe = result;
+        temp.isPercent = isPercent;
+        temp.value = useValue;
+        temp.remaindDuration = data.duration;
+
+        _saveData.userData.useItem.Add(temp);
+    }
+
+    private void ItemRemindDuration()
+    {
+        for (int i = _saveData.userData.useItem.Count - 1; i >= 0; i--)
+        {
+            if (_saveData.userData.useItem[i].remaindDuration == 0)
+            {
+                _textView.UpdateText(_saveData.userData.useItem[i].name + " 의 효과가 끝났습니다.");
+                ItemRemoveEffect(_saveData.userData.useItem[i]);
+
+                _saveData.userData.useItem.Remove(_saveData.userData.useItem[i]);
+
+                continue;
+            }
+
+            ItemApplyEffect(_saveData.userData.useItem[i]);
+            _saveData.userData.useItem[i].remaindDuration -= 1;
+        }
+
+        UpdateData();
+    }
+
+    private void ItemRemoveEffect(DataManager.Item_Duration useItem)
+    { 
+    
+    }
+
+    private void ItemApplyEffect(DataManager.Item_Duration useItem)
+    {
+
     }
 
     #endregion
