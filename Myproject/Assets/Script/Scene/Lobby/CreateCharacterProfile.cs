@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System;
 using TMPro;
+using System.Text.RegularExpressions;
 
 public class CreateCharacterProfile : MonoBehaviour
 {
@@ -42,10 +43,12 @@ public class CreateCharacterProfile : MonoBehaviour
             return;
         }
 
-        UiManager.instance.OpenPopup("캐릭터 생성", _inputfieldName.text + "\n" + "이대로 시작하시겠습니까?", string.Empty, string.Empty, () =>
+        string str_new = _inputfieldName.text.Replace(" ", "");
+
+        UiManager.instance.OpenPopup("캐릭터 생성", str_new + "\n" + "이대로 시작하시겠습니까?", string.Empty, string.Empty, () =>
         {
             GameManager.instance.dataManager.CreateNewSaveData();
-            GameManager.instance.dataManager.ChangePlayerData(_inputfieldName.text);
+            GameManager.instance.dataManager.ChangePlayerData(str_new);
 
             GameManager.instance.tools.SceneChange(eScene.Game);
         }, null);

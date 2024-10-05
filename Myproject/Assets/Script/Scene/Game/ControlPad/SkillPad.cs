@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using TMPro;
 using System;
 
 public class SkillPad : MonoBehaviour
@@ -53,17 +52,35 @@ public class SkillPad : MonoBehaviour
 
     private void MakeList()
     {
-        if(_data.skillDataIndexs.Count == 0)
+        if (_data.skillDataIndexs.Count == 0)
         {
             _objEmptyLabel.SetActive(true);
         }
+
+        DeleteTemplate();
 
         foreach (var id in _data.skillDataIndexs)
         {
             var obj = Instantiate(_template, _trTemplateParant);
             var com = obj.GetComponent<PadTemplate>();
 
-            com.Set(GameManager.instance.dataManager.GetskillData(id));
+            com.Initialize(ViewInfo);
+
+            bool isCoolDown = false;
+            int coolDown = -1;
+
+            for (int i = 0; i < _data.coolDownSkill.Count; i++)
+            {
+                if(_data.coolDownSkill[i].id == id)
+                {
+                    isCoolDown = true;
+                    coolDown = _data.coolDownSkill[i].coolDown;
+
+                    break;
+                }
+            }
+
+            com.Set(GameManager.instance.dataManager.GetskillData(id), coolDown - 1, isCoolDown);
         }
     }
 
@@ -82,8 +99,15 @@ public class SkillPad : MonoBehaviour
         _trTemplateParant.transform.DetachChildren();
     }
 
-    private void ViewInfo(string name, string des)
+    private void ViewInfo(int id, string name, string des, bool isUse)
     {
+        _id = id;
+
+        if (isUse == true)
+        {
+            return;
+        }
+
         _onOpenInformationCallback?.Invoke(name, des);
     }
 }

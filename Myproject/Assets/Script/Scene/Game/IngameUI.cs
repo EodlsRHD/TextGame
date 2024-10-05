@@ -108,14 +108,14 @@ public class IngameUI : MonoBehaviour
         _textRound.text = round.ToString();
     }
 
-    public void OpenNextRoundWindow(eRoundClear type)
+    public void OpenNextRoundWindow(eRoundClear type, string content = null)
     {
         _type = type;
 
         switch (type)
         {
             case eRoundClear.First:
-                _textLabel.text = string.Empty;
+                _textLabel.text = "게임을 시작합니다.";
                 _textButtonLabel.text = "시작";
                 break;
 
@@ -130,7 +130,7 @@ public class IngameUI : MonoBehaviour
                 break;
 
             case eRoundClear.Fail:
-                _textLabel.text = "라운드를 실패하셨습니다.";
+                _textLabel.text = "라운드를 실패하셨습니다." + "\n" + content;
                 _textButtonLabel.text = "메인 메뉴로";
                 break;
         }

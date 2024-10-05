@@ -109,7 +109,7 @@ public class Attacker : MonoBehaviour
         _playerCoinCount = userData.currentHP;
         _monsterCoinCount = monster.hp;
 
-        _batCount = 1;
+        _batCount = userData.level;
 
         _textPlayerNameLabel.text = userData.data.name;
 
@@ -134,6 +134,7 @@ public class Attacker : MonoBehaviour
         _textCommunityCard.text = string.Empty;
 
         _turnCount = 0;
+        _totalCount = 0;
         _playerBattleAction = eBattleAction.Non;
         _monsterBattleAction = eBattleAction.Non;
 
@@ -282,7 +283,7 @@ public class Attacker : MonoBehaviour
             {
                 _isPlayerWin = eWinorLose.Lose;
 
-                SettleUp(false);
+                SettleUp();
 
                 return;
             }
@@ -296,7 +297,7 @@ public class Attacker : MonoBehaviour
         {
             _isPlayerWin = eWinorLose.Win;
 
-            SettleUp(false);
+            SettleUp();
 
             return;
         }
@@ -323,31 +324,26 @@ public class Attacker : MonoBehaviour
 
     IEnumerator Co_EnemyTurn()
     {
-        // logic
-
         yield return new WaitForSecondsRealtime(0.7f);
 
         List<int> nums = new List<int>(6);
 
         for (int i = 2; i < _fieldCardIndex.Count; i++)
         {
+            if(_cards[_fieldCardIndex[i]].isHide)
+            {
+                continue;
+            }
+
             nums.Add(_fieldCardIndex[i]);
         }
 
-        ePedigree monsterPedigree = Pedigree(Sort(nums));
+        int monsterHighCardNum = 0;
+        ePedigree monsterPedigree = Pedigree(Sort(nums), ref monsterHighCardNum);
 
-        if ((int)monsterPedigree == 1)
+        if ((int)monsterPedigree < 2)
         {
-            bool result = Probability(80);
-
-            if (result == true)
-            {
-                OnBat(false, ref _monsterCoinCount, ref _batCount);
-            }
-            else
-            {
-                OnFold(false, ref _monsterCoinCount, ref _batCount);
-            }
+            OnBat(false, ref _monsterCoinCount, ref _batCount);
         }
 
         if(2 <= (int)monsterPedigree && (int)monsterPedigree < 4)
@@ -360,16 +356,7 @@ public class Attacker : MonoBehaviour
             }
             else
             {
-                bool result_1 = Probability(80);
-
-                if (result_1 == true)
-                {
-                    OnRaise(false, ref _monsterCoinCount, ref _batCount);
-                }
-                else
-                {
-                    OnFold(false, ref _monsterCoinCount, ref _batCount);
-                }
+                OnRaise(false, ref _monsterCoinCount, ref _batCount);
             }
         }
 
@@ -454,7 +441,7 @@ public class Attacker : MonoBehaviour
 
         if (_turnCount == 1)
         {
-            string s1 = _cards[_fieldCardIndex[2]].Name;
+            string s1 = _cards[_fieldCardIndex[2]].Name + " ";
             s1 += _cards[_fieldCardIndex[3]].Name + " ";
             s1 += _cards[_fieldCardIndex[4]].Name + " ";
 
@@ -463,7 +450,7 @@ public class Attacker : MonoBehaviour
 
         if (_turnCount == 2)
         {
-            string s1 = _cards[_fieldCardIndex[2]].Name;
+            string s1 = _cards[_fieldCardIndex[2]].Name + " ";
             s1 += _cards[_fieldCardIndex[3]].Name + " ";
             s1 += _cards[_fieldCardIndex[4]].Name + " ";
             s1 += _cards[_fieldCardIndex[5]].Name + " ";
@@ -473,7 +460,7 @@ public class Attacker : MonoBehaviour
 
         if (_turnCount == 3)
         {
-            string s1 = _cards[_fieldCardIndex[2]].Name;
+            string s1 = _cards[_fieldCardIndex[2]].Name + " ";
             s1 += _cards[_fieldCardIndex[3]].Name + " ";
             s1 += _cards[_fieldCardIndex[4]].Name + " ";
             s1 += _cards[_fieldCardIndex[5]].Name + " ";
@@ -486,21 +473,13 @@ public class Attacker : MonoBehaviour
 
         if (_turnCount == 4)
         {
-            SettleUp(true);
+            SettleUp();
         }
     }
 
-    private void SettleUp(bool isDone)
+    private void SettleUp()
     {
         _objButtons.SetActive(false);
-
-        if (isDone == false)
-        {
-            Done(_isPlayerWin);
-
-            return;
-        }
-
         StartCoroutine(Co_SettleUp());
     }
 
@@ -517,7 +496,8 @@ public class Attacker : MonoBehaviour
             nums.Add(_fieldCardIndex[i]);
         }
 
-        ePedigree playerPedigree = Pedigree(Sort(nums));
+        int playerHighCardNum = 0;
+        ePedigree playerPedigree = Pedigree(Sort(nums), ref playerHighCardNum);
 
         nums.Clear();
 
@@ -526,7 +506,8 @@ public class Attacker : MonoBehaviour
             nums.Add(_fieldCardIndex[i]);
         }
 
-        ePedigree monsterPedigree = Pedigree(Sort(nums));
+        int monsterHighCardNum = 0;
+        ePedigree monsterPedigree = Pedigree(Sort(nums), ref monsterHighCardNum);
 
         _onUpdateTextCallback?.Invoke("--- " + _userData.data.name + " 의 결과 : " + playerPedigree);
         _onUpdateTextCallback?.Invoke("--- " + _monster.name + " 의 결과 : " + monsterPedigree);
@@ -546,12 +527,32 @@ public class Attacker : MonoBehaviour
         else if(playerPedigree == monsterPedigree)
         {
             _isPlayerWin = eWinorLose.Draw;
+
+            _onUpdateTextCallback?.Invoke("--- " + _userData.data.name + " 의 높은 카드 : " + ChangeCardNum(playerHighCardNum));
+            _onUpdateTextCallback?.Invoke("--- " + _monster.name + " 의 높은 카드 : " + ChangeCardNum(monsterHighCardNum));
+
+            if(playerHighCardNum == monsterHighCardNum)
+            {
+                _isPlayerWin = eWinorLose.Draw;
+                _resultDamage = 0;
+            }
+            else if(playerHighCardNum > monsterHighCardNum)
+            {
+                _isPlayerWin = eWinorLose.Win;
+                _resultDamage = _playerBat;
+            }
+            else if(playerHighCardNum < monsterHighCardNum)
+            {
+                _isPlayerWin = eWinorLose.Lose;
+                _resultDamage -= _playerBat;
+            }
+
             _resultDamage = 0;
         }
 
         yield return new WaitForSecondsRealtime(1f);
 
-        OnClose();
+        Done(_isPlayerWin);
     }
 
     private void Done(eWinorLose isPlayerWin)
@@ -685,7 +686,7 @@ public class Attacker : MonoBehaviour
         return card;
     }
 
-    private ePedigree Pedigree(List<AttackerTemplate> card)
+    private ePedigree Pedigree(List<AttackerTemplate> card, ref int highCardNum)
     {
         ePedigree result = ePedigree.HighCard;
 
@@ -723,11 +724,21 @@ public class Attacker : MonoBehaviour
 
                     if (straightCount >= 5)
                     {
+                        if (highCardNum < card[i].Num)
+                        {
+                            highCardNum = card[i].Num;
+                        }
+
                         straight = true;
                     }
 
                     if (card[i].Num == 14)
                     {
+                        if (highCardNum < card[i].Num)
+                        {
+                            highCardNum = card[i].Num;
+                        }
+
                         royal = true;
                     }
                 }
@@ -743,26 +754,51 @@ public class Attacker : MonoBehaviour
 
                 if(numSameCount == 1)
                 {
+                    if (highCardNum < card[i].Num)
+                    {
+                        highCardNum = card[i].Num;
+                    }
+
                     pairCount++;
                 }
 
                 if(isChange == true && pairCount == 2)
                 {
+                    if (highCardNum < card[i].Num)
+                    {
+                        highCardNum = card[i].Num;
+                    }
+
                     twoPair = true;
                 }
 
                 if(numSameCount == 2)
                 {
+                    if (highCardNum < card[i].Num)
+                    {
+                        highCardNum = card[i].Num;
+                    }
+
                     threeofaKind = true;
                 }
 
                 if(numSameCount == 3)
                 {
+                    if (highCardNum < card[i].Num)
+                    {
+                        highCardNum = card[i].Num;
+                    }
+
                     foreofaKind = true;
                 }
 
                 if (threeofaKind == true && isChange == true && pairCount >= 1)
                 {
+                    if(highCardNum < card[i].Num)
+                    {
+                        highCardNum = card[i].Num;
+                    }
+
                     fullHouse = true;
                 }
 
@@ -837,5 +873,29 @@ public class Attacker : MonoBehaviour
     private bool Probability(int value)
     {
         return (UnityEngine.Random.Range(0, 100) < value);
+    }
+
+    private string ChangeCardNum(int value)
+    {
+        string num = value.ToString();
+
+        if (value == 11)
+        {
+            num = "J";
+        }
+        else if(value == 12)
+        {
+            num = "Q";
+        }
+        else if(value == 13)
+        {
+            num = "K";
+        }
+        else if(value == 14)
+        {
+            num = "A";
+        }
+
+        return num;
     }
 }

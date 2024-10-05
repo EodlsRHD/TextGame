@@ -29,6 +29,11 @@ public class AttackerTemplate : MonoBehaviour
         get { return _textShape.text + _textNum.text; }
     }
 
+    public bool isHide
+    {
+        get { return _imageBack.gameObject.activeSelf; }
+    }
+
     public void Initialize()
     {
         _imageBack.gameObject.SetActive(false);

@@ -363,7 +363,12 @@ public class DataManager : MonoBehaviour
 
     public bool CheckSaveData()
     {
-        return (_saveData != null);
+        if(_saveData == null)
+        {
+            return false;
+        }
+
+        return !(_saveData.userData.data.name.Length == 0);
     }
 
     public void SaveDataToCloud(Save_Data saveData = null, Action onSaveOrLoadCallback = null)
@@ -398,14 +403,30 @@ public class DataManager : MonoBehaviour
     {
         OrganizeEncyclopedia(saveData);
 
-        _saveData.round = 0;
+        _saveData = new Save_Data();
+        _saveData.round = 1;
 
         _saveData.userData = new User_Data();
-        _saveData.userData.data = new Creature_Data();
-        _saveData.userData.skillDataIndexs = new List<ushort>();
         _saveData.userData.itemDataIndexs = new List<ushort>();
+        _saveData.userData.itemDataIndexs.Add(501);
+
+        _saveData.userData.skillDataIndexs = new List<ushort>();
+        _saveData.userData.skillDataIndexs.Add(301);
+
+        _saveData.userData.useSkill = new List<Skill_Duration>();
+        _saveData.userData.coolDownSkill = new List<Skill_CoolDown>();
+
+        _saveData.userData.data = new Creature_Data();
+        _saveData.userData.data.hp = 1;
+        _saveData.userData.data.mp = 1;
+        _saveData.userData.data.ap = 10;
+        _saveData.userData.data.attack = 1;
+        _saveData.userData.data.defence = 0;
+        _saveData.userData.data.vision = 1;
+        _saveData.userData.data.attackRange = 1;
 
         _saveData.mapData = new Map_Data();
+        _saveData.mapData.mapSize = _mapSize;
         _saveData.mapData.nodeDatas = new List<Node_Data>();
         _saveData.mapData.monsterDatas = new List<Creature_Data>();
 
@@ -424,6 +445,14 @@ public class DataManager : MonoBehaviour
 
     private void OrganizeEncyclopedia(Save_Data lastData)
     {
+        if(_saveData.encyclopediaData == null)
+        {
+            _saveData.encyclopediaData = new Encyclopedia_Data();
+            _saveData.encyclopediaData.creatureDatas = new List<Creature_Data>();
+            _saveData.encyclopediaData.itemDatas = new List<Item_Data>();
+            _saveData.encyclopediaData.skillData = new List<Skill_Data>();
+        }
+
         if (_saveData.encyclopediaData.maxLevel < lastData.userData.level)
         {
             _saveData.encyclopediaData.maxLevel = lastData.userData.level;
@@ -538,7 +567,7 @@ public class DataManager : MonoBehaviour
 
     public Item_Data GetItemData(int index)
     {
-        return _itemDatas.Find(x => x.id == (index + 501)).DeepCopy();
+        return _itemDatas.Find(x => x.id == (index));
     }
 
     #endregion
@@ -568,7 +597,7 @@ public class DataManager : MonoBehaviour
 
     public Skill_Data GetskillData(int index)
     {
-        return _skillDatas.Find(x => x.id == (index + 301)).DeepCopy();
+        return _skillDatas.Find(x => x.id == (index));
     }
 
     #endregion

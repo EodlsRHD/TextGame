@@ -608,7 +608,7 @@ public class IngameManager : MonoBehaviour
                     _saveData.userData.currentHP = 0;
                 }
 
-                UpdateData();
+                UpdateData(resultDamage + " 의 피해를 입어 패배하였습니다.");
 
                 return;
             }
@@ -725,7 +725,7 @@ public class IngameManager : MonoBehaviour
     private void Skill(int id)
     {
         int reCooldown = 0;
-        if(SkillCheckCoolDown(id, ref reCooldown) == false)
+        if(SkillCheckCoolDown(id, ref reCooldown) == false || id == -1)
         {
             _textView.UpdateText("대기순서가 " + reCooldown  + "만큼 남았습니다.");
 
@@ -737,7 +737,7 @@ public class IngameManager : MonoBehaviour
         DataManager.Skill_CoolDown cooldown = new DataManager.Skill_CoolDown();
         cooldown.id = data.id;
         cooldown.name = data.name;
-        cooldown.coolDown = data.coolDown;
+        cooldown.coolDown = data.coolDown + 1;
         _saveData.userData.coolDownSkill.Add(cooldown);
 
         int useMP = data.usemp;
@@ -759,6 +759,9 @@ public class IngameManager : MonoBehaviour
 
         SkillConsumptionCheck(data, eStats.Defence, data.defence);
         SkillConsumptionCheck(data, eStats.Defence, data.defencePercentIncreased, true);
+
+        _controlPad.UpdateData(_saveData.userData);
+        UpdateData();
 
         _textView.UpdateText("스킬 " + data.name + " (을)를 발동하셨습니다.");
     }
@@ -808,6 +811,7 @@ public class IngameManager : MonoBehaviour
         temp.inDe = result;
         temp.isPercent = isPercent;
         temp.value = useValue;
+        temp.remaindDuration = data.coolDown + 1;
 
         _saveData.userData.useSkill.Add(temp);
     }
@@ -844,7 +848,7 @@ public class IngameManager : MonoBehaviour
             _saveData.userData.coolDownSkill[i].coolDown -= 1;
         }
 
-        _ingameUI.UpdatePlayerInfo(_saveData.userData);
+        UpdateData();
     }
 
     private void SkillRemoveEffect(DataManager.Skill_Duration useSkill)
@@ -929,19 +933,46 @@ public class IngameManager : MonoBehaviour
         {
             case eStats.HP:
                 {
-                    _saveData.userData.HP_Effect += (short)(useSkill.inDe == eSkill_IncreaseDecrease.Increase ? useSkill.value : (useSkill.value * -1));
+                    ushort value = (ushort)(useSkill.inDe == eSkill_IncreaseDecrease.Increase ? useSkill.value : (useSkill.value * -1));
+
+                    if(_saveData.userData.currentHP + value > _saveData.userData.maximumHP)
+                    {
+                        _saveData.userData.currentHP = _saveData.userData.maximumHP;
+                    }
+                    else
+                    {
+                        _saveData.userData.currentHP += value;
+                    }
                 }
                 break;
 
             case eStats.MP:
                 {
-                    _saveData.userData.MP_Effect += (short)(useSkill.inDe == eSkill_IncreaseDecrease.Increase ? useSkill.value : (useSkill.value * -1));
+                    ushort value = (ushort)(useSkill.inDe == eSkill_IncreaseDecrease.Increase ? useSkill.value : (useSkill.value * -1));
+
+                    if (_saveData.userData.currentMP + value > _saveData.userData.maximumMP)
+                    {
+                        _saveData.userData.currentMP = _saveData.userData.maximumMP;
+                    }
+                    else
+                    {
+                        _saveData.userData.currentMP += value;
+                    }
                 }
                 break;
 
             case eStats.AP:
                 {
-                    _saveData.userData.AP_Effect += (short)(useSkill.inDe == eSkill_IncreaseDecrease.Increase ? useSkill.value : (useSkill.value * -1));
+                    ushort value = (ushort)(useSkill.inDe == eSkill_IncreaseDecrease.Increase ? useSkill.value : (useSkill.value * -1));
+
+                    if (_saveData.userData.currentAP + value > _saveData.userData.maximumAP)
+                    {
+                        _saveData.userData.currentAP = _saveData.userData.maximumAP;
+                    }
+                    else
+                    {
+                        _saveData.userData.currentAP += value;
+                    }
                 }
                 break;
 
@@ -1001,28 +1032,23 @@ public class IngameManager : MonoBehaviour
 
     private void Bag(int id)
     {
-        eStats type = eStats.Non;
-        int value = 0;
-        int maxValue = 0;
 
 
 
-        _ingameUI.UpdatePlayerInfo(type, _saveData.userData);
+        UpdateData();
     }
 
     #endregion
 
     #region Function
 
-    private void UpdateData()
+    private void UpdateData(string contnet = null)
     {
         _ingameUI.UpdatePlayerInfo(_saveData.userData);
 
         if(_saveData.userData.currentHP == 0)
         {
-            _ingameUI.OpenNextRoundWindow(eRoundClear.Fail);
-
-            return;
+            _ingameUI.OpenNextRoundWindow(eRoundClear.Fail, contnet);
         }
 
         _mapController.UpdateMapData(_saveData, PlayerVision());

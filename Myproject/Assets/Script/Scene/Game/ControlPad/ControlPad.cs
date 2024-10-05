@@ -87,7 +87,7 @@ public class ControlPad : MonoBehaviour
         _objControlPad.SetActive(false);
 
         _skillPad.Initialize(OpenInformation);
-        _BagPad.Initialize();
+        _BagPad.Initialize(OpenInformation);
     }
 
     private void OnMove(eControl type)
@@ -99,7 +99,14 @@ public class ControlPad : MonoBehaviour
     {
         _onActionCallback?.Invoke(type);
     }
-    
+
+    public void UpdateData(DataManager.User_Data data)
+    {
+        _data = data;
+
+        OnOpenSecContolPad(_eOpenPad);
+    }
+
     public void Skill(DataManager.User_Data data, Action<int> onSkillResultCallback)
     {
         _data = data;
