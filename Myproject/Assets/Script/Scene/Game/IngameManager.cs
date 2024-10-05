@@ -26,7 +26,7 @@ public class IngameManager : MonoBehaviour
         _ingameUI.Initialize(OpenMap, OpenNextRound, _textView.UpdateText);
         _textView.Initialize();
         _controlPad.Initialize(PlayerMove, PlayerAction);
-        _mapController.Initialize(_saveData.mapData.mapSize);
+        _mapController.Initialize(GameManager.instance.dataManager.MapSize);
         _ingamePopup.Initialize();
 
         FirstSet();
@@ -36,7 +36,7 @@ public class IngameManager : MonoBehaviour
 
     private void FirstSet()
     {
-        if(_saveData.round > 1)
+        if (_saveData.round > 1)
         {
             _ingameUI.OpenNextRoundWindow(eRoundClear.Load);
 
@@ -59,6 +59,7 @@ public class IngameManager : MonoBehaviour
         if (type == eRoundClear.Load)
         {
             _ingameUI.UpdatePlayerInfo(_saveData.userData);
+
             return;
         }
 
@@ -108,7 +109,7 @@ public class IngameManager : MonoBehaviour
         _mapController.RemoveTemplate();
         _saveData.round++;
 
-        OpenNextRound(eRoundClear.Success);
+        _ingameUI.OpenNextRoundWindow(eRoundClear.Success);
     }
 
     #region Player
@@ -1019,7 +1020,7 @@ public class IngameManager : MonoBehaviour
 
         if(_saveData.userData.currentHP == 0)
         {
-            OpenNextRound(eRoundClear.Fail);
+            _ingameUI.OpenNextRoundWindow(eRoundClear.Fail);
 
             return;
         }

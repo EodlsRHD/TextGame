@@ -135,6 +135,7 @@ public class Attacker : MonoBehaviour
 
         _turnCount = 0;
         _playerBattleAction = eBattleAction.Non;
+        _monsterBattleAction = eBattleAction.Non;
 
         _fieldCardIndex = new List<int>();
 
@@ -337,7 +338,7 @@ public class Attacker : MonoBehaviour
 
         if ((int)monsterPedigree == 1)
         {
-            bool result = Probability(50);
+            bool result = Probability(80);
 
             if (result == true)
             {
@@ -347,20 +348,6 @@ public class Attacker : MonoBehaviour
             {
                 OnFold(false, ref _monsterCoinCount, ref _batCount);
             }
-        }
-
-        if ((int)monsterPedigree == 2)
-        {
-            bool result = Probability(42);
-
-            if(result == true)
-            {
-                OnBat(false, ref _monsterCoinCount, ref _batCount);
-            }
-            else
-            {
-                OnFold(false, ref _monsterCoinCount, ref _batCount);
-            } 
         }
 
         if(2 <= (int)monsterPedigree && (int)monsterPedigree < 4)
@@ -373,7 +360,7 @@ public class Attacker : MonoBehaviour
             }
             else
             {
-                bool result_1 = Probability(10);
+                bool result_1 = Probability(80);
 
                 if (result_1 == true)
                 {

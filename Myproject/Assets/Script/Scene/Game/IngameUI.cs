@@ -94,7 +94,11 @@ public class IngameUI : MonoBehaviour
     private void OnNextRound()
     {
         _onNextRoundCallback?.Invoke(_type);
-        _objNextRound.SetActive(false);
+
+        if(_type != eRoundClear.Fail)
+        {
+            _objNextRound.SetActive(false);
+        }
 
         _type = eRoundClear.Non;
     }
@@ -116,7 +120,7 @@ public class IngameUI : MonoBehaviour
                 break;
 
             case eRoundClear.Load:
-                _textLabel.text = "직전 라운드 이어하기";
+                _textLabel.text = "이어하기";
                 _textButtonLabel.text = "시작";
                 break;
 

@@ -14,8 +14,6 @@ public class LobbyManager : MonoBehaviour
     [SerializeField] private Button _buttonDictionary = null;
     [SerializeField] private TMP_Text _textVersion = null;
 
-    private const string SAVE_DATA = "SAVE_DATA";
-
     private void Start()
     {
         GameManager.instance.tools.Fade(true, null);
