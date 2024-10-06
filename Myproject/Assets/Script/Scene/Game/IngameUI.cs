@@ -22,26 +22,18 @@ public class IngameUI : MonoBehaviour
     [SerializeField] private Button _buttonNextRound = null;
     [SerializeField] private TMP_Text _textButtonLabel = null;
 
-    [Header("Player Infomation")]
-    [SerializeField] private TMP_Text _textLevel = null;
-    [SerializeField] private TMP_Text _textHP = null;
-    [SerializeField] private TMP_Text _textMP = null;
-    [SerializeField] private TMP_Text _textAP = null;
-    [SerializeField] private TMP_Text _textEXP = null;
+    [Header("Attack"), SerializeField] private Attacker _Attacker = null;
+    [Header("Level Point"), SerializeField] private LevelPoint _levelPoint = null;
+    [Header("Player Information"), SerializeField] private PlayerInformation _playerInformation = null;
 
-    [Header("Attack")]
-    [SerializeField] private Attacker _Attacker = null;
-
-    [Header("Level Point")]
-    [SerializeField] private LevelPoint _levelPoint = null;
+    [SerializeField] private Button _buttonOpenPlayerInformation = null;
 
     private Action<Action> _onViewMapCallback = null;
     private Action<eRoundClear> _onNextRoundCallback = null;
-    private Action<string> _onUpdateTextCallback = null;
 
     private eRoundClear _type = eRoundClear.Non;
 
-    public void Initialize(Action<Action> onViewMapCallback, Action<eRoundClear> onNextRoundCallback, Action<string> onUpdateTextCallback)
+    public void Initialize(Action<Action> onViewMapCallback, Action<eRoundClear> onNextRoundCallback, Action<string> onUpdateTextCallback, Action<string> onUpdatePopupCallback)
     {
         if(onViewMapCallback != null)
         {
@@ -53,17 +45,14 @@ public class IngameUI : MonoBehaviour
             _onNextRoundCallback = onNextRoundCallback;
         }
 
-        if(onUpdateTextCallback != null)
-        {
-            _onUpdateTextCallback = onUpdateTextCallback;
-        }
-
         _levelPoint.Initialize(CloseLevelPoint);
-        _Attacker.Initialize(CloseAttacker, _onUpdateTextCallback);
+        _Attacker.Initialize(CloseAttacker, onUpdateTextCallback, onUpdatePopupCallback);
+        _playerInformation.Initialize();
 
         _buttonViewMap.onClick.AddListener(OnMap);
         _buttonGameMenu.onClick.AddListener(OnOpenGameMenu);
         _buttonNextRound.onClick.AddListener(OnNextRound);
+        _buttonOpenPlayerInformation.onClick.AddListener(OnOpenPlayerInformation);
 
         _buttonViewMap.gameObject.SetActive(false);
 
@@ -138,39 +127,14 @@ public class IngameUI : MonoBehaviour
         _objNextRound.SetActive(true);
     }
 
-    public void UpdatePlayerInfo(DataManager.User_Data UserData)
+    public void UpdatePlayerInfo(DataManager.User_Data userData)
     {
-        _textLevel.text = UserData.level.ToString();
-        _textHP.text = UserData.currentHP + " / " + UserData.maximumHP;
-        _textMP.text = UserData.currentMP + " / " + UserData.maximumMP;
-        _textAP.text = UserData.currentAP + " / " + UserData.maximumAP;
-        _textEXP.text = UserData.currentEXP + " / " + UserData.maximumEXP;
+        _playerInformation.UpdatePlayerInfo(userData);
     }
 
     public void UpdatePlayerInfo(eStats type, DataManager.User_Data userData)
     {
-        switch(type)
-        {
-            case eStats.Level:
-                _textLevel.text = userData.level.ToString();
-                break;
-
-            case eStats.HP:
-                _textHP.text = userData.currentHP + " / " + userData.maximumHP;
-                break;
-
-            case eStats.MP:
-                _textMP.text = userData.currentMP + " / " + userData.maximumMP;
-                break;
-
-            case eStats.AP:
-                _textAP.text = userData.currentAP + " / " + userData.maximumAP;
-                break;
-
-            case eStats.EXP:
-                _textEXP.text = userData.currentHP + " / " + userData.maximumEXP;
-                break;
-        }
+        _playerInformation.UpdatePlayerInfo(userData);
     }
 
     public void CallAttacker(DataManager.User_Data userData, DataManager.Creature_Data monster, Action onLastCallback, Action<eWinorLose, int> onResultCallback)
@@ -195,5 +159,10 @@ public class IngameUI : MonoBehaviour
         _objBlocker.SetActive(false);
 
         _levelPoint.Close();
+    }
+
+    private void OnOpenPlayerInformation()
+    {
+        _playerInformation.Open();
     }
 }

@@ -7,8 +7,6 @@ using TMPro;
 
 public class Attacker : MonoBehaviour
 {
-    [SerializeField] private IngamePopup _popup = null;
-
     [Space(10)]
 
     [SerializeField]private AttackerTemplate _template = null;
@@ -40,6 +38,7 @@ public class Attacker : MonoBehaviour
     private Action _onLastCallback = null;
     private Action<eWinorLose, int> _onResultCallback = null;
     private Action<string> _onUpdateTextCallback = null;
+    private Action<string> _onUpdatePopupCallback = null;
 
     private List<AttackerTemplate> _cards = null;
     private List<int> _fieldCardIndex = new List<int>();
@@ -62,7 +61,7 @@ public class Attacker : MonoBehaviour
     private eBattleAction _playerBattleAction = eBattleAction.Non;
     private eBattleAction _monsterBattleAction = eBattleAction.Non;
 
-    public void Initialize(Action onCloseCallback, Action<string> onUpdateTextCallback)
+    public void Initialize(Action onCloseCallback, Action<string> onUpdateTextCallback, Action<string> onUpdatePopupCallback)
     {
         if(onCloseCallback != null)
         {
@@ -74,7 +73,11 @@ public class Attacker : MonoBehaviour
             _onUpdateTextCallback = onUpdateTextCallback;
         }
 
-        _popup.Initialize();
+        if(onUpdatePopupCallback != null)
+        {
+            _onUpdatePopupCallback = onUpdatePopupCallback;
+        }
+
         _template.Initialize();
 
         _textPlayerNameLabel.text = string.Empty;
@@ -162,7 +165,7 @@ public class Attacker : MonoBehaviour
         {
             if (coin < bat)
             {
-                _popup.UpdateText("남은 체력이 부족합니다.");
+                _onUpdatePopupCallback?.Invoke("남은 체력이 부족합니다.");
 
                 return;
             }
@@ -198,7 +201,7 @@ public class Attacker : MonoBehaviour
         {
             if (coin < (bat * 2))
             {
-                _popup.UpdateText("남은 체력이 부족합니다.");
+                _onUpdatePopupCallback?.Invoke("남은 체력이 부족합니다.");
 
                 return;
             }

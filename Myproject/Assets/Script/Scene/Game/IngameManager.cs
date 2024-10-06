@@ -23,7 +23,7 @@ public class IngameManager : MonoBehaviour
         _saveData = GameManager.instance.dataManager.CopySaveData();
 
         _tutorial.Initialize();
-        _ingameUI.Initialize(OpenMap, OpenNextRound, _textView.UpdateText);
+        _ingameUI.Initialize(OpenMap, OpenNextRound, _textView.UpdateText, _ingamePopup.UpdateText);
         _textView.Initialize();
         _controlPad.Initialize(PlayerMove, PlayerAction);
         _mapController.Initialize(GameManager.instance.dataManager.MapSize);
