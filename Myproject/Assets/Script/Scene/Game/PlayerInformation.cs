@@ -6,6 +6,8 @@ using TMPro;
 
 public class PlayerInformation : MonoBehaviour
 {
+    [SerializeField] private GameObject _objInformation = null;
+
     [Header("Horizontal")]
     [SerializeField] private TMP_Text _textLevel = null;
     [SerializeField] private TMP_Text _textHP = null;
@@ -14,7 +16,11 @@ public class PlayerInformation : MonoBehaviour
     [SerializeField] private TMP_Text _textEXP = null;
 
     [Header("Vertical")]
-    [SerializeField] private GameObject _objInformation = null;
+    [SerializeField] private TMP_Text _textCoin = null;
+    [SerializeField] private TMP_Text _textAttack = null;
+    [SerializeField] private TMP_Text _textDefence = null;
+    [SerializeField] private TMP_Text _textVision = null;
+    [SerializeField] private TMP_Text _textAttackRange = null;
 
     [Space(10)]
 
@@ -70,6 +76,12 @@ public class PlayerInformation : MonoBehaviour
 
     public void Open()
     {
+        _textCoin.text = _userData.data.coin.ToString();
+        _textAttack.text = _userData.currentATTACK.ToString();
+        _textDefence.text = _userData.currentDEFENCE.ToString();
+        _textVision.text = _userData.currentVISION.ToString();
+        _textAttackRange.text = _userData.currentATTACKRANGE.ToString();
+
         _objInformation.SetActive(true);
     }
 

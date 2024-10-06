@@ -95,7 +95,7 @@ public enum eWinorLose
     Draw
 }
 
-public enum eSkill_IncreaseDecrease
+public enum eEffect_IncreaseDecrease
 {
     Non = -1,
     Increase,

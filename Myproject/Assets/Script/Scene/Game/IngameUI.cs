@@ -134,7 +134,7 @@ public class IngameUI : MonoBehaviour
 
     public void UpdatePlayerInfo(eStats type, DataManager.User_Data userData)
     {
-        _playerInformation.UpdatePlayerInfo(userData);
+        _playerInformation.UpdatePlayerInfo(type, userData);
     }
 
     public void CallAttacker(DataManager.User_Data userData, DataManager.Creature_Data monster, Action onLastCallback, Action<eWinorLose, int> onResultCallback)

@@ -783,7 +783,7 @@ public class IngameManager : MonoBehaviour
 
     private void SkillConsumptionCheck(DataManager.Skill_Data data, eStats type, int useValue, bool isPercent = false)
     {
-        eSkill_IncreaseDecrease result = eSkill_IncreaseDecrease.Non;
+        eEffect_IncreaseDecrease result = eEffect_IncreaseDecrease.Non;
 
         if (useValue == 0)
         {
@@ -792,27 +792,28 @@ public class IngameManager : MonoBehaviour
 
         if (useValue < 0)
         {
-            result = eSkill_IncreaseDecrease.Decrease;
+            result = eEffect_IncreaseDecrease.Decrease;
         }
 
         if (useValue == -9999)
         {
-            result = eSkill_IncreaseDecrease.ALLDecrease;
+            result = eEffect_IncreaseDecrease.ALLDecrease;
         }
 
         if (useValue > 0)
         {
-            result = eSkill_IncreaseDecrease.Increase;
+            result = eEffect_IncreaseDecrease.Increase;
         }
 
-        DataManager.Skill_Duration temp = new DataManager.Skill_Duration();
-        temp.skill_ID = data.id;
+        DataManager.Duration temp = new DataManager.Duration();
+        temp.ID = data.id;
         temp.name = data.name;
         temp.stats = type;
         temp.inDe = result;
         temp.isPercent = isPercent;
         temp.value = useValue;
-        temp.remaindDuration = data.coolDown + 1;
+        temp.remaindCooldown = data.coolDown + 1;
+        temp.remaindDuration = data.duration + 1;
 
         _saveData.userData.useSkill.Add(temp);
     }
@@ -824,14 +825,14 @@ public class IngameManager : MonoBehaviour
             if(_saveData.userData.useSkill[i].remaindDuration == 0)
             {
                 _textView.UpdateText(_saveData.userData.useSkill[i].name + " 의 효과가 끝났습니다.");
-                SkillRemoveEffect(_saveData.userData.useSkill[i]);
+                RemoveEffect(_saveData.userData.useSkill[i]);
 
                 _saveData.userData.useSkill.Remove(_saveData.userData.useSkill[i]);
 
                 continue;
             }
 
-            SkillApplyEffect(_saveData.userData.useSkill[i]);
+            ApplyEffect(_saveData.userData.useSkill[i]);
             _saveData.userData.useSkill[i].remaindDuration -= 1;
         }
 
@@ -850,185 +851,6 @@ public class IngameManager : MonoBehaviour
         }
 
         UpdateData();
-    }
-
-    private void SkillRemoveEffect(DataManager.Skill_Duration useSkill)
-    {
-        switch (useSkill.stats)
-        {
-            case eStats.HP:
-                {
-                    _saveData.userData.HP_Effect -= (short)(useSkill.inDe == eSkill_IncreaseDecrease.Increase ? useSkill.value : (useSkill.value * -1));
-                }
-                break;
-
-            case eStats.MP:
-                {
-                    _saveData.userData.MP_Effect -= (short)(useSkill.inDe == eSkill_IncreaseDecrease.Increase ? useSkill.value : (useSkill.value * -1));
-                }
-                break;
-
-            case eStats.AP:
-                {
-                    _saveData.userData.AP_Effect -= (short)(useSkill.inDe == eSkill_IncreaseDecrease.Increase ? useSkill.value : (useSkill.value * -1));
-                }
-                break;
-
-            case eStats.EXP:
-                {
-                    if (useSkill.isPercent == true)
-                    {
-                        _saveData.userData.EXP_Effect_Per -= (short)(useSkill.inDe == eSkill_IncreaseDecrease.Increase ? useSkill.value : (useSkill.value * -1));
-
-                        return;
-                    }
-
-                    _saveData.userData.EXP_Effect -= (short)(useSkill.inDe == eSkill_IncreaseDecrease.Increase ? useSkill.value : (useSkill.value * -1));
-                }
-                break;
-
-            case eStats.Coin:
-                {
-                    if (useSkill.isPercent == true)
-                    {
-                        _saveData.userData.Coin_Effect_Per -= (short)(useSkill.inDe == eSkill_IncreaseDecrease.Increase ? useSkill.value : (useSkill.value * -1));
-
-                        return;
-                    }
-
-                    _saveData.userData.Coin_Effect -= (short)(useSkill.inDe == eSkill_IncreaseDecrease.Increase ? useSkill.value : (useSkill.value * -1));
-                }
-                break;
-
-            case eStats.Attack:
-                {
-                    if (useSkill.isPercent == true)
-                    {
-                        _saveData.userData.Attack_Effect_Per -= (short)(useSkill.inDe == eSkill_IncreaseDecrease.Increase ? useSkill.value : (useSkill.value * -1));
-
-                        return;
-                    }
-
-                    _saveData.userData.Attack_Effect -= (short)(useSkill.inDe == eSkill_IncreaseDecrease.Increase ? useSkill.value : (useSkill.value * -1));
-                }
-                break;
-
-            case eStats.Defence:
-                {
-                    if (useSkill.isPercent == true)
-                    {
-                        _saveData.userData.Defence_Effect_Per -= (short)(useSkill.inDe == eSkill_IncreaseDecrease.Increase ? useSkill.value : (useSkill.value * -1));
-
-                        return;
-                    }
-
-                    _saveData.userData.Defence_Effect -= (short)(useSkill.inDe == eSkill_IncreaseDecrease.Increase ? useSkill.value : (useSkill.value * -1));
-                }
-                break;
-        }
-    }
-
-    private void SkillApplyEffect(DataManager.Skill_Duration useSkill)
-    {
-        switch(useSkill.stats)
-        {
-            case eStats.HP:
-                {
-                    ushort value = (ushort)(useSkill.inDe == eSkill_IncreaseDecrease.Increase ? useSkill.value : (useSkill.value * -1));
-
-                    if(_saveData.userData.currentHP + value > _saveData.userData.maximumHP)
-                    {
-                        _saveData.userData.currentHP = _saveData.userData.maximumHP;
-                    }
-                    else
-                    {
-                        _saveData.userData.currentHP += value;
-                    }
-                }
-                break;
-
-            case eStats.MP:
-                {
-                    ushort value = (ushort)(useSkill.inDe == eSkill_IncreaseDecrease.Increase ? useSkill.value : (useSkill.value * -1));
-
-                    if (_saveData.userData.currentMP + value > _saveData.userData.maximumMP)
-                    {
-                        _saveData.userData.currentMP = _saveData.userData.maximumMP;
-                    }
-                    else
-                    {
-                        _saveData.userData.currentMP += value;
-                    }
-                }
-                break;
-
-            case eStats.AP:
-                {
-                    ushort value = (ushort)(useSkill.inDe == eSkill_IncreaseDecrease.Increase ? useSkill.value : (useSkill.value * -1));
-
-                    if (_saveData.userData.currentAP + value > _saveData.userData.maximumAP)
-                    {
-                        _saveData.userData.currentAP = _saveData.userData.maximumAP;
-                    }
-                    else
-                    {
-                        _saveData.userData.currentAP += value;
-                    }
-                }
-                break;
-
-            case eStats.EXP:
-                {
-                    if(useSkill.isPercent == true)
-                    {
-                        _saveData.userData.EXP_Effect_Per += (short)(useSkill.inDe == eSkill_IncreaseDecrease.Increase ? useSkill.value : (useSkill.value * -1));
-
-                        return;
-                    }
-
-                    _saveData.userData.EXP_Effect += (short)(useSkill.inDe == eSkill_IncreaseDecrease.Increase ? useSkill.value : (useSkill.value * -1));
-                }
-                break;
-
-            case eStats.Coin:
-                {
-                    if (useSkill.isPercent == true)
-                    {
-                        _saveData.userData.Coin_Effect_Per += (short)(useSkill.inDe == eSkill_IncreaseDecrease.Increase ? useSkill.value : (useSkill.value * -1));
-
-                        return;
-                    }
-
-                    _saveData.userData.Coin_Effect += (short)(useSkill.inDe == eSkill_IncreaseDecrease.Increase ? useSkill.value : (useSkill.value * -1));
-                }
-                break;
-
-            case eStats.Attack:
-                {
-                    if (useSkill.isPercent == true)
-                    {
-                        _saveData.userData.Attack_Effect_Per += (short)(useSkill.inDe == eSkill_IncreaseDecrease.Increase ? useSkill.value : (useSkill.value * -1));
-
-                        return;
-                    }
-
-                    _saveData.userData.Attack_Effect += (short)(useSkill.inDe == eSkill_IncreaseDecrease.Increase ? useSkill.value : (useSkill.value * -1));
-                }
-                break;
-
-            case eStats.Defence:
-                {
-                    if (useSkill.isPercent == true)
-                    {
-                        _saveData.userData.Defence_Effect_Per += (short)(useSkill.inDe == eSkill_IncreaseDecrease.Increase ? useSkill.value : (useSkill.value * -1));
-
-                        return;
-                    }
-
-                    _saveData.userData.Defence_Effect += (short)(useSkill.inDe == eSkill_IncreaseDecrease.Increase ? useSkill.value : (useSkill.value * -1));
-                }
-                break;
-        }
     }
 
     private void Bag(int id)
@@ -1068,7 +890,7 @@ public class IngameManager : MonoBehaviour
 
     private void ItemConsumptionCheck(DataManager.Item_Data data, eStats type, int useValue, bool isPercent = false)
     {
-        eSkill_IncreaseDecrease result = eSkill_IncreaseDecrease.Non;
+        eEffect_IncreaseDecrease result = eEffect_IncreaseDecrease.Non;
 
         if (useValue == 0)
         {
@@ -1077,27 +899,27 @@ public class IngameManager : MonoBehaviour
 
         if (useValue < 0)
         {
-            result = eSkill_IncreaseDecrease.Decrease;
+            result = eEffect_IncreaseDecrease.Decrease;
         }
 
         if (useValue == -9999)
         {
-            result = eSkill_IncreaseDecrease.ALLDecrease;
+            result = eEffect_IncreaseDecrease.ALLDecrease;
         }
 
         if (useValue > 0)
         {
-            result = eSkill_IncreaseDecrease.Increase;
+            result = eEffect_IncreaseDecrease.Increase;
         }
 
-        DataManager.Item_Duration temp = new DataManager.Item_Duration();
-        temp.Item_ID = data.id;
+        DataManager.Duration temp = new DataManager.Duration();
+        temp.ID = data.id;
         temp.name = data.name;
         temp.stats = type;
         temp.inDe = result;
         temp.isPercent = isPercent;
         temp.value = useValue;
-        temp.remaindDuration = data.duration;
+        temp.remaindDuration = data.duration + 1;
 
         _saveData.userData.useItem.Add(temp);
     }
@@ -1109,28 +931,296 @@ public class IngameManager : MonoBehaviour
             if (_saveData.userData.useItem[i].remaindDuration == 0)
             {
                 _textView.UpdateText(_saveData.userData.useItem[i].name + " 의 효과가 끝났습니다.");
-                ItemRemoveEffect(_saveData.userData.useItem[i]);
+                RemoveEffect(_saveData.userData.useItem[i]);
 
                 _saveData.userData.useItem.Remove(_saveData.userData.useItem[i]);
 
                 continue;
             }
 
-            ItemApplyEffect(_saveData.userData.useItem[i]);
+            ApplyEffect(_saveData.userData.useItem[i]);
             _saveData.userData.useItem[i].remaindDuration -= 1;
         }
 
         UpdateData();
     }
 
-    private void ItemRemoveEffect(DataManager.Item_Duration useItem)
-    { 
-    
+    private void RemoveEffect(DataManager.Duration use)
+    {
+        switch (use.stats)
+        {
+            case eStats.HP:
+                {
+                    ushort value = (ushort)(use.inDe == eEffect_IncreaseDecrease.Increase ? use.value : (use.value * -1));
+
+                    if (_saveData.userData.currentHP - value < 0)
+                    {
+                        _saveData.userData.currentHP = 0;
+                    }
+                    else
+                    {
+                        _saveData.userData.currentHP -= value;
+                    }
+                }
+                break;
+
+            case eStats.MP:
+                {
+                    ushort value = (ushort)(use.inDe == eEffect_IncreaseDecrease.Increase ? use.value : (use.value * -1));
+
+                    if (_saveData.userData.currentMP - value < 0)
+                    {
+                        _saveData.userData.currentMP = 0;
+                    }
+                    else
+                    {
+                        _saveData.userData.currentMP -= value;
+                    }
+                }
+                break;
+
+            case eStats.AP:
+                {
+                    ushort value = (ushort)(use.inDe == eEffect_IncreaseDecrease.Increase ? use.value : (use.value * -1));
+
+                    if (_saveData.userData.currentAP - value < 0)
+                    {
+                        _saveData.userData.currentAP = 0;
+
+                        return;
+                    }
+
+                    _saveData.userData.currentAP -= value;
+                }
+                break;
+
+            case eStats.EXP:
+                {
+                    ushort value = (ushort)(use.inDe == eEffect_IncreaseDecrease.Increase ? use.value : (use.value * -1));
+
+                    if (use.isPercent == true)
+                    {
+                        if(_saveData.userData.EXP_Effect_Per - (short)value < 0)
+                        {
+                            _saveData.userData.EXP_Effect_Per = 0;
+
+                            return;
+                        }
+
+                        _saveData.userData.EXP_Effect_Per -= (short)value;
+
+                        return;
+                    }
+
+                    if (_saveData.userData.EXP_Effect - value < 0)
+                    {
+                        _saveData.userData.EXP_Effect = 0;
+
+                        return;
+                    }
+
+                    _saveData.userData.EXP_Effect -= (short)value;
+                }
+                break;
+
+            case eStats.Coin:
+                {
+                    ushort value = (ushort)(use.inDe == eEffect_IncreaseDecrease.Increase ? use.value : (use.value * -1));
+
+                    if (use.isPercent == true)
+                    {
+                        if (_saveData.userData.Coin_Effect_Per - (short)value < 0)
+                        {
+                            _saveData.userData.Coin_Effect_Per = 0;
+
+                            return;
+                        }
+
+                        _saveData.userData.Coin_Effect_Per -= (short)value;
+
+                        return;
+                    }
+
+                    if (_saveData.userData.data.coin - value < 0)
+                    {
+                        _saveData.userData.data.coin = 0;
+
+                        return;
+                    }
+
+                    _saveData.userData.data.coin -= value;
+                }
+                break;
+
+            case eStats.Attack:
+                {
+                    ushort value = (ushort)(use.inDe == eEffect_IncreaseDecrease.Increase ? use.value : (use.value * -1));
+
+                    if (use.isPercent == true)
+                    {
+                        if (_saveData.userData.Attack_Effect_Per - (short)value < 0)
+                        {
+                            _saveData.userData.Attack_Effect_Per = 0;
+
+                            return;
+                        }
+
+                        _saveData.userData.Attack_Effect_Per -= (short)value;
+
+                        return;
+                    }
+
+                    if (_saveData.userData.Attack_Effect - value < 0)
+                    {
+                        _saveData.userData.Attack_Effect = 0;
+
+                        return;
+                    }
+
+                    _saveData.userData.Attack_Effect -= (short)value;
+                }
+                break;
+
+            case eStats.Defence:
+                {
+                    ushort value = (ushort)(use.inDe == eEffect_IncreaseDecrease.Increase ? use.value : (use.value * -1));
+
+                    if (use.isPercent == true)
+                    {
+                        if (_saveData.userData.Defence_Effect_Per - (short)value < 0)
+                        {
+                            _saveData.userData.Defence_Effect_Per = 0;
+
+                            return;
+                        }
+
+                        _saveData.userData.Defence_Effect_Per -= (short)value;
+
+                        return;
+                    }
+
+                    if (_saveData.userData.Defence_Effect - value < 0)
+                    {
+                        _saveData.userData.Defence_Effect = 0;
+
+                        return;
+                    }
+
+                    _saveData.userData.Defence_Effect -= (short)value;
+                }
+                break;
+        }
     }
 
-    private void ItemApplyEffect(DataManager.Item_Duration useItem)
+    private void ApplyEffect(DataManager.Duration use)
     {
+        switch (use.stats)
+        {
+            case eStats.HP:
+                {
+                    ushort value = (ushort)(use.inDe == eEffect_IncreaseDecrease.Increase ? use.value : (use.value * -1));
 
+                    if (_saveData.userData.currentHP + value > _saveData.userData.maximumHP)
+                    {
+                        _saveData.userData.currentHP = _saveData.userData.maximumHP;
+                    }
+                    else
+                    {
+                        _saveData.userData.currentHP += value;
+                    }
+                }
+                break;
+
+            case eStats.MP:
+                {
+                    ushort value = (ushort)(use.inDe == eEffect_IncreaseDecrease.Increase ? use.value : (use.value * -1));
+
+                    if (_saveData.userData.currentMP + value > _saveData.userData.maximumMP)
+                    {
+                        _saveData.userData.currentMP = _saveData.userData.maximumMP;
+                    }
+                    else
+                    {
+                        _saveData.userData.currentMP += value;
+                    }
+                }
+                break;
+
+            case eStats.AP:
+                {
+                    ushort value = (ushort)(use.inDe == eEffect_IncreaseDecrease.Increase ? use.value : (use.value * -1));
+
+                    if (_saveData.userData.currentAP + value > _saveData.userData.maximumAP)
+                    {
+                        _saveData.userData.currentAP = _saveData.userData.maximumAP;
+                    }
+                    else
+                    {
+                        _saveData.userData.currentAP += value;
+                    }
+                }
+                break;
+
+            case eStats.EXP:
+                {
+                    ushort value = (ushort)(use.inDe == eEffect_IncreaseDecrease.Increase ? use.value : (use.value * -1));
+
+                    if (use.isPercent == true)
+                    {
+                        _saveData.userData.EXP_Effect_Per += (short)value;
+
+                        return;
+                    }
+
+                    _saveData.userData.EXP_Effect += (short)value;
+                }
+                break;
+
+            case eStats.Coin:
+                {
+                    ushort value = (ushort)(use.inDe == eEffect_IncreaseDecrease.Increase ? use.value : (use.value * -1));
+
+                    if (use.isPercent == true)
+                    {
+                        _saveData.userData.Coin_Effect_Per += (short)value;
+
+                        return;
+                    }
+
+                    _saveData.userData.data.coin += value;
+                }
+                break;
+
+            case eStats.Attack:
+                {
+                    ushort value = (ushort)(use.inDe == eEffect_IncreaseDecrease.Increase ? use.value : (use.value * -1));
+
+                    if (use.isPercent == true)
+                    {
+                        _saveData.userData.Attack_Effect_Per += (short)value;
+
+                        return;
+                    }
+
+                    _saveData.userData.Attack_Effect += (short)value;
+                }
+                break;
+
+            case eStats.Defence:
+                {
+                    ushort value = (ushort)(use.inDe == eEffect_IncreaseDecrease.Increase ? use.value : (use.value * -1));
+
+                    if (use.isPercent == true)
+                    {
+                        _saveData.userData.Defence_Effect_Per += (short)value;
+
+                        return;
+                    }
+
+                    _saveData.userData.Defence_Effect += (short)value;
+                }
+                break;
+        }
     }
 
     #endregion
