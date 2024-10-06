@@ -245,8 +245,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _creatureDataPath: Data/CreatureData
+  _npcDataPath: Data/NpcData
   _itemDataPath: Data/ItemData
   _skillDataPath: Data/SkillData
+  _mapSize: 9
 --- !u!1 &1348999021
 GameObject:
   m_ObjectHideFlags: 0

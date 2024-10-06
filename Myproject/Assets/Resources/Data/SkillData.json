@@ -137,7 +137,7 @@
     {
       "id": 308,
       "name": "스킬 8",
-      "description": "공 -10% 방 -10% 경 +10% 행동력 + 1 / 감소량은 1턴, 증가량과 행동력은 2턴 / 마나 5 사용",
+      "description": "공 -10% 방 -10% 경 +10% 행동력 + 1 / 마나 5 사용",
       "coolDown": 1,
       "usemp": 5,
       "hp": 0,
@@ -151,7 +151,7 @@
       "attackPercentIncreased": -10,
       "defence": 0,
       "defencePercentIncreased": -10,
-      "duration": "1/2"
+      "duration": 0
     },
     {
       "id": 309,

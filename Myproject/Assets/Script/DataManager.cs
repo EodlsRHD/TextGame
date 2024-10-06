@@ -37,6 +37,18 @@ public class DataManager : MonoBehaviour
     }
 
     [Serializable]
+    public class Npc_Data
+    {
+        public ushort id = 0;
+
+        public string name = string.Empty;
+        public string description = string.Empty;
+
+        public List<ushort> itemIndexs = null;
+        public int currentNodeIndex = 0;
+    }
+
+    [Serializable]
     public class User_Data
     {
         public Creature_Data data = null;
@@ -248,6 +260,7 @@ public class DataManager : MonoBehaviour
         public List<Node_Data> nodeDatas = null;
         public List<Creature_Data> monsterDatas = null;
         public List<Item_Data> itemDatas = null;
+        public List<Npc_Data> npcDatas = null;
     }
 
     [Serializable]
@@ -260,6 +273,7 @@ public class DataManager : MonoBehaviour
         public bool isWalkable = false;
         public bool isMonster = false;
         public bool isUser = false;
+        public bool isShop = false;
         public bool isItem = false;
     }
 
@@ -291,6 +305,7 @@ public class DataManager : MonoBehaviour
 
     [Header("Data Path")]
     [SerializeField] private string _creatureDataPath = string.Empty;
+    [SerializeField] private string _npcDataPath = string.Empty;
     [SerializeField] private string _itemDataPath = string.Empty;
     [SerializeField] private string _skillDataPath = string.Empty;
     [Header("Map Size"), Tooltip("3의 배수이되 홀수여야함"), SerializeField] private int _mapSize = 9;
@@ -298,6 +313,7 @@ public class DataManager : MonoBehaviour
     private Save_Data _saveData = null;
 
     private List<Creature_Data> _creatureDatas = null;
+    private List<Npc_Data> _npcDatas = null;
     private List<Item_Data> _itemDatas = null;
     private List<Skill_Data> _skillDatas = null;
 
@@ -316,6 +332,7 @@ public class DataManager : MonoBehaviour
     public void ReadGameData()
     {
         ReadCreaturesData();
+        ReadNpcData();
         ReadItemsData();
         ReadSkillsData();
     }
@@ -353,6 +370,8 @@ public class DataManager : MonoBehaviour
         _saveData.mapData.mapSize = _mapSize;
         _saveData.mapData.nodeDatas = new List<Node_Data>();
         _saveData.mapData.monsterDatas = new List<Creature_Data>();
+        _saveData.mapData.itemDatas = new List<Item_Data>();
+        _saveData.mapData.npcDatas = new List<Npc_Data>();
 
         _saveData.encyclopediaData = new Encyclopedia_Data();
         _saveData.encyclopediaData.creatureDatas = new List<Creature_Data>();
@@ -547,6 +566,42 @@ public class DataManager : MonoBehaviour
 
     #endregion
 
+
+    #region Npc
+
+    private void ReadNpcData()
+    {
+        if (_npcDatas != null)
+        {
+            _npcDatas.Clear();
+        }
+
+        _npcDatas = new List<Npc_Data>();
+
+        string json = Resources.Load<TextAsset>(_npcDataPath).text;
+
+        var respons = new
+        {
+            datas = new List<Npc_Data>()
+        };
+
+        var result = JsonConvert.DeserializeAnonymousType(json, respons);
+
+        _npcDatas = result.datas;
+    }
+
+    public Npc_Data GetNpcData(int index)
+    {
+        if (index >= _npcDatas.Count)
+        {
+            index %= _npcDatas.Count;
+        }
+
+        return _npcDatas.Find(x => x.id == index).DeepCopy();
+    }
+
+    #endregion
+
     #region Item
 
     private void ReadItemsData()
@@ -573,6 +628,11 @@ public class DataManager : MonoBehaviour
     public Item_Data GetItemData(int index)
     {
         return _itemDatas.Find(x => x.id == (index));
+    }
+
+    public int GetItemDataCount()
+    {
+        return _itemDatas.Count;
     }
 
     #endregion

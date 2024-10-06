@@ -11,6 +11,7 @@ public class IngameManager : MonoBehaviour
     [Header("Control"), SerializeField] private ControlPad _controlPad = null;
     [Header("MapController"), SerializeField] private MapController _mapController = null;
     [Header("Ingame Popup"), SerializeField] private IngamePopup _ingamePopup = null;
+    [Header("Shop"), SerializeField] private Shop _shop = null;
 
     private DataManager.Save_Data _saveData = null;
     private MapGenerator _mapGenerator = null;
@@ -28,6 +29,7 @@ public class IngameManager : MonoBehaviour
         _controlPad.Initialize(PlayerMove, PlayerAction);
         _mapController.Initialize(GameManager.instance.dataManager.MapSize);
         _ingamePopup.Initialize();
+        _shop.Initialize(_textView.UpdateText, _ingamePopup.UpdateText);
 
         FirstSet();
 
@@ -197,6 +199,13 @@ public class IngameManager : MonoBehaviour
         if (_saveData.mapData.nodeDatas[result].isMonster == true)
         {
             Attack(result);
+
+            return -1;
+        }
+
+        if (_saveData.mapData.nodeDatas[result].isShop == true)
+        {
+            Shop(result);
 
             return -1;
         }
@@ -491,6 +500,11 @@ public class IngameManager : MonoBehaviour
                 continue;
             }
 
+            if (_saveData.mapData.nodeDatas[NearbyIndexs[i]].isShop == true)
+            {
+                continue;
+            }
+
             if (_saveData.userData.data.currentNodeIndex == NearbyIndexs[i])
             {
                 isFindPlayer = true;
@@ -581,6 +595,18 @@ public class IngameManager : MonoBehaviour
 
     #region Action
 
+    private void Shop(int nodeIndex)
+    {
+        _textView.UpdateText("--- 상인을 만났습니다.");
+
+        UiManager.instance.OpenPopup("상인", " 안녕하세요! " + "\n" + " 좋은 물건 구경해보세요!", string.Empty, string.Empty, () =>
+        {
+            DataManager.Npc_Data npc = _saveData.mapData.npcDatas.Find(x => x.currentNodeIndex == nodeIndex);
+
+            _shop.Open(npc);
+        }, null);
+    }
+
     private void Attack(int nodeMonsterIndex, System.Action onLastCallback = null)
     {
         DataManager.Creature_Data monster = _saveData.mapData.monsterDatas.Find(x => x.currentNodeIndex == nodeMonsterIndex);
@@ -653,6 +679,11 @@ public class IngameManager : MonoBehaviour
                         if(monster.itemIndexs.Count > 0)
                         {
                             _textView.UpdateText("--- 아이템 " + monster.itemIndexs.Count + " 개를 획득했습니다.");
+
+                            for (int i = 0; i < monster.itemIndexs.Count; i++)
+                            {
+                                _saveData.userData.itemDataIndexs.Add(monster.itemIndexs[i]);
+                            }
                         }
                     }
                      
@@ -815,6 +846,13 @@ public class IngameManager : MonoBehaviour
         temp.remaindCooldown = data.coolDown + 1;
         temp.remaindDuration = data.duration + 1;
 
+        if (data.duration == 0)
+        {
+            ApplyEffect(temp);
+
+            return;
+        }
+
         _saveData.userData.useSkill.Add(temp);
     }
 
@@ -824,7 +862,6 @@ public class IngameManager : MonoBehaviour
         {
             if(_saveData.userData.useSkill[i].remaindDuration == 0)
             {
-                _textView.UpdateText(_saveData.userData.useSkill[i].name + " 의 효과가 끝났습니다.");
                 RemoveEffect(_saveData.userData.useSkill[i]);
 
                 _saveData.userData.useSkill.Remove(_saveData.userData.useSkill[i]);
@@ -865,8 +902,6 @@ public class IngameManager : MonoBehaviour
             }
         }
 
-        _controlPad.UpdateData(_saveData.userData);
-
         DataManager.Item_Data data = GameManager.instance.dataManager.GetItemData(id);
 
         ItemConsumptionCheck(data, eStats.HP, data.hp);
@@ -885,6 +920,7 @@ public class IngameManager : MonoBehaviour
         ItemConsumptionCheck(data, eStats.Defence, data.defence);
         ItemConsumptionCheck(data, eStats.Defence, data.defencePercentIncreased, true);
 
+        _controlPad.UpdateData(_saveData.userData);
         UpdateData();
     }
 
@@ -921,6 +957,13 @@ public class IngameManager : MonoBehaviour
         temp.value = useValue;
         temp.remaindDuration = data.duration + 1;
 
+        if(data.duration == 0)
+        {
+            ApplyEffect(temp);
+
+            return;
+        }
+
         _saveData.userData.useItem.Add(temp);
     }
 
@@ -930,7 +973,6 @@ public class IngameManager : MonoBehaviour
         {
             if (_saveData.userData.useItem[i].remaindDuration == 0)
             {
-                _textView.UpdateText(_saveData.userData.useItem[i].name + " 의 효과가 끝났습니다.");
                 RemoveEffect(_saveData.userData.useItem[i]);
 
                 _saveData.userData.useItem.Remove(_saveData.userData.useItem[i]);
@@ -947,6 +989,8 @@ public class IngameManager : MonoBehaviour
 
     private void RemoveEffect(DataManager.Duration use)
     {
+        _textView.UpdateText(use.name + " 의 효과가 끝났습니다.");
+
         switch (use.stats)
         {
             case eStats.HP:
@@ -1114,6 +1158,8 @@ public class IngameManager : MonoBehaviour
 
     private void ApplyEffect(DataManager.Duration use)
     {
+        _textView.UpdateText(use.name + " 의 효과가 적용되었습니다.");
+
         switch (use.stats)
         {
             case eStats.HP:
@@ -1439,7 +1485,11 @@ public class MapGenerator
             }
         }
 
-        GenerateBlocker();
+        if(_saveData.round % 5 != 0)
+        {
+            GenerateBlocker();
+        }
+
         SelectExitBlock();
         Done();
     }
@@ -1802,7 +1852,16 @@ public class CreatureGenerator
     private void Start()
     {
         GeneratePlayer();
-        GenerateMonster();
+
+        if (_saveData.round % 5 != 0)
+        {
+            GenerateMonster();
+        }
+        else
+        {
+            GenerateShop();
+        }
+
         Done();
     }
 
@@ -1810,6 +1869,30 @@ public class CreatureGenerator
     {
         _saveData.userData.data.currentNodeIndex = _saveData.mapData.enterNodeIndex;
         _saveData.mapData.nodeDatas[_saveData.userData.data.currentNodeIndex].isUser = true;
+    }
+
+    private void GenerateShop()
+    {
+        int mapSize = (int)Mathf.Pow(_saveData.mapData.nodeDatas.Count, 2);
+        int currentIndex = mapSize * (int)(mapSize * 0.5f);
+
+        DataManager.Npc_Data npc = GameManager.instance.dataManager.GetNpcData(201);
+        npc.currentNodeIndex = currentIndex;
+
+        ShopNpc(ref npc);
+
+        _saveData.mapData.nodeDatas[currentIndex].isShop = true;
+        _saveData.mapData.npcDatas.Add(npc);
+    }
+
+    private void ShopNpc(ref DataManager.Npc_Data npc)
+    {
+        for (int i = 0; i < 3; i++)
+        {
+            int ran = Random.Range(0, GameManager.instance.dataManager.GetItemDataCount());
+                
+            npc.itemIndexs.Add((ushort)ran);
+        }
     }
 
     private void GenerateMonster()
