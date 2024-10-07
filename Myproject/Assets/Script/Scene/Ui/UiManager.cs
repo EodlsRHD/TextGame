@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using System;
 
 public class UiManager : MonoBehaviour
@@ -23,6 +24,10 @@ public class UiManager : MonoBehaviour
 
     [Header("Popup"), SerializeField] private PopupGenerator _popupGenerator = null;
     [Header("Game Menu"), SerializeField] private GameMenu _gameMenu = null;
+    [Header("Tutorial"), SerializeField] private Tutorial _tutorial = null;
+    [Header("Rankings"), SerializeField] private GameObject _rankings = null;
+
+    [SerializeField] private Button _buttonCloseRankings = null;
 
     private void Awake()
     {
@@ -30,6 +35,8 @@ public class UiManager : MonoBehaviour
 
         _popupGenerator.Initialize(ClosePopup);
         _gameMenu.Initialize(CloseMenu);
+        _tutorial.Initialize(CloseTutorial);
+        _buttonCloseRankings.onClick.AddListener(CloseRankings);
 
         ActiveBlocker(false);
     }
@@ -104,6 +111,22 @@ public class UiManager : MonoBehaviour
 
     #endregion
 
+    #region Rankings
+
+    public void OpenRankings()
+    {
+        ActiveBlocker(true);
+        _rankings.SetActive(true);
+    }
+
+    private void CloseRankings()
+    {
+        ActiveBlocker(false);
+        _rankings.SetActive(false);
+    }
+
+    #endregion
+
     #region Encyclopedia
 
     public void OpenEncyclopedia()
@@ -114,6 +137,22 @@ public class UiManager : MonoBehaviour
     }
 
     private void CloseEncyclopedia()
+    {
+        //ActiveBlocker(false);
+    }
+
+    #endregion
+
+    #region Turorial
+
+    public void OpenTutorial()
+    {
+        //ActiveBlocker(true);
+
+        OpenPopup("시스템", "아직 준비중입니다.", string.Empty, null);
+    }
+
+    private void CloseTutorial()
     {
         //ActiveBlocker(false);
     }

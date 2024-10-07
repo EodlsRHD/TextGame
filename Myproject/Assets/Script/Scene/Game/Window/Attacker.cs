@@ -343,7 +343,7 @@ public class Attacker : MonoBehaviour
         }
 
         int monsterHighCardNum = 0;
-        ePedigree monsterPedigree = Pedigree(Sort(nums), ref monsterHighCardNum);
+        eRankings monsterPedigree = Rankings(Sort(nums), ref monsterHighCardNum);
 
         if ((int)monsterPedigree < 2)
         {
@@ -501,7 +501,7 @@ public class Attacker : MonoBehaviour
         }
 
         int playerHighCardNum = 0;
-        ePedigree playerPedigree = Pedigree(Sort(nums), ref playerHighCardNum);
+        eRankings playerRankings = Rankings(Sort(nums), ref playerHighCardNum);
 
         nums.Clear();
 
@@ -511,24 +511,24 @@ public class Attacker : MonoBehaviour
         }
 
         int monsterHighCardNum = 0;
-        ePedigree monsterPedigree = Pedigree(Sort(nums), ref monsterHighCardNum);
+        eRankings monsterRankings = Rankings(Sort(nums), ref monsterHighCardNum);
 
-        _onUpdateTextCallback?.Invoke("--- " + _userData.data.name + " 의 결과 : " + playerPedigree);
-        _onUpdateTextCallback?.Invoke("--- " + _monster.name + " 의 결과 : " + monsterPedigree);
+        _onUpdateTextCallback?.Invoke("--- " + _userData.data.name + " 의 결과 : " + playerRankings);
+        _onUpdateTextCallback?.Invoke("--- " + _monster.name + " 의 결과 : " + monsterRankings);
 
         _resultDamage = _totalCount;
 
-        if (playerPedigree > monsterPedigree)
+        if (playerRankings > monsterRankings)
         {
             _isPlayerWin = eWinorLose.Win;
             _resultDamage = _playerBat;
         }
-        else if(playerPedigree < monsterPedigree)
+        else if(playerRankings < monsterRankings)
         {
             _isPlayerWin = eWinorLose.Lose;
             _resultDamage -= _playerBat;
         }
-        else if(playerPedigree == monsterPedigree)
+        else if(playerRankings == monsterRankings)
         {
             _isPlayerWin = eWinorLose.Draw;
 
@@ -690,11 +690,11 @@ public class Attacker : MonoBehaviour
         return card;
     }
 
-    private ePedigree Pedigree(List<AttackerTemplate> card, ref int highCardNum)
+    private eRankings Rankings(List<AttackerTemplate> card, ref int highCardNum)
     {
-        ePedigree result = ePedigree.HighCard;
+        eRankings result = eRankings.HighCard;
 
-        List<ePedigree> results = new List<ePedigree>();
+        List<eRankings> results = new List<eRankings>();
 
         bool royal = false;
         bool twoPair = false;
@@ -834,43 +834,43 @@ public class Attacker : MonoBehaviour
 
         if (royal == true) // RoyalStraightFlush
         {
-            result = ePedigree.RoyalStraightFlush;
+            result = eRankings.RoyalStraightFlush;
         }
         else if (straight == true && flush == true) // StraightFlush
         {
-            result = ePedigree.StraightFlush;
+            result = eRankings.StraightFlush;
         }
         else if (foreofaKind == true) // FourofaKind
         {
-            result = ePedigree.FourofaKind;
+            result = eRankings.FourofaKind;
         }
         else if (fullHouse == true) // FullHouse
         {
-            result = ePedigree.FullHouse;
+            result = eRankings.FullHouse;
         }
         else if (flush == true) // Flush
         {
-            result = ePedigree.Flush;
+            result = eRankings.Flush;
         }
         else if (straight == true) // Straight
         {
-            result = ePedigree.Straight;
+            result = eRankings.Straight;
         }
         else if (threeofaKind == true) // ThreeofaKind
         {
-            result = ePedigree.ThreeofaKind;
+            result = eRankings.ThreeofaKind;
         }
         else if (twoPair == true) // TwoPair
         {
-            result = ePedigree.TwoPair;
+            result = eRankings.TwoPair;
         }
         else if (pairCount == 1) // OnePair
         {
-            result = ePedigree.OnePair;
+            result = eRankings.OnePair;
         }
         else // HighCard
         {
-            result = ePedigree.HighCard;
+            result = eRankings.HighCard;
             highCardNum = card[0].Num;
         }
 

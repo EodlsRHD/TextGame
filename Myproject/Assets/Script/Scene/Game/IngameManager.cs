@@ -5,7 +5,6 @@ using UnityEngine;
 
 public class IngameManager : MonoBehaviour
 {
-    [Header("Tutorial"), SerializeField] private Tutorial _tutorial = null;
     [Header("Ingame UI"), SerializeField] private IngameUI _ingameUI = null;
     [Header("TextView"), SerializeField] private TextView _textView = null;
     [Header("Control"), SerializeField] private ControlPad _controlPad = null;
@@ -23,7 +22,6 @@ public class IngameManager : MonoBehaviour
     {
         _saveData = GameManager.instance.dataManager.CopySaveData();
 
-        _tutorial.Initialize();
         _ingameUI.Initialize(OpenMap, OpenNextRound, _textView.UpdateText, _ingamePopup.UpdateText);
         _textView.Initialize();
         _controlPad.Initialize(PlayerMove, PlayerAction);
@@ -46,7 +44,7 @@ public class IngameManager : MonoBehaviour
         }
 
         _ingameUI.OpenNextRoundWindow(eRoundClear.First);
-        //_tutorial.Open();
+        UiManager.instance.OpenTutorial();
     }
 
     private void OpenMap(System.Action onCallback)

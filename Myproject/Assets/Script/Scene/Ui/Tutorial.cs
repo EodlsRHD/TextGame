@@ -16,8 +16,15 @@ public class Tutorial : MonoBehaviour
 
     [SerializeField] private List<Sprite> _sprites = new List<Sprite>();
 
-    public void Initialize()
+    private Action _onCloseCallback = null;
+
+    public void Initialize(Action onCloseCallback)
     {
+        if(onCloseCallback != null)
+        {
+            _onCloseCallback = onCloseCallback;
+        }
+
         this.gameObject.SetActive(false);
     }
 

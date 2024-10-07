@@ -8,6 +8,7 @@ public class GameMenu : MonoBehaviour
 {
     [SerializeField] private Button _buttonClose = null;
     [SerializeField] private Button _buttonSettings = null;
+    [SerializeField] private Button _buttonRankings = null;
     [SerializeField] private Button _buttonEncyclopedia = null;
     [SerializeField] private Button _buttonGotoMainMenu = null;
 
@@ -22,6 +23,7 @@ public class GameMenu : MonoBehaviour
 
         _buttonClose.onClick.AddListener(OnClose);
         _buttonSettings.onClick.AddListener(OnSettings);
+        _buttonRankings.onClick.AddListener(OnRankings);
         _buttonEncyclopedia.onClick.AddListener(OnEncyclopedia);
         _buttonGotoMainMenu.onClick.AddListener(OnGotoMainMenu);
 
@@ -46,6 +48,11 @@ public class GameMenu : MonoBehaviour
     private void OnSettings()
     {
         UiManager.instance.OpenSettings();
+    }
+
+    private void OnRankings()
+    {
+        UiManager.instance.OpenRankings();
     }
 
     private void OnEncyclopedia()

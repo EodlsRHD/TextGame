@@ -64,7 +64,7 @@ public enum eCardShape
     Spade
 }
 
-public enum ePedigree
+public enum eRankings
 {
     Non = -1,
     HighCard,
