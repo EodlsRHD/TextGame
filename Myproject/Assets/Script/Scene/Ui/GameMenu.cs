@@ -11,6 +11,17 @@ public class GameMenu : MonoBehaviour
     [SerializeField] private Button _buttonRankings = null;
     [SerializeField] private Button _buttonEncyclopedia = null;
     [SerializeField] private Button _buttonGotoMainMenu = null;
+    [SerializeField] private Button _buttonLanguage = null;
+
+    [Header("Sound"), SerializeField] private Button _buttonSound = null;
+    [SerializeField] private Button _buttonEffect = null;
+    [SerializeField] private GameObject _objEffectMute = null;
+    [SerializeField] private GameObject _objSoundMute = null;
+
+    [Space(10)]
+
+    [SerializeField] private Button _buttonViewMap = null;
+    [SerializeField] private Button _buttonDeveloper = null;
 
     private Action _onCloseCallback = null;
 
@@ -26,6 +37,13 @@ public class GameMenu : MonoBehaviour
         _buttonRankings.onClick.AddListener(OnRankings);
         _buttonEncyclopedia.onClick.AddListener(OnEncyclopedia);
         _buttonGotoMainMenu.onClick.AddListener(OnGotoMainMenu);
+        _buttonLanguage.onClick.AddListener(OnLanguage);
+
+        _buttonSound.onClick.AddListener(OnSound);
+        _buttonEffect.onClick.AddListener(OnEffect);
+
+        _buttonViewMap.onClick.AddListener(OnViewMap);
+        _buttonDeveloper.onClick.AddListener(OnDeveloper);
 
         this.gameObject.SetActive(false);
     }
@@ -72,5 +90,36 @@ public class GameMenu : MonoBehaviour
         {
             GameManager.instance.tools.SceneChange(eScene.Game);
         });
+    }
+
+    private void OnLanguage()
+    {
+
+    }
+
+    private void OnSound()
+    {
+        GameManager.instance.soundManager.MuteBgm((isMute) =>
+        {
+            _objSoundMute.SetActive(isMute);
+        });
+    }
+
+    private void OnEffect()
+    {
+        GameManager.instance.soundManager.MuteSfx((isMute) => 
+        {
+            _objEffectMute.SetActive(isMute);
+        });
+    }
+
+    private void OnViewMap()
+    {
+
+    }
+
+    private void OnDeveloper()
+    {
+
     }
 }

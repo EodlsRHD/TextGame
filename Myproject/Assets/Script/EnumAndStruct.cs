@@ -106,3 +106,20 @@ public enum eEffect_IncreaseDecrease
     Decrease,
     ALLDecrease
 }
+
+public enum eSound
+{
+    Non = -1,
+    ButtonPress,
+    ButtonUp,
+    ButtonClick,
+    PageIn,
+    PageOut,
+    Attack,
+    Blocked,
+    Hit,
+    LevelUp,
+    GetTrophy,
+    UseItem,
+    UseSkill
+}

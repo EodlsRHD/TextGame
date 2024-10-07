@@ -302,8 +302,15 @@ public class DataManager : MonoBehaviour
     [Serializable]
     public class BlockImageTemplate
     {
-        public eCreature creature = eCreature.Non;
+        public eCreature type = eCreature.Non;
         public Sprite sprite = null;
+    }
+
+    [Serializable]
+    public class SoundTemplate
+    {
+        public eSound type = eSound.Non;
+        public AudioClip clip = null;
     }
 
     [Header("Data Path")]
@@ -674,7 +681,7 @@ public class DataManager : MonoBehaviour
 
     public Sprite GetCreatureSprite(eCreature type)
     {
-        return _creatureSpriteTemplate.Find(x => x.creature == type).sprite;
+        return _creatureSpriteTemplate.Find(x => x.type == type).sprite;
     }
 }
 

@@ -360,7 +360,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: 1bit 16px icons part-2 outlines_11
+      name: denied_Line
       rect:
         serializedVersion: 2
         x: 268
@@ -9329,7 +9329,6 @@ TextureImporter:
       1bit 16px icons part-2 outlines_107: -24752205
       1bit 16px icons part-2 outlines_108: -367818905
       1bit 16px icons part-2 outlines_109: -1810015157
-      1bit 16px icons part-2 outlines_11: 339432348
       1bit 16px icons part-2 outlines_110: -774223978
       1bit 16px icons part-2 outlines_111: -1604038019
       1bit 16px icons part-2 outlines_112: 1730612401
@@ -9757,6 +9756,7 @@ TextureImporter:
       1bit 16px icons part-2 outlines_97: 1695073790
       1bit 16px icons part-2 outlines_98: -946539530
       1bit 16px icons part-2 outlines_99: -1923654768
+      denied_Line: 339432348
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

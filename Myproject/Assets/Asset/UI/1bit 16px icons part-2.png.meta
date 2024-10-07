@@ -360,7 +360,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: 1bit 16px icons part-2_11
+      name: Denied
       rect:
         serializedVersion: 2
         x: 268
@@ -1578,7 +1578,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: 1bit 16px icons part-2_69
+      name: Sound
       rect:
         serializedVersion: 2
         x: 148
@@ -1599,7 +1599,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: 1bit 16px icons part-2_70
+      name: Effect
       rect:
         serializedVersion: 2
         x: 172
@@ -2313,7 +2313,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: 1bit 16px icons part-2_104
+      name: Spade
       rect:
         serializedVersion: 2
         x: 484
@@ -9323,13 +9323,11 @@ TextureImporter:
       1bit 16px icons part-2_101: -426259755
       1bit 16px icons part-2_102: -189302142
       1bit 16px icons part-2_103: 1907624200
-      1bit 16px icons part-2_104: 1077308906
       1bit 16px icons part-2_105: 1494117917
       1bit 16px icons part-2_106: -7403226
       1bit 16px icons part-2_107: -586933923
       1bit 16px icons part-2_108: -384050755
       1bit 16px icons part-2_109: -246770259
-      1bit 16px icons part-2_11: -1739897784
       1bit 16px icons part-2_110: -171229486
       1bit 16px icons part-2_111: 1806301012
       1bit 16px icons part-2_112: -840208211
@@ -9714,9 +9712,7 @@ TextureImporter:
       1bit 16px icons part-2_65: 1448063741
       1bit 16px icons part-2_67: -1217172610
       1bit 16px icons part-2_68: -1463407607
-      1bit 16px icons part-2_69: -560036369
       1bit 16px icons part-2_7: 1355932144
-      1bit 16px icons part-2_70: -27712124
       1bit 16px icons part-2_71: -128694738
       1bit 16px icons part-2_72: 1916972252
       1bit 16px icons part-2_73: 20053798
@@ -9749,6 +9745,8 @@ TextureImporter:
       1bit 16px icons part-2_99: -2006909712
       Bag: 70951560
       Defence: -205385056
+      Denied: 43683021
+      Effect: 1355932144
       Exit: 1100448789
       Monster: 43683021
       Rest: -19607244
@@ -9757,6 +9755,8 @@ TextureImporter:
       Skill_2: 1601908867
       Skill_3: -219172780
       Skill_4: -1657658129
+      Sound: -1463407607
+      Spade: 1077308906
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

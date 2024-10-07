@@ -20,6 +20,7 @@ public class GameManager : MonoBehaviour
 
     [Header("Tool Proxy"), SerializeField] private ToolProxy _toolProxy = null;
     [Header("Data Manager"), SerializeField] private DataManager _dataManager = null;
+    [Header("Sound Manager"), SerializeField] private SoundManager _soundManager = null;
 
     #region GetSet
 
@@ -31,6 +32,11 @@ public class GameManager : MonoBehaviour
     public DataManager dataManager
     {
         get { return _dataManager; }
+    }
+
+    public SoundManager soundManager
+    {
+        get { return _soundManager; }
     }
 
     #endregion

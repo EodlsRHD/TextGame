@@ -26,6 +26,7 @@ public class LobbyManager : MonoBehaviour
 
         _textVersion.text = Application.version;
 
+        GameManager.instance.soundManager.PlayBgm();
         GameManager.instance.dataManager.ReadGameData();
     }
 
