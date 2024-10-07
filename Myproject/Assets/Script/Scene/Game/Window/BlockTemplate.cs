@@ -12,40 +12,52 @@ public class BlockTemplate : MonoBehaviour
     public void Initialize()
     {
         _isRresrarch = false;
+        _imageBlock.enabled = true;
 
         this.gameObject.SetActive(false);
     }
 
     public void SetTemplate(bool isNearby, bool isExit, DataManager.Node_Data blockData)
     {
-        if(isNearby == true)
+        _imageBlock.enabled = true;
+
+        if (isNearby == true)
         {
             _isRresrarch = true;
         }
 
         Color color = new Color();
+        color = Color.white;
 
         if (isNearby == false && _isRresrarch == false)
         {
+            _imageBlock.enabled = true;
+            _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eCreature.Fog);
             color = Color.gray;
-            color.a = 1f;
+            color.a = 0.5f;
+
         }
         else if(isNearby == false && _isRresrarch == true)
         {
             if (blockData.isWalkable == true)
             {
+                _imageBlock.enabled = false;
                 color = Color.white;
                 color.a = 0.5f;
             }
             else if (blockData.isWalkable == false)
             {
-                color = Color.black;
+                _imageBlock.enabled = true;
+                _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eCreature.Blocker);
+                color = Color.white;
                 color.a = 0.5f;
             }
 
             if (isExit == true)
             {
-                color = Color.magenta;
+                _imageBlock.enabled = true;
+                _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eCreature.Exit);
+                color = Color.red;
                 color.a = 0.5f;
             }
         }
@@ -53,38 +65,48 @@ public class BlockTemplate : MonoBehaviour
         {
             if (blockData.isWalkable == true)
             {
-                color = Color.white;
+                _imageBlock.enabled = false;
                 color.a = 1f;
             }
             else if (blockData.isWalkable == false)
             {
-                color = Color.black;
+                _imageBlock.enabled = true;
+                _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eCreature.Blocker);
+                color = Color.white;
                 color.a = 1f;
             }
 
             if (blockData.isMonster == true)
             {
-                color = Color.red;
+                _imageBlock.enabled = true;
+                _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eCreature.Monster);
+                color = Color.white;
                 color.a = 1f;
             }
 
             if (blockData.isShop == true)
             {
-                color = Color.yellow;
+                _imageBlock.enabled = true;
+                _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eCreature.Shop);
+                color = Color.white;
                 color.a = 1f;
             }
 
             if (isExit == true)
             {
-                color = Color.magenta;
+                _imageBlock.enabled = true;
+                _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eCreature.Exit);
+                color = Color.red;
                 color.a = 1f;
             }
         }
 
         if (blockData.isUser == true)
         {
-            color = Color.green;
-            color.a = 255f;
+            _imageBlock.enabled = true;
+            _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eCreature.Player);
+            color = Color.white;
+            color.a = 1f;
         }
 
         SetColor(color);
@@ -94,6 +116,8 @@ public class BlockTemplate : MonoBehaviour
     public void RemoveTemplate()
     {
         _isRresrarch = false;
+        _imageBlock.enabled = true;
+
         this.gameObject.SetActive(false);
     }
 

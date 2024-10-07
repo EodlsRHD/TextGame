@@ -35,7 +35,7 @@ public class TextView : MonoBehaviour
     /// <summary>
     ///  Find Monster
     /// </summary>
-    public void UpdateText(eFind type, DataManager.Node_Data monsterNode, DataManager.Node_Data playerNode)
+    public void UpdateText(eCreature type, DataManager.Node_Data monsterNode, DataManager.Node_Data playerNode)
     {
         string dirStr = string.Empty;
         string findType = string.Empty;
@@ -85,19 +85,19 @@ public class TextView : MonoBehaviour
 
         switch(type)
         {
-            case eFind.Monster:
+            case eCreature.Monster:
                 findType = "몬스터";
                 break;
 
-            case eFind.Item:
+            case eCreature.Item:
                 findType = "아이템";
                 break;
 
-            case eFind.Shop:
+            case eCreature.Shop:
                 findType = "상인";
                 break;
 
-            case eFind.Exit:
+            case eCreature.Exit:
                 findType = "탈출구";
                 break;
         }

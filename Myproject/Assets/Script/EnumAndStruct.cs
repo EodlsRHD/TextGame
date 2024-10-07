@@ -30,13 +30,16 @@ public enum eRoundClear
     Fail
 }
 
-public enum eFind
+public enum eCreature
 {
     Non = -1,
     Monster,
     Item,
     Shop,
-    Exit
+    Exit,
+    Blocker,
+    Player,
+    Fog
 }
 
 

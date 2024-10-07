@@ -22,17 +22,11 @@ public class PlayerInformation : MonoBehaviour
     [SerializeField] private TMP_Text _textVision = null;
     [SerializeField] private TMP_Text _textAttackRange = null;
 
-    [Space(10)]
-
-    [SerializeField] private Button _buttonClose = null;
-
     private DataManager.User_Data _userData = null;
 
     public void Initialize()
     {
-        _buttonClose.onClick.AddListener(OnClose);
-
-        _objInformation.SetActive(false);
+        // MOVE Hide
     }
 
     public void UpdatePlayerInfo(DataManager.User_Data userData)
@@ -82,12 +76,12 @@ public class PlayerInformation : MonoBehaviour
         _textVision.text = _userData.currentVISION.ToString();
         _textAttackRange.text = _userData.currentATTACKRANGE.ToString();
 
-        _objInformation.SetActive(true);
+        // MOVE Open
     }
 
-    private void OnClose()
+    public void Close()
     {
-        _objInformation.SetActive(false);
+        // MOVE Hide
 
         _userData = null;
     }

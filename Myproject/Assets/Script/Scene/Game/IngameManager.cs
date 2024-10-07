@@ -328,7 +328,7 @@ public class IngameManager : MonoBehaviour
             {
                 actions.Add(() => 
                 {
-                    _textView.UpdateText(eFind.Exit, _saveData.mapData.nodeDatas[index], _saveData.mapData.nodeDatas[_saveData.userData.data.currentNodeIndex]);
+                    _textView.UpdateText(eCreature.Exit, _saveData.mapData.nodeDatas[index], _saveData.mapData.nodeDatas[_saveData.userData.data.currentNodeIndex]);
                 });
 
                 Non = true;
@@ -340,7 +340,7 @@ public class IngameManager : MonoBehaviour
             {
                 actions.Add(() =>
                 {
-                    _textView.UpdateText(eFind.Item, _saveData.mapData.nodeDatas[index], _saveData.mapData.nodeDatas[_saveData.userData.data.currentNodeIndex]);
+                    _textView.UpdateText(eCreature.Item, _saveData.mapData.nodeDatas[index], _saveData.mapData.nodeDatas[_saveData.userData.data.currentNodeIndex]);
                 });
 
                 Non = true;
@@ -352,7 +352,7 @@ public class IngameManager : MonoBehaviour
             {
                 actions.Add(() =>
                 {
-                    _textView.UpdateText(eFind.Shop, _saveData.mapData.nodeDatas[index], _saveData.mapData.nodeDatas[_saveData.userData.data.currentNodeIndex]);
+                    _textView.UpdateText(eCreature.Shop, _saveData.mapData.nodeDatas[index], _saveData.mapData.nodeDatas[_saveData.userData.data.currentNodeIndex]);
                 });
 
                 Non = true;
@@ -364,7 +364,7 @@ public class IngameManager : MonoBehaviour
             {
                 actions.Add(() =>
                 {
-                    _textView.UpdateText(eFind.Monster, _saveData.mapData.nodeDatas[index], _saveData.mapData.nodeDatas[_saveData.userData.data.currentNodeIndex]);
+                    _textView.UpdateText(eCreature.Monster, _saveData.mapData.nodeDatas[index], _saveData.mapData.nodeDatas[_saveData.userData.data.currentNodeIndex]);
                 });
 
                 Non = true;

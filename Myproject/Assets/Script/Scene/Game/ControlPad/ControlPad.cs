@@ -30,10 +30,10 @@ public class ControlPad : MonoBehaviour
 
     [Space(20)]
 
-    [SerializeField] private GameObject _objControlPad = null;
-    [SerializeField] private TMP_Text _textTitle = null;
-    [SerializeField] private Button _buttonCloseSecControlPad = null;
-    [SerializeField] private Button _buttonUseSecControlPad = null;
+    [SerializeField] private GameObject _objSkillAndBagPad = null;
+    [SerializeField] private TMP_Text _textSkillAndBagPadTitle = null;
+    [SerializeField] private Button _buttonCloseSkillAndBagPad = null;
+    [SerializeField] private Button _buttonUseSkillAndBagPad = null;
 
     [Space(10)]
 
@@ -77,14 +77,14 @@ public class ControlPad : MonoBehaviour
         _buttomRest.onClick.AddListener(() => { OnAction(eControl.Rest); });
         _buttomSearchNearby.onClick.AddListener(() => OnAction(eControl.SearchNearby));
 
-        _buttonCloseSecControlPad.onClick.AddListener(OnCloseSecControlPad);
-        _buttonUseSecControlPad.onClick.AddListener(OnUseSecControlPad);
+        _buttonCloseSkillAndBagPad.onClick.AddListener(OnCloseSecControlPad);
+        _buttonUseSkillAndBagPad.onClick.AddListener(OnUseSecControlPad);
 
         _objInformation.SetActive(false);
         _textName.text = string.Empty;
         _textDescription.text = string.Empty;
 
-        _objControlPad.SetActive(false);
+        _objSkillAndBagPad.SetActive(false);
 
         _skillPad.Initialize(OpenInformation);
         _BagPad.Initialize(OpenInformation);
@@ -133,7 +133,7 @@ public class ControlPad : MonoBehaviour
 
     private void OnOpenSecContolPad(eControl type)
     {
-        _textTitle.text = type.ToString();
+        _textSkillAndBagPadTitle.text = type.ToString();
         _eOpenPad = type;
 
         switch (type)
@@ -147,7 +147,7 @@ public class ControlPad : MonoBehaviour
                 break;
         } 
 
-        _objControlPad.SetActive(true);
+        _objSkillAndBagPad.SetActive(true);
     }
 
     private void OnUseSecControlPad()
@@ -171,7 +171,7 @@ public class ControlPad : MonoBehaviour
 
     private void OnCloseSecControlPad()
     {
-        _objControlPad.SetActive(false);
+        _objSkillAndBagPad.SetActive(false);
 
         CloseInformation();
 
@@ -186,7 +186,7 @@ public class ControlPad : MonoBehaviour
                 break;
         }
 
-        _textTitle.text = string.Empty;
+        _textSkillAndBagPadTitle.text = string.Empty;
         _eOpenPad = eControl.Non;
     }
 

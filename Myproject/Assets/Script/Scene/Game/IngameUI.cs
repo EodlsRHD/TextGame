@@ -33,6 +33,8 @@ public class IngameUI : MonoBehaviour
 
     private eRoundClear _type = eRoundClear.Non;
 
+    private bool _isPlayerInformationOpen = false;
+
     public void Initialize(Action<Action> onViewMapCallback, Action<eRoundClear> onNextRoundCallback, Action<string> onUpdateTextCallback, Action<string> onUpdatePopupCallback)
     {
         if(onViewMapCallback != null)
@@ -52,7 +54,7 @@ public class IngameUI : MonoBehaviour
         _buttonViewMap.onClick.AddListener(OnMap);
         _buttonGameMenu.onClick.AddListener(OnOpenGameMenu);
         _buttonNextRound.onClick.AddListener(OnNextRound);
-        _buttonOpenPlayerInformation.onClick.AddListener(OnOpenPlayerInformation);
+        _buttonOpenPlayerInformation.onClick.AddListener(OnOpenClosePlayerInformation);
 
         _buttonViewMap.gameObject.SetActive(false);
 
@@ -161,8 +163,17 @@ public class IngameUI : MonoBehaviour
         _levelPoint.Close();
     }
 
-    private void OnOpenPlayerInformation()
+    private void OnOpenClosePlayerInformation()
     {
+        if(_isPlayerInformationOpen == true)
+        {
+            _isPlayerInformationOpen = false;
+            _playerInformation.Close();
+
+            return;
+        }
+
+        _isPlayerInformationOpen = true;
         _playerInformation.Open();
     }
 }

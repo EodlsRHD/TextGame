@@ -299,12 +299,20 @@ public class DataManager : MonoBehaviour
         public Encyclopedia_Data encyclopediaData = null;
     }
 
+    [Serializable]
+    public class BlockImageTemplate
+    {
+        public eCreature creature = eCreature.Non;
+        public Sprite sprite = null;
+    }
+
     [Header("Data Path")]
     [SerializeField] private string _creatureDataPath = string.Empty;
     [SerializeField] private string _npcDataPath = string.Empty;
     [SerializeField] private string _itemDataPath = string.Empty;
     [SerializeField] private string _skillDataPath = string.Empty;
     [Header("Map Size"), Tooltip("3의 배수이되 홀수여야함"), SerializeField] private int _mapSize = 9;
+    [Header("Creature Sprite Template"), SerializeField] private List<BlockImageTemplate> _creatureSpriteTemplate = null;
 
     private Save_Data _saveData = null;
 
@@ -663,6 +671,11 @@ public class DataManager : MonoBehaviour
     }
 
     #endregion
+
+    public Sprite GetCreatureSprite(eCreature type)
+    {
+        return _creatureSpriteTemplate.Find(x => x.creature == type).sprite;
+    }
 }
 
 public static class Extensions
