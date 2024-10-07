@@ -73,13 +73,8 @@ public class DataManager : MonoBehaviour
         public ushort currentVISION = 3;
         public ushort currentATTACKRANGE = 10;
 
-        public short HP_Effect = 0;
-        public short MP_Effect = 0;
-        public short AP_Effect = 0;
-        public short EXP_Effect = 0;
         public short Attack_Effect = 0;
         public short Defence_Effect = 0;
-        public short Coin_Effect = 0;
 
         public short Attack_Effect_Per = 0;
         public short Defence_Effect_Per = 0;
@@ -99,19 +94,19 @@ public class DataManager : MonoBehaviour
 
         public ushort maximumHP
         {
-            get { return (ushort)(_defultHP * data.hp + HP_Effect); }
+            get { return (ushort)(_defultHP * data.hp); }
             set { data.hp = (ushort)value; }
         }
 
         public ushort maximumMP
         {
-            get { return (ushort)(_defultMP * data.mp + MP_Effect); }
+            get { return (ushort)(_defultMP * data.mp); }
             set { data.mp = (ushort)value; }
         }
 
         public ushort maximumAP
         {
-            get { return (ushort)(_defultAP * data.ap + AP_Effect); }
+            get { return (ushort)(_defultAP * data.ap); }
             set { data.ap = (ushort)value; }
         }
 
@@ -207,6 +202,7 @@ public class DataManager : MonoBehaviour
 
         public string name = string.Empty;
         public string description = string.Empty;
+        public ushort price = 0;
 
         public short hp = 0;
         public short mp = 0;
@@ -260,7 +256,7 @@ public class DataManager : MonoBehaviour
         public List<Node_Data> nodeDatas = null;
         public List<Creature_Data> monsterDatas = null;
         public List<Item_Data> itemDatas = null;
-        public List<Npc_Data> npcDatas = null;
+        public Npc_Data npcData = null;
     }
 
     [Serializable]
@@ -358,20 +354,21 @@ public class DataManager : MonoBehaviour
         _saveData.userData.coolDownSkill = new List<Skill_CoolDown>();
 
         _saveData.userData.data = new Creature_Data();
-        _saveData.userData.data.hp = 1;
-        _saveData.userData.data.mp = 1;
+        _saveData.userData.data.hp = 10;
+        _saveData.userData.data.mp = 10;
         _saveData.userData.data.ap = 10;
-        _saveData.userData.data.attack = 1;
-        _saveData.userData.data.defence = 0;
-        _saveData.userData.data.vision = 1;
+        _saveData.userData.data.attack = 100;
+        _saveData.userData.data.defence = 100;
+        _saveData.userData.data.vision = 3;
         _saveData.userData.data.attackRange = 1;
+        _saveData.userData.data.coin = 1000;
 
         _saveData.mapData = new Map_Data();
         _saveData.mapData.mapSize = _mapSize;
         _saveData.mapData.nodeDatas = new List<Node_Data>();
         _saveData.mapData.monsterDatas = new List<Creature_Data>();
         _saveData.mapData.itemDatas = new List<Item_Data>();
-        _saveData.mapData.npcDatas = new List<Npc_Data>();
+        _saveData.mapData.npcData = new Npc_Data();
 
         _saveData.encyclopediaData = new Encyclopedia_Data();
         _saveData.encyclopediaData.creatureDatas = new List<Creature_Data>();
@@ -625,9 +622,9 @@ public class DataManager : MonoBehaviour
         _itemDatas = result.datas;
     }
 
-    public Item_Data GetItemData(int index)
+    public Item_Data GetItemData(int index, bool isID= true)
     {
-        return _itemDatas.Find(x => x.id == (index));
+        return _itemDatas.Find(x => x.id == (index + (isID == true ? 0 : 501)));
     }
 
     public int GetItemDataCount()

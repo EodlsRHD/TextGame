@@ -35,6 +35,7 @@ public enum eFind
     Non = -1,
     Monster,
     Item,
+    Shop,
     Exit
 }
 

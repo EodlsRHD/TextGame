@@ -68,6 +68,12 @@ public class BlockTemplate : MonoBehaviour
                 color.a = 1f;
             }
 
+            if (blockData.isShop == true)
+            {
+                color = Color.yellow;
+                color.a = 1f;
+            }
+
             if (isExit == true)
             {
                 color = Color.magenta;

@@ -77,6 +77,12 @@ public class MapController : MonoBehaviour
         _onCloseCallback?.Invoke();
     }
 
+    public void Close()
+    {
+        this.gameObject.SetActive(false);
+        _onCloseCallback?.Invoke();
+    }
+
     public void RemoveTemplate()
     {
         for (int i = 0; i < _pool.Count; i++)

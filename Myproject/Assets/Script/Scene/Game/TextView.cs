@@ -93,6 +93,10 @@ public class TextView : MonoBehaviour
                 findType = "아이템";
                 break;
 
+            case eFind.Shop:
+                findType = "상인";
+                break;
+
             case eFind.Exit:
                 findType = "탈출구";
                 break;

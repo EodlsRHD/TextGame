@@ -135,6 +135,7 @@ public class Attacker : MonoBehaviour
         _textPlayerNameLabel.text = string.Empty;
         _textPlayerCard.text = string.Empty;
         _textCommunityCard.text = string.Empty;
+        _textTotal.text = string.Empty;
 
         _turnCount = 0;
         _totalCount = 0;
@@ -827,6 +828,8 @@ public class Attacker : MonoBehaviour
         if(spadeCount >= 5 || heartCount >= 5 || diamondCount >= 5 || clobCount >= 5)
         {
             flush = true;
+
+            highCardNum = card[0].Num;
         }
 
         if (royal == true) // RoyalStraightFlush
@@ -868,6 +871,7 @@ public class Attacker : MonoBehaviour
         else // HighCard
         {
             result = ePedigree.HighCard;
+            highCardNum = card[0].Num;
         }
 
         return result;

@@ -29,7 +29,7 @@ public class IngameManager : MonoBehaviour
         _controlPad.Initialize(PlayerMove, PlayerAction);
         _mapController.Initialize(GameManager.instance.dataManager.MapSize);
         _ingamePopup.Initialize();
-        _shop.Initialize(_textView.UpdateText, _ingamePopup.UpdateText);
+        _shop.Initialize(_textView.UpdateText, _ingamePopup.UpdateText, Buy);
 
         FirstSet();
 
@@ -108,6 +108,7 @@ public class IngameManager : MonoBehaviour
 
     private void RoundClear()
     {
+        _mapController.Close();
         _mapController.RemoveTemplate();
         _saveData.round++;
 
@@ -198,6 +199,9 @@ public class IngameManager : MonoBehaviour
 
         if (_saveData.mapData.nodeDatas[result].isMonster == true)
         {
+            _saveData.userData.currentAP -= 2;
+            _ingameUI.UpdatePlayerInfo(eStats.AP, _saveData.userData);
+
             Attack(result);
 
             return -1;
@@ -205,6 +209,9 @@ public class IngameManager : MonoBehaviour
 
         if (_saveData.mapData.nodeDatas[result].isShop == true)
         {
+            _saveData.userData.currentAP -= 1;
+            _ingameUI.UpdatePlayerInfo(eStats.AP, _saveData.userData);
+
             Shop(result);
 
             return -1;
@@ -336,6 +343,18 @@ public class IngameManager : MonoBehaviour
                 actions.Add(() =>
                 {
                     _textView.UpdateText(eFind.Item, _saveData.mapData.nodeDatas[index], _saveData.mapData.nodeDatas[_saveData.userData.data.currentNodeIndex]);
+                });
+
+                Non = true;
+
+                continue;
+            }
+
+            if (_saveData.mapData.nodeDatas[index].isShop == true)
+            {
+                actions.Add(() =>
+                {
+                    _textView.UpdateText(eFind.Shop, _saveData.mapData.nodeDatas[index], _saveData.mapData.nodeDatas[_saveData.userData.data.currentNodeIndex]);
                 });
 
                 Non = true;
@@ -597,22 +616,37 @@ public class IngameManager : MonoBehaviour
 
     private void Shop(int nodeIndex)
     {
-        _textView.UpdateText("--- 상인을 만났습니다.");
-
-        UiManager.instance.OpenPopup("상인", " 안녕하세요! " + "\n" + " 좋은 물건 구경해보세요!", string.Empty, string.Empty, () =>
+        if(_saveData.mapData.npcData.itemIndexs.Count == 0)
         {
-            DataManager.Npc_Data npc = _saveData.mapData.npcDatas.Find(x => x.currentNodeIndex == nodeIndex);
+            _textView.UpdateText("@상인 : 물건이 다 떨어졌어요 다음에 들러주세요!");
 
-            _shop.Open(npc);
-        }, null);
+            return;
+        }
+
+        _textView.UpdateText("@상인 : 안녕하세요! 좋은 물건 구경해보세요!");
+
+        _shop.Open(_saveData.mapData.npcData, _saveData.userData.data.coin);
+    }
+
+    private void Buy(int index, ushort price)
+    {
+        if(index < 0)
+        {
+            return;
+        }
+
+        _saveData.mapData.npcData.itemIndexs.Remove(_saveData.mapData.npcData.itemIndexs.Find(x => x == index));
+
+        _textView.UpdateText("@상인 : 구매해주셔서 감사합니다!");
+        _ingamePopup.UpdateText("가방에 보관되었습니다.");
+
+        _saveData.userData.data.coin -= price;
+        _saveData.userData.itemDataIndexs.Add((ushort)index);
     }
 
     private void Attack(int nodeMonsterIndex, System.Action onLastCallback = null)
     {
         DataManager.Creature_Data monster = _saveData.mapData.monsterDatas.Find(x => x.currentNodeIndex == nodeMonsterIndex);
-
-        _saveData.userData.currentAP -= 1;
-        _ingameUI.UpdatePlayerInfo(eStats.AP, _saveData.userData);
 
         _ingameUI.CallAttacker(_saveData.userData, monster, onLastCallback, (result, damage) => 
         {
@@ -621,21 +655,27 @@ public class IngameManager : MonoBehaviour
                 _textView.UpdateText("--- " + monster.name + " (이)가 승리했습니다.");
 
                 int monsterAttack = damage + monster.attack;
-
-                _textView.UpdateText("--- " + monster.name + " (이)가 " + monsterAttack + " 의 공격력으로 공격합니다.");
-
                 int playerDef = _saveData.userData.currentDEFENCE + (int)(_saveData.userData.currentDEFENCE * (0.01f * _saveData.userData.Defence_Effect_Per)) + _saveData.userData.Defence_Effect;
-                ushort resultDamage = (ushort)Mathf.Abs((playerDef - monsterAttack));
-                _saveData.userData.currentHP -= resultDamage;
+                int resultDamage = (playerDef - monsterAttack);
 
-                _textView.UpdateText("--- " + resultDamage + " 의 피해를 입었습니다.");
-
-                if(_saveData.userData.currentHP > 60000)
+                if(resultDamage >= 0)
                 {
-                    _saveData.userData.currentHP = 0;
+                    _textView.UpdateText("--- " + monster.name + " 의 공격이 방어도에 막혔습니다.");
+
+                    return;
                 }
 
-                UpdateData(resultDamage + " 의 피해를 입어 패배하였습니다.");
+                _saveData.userData.currentHP -= (ushort)Mathf.Abs(resultDamage);
+
+                _textView.UpdateText("--- " + monster.name + " (이)가 " + monsterAttack + " 의 공격력으로 공격합니다.");
+                _textView.UpdateText("--- " + Mathf.Abs(resultDamage) + " 의 피해를 입었습니다.");
+
+                if(_saveData.userData.currentHP > 60000 || _saveData.userData.currentHP == 0)
+                {
+                    _saveData.userData.currentHP = 0;
+
+                    UpdateData(Mathf.Abs(resultDamage) + " 의 피해를 입어 패배하였습니다.");
+                }
 
                 return;
             }
@@ -651,12 +691,12 @@ public class IngameManager : MonoBehaviour
 
             _textView.UpdateText("--- " + _saveData.userData.data.name + " (이)가 승리했습니다.");
 
-            int playerDamage = damage + (int)(damage * (0.01f * _saveData.userData.Attack_Effect_Per)) + _saveData.userData.Attack_Effect;
+            int playerDamage = _saveData.userData.currentATTACK + damage + (int)(_saveData.userData.currentATTACK * (0.01f * _saveData.userData.Attack_Effect_Per)) + _saveData.userData.Attack_Effect ;
             int _damage = monster.defence - playerDamage;
 
             if(_damage >= 0)
             {
-                _textView.UpdateText(monster.name + " 의 방어도에 막혔습니다.");
+                _textView.UpdateText("--- " + _saveData.userData.data.name + " 의 공격이 방어도에 막혔습니다.");
 
                 return;
             }
@@ -690,33 +730,7 @@ public class IngameManager : MonoBehaviour
                     _saveData.userData.data.coin += (ushort)(monster.coin + (monster.coin * 0.01f * _saveData.userData.Coin_Effect_Per));
                     _saveData.userData.currentEXP += (ushort)(monster.exp + (monster.exp * 0.01f * _saveData.userData.EXP_Effect_Per));
 
-                    if (_saveData.userData.maximumEXP <= _saveData.userData.currentEXP)
-                    {
-                        _textView.UpdateText("레벨이 증가했습니다 !");
-
-                        _saveData.userData.level += 1;
-                        _saveData.userData.currentEXP = (ushort)Mathf.Abs(_saveData.userData.maximumEXP - _saveData.userData.currentEXP);
-
-                        _ingameUI.UpdatePlayerInfo(eStats.EXP, _saveData.userData);
-                        _ingameUI.UpdatePlayerInfo(eStats.Level, _saveData.userData);
-
-                        _ingameUI.OpneLevelPoint(_saveData.userData, (newData) => 
-                        {
-                            _saveData.userData.data.hp = newData.data.hp;
-                            _saveData.userData.data.mp = newData.data.mp;
-                            _saveData.userData.data.ap = newData.data.ap;
-                            _saveData.userData.data.attack = newData.data.attack;
-                            _saveData.userData.data.defence = newData.data.defence;
-                            _saveData.userData.data.vision = newData.data.vision;
-                            _saveData.userData.data.attackRange = newData.data.attackRange;
-
-                            _saveData.userData.currentHP = _saveData.userData.maximumHP;
-                            _saveData.userData.currentMP = _saveData.userData.maximumMP;
-                            _saveData.userData.currentAP = _saveData.userData.maximumAP;
-
-                            _ingameUI.UpdatePlayerInfo(_saveData.userData);
-                        });
-                    }
+                    LevelUp();
 
                     MonsterDead(monster);
                 }
@@ -752,6 +766,37 @@ public class IngameManager : MonoBehaviour
         _textView.UpdateText("행동력을 모두 소진하여 방어도가 " + ap + "만큼 증가했습니다.");
 
         _ingameUI.UpdatePlayerInfo(eStats.AP, _saveData.userData);
+    }
+
+    private void LevelUp()
+    {
+        if (_saveData.userData.maximumEXP <= _saveData.userData.currentEXP)
+        {
+            _textView.UpdateText("레벨이 증가했습니다 !");
+
+            _saveData.userData.level += 1;
+            _saveData.userData.currentEXP = (ushort)Mathf.Abs(_saveData.userData.maximumEXP - _saveData.userData.currentEXP);
+
+            _ingameUI.UpdatePlayerInfo(eStats.EXP, _saveData.userData);
+            _ingameUI.UpdatePlayerInfo(eStats.Level, _saveData.userData);
+
+            _ingameUI.OpneLevelPoint(_saveData.userData, (newData) =>
+            {
+                _saveData.userData.data.hp = newData.data.hp;
+                _saveData.userData.data.mp = newData.data.mp;
+                _saveData.userData.data.ap = newData.data.ap;
+                _saveData.userData.data.attack = newData.data.attack;
+                _saveData.userData.data.defence = newData.data.defence;
+                _saveData.userData.data.vision = newData.data.vision;
+                _saveData.userData.data.attackRange = newData.data.attackRange;
+
+                _saveData.userData.currentHP = _saveData.userData.maximumHP;
+                _saveData.userData.currentMP = _saveData.userData.maximumMP;
+                _saveData.userData.currentAP = _saveData.userData.maximumAP;
+
+                UpdateData();
+            });
+        }
     }
 
     private void Skill(int id)
@@ -1056,14 +1101,14 @@ public class IngameManager : MonoBehaviour
                         return;
                     }
 
-                    if (_saveData.userData.EXP_Effect - value < 0)
+                    if (_saveData.userData.currentEXP - value < 0)
                     {
-                        _saveData.userData.EXP_Effect = 0;
+                        _saveData.userData.currentEXP = 0;
 
                         return;
                     }
 
-                    _saveData.userData.EXP_Effect -= (short)value;
+                    _saveData.userData.currentEXP -= (ushort)value;
                 }
                 break;
 
@@ -1218,7 +1263,9 @@ public class IngameManager : MonoBehaviour
                         return;
                     }
 
-                    _saveData.userData.EXP_Effect += (short)value;
+                    _saveData.userData.currentEXP += (ushort)value;
+
+                    LevelUp();
                 }
                 break;
 
@@ -1851,15 +1898,17 @@ public class CreatureGenerator
 
     private void Start()
     {
+        _saveData.mapData.monsterDatas = new List<DataManager.Creature_Data>();
+
         GeneratePlayer();
 
-        if (_saveData.round % 5 != 0)
+        if (_saveData.round % 5 == 0)
         {
-            GenerateMonster();
+            GenerateShop();
         }
         else
         {
-            GenerateShop();
+            GenerateMonster();
         }
 
         Done();
@@ -1873,26 +1922,27 @@ public class CreatureGenerator
 
     private void GenerateShop()
     {
-        int mapSize = (int)Mathf.Pow(_saveData.mapData.nodeDatas.Count, 2);
+        int mapSize = (int)Mathf.Sqrt(_saveData.mapData.nodeDatas.Count);
         int currentIndex = mapSize * (int)(mapSize * 0.5f);
 
         DataManager.Npc_Data npc = GameManager.instance.dataManager.GetNpcData(201);
         npc.currentNodeIndex = currentIndex;
+        npc.itemIndexs = new List<ushort>(3);
 
-        ShopNpc(ref npc);
-
-        _saveData.mapData.nodeDatas[currentIndex].isShop = true;
-        _saveData.mapData.npcDatas.Add(npc);
-    }
-
-    private void ShopNpc(ref DataManager.Npc_Data npc)
-    {
         for (int i = 0; i < 3; i++)
         {
-            int ran = Random.Range(0, GameManager.instance.dataManager.GetItemDataCount());
-                
+            int ran = Random.Range(501, 500 + GameManager.instance.dataManager.GetItemDataCount());
+
             npc.itemIndexs.Add((ushort)ran);
         }
+
+        if (_saveData.mapData.npcData == null)
+        {
+            _saveData.mapData.npcData = new DataManager.Npc_Data();
+        }
+
+        _saveData.mapData.nodeDatas[currentIndex].isShop = true;
+        _saveData.mapData.npcData = npc;
     }
 
     private void GenerateMonster()
