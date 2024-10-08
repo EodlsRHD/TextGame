@@ -103,11 +103,15 @@ public class LevelPoint : MonoBehaviour
 
     private void OnClose()
     {
+        GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+
         _onCloseCallback?.Invoke();
     }
 
     private void ResetPoint()
     {
+        GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+
         foreach (var item in _templates)
         {
             item.ResetPoint();

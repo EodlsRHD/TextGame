@@ -69,7 +69,9 @@ public class LevelPointTemplate : MonoBehaviour
 
     private void Plus()
     {
-        if(_type == eStats.Vision)
+        GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+
+        if (_type == eStats.Vision)
         {
             if(_point == 5 || _oriPoint == 5)
             {
@@ -93,6 +95,8 @@ public class LevelPointTemplate : MonoBehaviour
 
     private void Minus()
     {
+        GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+
         _onMinusCallback?.Invoke((result) =>
         {
             if (result == false)

@@ -26,7 +26,12 @@ public class Shop : MonoBehaviour
 
             _textButtonLabel.text = item.name;
 
-            button?.onClick.AddListener(() => { onCallback(this); });
+            button?.onClick.AddListener(() => 
+            {
+                GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+
+                onCallback(this); 
+            });
         }
 
         public void Buy()
@@ -93,6 +98,8 @@ public class Shop : MonoBehaviour
 
     public void Open(DataManager.Npc_Data npc, int userCoin)
     {
+        GameManager.instance.soundManager.PlaySfx(eSfx.ShopEnter);
+
         _npc = npc;
         _userCoin = userCoin;
 
@@ -115,6 +122,8 @@ public class Shop : MonoBehaviour
 
     private void OnClose()
     {
+        GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+
         this.gameObject.SetActive(false);
         _objInformation.SetActive(false);
 
@@ -133,6 +142,8 @@ public class Shop : MonoBehaviour
 
     private void OnBuy()
     {
+        GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+
         _objInformation.SetActive(false);
 
         var template = _template[_selectTemplateIndex];

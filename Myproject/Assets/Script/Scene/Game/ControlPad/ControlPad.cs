@@ -92,11 +92,15 @@ public class ControlPad : MonoBehaviour
 
     private void OnMove(eControl type)
     {
+        GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+
         _onMoveCallback?.Invoke(type);
     }
 
     private void OnAction(eControl type)
     {
+        GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+
         _onActionCallback?.Invoke(type);
     }
 
@@ -152,6 +156,8 @@ public class ControlPad : MonoBehaviour
 
     private void OnUseSecControlPad()
     {
+        GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+
         int value = -1;
 
         switch (_eOpenPad)
@@ -171,6 +177,8 @@ public class ControlPad : MonoBehaviour
 
     private void OnCloseSecControlPad()
     {
+        GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+
         _objSkillAndBagPad.SetActive(false);
 
         CloseInformation();

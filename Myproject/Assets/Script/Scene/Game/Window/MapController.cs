@@ -73,6 +73,8 @@ public class MapController : MonoBehaviour
 
     private void CloseMap()
     {
+        GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+
         this.gameObject.SetActive(false);
         _onCloseCallback?.Invoke();
     }

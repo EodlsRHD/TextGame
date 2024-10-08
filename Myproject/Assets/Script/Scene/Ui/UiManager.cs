@@ -36,6 +36,7 @@ public class UiManager : MonoBehaviour
         _popupGenerator.Initialize(ClosePopup);
         _gameMenu.Initialize(CloseMenu);
         _tutorial.Initialize(CloseTutorial);
+
         _buttonCloseRankings.onClick.AddListener(CloseRankings);
 
         ActiveBlocker(false);
@@ -121,6 +122,8 @@ public class UiManager : MonoBehaviour
 
     private void CloseRankings()
     {
+        GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+
         ActiveBlocker(false);
         _rankings.SetActive(false);
     }

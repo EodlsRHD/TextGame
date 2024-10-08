@@ -164,7 +164,9 @@ public class Attacker : MonoBehaviour
 
     private void OnBat(bool isPlayer, ref int coin, ref int bat)
     {
-        if(isPlayer == true)
+        GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+
+        if (isPlayer == true)
         {
             if (coin < bat)
             {
@@ -200,6 +202,8 @@ public class Attacker : MonoBehaviour
 
     private void OnRaise(bool isPlayer, ref int coin, ref int bat)
     {
+        GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+
         if (isPlayer == true)
         {
             if (coin < (bat * 2))
@@ -237,6 +241,8 @@ public class Attacker : MonoBehaviour
 
     private void OnAllin(bool isPlayer, ref int coin, ref int bat)
     {
+        GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+
         string str_name = isPlayer == true ? _userData.data.name : _monster.name;
         _onUpdateTextCallback?.Invoke(str_name + "   ALL IN");
         
@@ -264,6 +270,8 @@ public class Attacker : MonoBehaviour
 
     private void OnFold(bool isPlayer, ref int coin, ref int bat)
     {
+        GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+
         string str_name = isPlayer == true ? _userData.data.name : _monster.name;
         _onUpdateTextCallback?.Invoke(str_name + " (이)가 Fold 했습니다.");
 

@@ -30,6 +30,8 @@ public class Tutorial : MonoBehaviour
 
     public void Open()
     {
+        GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+
         for (int i = 0; i < _sprites.Count; i++)
         {
 

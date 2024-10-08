@@ -72,6 +72,8 @@ public class IngameUI : MonoBehaviour
 
     private void OnMap()
     {
+        GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+
         _buttonViewMap.gameObject.SetActive(false);
 
         _onViewMapCallback?.Invoke(() => { _buttonViewMap.gameObject.SetActive(true); });
@@ -79,11 +81,15 @@ public class IngameUI : MonoBehaviour
 
     private void OnOpenGameMenu()
     {
+        GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+
         UiManager.instance.OpenGameMenu();
     }
 
     private void OnNextRound()
     {
+        GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+
         _onNextRoundCallback?.Invoke(_type);
 
         if(_type != eRoundClear.Fail)
@@ -165,7 +171,9 @@ public class IngameUI : MonoBehaviour
 
     private void OnOpenClosePlayerInformation()
     {
-        if(_isPlayerInformationOpen == true)
+        GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+
+        if (_isPlayerInformationOpen == true)
         {
             _isPlayerInformationOpen = false;
             _playerInformation.Close();

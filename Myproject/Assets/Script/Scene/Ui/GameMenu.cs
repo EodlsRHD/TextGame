@@ -62,6 +62,8 @@ public class GameMenu : MonoBehaviour
 
     public void Close()
     {
+        GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+
         this.gameObject.SetActive(false);
     }
 
@@ -72,22 +74,30 @@ public class GameMenu : MonoBehaviour
 
     private void OnRankings()
     {
+        GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+
         UiManager.instance.OpenRankings();
     }
 
     private void OnEncyclopedia()
     {
+        GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+
         UiManager.instance.OpenEncyclopedia();
     }
 
     private void OnGotoMainMenu()
     {
+        GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+
         UiManager.instance.OpenPopup("시스템", "저장하시겠습니까?", string.Empty, string.Empty, () =>
         {
             GameManager.instance.dataManager.SaveDataToCloud(null, () => 
             {
                 GameManager.instance.tools.Fade(false, () =>
                 {
+                    GameManager.instance.soundManager.PlaySfx(eSfx.GotoLobby);
+
                     GameManager.instance.tools.SceneChange(eScene.Lobby);
                 });
             });
@@ -96,11 +106,15 @@ public class GameMenu : MonoBehaviour
 
     private void OnLanguage()
     {
+        GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
 
+        UiManager.instance.OpenPopup("시스템", "아직 준비중입니다.", string.Empty, null);
     }
 
     private void OnBgm()
     {
+        GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+
         GameManager.instance.soundManager.MuteBgm((isMute) =>
         {
             _objBgmMute.SetActive(isMute);
@@ -109,6 +123,8 @@ public class GameMenu : MonoBehaviour
 
     private void OnSfx()
     {
+        GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+
         GameManager.instance.soundManager.MuteSfx((isMute) => 
         {
             _objSfxMute.SetActive(isMute);
@@ -117,11 +133,17 @@ public class GameMenu : MonoBehaviour
 
     private void OnViewMap()
     {
+        GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
 
+        UiManager.instance.OpenPopup("시스템", "아직 준비중입니다.", string.Empty, null);
     }
 
     private void OnCredit()
     {
+        GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+
+        UiManager.instance.OpenPopup("시스템", "아직 준비중입니다.", string.Empty, null);
+
         // bgm by https://makotohiramatsu.itch.io/
         // sfx by https://zombieham.itch.io/ (book sound)
     }

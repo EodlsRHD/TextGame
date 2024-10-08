@@ -99,6 +99,7 @@ public class PopupGenerator : MonoBehaviour
 
     private void onClosePopup()
     {
+        GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
         _onClosePopupCallback?.Invoke();
     }
 

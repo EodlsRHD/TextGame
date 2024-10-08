@@ -8,6 +8,10 @@ public class SoundManager : MonoBehaviour
 {
     [SerializeField] private AudioSource _audioSFX = null;
     [SerializeField] private AudioSource _audioBGM = null;
+    [SerializeField] private AudioSource _audioButton = null;
+    [SerializeField] private AudioSource _audioBook = null;
+    [SerializeField] private AudioSource _audioAttack = null;
+    [SerializeField] private AudioSource _audioHit = null;
 
     [Header("Lobby BGM Clip"), SerializeField] private List<AudioClip> _clipLobbyBgm = null;
     [Header("InGame BGM Clip"), SerializeField] private List<AudioClip> _clipInGameBgm = null;
@@ -48,12 +52,42 @@ public class SoundManager : MonoBehaviour
 
     public void PlaySfx(eSfx type)
     {
-        var a = _sfxTemplate.Find(x => x.type == type);
+        if(type == eSfx.ButtonPress)
+        {
+            PlayButton();
+
+            return;
+        }
+
+        DataManager.SoundTemplate template = _sfxTemplate.Find(x => x.type == type);
+
+        if(template.clip != null)
+        {
+            _audioSFX.clip = template.clip;
+            _audioSFX.Play();
+
+            return;
+        }
+
+        if(template.clips[Random(template.clips.Count)] != null)
+        {
+            _audioSFX.clip = template.clips[Random(template.clips.Count)];
+            _audioSFX.Play();
+        }
+    }
+
+    public void PlayButton()
+    {
+        DataManager.SoundTemplate template = _sfxTemplate.Find(x => x.type == eSfx.ButtonPress);
+
+        _audioButton.clip = template.clip;
+        _audioButton.Play();
     }
 
     public void MuteSfx(Action<bool> onCallback)
     {
         _audioSFX.mute = _audioSFX.mute == true ? false : true;
+        _audioButton.mute = _audioButton.mute == true ? false : true;
         PlayerPrefs.SetInt("SFX", _audioSFX.mute == true ? 0 : 1);
 
         onCallback?.Invoke(_audioSFX.mute);
@@ -70,6 +104,7 @@ public class SoundManager : MonoBehaviour
     public void MuteSfx(bool isMute)
     {
         _audioSFX.mute = isMute;
+        _audioButton.mute = isMute;
     }
 
     public void MuteBgm(bool isMute)

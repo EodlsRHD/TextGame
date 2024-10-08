@@ -114,10 +114,10 @@ public enum eSfx
     Confirm, //
     ButtonPress, //
     Window, //
-    Battle, //
     Attack, //
     Blocked, //
-    Hit,//
+    Hit_light,//
+    Hit_hard,//
     LevelUp,
     Coin, //
     Item, 
@@ -130,10 +130,8 @@ public enum eSfx
     Death, //
     RoundSuccess,
     RoundFail,
-    RandomEffect, //
-    RandomBgm, //
-    Lobby, //
-    SceneChange //
+    SceneChange, //
+    GotoLobby //
 }
 
 public enum eBgm

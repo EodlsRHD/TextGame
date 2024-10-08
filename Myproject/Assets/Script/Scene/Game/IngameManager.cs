@@ -21,6 +21,7 @@ public class IngameManager : MonoBehaviour
     void Start()
     {
         GameManager.instance.tools.Fade(true, null);
+        GameManager.instance.soundManager.PlaySfx(eSfx.SceneChange);
 
         _saveData = GameManager.instance.dataManager.CopySaveData();
 
@@ -78,6 +79,8 @@ public class IngameManager : MonoBehaviour
         {
             GameManager.instance.tools.Fade(false, () => 
             {
+                GameManager.instance.soundManager.PlaySfx(eSfx.GotoLobby);
+
                 GameManager.instance.tools.SceneChange(eScene.Lobby, () =>
                 {
                     GameManager.instance.dataManager.FailGame(_saveData);
@@ -85,6 +88,12 @@ public class IngameManager : MonoBehaviour
             });
 
             return;
+        }
+
+        if(type == eRoundClear.Success)
+        {
+            _textView.UpdateText("--- " + _saveData.round + " 라운드 입니다.");
+            GameManager.instance.soundManager.PlaySfx(eSfx.SceneChange);
         }
 
         GameManager.instance.dataManager.SaveDataToCloud(_saveData, () => 
@@ -222,7 +231,7 @@ public class IngameManager : MonoBehaviour
             _saveData.userData.currentAP -= 1;
             _ingameUI.UpdatePlayerInfo(eStats.AP, _saveData.userData);
 
-            Shop(result);
+            Shop();
 
             return -1;
         }
@@ -238,6 +247,7 @@ public class IngameManager : MonoBehaviour
 
             UiManager.instance.OpenPopup(string.Empty, "다음 라운드로 넘어가시겠습니까?", string.Empty, string.Empty, () =>
             {
+                GameManager.instance.soundManager.PlaySfx(eSfx.RoundSuccess);
                 RoundClear();
             }, null);
 
@@ -624,7 +634,7 @@ public class IngameManager : MonoBehaviour
 
     #region Action
 
-    private void Shop(int nodeIndex)
+    private void Shop()
     {
         if(_saveData.mapData.npcData.itemIndexs.Count == 0)
         {
@@ -646,6 +656,8 @@ public class IngameManager : MonoBehaviour
         }
 
         _saveData.mapData.npcData.itemIndexs.Remove(_saveData.mapData.npcData.itemIndexs.Find(x => x == index));
+
+        GameManager.instance.soundManager.PlaySfx(eSfx.Coin);
 
         _textView.UpdateText("@상인 : 구매해주셔서 감사합니다!");
         _ingamePopup.UpdateText("가방에 보관되었습니다.");
@@ -672,12 +684,24 @@ public class IngameManager : MonoBehaviour
 
                 if(resultDamage >= 0)
                 {
+                    GameManager.instance.soundManager.PlaySfx(eSfx.Blocked);
                     _textView.UpdateText("--- " + monster.name + " 의 공격이 방어도에 막혔습니다.");
 
                     return;
                 }
 
                 _saveData.userData.currentHP -= (ushort)Mathf.Abs(resultDamage);
+
+                int soundHP = _saveData.userData.currentHP / 3;
+
+                if (soundHP > (ushort)Mathf.Abs(resultDamage))
+                {
+                    GameManager.instance.soundManager.PlaySfx(eSfx.Hit_hard);
+                }
+                else
+                {
+                    GameManager.instance.soundManager.PlaySfx(eSfx.Hit_light);
+                }
 
                 _textView.UpdateText("--- " + monster.name + " (이)가 " + monsterAttack + " 의 공격력으로 공격합니다.");
                 _textView.UpdateText("--- " + Mathf.Abs(resultDamage) + " 의 피해를 입었습니다.");
@@ -686,6 +710,7 @@ public class IngameManager : MonoBehaviour
                 {
                     _saveData.userData.currentHP = 0;
 
+                    GameManager.instance.soundManager.PlaySfx(eSfx.RoundFail);
                     UpdateData(Mathf.Abs(resultDamage) + " 의 피해를 입어 패배하였습니다.");
                 }
 
@@ -709,11 +734,13 @@ public class IngameManager : MonoBehaviour
             if(_damage >= 0)
             {
                 _textView.UpdateText("--- " + _saveData.userData.data.name + " 의 공격이 방어도에 막혔습니다.");
+                GameManager.instance.soundManager.PlaySfx(eSfx.Blocked);
 
                 return;
             }
             else
             {
+                GameManager.instance.soundManager.PlaySfx(eSfx.Attack);
                 _textView.UpdateText("--- " + _saveData.userData.data.name + " (이)가 " + playerDamage + " 의 공격력으로 공격합니다.");
                 _textView.UpdateText("방어도를 제외한 " + Mathf.Abs(_damage) + " 의 데미지를 가했습니다.");
 
@@ -723,6 +750,8 @@ public class IngameManager : MonoBehaviour
                 {
                     _saveData.mapData.monsterDatas.Find(x => x.currentNodeIndex == nodeMonsterIndex).hp = 0;
 
+                    GameManager.instance.soundManager.PlaySfx(eSfx.Coin);
+
                     _textView.UpdateText(monster.name + " (을)를 처치하였습니다");
                     _textView.UpdateText("--- 경험치 " + monster.exp + " , 코인 " + monster.coin + "을 획득했습니다");
                     
@@ -730,6 +759,8 @@ public class IngameManager : MonoBehaviour
                     {
                         if(monster.itemIndexs.Count > 0)
                         {
+                            GameManager.instance.soundManager.PlaySfx(eSfx.Item);
+
                             _textView.UpdateText("--- 아이템 " + monster.itemIndexs.Count + " 개를 획득했습니다.");
 
                             for (int i = 0; i < monster.itemIndexs.Count; i++)
@@ -755,6 +786,7 @@ public class IngameManager : MonoBehaviour
 
                 if(_saveData.mapData.monsterDatas.Count == 0)
                 {
+                    GameManager.instance.soundManager.PlaySfx(eSfx.ExitOpen);
                     _isAllMonsterDead = true;
                 }
 
@@ -774,10 +806,13 @@ public class IngameManager : MonoBehaviour
 
         ushort ap = _saveData.userData.currentAP;
         _saveData.userData.currentDEFENCE += ap;
+        _saveData.userData.currentAP = 0;
 
-        _textView.UpdateText("행동력을 모두 소진하여 방어도가 " + ap + "만큼 증가했습니다.");
+        _textView.UpdateText("행동력을 모드 소진하였습니다.");
+        _textView.UpdateText("방어도가 " + ap + "만큼 증가했습니다.");
 
         _ingameUI.UpdatePlayerInfo(eStats.AP, _saveData.userData);
+        _ingameUI.UpdatePlayerInfo(eStats.Defence, _saveData.userData);
     }
 
     private void LevelUp()
@@ -813,8 +848,14 @@ public class IngameManager : MonoBehaviour
 
     private void Skill(int id)
     {
+        if (id == -1)
+            _ingamePopup.UpdateText("선택된 스킬이 없습니다.");
+        {
+            return;
+        }
+
         int reCooldown = 0;
-        if(SkillCheckCoolDown(id, ref reCooldown) == false || id == -1)
+        if(SkillCheckCoolDown(id, ref reCooldown) == false)
         {
             _textView.UpdateText("대기순서가 " + reCooldown  + "만큼 남았습니다.");
 
@@ -949,6 +990,13 @@ public class IngameManager : MonoBehaviour
 
     private void Bag(int id)
     {
+        if (id == -1)
+        {
+            _ingamePopup.UpdateText("선택된 아이템이 없습니다.");
+
+            return;
+        }
+
         for (int i = _saveData.userData.itemDataIndexs.Count -  1; i >= 0; i--)
         {
             if(_saveData.userData.itemDataIndexs[i] == id)

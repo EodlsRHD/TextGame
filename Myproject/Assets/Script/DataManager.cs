@@ -311,6 +311,7 @@ public class DataManager : MonoBehaviour
     {
         public eSfx type = eSfx.Non;
         public AudioClip clip = null;
+        public List<AudioClip> clips = null;
     }
 
     [Header("Data Path")]

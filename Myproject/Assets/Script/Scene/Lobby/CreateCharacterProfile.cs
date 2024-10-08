@@ -36,7 +36,9 @@ public class CreateCharacterProfile : MonoBehaviour
 
     private void OnSave()
     {
-        if(_inputfieldName.text.Length == 0)
+        GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+
+        if (_inputfieldName.text.Length == 0)
         {
             UiManager.instance.OpenPopup("캐릭터 생성", "닉네임은 비워둘 수 없습니다.", string.Empty, null);
 
@@ -60,6 +62,8 @@ public class CreateCharacterProfile : MonoBehaviour
 
     private void OnBack()
     {
+        GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+
         this.gameObject.SetActive(false);
 
         _inputfieldName.text = string.Empty;

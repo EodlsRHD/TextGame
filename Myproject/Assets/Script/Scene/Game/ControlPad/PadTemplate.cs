@@ -61,7 +61,9 @@ public class PadTemplate : MonoBehaviour
 
     private void OnClick()
     {
-        if(_isItem == true)
+        GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+
+        if (_isItem == true)
         {
             _onViewInfoCallback?.Invoke(_itemData.id, _itemData.name, _itemData.description, true);
 
