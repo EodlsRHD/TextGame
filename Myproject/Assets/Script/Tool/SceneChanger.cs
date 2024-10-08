@@ -15,7 +15,7 @@ public class SceneChanger : MonoBehaviour
 
     public void ChangeScene(eScene _scene, Action onResultCallback)
     {
-        if(onResultCallback != null)
+        if (onResultCallback != null)
         {
             _onResultCallback = onResultCallback;
         }

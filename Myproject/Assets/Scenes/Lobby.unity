@@ -139,7 +139,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &67291935
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1160,12 +1160,12 @@ GameObject:
   - component: {fileID: 535361380}
   - component: {fileID: 535361383}
   m_Layer: 0
-  m_Name: Main Camera
+  m_Name: Listener
   m_TagString: MainCamera
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!81 &535361380
 AudioListener:
   m_ObjectHideFlags: 0

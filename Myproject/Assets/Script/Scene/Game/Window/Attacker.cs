@@ -96,7 +96,9 @@ public class Attacker : MonoBehaviour
 
     public void CallAttacker(DataManager.User_Data userData, DataManager.Creature_Data monster, Action onLastCallback, Action<eWinorLose, int> onResultCallback)
     {
-        if(onLastCallback != null)
+        PlayBgm(eBgm.Battle);
+
+        if (onLastCallback != null)
         {
             _onLastCallback = onLastCallback;
         }
@@ -904,5 +906,10 @@ public class Attacker : MonoBehaviour
         }
 
         return num;
+    }
+
+    private void PlayBgm(eBgm type)
+    {
+        GameManager.instance.soundManager.PlayBgm(type);
     }
 }

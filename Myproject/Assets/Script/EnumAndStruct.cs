@@ -107,7 +107,7 @@ public enum eEffect_IncreaseDecrease
     ALLDecrease
 }
 
-public enum eSound
+public enum eSfx
 {
     Non = -1,
     Error, //
@@ -134,4 +134,13 @@ public enum eSound
     RandomBgm, //
     Lobby, //
     SceneChange //
+}
+
+public enum eBgm
+{
+    Non = -1,
+    Lobby,
+    Ingame,
+    Battle,
+    Shop
 }

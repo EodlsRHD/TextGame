@@ -3774,15 +3774,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _buttonClose: {fileID: 1045606217}
-  _buttonSettings: {fileID: 0}
   _buttonRankings: {fileID: 901686738}
   _buttonEncyclopedia: {fileID: 2062022961}
   _buttonGotoMainMenu: {fileID: 595024748}
   _buttonLanguage: {fileID: 794622848}
-  _buttonSound: {fileID: 1306942179}
-  _buttonEffect: {fileID: 669538883}
-  _objEffectMute: {fileID: 991937458}
-  _objSoundMute: {fileID: 1719828029}
+  _buttonBgm: {fileID: 1306942179}
+  _buttonSfx: {fileID: 669538883}
+  _objSfxMute: {fileID: 991937458}
+  _objBgmMute: {fileID: 1719828029}
   _buttonViewMap: {fileID: 256351296}
   _buttonCredit: {fileID: 1651997765}
 --- !u!1 &1306942177

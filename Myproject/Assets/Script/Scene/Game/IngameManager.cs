@@ -20,6 +20,8 @@ public class IngameManager : MonoBehaviour
 
     void Start()
     {
+        GameManager.instance.tools.Fade(true, null);
+
         _saveData = GameManager.instance.dataManager.CopySaveData();
 
         _ingameUI.Initialize(OpenMap, OpenNextRound, _textView.UpdateText, _ingamePopup.UpdateText);
@@ -36,6 +38,15 @@ public class IngameManager : MonoBehaviour
 
     private void FirstSet()
     {
+        if(_saveData.round % 5 == 0)
+        {
+            PlayBgm(eBgm.Shop);
+        }
+        else
+        {
+            PlayBgm(eBgm.Ingame);
+        }
+
         if (_saveData.round > 1)
         {
             _ingameUI.OpenNextRoundWindow(eRoundClear.Load);
@@ -65,9 +76,12 @@ public class IngameManager : MonoBehaviour
 
         if (type == eRoundClear.Fail)
         {
-            GameManager.instance.tools.SceneChange(eScene.Lobby, () => 
+            GameManager.instance.tools.Fade(false, () => 
             {
-                GameManager.instance.dataManager.FailGame(_saveData);
+                GameManager.instance.tools.SceneChange(eScene.Lobby, () =>
+                {
+                    GameManager.instance.dataManager.FailGame(_saveData);
+                });
             });
 
             return;
@@ -75,8 +89,6 @@ public class IngameManager : MonoBehaviour
 
         GameManager.instance.dataManager.SaveDataToCloud(_saveData, () => 
         {
-            _saveData.userData.Reset();
-
             _mapGenerator = new MapGenerator(GenerateMap, _saveData);
 
             _ingameUI.UpdatePlayerInfo(_saveData.userData);
@@ -648,7 +660,9 @@ public class IngameManager : MonoBehaviour
 
         _ingameUI.CallAttacker(_saveData.userData, monster, onLastCallback, (result, damage) => 
         {
-            if(result == eWinorLose.Lose)
+            PlayBgm(eBgm.Ingame);
+
+            if (result == eWinorLose.Lose)
             {
                 _textView.UpdateText("--- " + monster.name + " (이)가 승리했습니다.");
 
@@ -1459,6 +1473,11 @@ public class IngameManager : MonoBehaviour
     }
 
     #endregion
+
+    private void PlayBgm(eBgm type)
+    {
+        GameManager.instance.soundManager.PlayBgm(type);
+    }
 }
 
 public class MapGenerator

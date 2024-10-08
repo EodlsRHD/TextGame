@@ -309,7 +309,7 @@ public class DataManager : MonoBehaviour
     [Serializable]
     public class SoundTemplate
     {
-        public eSound type = eSound.Non;
+        public eSfx type = eSfx.Non;
         public AudioClip clip = null;
     }
 

@@ -50,7 +50,11 @@ public class CreateCharacterProfile : MonoBehaviour
             GameManager.instance.dataManager.CreateNewSaveData();
             GameManager.instance.dataManager.ChangePlayerData(str_new);
 
-            GameManager.instance.tools.SceneChange(eScene.Game);
+            GameManager.instance.tools.Fade(false, () =>
+            {
+                GameManager.instance.tools.SceneChange(eScene.Game);
+            });
+
         }, null);
     }
 

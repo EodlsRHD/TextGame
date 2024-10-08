@@ -26,7 +26,7 @@ public class LobbyManager : MonoBehaviour
 
         _textVersion.text = Application.version;
 
-        GameManager.instance.soundManager.PlayBgm();
+        GameManager.instance.soundManager.PlayBgm(eBgm.Lobby);
         GameManager.instance.dataManager.ReadGameData();
     }
 
@@ -43,7 +43,10 @@ public class LobbyManager : MonoBehaviour
         {
             GameManager.instance.dataManager.LoadDataToCloud(() => 
             {
-                GameManager.instance.tools.SceneChange(eScene.Game);
+                GameManager.instance.tools.Fade(false, () => 
+                {
+                    GameManager.instance.tools.SceneChange(eScene.Game);
+                });
             });
 
         }, () =>
@@ -64,6 +67,9 @@ public class LobbyManager : MonoBehaviour
 
     private void NewGame()
     {
-        GameManager.instance.tools.SceneChange(eScene.Game);
+        GameManager.instance.tools.Fade(false, () =>
+        {
+            GameManager.instance.tools.SceneChange(eScene.Game);
+        });
     }
 }

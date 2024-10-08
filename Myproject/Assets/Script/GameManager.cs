@@ -46,7 +46,7 @@ public class GameManager : MonoBehaviour
         _instance = this;
         DontDestroyOnLoad(this.gameObject);
 
-        _toolProxy.Initialize();
+        _toolProxy.Initialize(_soundManager.VolumeDown);
         _dataManager.Initialize();
     }
 

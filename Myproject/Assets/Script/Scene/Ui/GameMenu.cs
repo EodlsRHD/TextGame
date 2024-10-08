@@ -12,10 +12,10 @@ public class GameMenu : MonoBehaviour
     [SerializeField] private Button _buttonGotoMainMenu = null;
     [SerializeField] private Button _buttonLanguage = null;
 
-    [Header("Sound"), SerializeField] private Button _buttonSound = null;
-    [SerializeField] private Button _buttonEffect = null;
-    [SerializeField] private GameObject _objEffectMute = null;
-    [SerializeField] private GameObject _objSoundMute = null;
+    [Header("Sound"), SerializeField] private Button _buttonBgm = null;
+    [SerializeField] private Button _buttonSfx = null;
+    [SerializeField] private GameObject _objSfxMute = null;
+    [SerializeField] private GameObject _objBgmMute = null;
 
     [Space(10)]
 
@@ -37,11 +37,20 @@ public class GameMenu : MonoBehaviour
         _buttonGotoMainMenu.onClick.AddListener(OnGotoMainMenu);
         _buttonLanguage.onClick.AddListener(OnLanguage);
 
-        _buttonSound.onClick.AddListener(OnSound);
-        _buttonEffect.onClick.AddListener(OnEffect);
+        _buttonBgm.onClick.AddListener(OnBgm);
+        _buttonSfx.onClick.AddListener(OnSfx);
 
         _buttonViewMap.onClick.AddListener(OnViewMap);
         _buttonCredit.onClick.AddListener(OnCredit);
+
+        bool isSFX = PlayerPrefs.GetInt("SFX", 1) == 0 ? false : true;
+        bool isBGM = PlayerPrefs.GetInt("BGM", 1) == 0 ? false : true;
+
+        GameManager.instance.soundManager.MuteSfx(!isSFX);
+        GameManager.instance.soundManager.MuteBgm(!isBGM);
+
+        _objSfxMute.SetActive(!isSFX);
+        _objBgmMute.SetActive(!isBGM);
 
         this.gameObject.SetActive(false);
     }
@@ -77,12 +86,12 @@ public class GameMenu : MonoBehaviour
         {
             GameManager.instance.dataManager.SaveDataToCloud(null, () => 
             {
-                GameManager.instance.tools.SceneChange(eScene.Lobby);
+                GameManager.instance.tools.Fade(false, () =>
+                {
+                    GameManager.instance.tools.SceneChange(eScene.Lobby);
+                });
             });
-        }, () => 
-        {
-            GameManager.instance.tools.SceneChange(eScene.Game);
-        });
+        }, null);
     }
 
     private void OnLanguage()
@@ -90,19 +99,19 @@ public class GameMenu : MonoBehaviour
 
     }
 
-    private void OnSound()
+    private void OnBgm()
     {
         GameManager.instance.soundManager.MuteBgm((isMute) =>
         {
-            _objSoundMute.SetActive(isMute);
+            _objBgmMute.SetActive(isMute);
         });
     }
 
-    private void OnEffect()
+    private void OnSfx()
     {
         GameManager.instance.soundManager.MuteSfx((isMute) => 
         {
-            _objEffectMute.SetActive(isMute);
+            _objSfxMute.SetActive(isMute);
         });
     }
 

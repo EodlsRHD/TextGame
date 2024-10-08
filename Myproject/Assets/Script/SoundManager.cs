@@ -9,24 +9,44 @@ public class SoundManager : MonoBehaviour
     [SerializeField] private AudioSource _audioSFX = null;
     [SerializeField] private AudioSource _audioBGM = null;
 
-    [Header("BGM Clip"), SerializeField] private AudioClip _clipBgm = null;
+    [Header("Lobby BGM Clip"), SerializeField] private List<AudioClip> _clipLobbyBgm = null;
+    [Header("InGame BGM Clip"), SerializeField] private List<AudioClip> _clipInGameBgm = null;
+    [Header("Battle BGM Clip"), SerializeField] private List<AudioClip> _clipBattleBgm = null;
+    [Header("Shop BGM Clip"), SerializeField] private List<AudioClip> _clipShopBgm = null;
+
     [Header("SFX Clip"), SerializeField] private List<DataManager.SoundTemplate> _sfxTemplate = null;
 
     public void Initialize()
     {
-
+        _audioBGM.volume = 0;
     }
 
-    public void PlayBgm()
+    public void PlayBgm(eBgm type)
     {
-        _audioBGM.clip = _clipBgm;
-        _audioBGM.playOnAwake = true;
-        _audioBGM.loop = true;
+        switch(type)
+        {
+            case eBgm.Lobby:
+                VolumeUp(_clipLobbyBgm[Random(_clipLobbyBgm.Count)]);
+                break;
 
+            case eBgm.Ingame:
+                VolumeUp(_clipInGameBgm[Random(_clipInGameBgm.Count)]);
+                break;
+
+            case eBgm.Battle:
+                VolumeUp(_clipBattleBgm[Random(_clipBattleBgm.Count)]);
+                break;
+
+            case eBgm.Shop:
+                VolumeUp(_clipShopBgm[Random(_clipShopBgm.Count)]);
+                break;
+        }
+
+        _audioBGM.loop = true;
         _audioBGM.Play();
     }
 
-    public void PlaySfx(eSound type)
+    public void PlaySfx(eSfx type)
     {
         var a = _sfxTemplate.Find(x => x.type == type);
     }
@@ -34,6 +54,7 @@ public class SoundManager : MonoBehaviour
     public void MuteSfx(Action<bool> onCallback)
     {
         _audioSFX.mute = _audioSFX.mute == true ? false : true;
+        PlayerPrefs.SetInt("SFX", _audioSFX.mute == true ? 0 : 1);
 
         onCallback?.Invoke(_audioSFX.mute);
     }
@@ -41,7 +62,79 @@ public class SoundManager : MonoBehaviour
     public void MuteBgm(Action<bool> onCallback)
     {
         _audioBGM.mute = _audioBGM.mute == true ? false : true;
+        PlayerPrefs.SetInt("BGM", _audioBGM.mute == true ? 0 : 1);
 
         onCallback?.Invoke(_audioBGM.mute);
+    }
+
+    public void MuteSfx(bool isMute)
+    {
+        _audioSFX.mute = isMute;
+    }
+
+    public void MuteBgm(bool isMute)
+    {
+        _audioBGM.mute = isMute;
+    }
+
+    private void VolumeUp(AudioClip newBgm)
+    {
+        _audioBGM.volume = 0;
+        _audioBGM.clip = newBgm;
+
+        StartCoroutine(Co_VolumeUp());
+    }
+
+    IEnumerator Co_VolumeUp()
+    {
+        while(true)
+        {
+            yield return null;
+
+            if (_audioBGM.volume == 1)
+            {
+                break;
+            }
+
+            _audioBGM.volume += 0.01f;
+        }
+
+        yield return null;
+    }
+
+    public void VolumeDown(Action onResultCallback)
+    {
+        if(_audioBGM.volume == 0)
+        {
+            onResultCallback?.Invoke();
+
+            return;
+        }
+
+        StartCoroutine(Co_VolumeDown(onResultCallback));
+    }
+
+    IEnumerator Co_VolumeDown(Action onResultCallback)
+    {
+        while (true)
+        {
+            yield return null;
+
+            if (_audioBGM.volume == 0)
+            {
+                break;
+            }
+
+            _audioBGM.volume -= 0.05f;
+        }
+
+        onResultCallback?.Invoke();
+
+        yield return null;
+    }
+
+    private int Random(int maximum)
+    {
+        return UnityEngine.Random.Range(0, maximum);
     }
 }

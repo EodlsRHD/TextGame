@@ -13,8 +13,15 @@ public class ToolProxy : MonoBehaviour
     [SerializeField] private GameObject _prefabSceneChanger = null;
     [SerializeField] private Transform _parentSceneChanger = null;
 
-    public void Initialize()
+    private Action<Action> _onVolumeDown = null;
+
+    public void Initialize(Action<Action> onVolumeDown)
     {
+        if(onVolumeDown != null)
+        {
+            _onVolumeDown = onVolumeDown;
+        }
+
         this.gameObject.SetActive(true);
     }
 
@@ -36,7 +43,10 @@ public class ToolProxy : MonoBehaviour
             return;
         }
 
-        com.FadeOut(_onResultCallback);
+        _onVolumeDown?.Invoke(() => 
+        {
+            com.FadeOut(_onResultCallback);
+        });
     }
 
     public void SceneChange(eScene _scene, Action _onResultCallback = null)
