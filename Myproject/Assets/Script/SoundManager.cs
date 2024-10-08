@@ -6,12 +6,15 @@ using System;
 
 public class SoundManager : MonoBehaviour
 {
-    [SerializeField] private AudioSource _audioSFX = null;
     [SerializeField] private AudioSource _audioBGM = null;
+    [SerializeField] private AudioSource _audioSFX = null;
+
     [SerializeField] private AudioSource _audioButton = null;
     [SerializeField] private AudioSource _audioBook = null;
     [SerializeField] private AudioSource _audioAttack = null;
     [SerializeField] private AudioSource _audioHit = null;
+    [SerializeField] private AudioSource _audioDefence = null;
+    [SerializeField] private AudioSource _audioOther = null;
 
     [Header("Lobby BGM Clip"), SerializeField] private List<AudioClip> _clipLobbyBgm = null;
     [Header("InGame BGM Clip"), SerializeField] private List<AudioClip> _clipInGameBgm = null;
@@ -52,36 +55,61 @@ public class SoundManager : MonoBehaviour
 
     public void PlaySfx(eSfx type)
     {
-        if(type == eSfx.ButtonPress)
-        {
-            PlayButton();
-
-            return;
-        }
-
         DataManager.SoundTemplate template = _sfxTemplate.Find(x => x.type == type);
 
-        if(template.clip != null)
+        if (type == eSfx.ButtonPress)
         {
-            _audioSFX.clip = template.clip;
-            _audioSFX.Play();
+            Play(_audioButton, template);
 
             return;
         }
 
-        if(template.clips[Random(template.clips.Count)] != null)
+        if (type == eSfx.Attack)
         {
-            _audioSFX.clip = template.clips[Random(template.clips.Count)];
-            _audioSFX.Play();
+            Play(_audioAttack, template);
+
+            return;
         }
+
+        if (type == eSfx.Hit_light || type == eSfx.Hit_hard)
+        {
+            Play(_audioHit, template);
+
+            return;
+        }
+
+        if (type == eSfx.Blocked)
+        {
+            Play(_audioDefence, template);
+
+            return;
+        }
+
+        if (type == eSfx.SceneChange)
+        {
+            Play(_audioBook, template);
+
+            return;
+        }
+
+        Play(_audioOther, template);
     }
 
-    public void PlayButton()
+    public void Play(AudioSource souece, DataManager.SoundTemplate template)
     {
-        DataManager.SoundTemplate template = _sfxTemplate.Find(x => x.type == eSfx.ButtonPress);
+        if (template.clip != null)
+        {
+            souece.clip = template.clip;
+            souece.Play();
 
-        _audioButton.clip = template.clip;
-        _audioButton.Play();
+            return;
+        }
+
+        if(template.clips != null)
+        {
+            souece.clip = template.clips[Random(template.clips.Count)];
+            souece.Play();
+        }
     }
 
     public void MuteSfx(Action<bool> onCallback)
@@ -104,7 +132,6 @@ public class SoundManager : MonoBehaviour
     public void MuteSfx(bool isMute)
     {
         _audioSFX.mute = isMute;
-        _audioButton.mute = isMute;
     }
 
     public void MuteBgm(bool isMute)
@@ -126,8 +153,10 @@ public class SoundManager : MonoBehaviour
         {
             yield return null;
 
-            if (_audioBGM.volume == 1)
+            if (_audioBGM.volume >= 0.8f)
             {
+                _audioBGM.volume = 0.8f;
+
                 break;
             }
 

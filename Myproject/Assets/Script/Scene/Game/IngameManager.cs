@@ -750,8 +750,6 @@ public class IngameManager : MonoBehaviour
                 {
                     _saveData.mapData.monsterDatas.Find(x => x.currentNodeIndex == nodeMonsterIndex).hp = 0;
 
-                    GameManager.instance.soundManager.PlaySfx(eSfx.Coin);
-
                     _textView.UpdateText(monster.name + " (을)를 처치하였습니다");
                     _textView.UpdateText("--- 경험치 " + monster.exp + " , 코인 " + monster.coin + "을 획득했습니다");
                     
@@ -759,8 +757,6 @@ public class IngameManager : MonoBehaviour
                     {
                         if(monster.itemIndexs.Count > 0)
                         {
-                            GameManager.instance.soundManager.PlaySfx(eSfx.Item);
-
                             _textView.UpdateText("--- 아이템 " + monster.itemIndexs.Count + " 개를 획득했습니다.");
 
                             for (int i = 0; i < monster.itemIndexs.Count; i++)
