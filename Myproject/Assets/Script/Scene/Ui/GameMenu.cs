@@ -7,7 +7,6 @@ using System;
 public class GameMenu : MonoBehaviour
 {
     [SerializeField] private Button _buttonClose = null;
-    [SerializeField] private Button _buttonSettings = null;
     [SerializeField] private Button _buttonRankings = null;
     [SerializeField] private Button _buttonEncyclopedia = null;
     [SerializeField] private Button _buttonGotoMainMenu = null;
@@ -21,7 +20,7 @@ public class GameMenu : MonoBehaviour
     [Space(10)]
 
     [SerializeField] private Button _buttonViewMap = null;
-    [SerializeField] private Button _buttonDeveloper = null;
+    [SerializeField] private Button _buttonCredit = null;
 
     private Action _onCloseCallback = null;
 
@@ -33,7 +32,6 @@ public class GameMenu : MonoBehaviour
         }
 
         _buttonClose.onClick.AddListener(OnClose);
-        _buttonSettings.onClick.AddListener(OnSettings);
         _buttonRankings.onClick.AddListener(OnRankings);
         _buttonEncyclopedia.onClick.AddListener(OnEncyclopedia);
         _buttonGotoMainMenu.onClick.AddListener(OnGotoMainMenu);
@@ -43,7 +41,7 @@ public class GameMenu : MonoBehaviour
         _buttonEffect.onClick.AddListener(OnEffect);
 
         _buttonViewMap.onClick.AddListener(OnViewMap);
-        _buttonDeveloper.onClick.AddListener(OnDeveloper);
+        _buttonCredit.onClick.AddListener(OnCredit);
 
         this.gameObject.SetActive(false);
     }
@@ -61,11 +59,6 @@ public class GameMenu : MonoBehaviour
     private void OnClose()
     {
         _onCloseCallback?.Invoke();
-    }
-
-    private void OnSettings()
-    {
-        UiManager.instance.OpenSettings();
     }
 
     private void OnRankings()
@@ -118,8 +111,9 @@ public class GameMenu : MonoBehaviour
 
     }
 
-    private void OnDeveloper()
+    private void OnCredit()
     {
-
+        // bgm by https://makotohiramatsu.itch.io/
+        // sfx by https://zombieham.itch.io/ (book sound)
     }
 }

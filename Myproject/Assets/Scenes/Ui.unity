@@ -1265,7 +1265,7 @@ RectTransform:
   - {fileID: 786656109}
   - {fileID: 448731201}
   m_Father: {fileID: 1012648117}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -1912,7 +1912,7 @@ RectTransform:
   - {fileID: 669538882}
   - {fileID: 1306942178}
   m_Father: {fileID: 1012648117}
-  m_RootOrder: 5
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -1958,7 +1958,7 @@ GameObject:
   - component: {fileID: 669538884}
   - component: {fileID: 669538883}
   m_Layer: 5
-  m_Name: EffectButton
+  m_Name: SfxButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3147,7 +3147,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uAC1C\uBC1C\uC790"
+  m_text: Credit
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 61861d33c37fa674f9641e2a91e5504b, type: 2}
   m_sharedMaterial: {fileID: -8925474514680077256, guid: 61861d33c37fa674f9641e2a91e5504b, type: 2}
@@ -3236,7 +3236,7 @@ GameObject:
   - component: {fileID: 991937461}
   - component: {fileID: 991937460}
   m_Layer: 5
-  m_Name: Image_Mute_Effect
+  m_Name: Image_Mute_Sfx
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3333,9 +3333,9 @@ RectTransform:
   - {fileID: 2062022960}
   - {fileID: 595024747}
   - {fileID: 794622847}
+  - {fileID: 1140060442}
   - {fileID: 274417553}
   - {fileID: 633328501}
-  - {fileID: 1140060442}
   m_Father: {fileID: 1188362026}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -3616,7 +3616,7 @@ GameObject:
   - component: {fileID: 1140060442}
   - component: {fileID: 1140060443}
   m_Layer: 5
-  m_Name: MapAndDeveloper
+  m_Name: MapAndCredit
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3637,7 +3637,7 @@ RectTransform:
   - {fileID: 256351295}
   - {fileID: 1651997764}
   m_Father: {fileID: 1012648117}
-  m_RootOrder: 6
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -3778,13 +3778,13 @@ MonoBehaviour:
   _buttonRankings: {fileID: 901686738}
   _buttonEncyclopedia: {fileID: 2062022961}
   _buttonGotoMainMenu: {fileID: 595024748}
-  _buttonLanguage: {fileID: 0}
-  _buttonSound: {fileID: 0}
-  _buttonEffect: {fileID: 0}
-  _objEffectMute: {fileID: 0}
-  _objSoundMute: {fileID: 0}
-  _buttonViewMap: {fileID: 0}
-  _buttonDeveloper: {fileID: 0}
+  _buttonLanguage: {fileID: 794622848}
+  _buttonSound: {fileID: 1306942179}
+  _buttonEffect: {fileID: 669538883}
+  _objEffectMute: {fileID: 991937458}
+  _objSoundMute: {fileID: 1719828029}
+  _buttonViewMap: {fileID: 256351296}
+  _buttonCredit: {fileID: 1651997765}
 --- !u!1 &1306942177
 GameObject:
   m_ObjectHideFlags: 0
@@ -3798,7 +3798,7 @@ GameObject:
   - component: {fileID: 1306942180}
   - component: {fileID: 1306942179}
   m_Layer: 5
-  m_Name: SoundButton
+  m_Name: BgmButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4443,7 +4443,7 @@ GameObject:
   - component: {fileID: 1651997766}
   - component: {fileID: 1651997765}
   m_Layer: 5
-  m_Name: DeveloperButton
+  m_Name: CreditButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4604,7 +4604,7 @@ GameObject:
   - component: {fileID: 1719828032}
   - component: {fileID: 1719828031}
   m_Layer: 5
-  m_Name: Image_Mute_Sound
+  m_Name: Image_Mute_Bgm
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -110,16 +110,28 @@ public enum eEffect_IncreaseDecrease
 public enum eSound
 {
     Non = -1,
-    ButtonPress,
-    ButtonUp,
-    ButtonClick,
-    PageIn,
-    PageOut,
-    Attack,
-    Blocked,
-    Hit,
+    Error, //
+    Confirm, //
+    ButtonPress, //
+    Window, //
+    Battle, //
+    Attack, //
+    Blocked, //
+    Hit,//
     LevelUp,
-    GetTrophy,
-    UseItem,
-    UseSkill
+    Coin, //
+    Item, 
+    ChestOpen,
+    UseItem, //
+    UseSkill,
+    ExitOpen, //
+    Enter, //
+    ShopEnter, //
+    Death, //
+    RoundSuccess,
+    RoundFail,
+    RandomEffect, //
+    RandomBgm, //
+    Lobby, //
+    SceneChange //
 }
