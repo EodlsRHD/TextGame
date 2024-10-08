@@ -120,6 +120,7 @@ public class Attacker : MonoBehaviour
 
         _textCoin.text = _playerCoinCount.ToString();
         _textBat.text = _batCount.ToString();
+        _textTotal.text = _totalCount.ToString();
 
         _onUpdateTextCallback?.Invoke(_monster.name + " 과 전투를 시작합니다!");
         _onUpdateTextCallback?.Invoke("--- " + (_turnCount + 1) + "번째 턴");
@@ -164,10 +165,10 @@ public class Attacker : MonoBehaviour
 
     private void OnBat(bool isPlayer, ref int coin, ref int bat)
     {
-        GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
-
         if (isPlayer == true)
         {
+            GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+
             if (coin < bat)
             {
                 _onUpdatePopupCallback?.Invoke("남은 체력이 부족합니다.");
@@ -202,10 +203,10 @@ public class Attacker : MonoBehaviour
 
     private void OnRaise(bool isPlayer, ref int coin, ref int bat)
     {
-        GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
-
         if (isPlayer == true)
         {
+            GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+
             if (coin < (bat * 2))
             {
                 _onUpdatePopupCallback?.Invoke("남은 체력이 부족합니다.");
@@ -241,7 +242,10 @@ public class Attacker : MonoBehaviour
 
     private void OnAllin(bool isPlayer, ref int coin, ref int bat)
     {
-        GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+        if(isPlayer == true)
+        {
+            GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+        }
 
         string str_name = isPlayer == true ? _userData.data.name : _monster.name;
         _onUpdateTextCallback?.Invoke(str_name + "   ALL IN");
@@ -270,7 +274,10 @@ public class Attacker : MonoBehaviour
 
     private void OnFold(bool isPlayer, ref int coin, ref int bat)
     {
-        GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+        if (isPlayer == true)
+        {
+            GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+        }
 
         string str_name = isPlayer == true ? _userData.data.name : _monster.name;
         _onUpdateTextCallback?.Invoke(str_name + " (이)가 Fold 했습니다.");

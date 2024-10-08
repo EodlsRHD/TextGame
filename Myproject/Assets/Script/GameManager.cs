@@ -21,6 +21,7 @@ public class GameManager : MonoBehaviour
     [Header("Tool Proxy"), SerializeField] private ToolProxy _toolProxy = null;
     [Header("Data Manager"), SerializeField] private DataManager _dataManager = null;
     [Header("Sound Manager"), SerializeField] private SoundManager _soundManager = null;
+    [Header("Google Ads"), SerializeField] private GoogleAds _googleAds = null;
 
     private bool _isMapBackgroundUpdate = false;
 
@@ -39,6 +40,11 @@ public class GameManager : MonoBehaviour
     public SoundManager soundManager
     {
         get { return _soundManager; }
+    }
+
+    public GoogleAds googleAds
+    {
+        get { return _googleAds; }
     }
 
     public bool isMapBackgroundUpdate { get; set; }

@@ -727,7 +727,6 @@ public class IngameManager : MonoBehaviour
                     GameManager.instance.soundManager.PlaySfx(eSfx.Hit_light);
                 }
 
-                _textView.UpdateText("--- " + monster.name + " (이)가 " + monsterAttack + " 의 공격력으로 공격합니다.");
                 _textView.UpdateText("--- " + Mathf.Abs(resultDamage) + " 의 피해를 입었습니다.");
 
                 if(_saveData.userData.currentHP > 60000 || _saveData.userData.currentHP == 0)
@@ -736,7 +735,11 @@ public class IngameManager : MonoBehaviour
 
                     GameManager.instance.soundManager.PlaySfx(eSfx.RoundFail);
                     UpdateData(Mathf.Abs(resultDamage) + " 의 피해를 입어 패배하였습니다.");
+
+                    return;
                 }
+
+                UpdateData();
 
                 return;
             }
@@ -812,6 +815,8 @@ public class IngameManager : MonoBehaviour
 
                 UpdateData();
             }
+
+            UpdateData();
         });
     }
 

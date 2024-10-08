@@ -59,8 +59,8 @@ public class DataManager : MonoBehaviour
         private ushort _defultMP = 10;
         private ushort _defultAP = 10;
         private ushort _defultEXP = 15;
-        private ushort _defultATTACK = 10;
-        private ushort _defultDEFENCE = 4;
+        private ushort _defultATTACK = 5;
+        private ushort _defultDEFENCE = 0;
         private ushort _defultVISION = 1;
         private ushort _defultATTACKRANGE = 1;
 
@@ -68,8 +68,8 @@ public class DataManager : MonoBehaviour
         public ushort currentMP = 10;
         public ushort currentAP = 10;
         public ushort currentEXP = 0;
-        public ushort currentATTACK = 10;
-        public ushort currentDEFENCE = 10;
+        public ushort currentATTACK = 5;
+        public ushort currentDEFENCE = 0;
         public ushort currentVISION = 3;
         public ushort currentATTACKRANGE = 10;
 
@@ -370,11 +370,11 @@ public class DataManager : MonoBehaviour
         _saveData.userData.coolDownSkill = new List<Skill_CoolDown>();
 
         _saveData.userData.data = new Creature_Data();
-        _saveData.userData.data.hp = 10;
+        _saveData.userData.data.hp = 1;
         _saveData.userData.data.mp = 10;
         _saveData.userData.data.ap = 10;
         _saveData.userData.data.attack = 100;
-        _saveData.userData.data.defence = 100;
+        _saveData.userData.data.defence = 0;
         _saveData.userData.data.vision = 3;
         _saveData.userData.data.attackRange = 1;
         _saveData.userData.data.coin = 1000;

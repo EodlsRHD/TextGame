@@ -107,8 +107,15 @@ public class SoundManager : MonoBehaviour
 
         if(template.clips != null)
         {
-            souece.clip = template.clips[Random(template.clips.Count)];
-            souece.Play();
+            try
+            {
+                souece.clip = template.clips[Random(template.clips.Count)];
+                souece.Play();
+            }
+            catch
+            {
+
+            }
         }
     }
 

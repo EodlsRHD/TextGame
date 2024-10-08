@@ -114,13 +114,14 @@ public class IngameUI : MonoBehaviour
             return;
         }
 
-        // AD
-
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
 
-        _onNextRoundCallback?.Invoke(_type);
-        _resurrectionCount--;
-        _type = eRoundClear.Non;
+        GameManager.instance.googleAds.ShowRewardedAd_Resurrection(() =>
+        {
+            _onNextRoundCallback?.Invoke(_type);
+            _resurrectionCount--;
+            _type = eRoundClear.Non;
+        });
     }
 
     public void SetRoundText(int round)

@@ -7696,7 +7696,7 @@ RectTransform:
   m_Children:
   - {fileID: 538109927}
   m_Father: {fileID: 817054811}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
@@ -8330,7 +8330,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &817054811
 RectTransform:
   m_ObjectHideFlags: 0
@@ -8344,8 +8344,8 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 555507256}
-  - {fileID: 719658756}
   - {fileID: 1327112837}
+  - {fileID: 719658756}
   - {fileID: 2097191250}
   - {fileID: 295122151}
   m_Father: {fileID: 162815012}
@@ -11164,8 +11164,8 @@ MonoBehaviour:
   _objNextRound: {fileID: 817054810}
   _textLabel: {fileID: 156528326}
   _buttonNextRound: {fileID: 719658757}
-  _buttonGiveUp: {fileID: 0}
-  _buttonResurrection: {fileID: 0}
+  _buttonGiveUp: {fileID: 2097191251}
+  _buttonResurrection: {fileID: 295122152}
   _textButtonLabel: {fileID: 538109928}
   _Attacker: {fileID: 1552922361}
   _levelPoint: {fileID: 789466081}
@@ -13760,7 +13760,7 @@ RectTransform:
   - {fileID: 1458568986}
   - {fileID: 156528325}
   m_Father: {fileID: 817054811}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
