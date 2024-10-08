@@ -91,6 +91,14 @@ public class IngameManager : MonoBehaviour
             return;
         }
 
+        if(type == eRoundClear.Restart)
+        {
+            _saveData.userData.Reset();
+            _ingameUI.UpdatePlayerInfo(_saveData.userData);
+
+            return;
+        }
+
         if (type == eRoundClear.Fail)
         {
             GameManager.instance.tools.Fade(false, () => 

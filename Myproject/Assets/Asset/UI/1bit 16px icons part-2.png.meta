@@ -591,7 +591,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: 1bit 16px icons part-2_22
+      name: AD
       rect:
         serializedVersion: 2
         x: 28
@@ -9446,7 +9446,6 @@ TextureImporter:
       1bit 16px icons part-2_217: 331082031
       1bit 16px icons part-2_218: -1362252915
       1bit 16px icons part-2_219: 1429358511
-      1bit 16px icons part-2_22: 1526877331
       1bit 16px icons part-2_220: 1858599135
       1bit 16px icons part-2_221: -1832515476
       1bit 16px icons part-2_222: 1399571792
@@ -9743,6 +9742,7 @@ TextureImporter:
       1bit 16px icons part-2_97: 168410739
       1bit 16px icons part-2_98: 757702697
       1bit 16px icons part-2_99: -2006909712
+      AD: 1429358511
       Bag: 70951560
       Defence: -205385056
       Denied: 43683021

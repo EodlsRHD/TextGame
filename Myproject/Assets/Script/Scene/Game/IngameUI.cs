@@ -20,6 +20,8 @@ public class IngameUI : MonoBehaviour
     [SerializeField] private GameObject _objNextRound = null;
     [SerializeField] private TMP_Text _textLabel = null;
     [SerializeField] private Button _buttonNextRound = null;
+    [SerializeField] private Button _buttonGiveUp = null;
+    [SerializeField] private Button _buttonResurrection = null;
     [SerializeField] private TMP_Text _textButtonLabel = null;
 
     [Header("Attack"), SerializeField] private Attacker _Attacker = null;
@@ -34,6 +36,7 @@ public class IngameUI : MonoBehaviour
     private eRoundClear _type = eRoundClear.Non;
 
     private bool _isPlayerInformationOpen = false;
+    private int _resurrectionCount = 2;
 
     public void Initialize(Action<Action> onViewMapCallback, Action<eRoundClear> onNextRoundCallback, Action<string> onUpdateTextCallback, Action<string> onUpdatePopupCallback)
     {
@@ -54,6 +57,8 @@ public class IngameUI : MonoBehaviour
         _buttonViewMap.onClick.AddListener(OnMap);
         _buttonGameMenu.onClick.AddListener(OnOpenGameMenu);
         _buttonNextRound.onClick.AddListener(OnNextRound);
+        _buttonGiveUp.onClick.AddListener(OnGiveUp);
+        _buttonResurrection.onClick.AddListener(OnResurrection);
         _buttonOpenPlayerInformation.onClick.AddListener(OnOpenClosePlayerInformation);
 
         _objNextRound.SetActive(false);
@@ -90,11 +95,31 @@ public class IngameUI : MonoBehaviour
 
         _onNextRoundCallback?.Invoke(_type);
 
-        if(_type != eRoundClear.Fail)
+        _objNextRound.SetActive(false);
+        _type = eRoundClear.Non;
+    }
+
+    private void OnGiveUp()
+    {
+        GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+
+        _onNextRoundCallback?.Invoke(_type);
+        _type = eRoundClear.Non;
+    }
+
+    private void OnResurrection()
+    {
+        if(_resurrectionCount == 0)
         {
-            _objNextRound.SetActive(false);
+            return;
         }
 
+        // AD
+
+        GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+
+        _onNextRoundCallback?.Invoke(_type);
+        _resurrectionCount--;
         _type = eRoundClear.Non;
     }
 
@@ -107,26 +132,43 @@ public class IngameUI : MonoBehaviour
     {
         _type = type;
 
+        _buttonNextRound.gameObject.SetActive(false);
+        _buttonGiveUp.gameObject.SetActive(false);
+        _buttonResurrection.gameObject.SetActive(false);
+
         switch (type)
         {
             case eRoundClear.First:
                 _textLabel.text = "게임을 시작합니다.";
                 _textButtonLabel.text = "시작";
+                _buttonNextRound.gameObject.SetActive(true);
                 break;
 
             case eRoundClear.Load:
                 _textLabel.text = "이어하기";
                 _textButtonLabel.text = "시작";
+                _buttonNextRound.gameObject.SetActive(true);
                 break;
 
             case eRoundClear.Success:
                 _textLabel.text = "라운드를 돌파하셨습니다.";
                 _textButtonLabel.text = "다음 라운드로";
+                _buttonNextRound.gameObject.SetActive(true);
                 break;
 
             case eRoundClear.Fail:
                 _textLabel.text = "라운드를 실패하셨습니다." + "\n" + content;
                 _textButtonLabel.text = "메인 메뉴로";
+
+                if(_resurrectionCount == 0)
+                {
+                    _buttonNextRound.gameObject.SetActive(true);
+                }
+                else if(_resurrectionCount > 0)
+                {
+                    _buttonGiveUp.gameObject.SetActive(true);
+                    _buttonResurrection.gameObject.SetActive(true);
+                }
                 break;
         }
 

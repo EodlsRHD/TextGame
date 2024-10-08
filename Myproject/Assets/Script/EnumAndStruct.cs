@@ -27,7 +27,8 @@ public enum eRoundClear
     First,
     Load,
     Success,
-    Fail
+    Fail,
+    Restart
 }
 
 public enum eCreature

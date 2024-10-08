@@ -276,7 +276,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Book_16
+      name: Monster_1
       rect:
         serializedVersion: 2
         x: 308
@@ -1497,7 +1497,6 @@ TextureImporter:
       Book_13: -722251471
       Book_14: -1796241948
       Book_15: -809254126
-      Book_16: -827685566
       Book_17: -1138874489
       Book_18: 970864623
       Book_19: -102319252
@@ -1591,6 +1590,7 @@ TextureImporter:
       Book_Down: 1676646971
       Book_Up: 2113094728
       Item: -660914065
+      Monster_1: -827685566
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0
