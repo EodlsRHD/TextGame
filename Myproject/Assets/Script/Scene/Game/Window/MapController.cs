@@ -10,6 +10,7 @@ public class MapController : MonoBehaviour
 
     [Header("Template"), SerializeField] private BlockTemplate _tempalte = null;
     [SerializeField] private Transform _trTemplateParant = null;
+    [SerializeField] private Transform _trTemplateParant_Back = null;
 
     private List<BlockTemplate> _pool = new List<BlockTemplate>();
 
@@ -30,11 +31,15 @@ public class MapController : MonoBehaviour
             _pool.Add(com);
         }
 
+        _trTemplateParant_Back.gameObject.SetActive(GameManager.instance.isMapBackgroundUpdate);
+
         this.gameObject.SetActive(false);
     }
 
     public void SetMap(DataManager.Save_Data saveData, List<int> nearbyIndexs)
     {
+        _trTemplateParant_Back.gameObject.SetActive(GameManager.instance.isMapBackgroundUpdate);
+
         var blockData = saveData.mapData.nodeDatas;
 
         for (int i = 0; i < blockData.Count; i++)
@@ -52,6 +57,7 @@ public class MapController : MonoBehaviour
                 }
             }
 
+            template.gameObject.transform.SetParent(GameManager.instance.isMapBackgroundUpdate == false ? _trTemplateParant : _trTemplateParant_Back);
             template.SetTemplate(same, i == saveData.mapData.exitNodeIndex, blockData[i]);
         }
     }

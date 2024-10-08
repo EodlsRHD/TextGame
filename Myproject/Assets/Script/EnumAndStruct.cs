@@ -142,3 +142,10 @@ public enum eBgm
     Battle,
     Shop
 }
+
+public enum eLanguage
+{
+    Non = -1,
+    Kor,
+    Eng
+}

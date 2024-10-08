@@ -22,6 +22,8 @@ public class GameManager : MonoBehaviour
     [Header("Data Manager"), SerializeField] private DataManager _dataManager = null;
     [Header("Sound Manager"), SerializeField] private SoundManager _soundManager = null;
 
+    private bool _isMapBackgroundUpdate = false;
+
     #region GetSet
 
     public ToolProxy tools
@@ -38,6 +40,8 @@ public class GameManager : MonoBehaviour
     {
         get { return _soundManager; }
     }
+
+    public bool isMapBackgroundUpdate { get; set; }
 
     #endregion
 

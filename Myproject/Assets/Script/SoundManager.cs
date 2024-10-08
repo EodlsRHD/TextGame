@@ -114,8 +114,8 @@ public class SoundManager : MonoBehaviour
 
     public void MuteSfx(Action<bool> onCallback)
     {
-        _audioSFX.mute = _audioSFX.mute == true ? false : true;
-        _audioButton.mute = _audioButton.mute == true ? false : true;
+        MuteSfx(_audioSFX.mute == true ? false : true);
+
         PlayerPrefs.SetInt("SFX", _audioSFX.mute == true ? 0 : 1);
 
         onCallback?.Invoke(_audioSFX.mute);
@@ -132,6 +132,12 @@ public class SoundManager : MonoBehaviour
     public void MuteSfx(bool isMute)
     {
         _audioSFX.mute = isMute;
+        _audioButton.mute = isMute;
+        _audioAttack.mute = isMute;
+        _audioHit.mute = isMute;
+        _audioDefence.mute = isMute;
+        _audioBook.mute = isMute;
+        _audioOther.mute = isMute;
     }
 
     public void MuteBgm(bool isMute)

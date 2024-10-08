@@ -56,8 +56,6 @@ public class IngameUI : MonoBehaviour
         _buttonNextRound.onClick.AddListener(OnNextRound);
         _buttonOpenPlayerInformation.onClick.AddListener(OnOpenClosePlayerInformation);
 
-        _buttonViewMap.gameObject.SetActive(false);
-
         _objNextRound.SetActive(false);
 
         _objBlocker.SetActive(false);
@@ -67,14 +65,14 @@ public class IngameUI : MonoBehaviour
 
     public void StartGame()
     {
-        _buttonViewMap.gameObject.SetActive(true);
+        _buttonViewMap.gameObject.SetActive(!GameManager.instance.isMapBackgroundUpdate);
     }
 
     private void OnMap()
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
 
-        _buttonViewMap.gameObject.SetActive(false);
+        _buttonViewMap.gameObject.SetActive(!GameManager.instance.isMapBackgroundUpdate);
 
         _onViewMapCallback?.Invoke(() => { _buttonViewMap.gameObject.SetActive(true); });
     }
@@ -183,5 +181,10 @@ public class IngameUI : MonoBehaviour
 
         _isPlayerInformationOpen = true;
         _playerInformation.Open();
+    }
+
+    public void HideMapButton()
+    {
+        _buttonViewMap.gameObject.SetActive(!GameManager.instance.isMapBackgroundUpdate);
     }
 }

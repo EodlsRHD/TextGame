@@ -5,6 +5,20 @@ using UnityEngine;
 
 public class IngameManager : MonoBehaviour
 {
+    private static IngameManager _instance = null;
+    public static IngameManager instance
+    {
+        get
+        {
+            if (_instance == null)
+            {
+                _instance = new IngameManager();
+            }
+
+            return _instance;
+        }
+    }
+
     [Header("Ingame UI"), SerializeField] private IngameUI _ingameUI = null;
     [Header("TextView"), SerializeField] private TextView _textView = null;
     [Header("Control"), SerializeField] private ControlPad _controlPad = null;
@@ -20,6 +34,8 @@ public class IngameManager : MonoBehaviour
 
     void Start()
     {
+        _instance = this;
+
         GameManager.instance.tools.Fade(true, null);
         GameManager.instance.soundManager.PlaySfx(eSfx.SceneChange);
 
@@ -1375,6 +1391,12 @@ public class IngameManager : MonoBehaviour
     #endregion
 
     #region Function
+
+    public void UpdateMap()
+    {
+        _ingameUI.HideMapButton();
+        _mapController.UpdateMapData(_saveData, PlayerVision());
+    }
 
     private void UpdateData(string contnet = null)
     {

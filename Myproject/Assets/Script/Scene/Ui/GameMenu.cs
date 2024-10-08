@@ -43,8 +43,10 @@ public class GameMenu : MonoBehaviour
         _buttonViewMap.onClick.AddListener(OnViewMap);
         _buttonCredit.onClick.AddListener(OnCredit);
 
-        bool isSFX = PlayerPrefs.GetInt("SFX", 1) == 0 ? false : true;
-        bool isBGM = PlayerPrefs.GetInt("BGM", 1) == 0 ? false : true;
+        GameManager.instance.isMapBackgroundUpdate = PlayerPrefs.GetInt("MAP_BACKGROUND", 0) == 1 ? true : false;
+
+        bool isSFX = PlayerPrefs.GetInt("SFX") == 0 ? false : true;
+        bool isBGM = PlayerPrefs.GetInt("BGM") == 0 ? false : true;
 
         GameManager.instance.soundManager.MuteSfx(!isSFX);
         GameManager.instance.soundManager.MuteBgm(!isBGM);
@@ -135,7 +137,13 @@ public class GameMenu : MonoBehaviour
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
 
-        UiManager.instance.OpenPopup("시스템", "아직 준비중입니다.", string.Empty, null);
+        PlayerPrefs.SetInt("MAP_BACKGROUND", !GameManager.instance.isMapBackgroundUpdate == true ? 1 : 0);
+        GameManager.instance.isMapBackgroundUpdate = PlayerPrefs.GetInt("MAP_BACKGROUND") == 1 ? true : false;
+
+        if (IngameManager.instance != null)
+        {
+            IngameManager.instance.UpdateMap();
+        }
     }
 
     private void OnCredit()
