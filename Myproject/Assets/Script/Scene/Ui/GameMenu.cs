@@ -67,10 +67,9 @@ public class GameMenu : MonoBehaviour
     public void Close()
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+        GameManager.instance.googleAds.HideGameMenuAd();
 
         this.gameObject.SetActive(false);
-
-        GameManager.instance.googleAds.HideGameMenuAd();
     }
 
     private void OnClose()
@@ -98,8 +97,15 @@ public class GameMenu : MonoBehaviour
 
         UiManager.instance.OpenPopup("시스템", "저장하시겠습니까?", string.Empty, string.Empty, () =>
         {
-            GameManager.instance.dataManager.SaveDataToCloud(null, () => 
+            GameManager.instance.dataManager.SaveDataToCloud(null, (result) => 
             {
+                if(result == false)
+                {
+                    UiManager.instance.OpenPopup(string.Empty, "저장에 실패하였습니다. 잠시후 다시 시도해주세요.", string.Empty, null);
+
+                    return;
+                }
+
                 GameManager.instance.tools.Fade(false, () =>
                 {
                     GameManager.instance.soundManager.PlaySfx(eSfx.GotoLobby);

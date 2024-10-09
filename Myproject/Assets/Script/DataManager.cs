@@ -397,42 +397,79 @@ public class DataManager : MonoBehaviour
         return _saveData;
     }
 
-    public bool CheckSaveData()
+    public void SaveDataToCloud(Save_Data saveData = null, Action<bool> onSaveOrLoadCallback = null)
     {
-        if(_saveData == null)
+        if(saveData != null)
         {
-            return false;
+            _saveData = saveData;
         }
 
-        return !(_saveData.userData.data.name.Length == 0);
-    }
-
-    public void SaveDataToCloud(Save_Data saveData = null, Action onSaveOrLoadCallback = null)
-    {
         var request = new
         {
-            data = saveData
+            data = _saveData
         };
 
         string json = JsonConvert.SerializeObject(request);
+
+#if UNITY_EDITOR
+
         PlayerPrefs.SetString("SAVE", json);
 
-        onSaveOrLoadCallback?.Invoke();
+        onSaveOrLoadCallback?.Invoke(true);
+
+        return;
+#endif
+
+        GameManager.instance.googlePlayGameServeice.SaveData(json, (result) =>
+        {
+            onSaveOrLoadCallback?.Invoke(result);
+        });
     }
 
-    public void LoadDataToCloud(Action onSaveOrLoadCallback = null)
+    public void LoadDataToCloud(Action<bool> onSaveOrLoadCallback = null)
     {
-        string json = PlayerPrefs.GetString("SAVE");
+#if UNITY_EDITOR
+        string pjson = PlayerPrefs.GetString("SAVE");
 
-        var respons = new
+        if(pjson.Length == 0)
+        {
+            onSaveOrLoadCallback?.Invoke(false);
+
+            return;
+        }
+
+        var prespons = new
         {
             data = new Save_Data()
         };
 
-        var result = JsonConvert.DeserializeAnonymousType(json, respons);
-        _saveData = result.data;
+        var presult = JsonConvert.DeserializeAnonymousType(pjson, prespons);
+        _saveData = presult.data;
 
-        onSaveOrLoadCallback?.Invoke();
+        onSaveOrLoadCallback?.Invoke(true);
+
+        return;
+#endif
+
+        GameManager.instance.googlePlayGameServeice.LoadData((result, json) =>
+        {
+            if(result == false)
+            {
+                onSaveOrLoadCallback?.Invoke(false);
+
+                return;
+            }
+
+            var respons = new
+            {
+                data = new Save_Data()
+            };
+
+            var data = JsonConvert.DeserializeAnonymousType(json, respons);
+            _saveData = data.data;
+
+            onSaveOrLoadCallback?.Invoke(true);
+        });
     }
 
     public void FailGame(Save_Data saveData)

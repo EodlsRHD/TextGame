@@ -122,7 +122,7 @@ public class IngameManager : MonoBehaviour
             GameManager.instance.soundManager.PlaySfx(eSfx.SceneChange);
         }
 
-        GameManager.instance.dataManager.SaveDataToCloud(_saveData, () => 
+        GameManager.instance.dataManager.SaveDataToCloud(_saveData, (result) => 
         {
             _mapGenerator = new MapGenerator(GenerateMap, _saveData);
 
@@ -153,6 +153,8 @@ public class IngameManager : MonoBehaviour
 
     private void RoundClear()
     {
+        GameManager.instance.dataManager.ChangePlayerData(_saveData);
+
         _mapController.Close();
         _mapController.RemoveTemplate();
         _saveData.round++;

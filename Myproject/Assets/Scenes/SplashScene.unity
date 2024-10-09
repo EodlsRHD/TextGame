@@ -729,6 +729,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1293898994}
   - component: {fileID: 1293898995}
+  - component: {fileID: 1293898996}
   m_Layer: 0
   m_Name: Google
   m_TagString: Untagged
@@ -761,6 +762,21 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: aa8259c53f740ff45bef77eab1528376, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _adResurrectionId: ca-app-pub-3940256099942544/5224354917
+  _adGameMenuId: ca-app-pub-3940256099942544/6300978111
+  _adPopupId: ca-app-pub-3940256099942544/6300978111
+--- !u!114 &1293898996
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1293898993}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9040b24e73ba154d8614c2fb3130d74, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1344980023
@@ -799,6 +815,7 @@ MonoBehaviour:
   _dataManager: {fileID: 1344980027}
   _soundManager: {fileID: 1344980028}
   _googleAds: {fileID: 1293898995}
+  _googlePlayGameServeice: {fileID: 0}
 --- !u!4 &1344980025
 Transform:
   m_ObjectHideFlags: 0

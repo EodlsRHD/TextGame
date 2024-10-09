@@ -22,6 +22,7 @@ public class GameManager : MonoBehaviour
     [Header("Data Manager"), SerializeField] private DataManager _dataManager = null;
     [Header("Sound Manager"), SerializeField] private SoundManager _soundManager = null;
     [Header("Google Ads"), SerializeField] private GoogleAds _googleAds = null;
+    [Header("Google Play Game Serveices"), SerializeField] private GooglePlayGameServeice _googlePlayGameServeice = null;
 
     private bool _isMapBackgroundUpdate = false;
 
@@ -47,6 +48,11 @@ public class GameManager : MonoBehaviour
         get { return _googleAds; }
     }
 
+    public GooglePlayGameServeice googlePlayGameServeice
+    {
+        get { return _googlePlayGameServeice; }
+    }
+
     public bool isMapBackgroundUpdate { get; set; }
 
     #endregion
@@ -59,6 +65,7 @@ public class GameManager : MonoBehaviour
         _toolProxy.Initialize(_soundManager.VolumeDown);
         _dataManager.Initialize();
         _googleAds.Initialize();
+        _googlePlayGameServeice.Initialize();
     }
 
     public void GameError()

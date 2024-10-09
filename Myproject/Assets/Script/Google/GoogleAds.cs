@@ -81,13 +81,12 @@ public class GoogleAds : MonoBehaviour
 
     private void CreateGameMenuBannerView()
     {
-        if (_popupBannerView != null)
+        if (_gameMenuBannerView != null)
         {
             DestroyGameMenuAd();
         }
 
-        AdSize adaptiveSize = AdSize.GetPortraitAnchoredAdaptiveBannerAdSizeWithWidth(AdSize.FullWidth);
-        _gameMenuBannerView = new BannerView(_adGameMenuId, adaptiveSize, AdPosition.Top);
+        _gameMenuBannerView = new BannerView(_adGameMenuId, AdSize.MediumRectangle, AdPosition.Top);
 
         _gameMenuBannerView.LoadAd(new AdRequest());
         _gameMenuBannerView.Hide();
@@ -148,7 +147,7 @@ public class GoogleAds : MonoBehaviour
     {
         if (_popupBannerView == null)
         {
-            CreateGameMenuBannerView();
+            CreatePopupBannerView();
 
             return;
         }
@@ -160,7 +159,7 @@ public class GoogleAds : MonoBehaviour
     {
         if (_popupBannerView == null)
         {
-            CreateGameMenuBannerView();
+            CreatePopupBannerView();
 
             return;
         }

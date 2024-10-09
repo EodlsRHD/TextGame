@@ -34,24 +34,25 @@ public class LobbyManager : MonoBehaviour
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
 
-        if(GameManager.instance.dataManager.CheckSaveData() == false)
+        GameManager.instance.dataManager.LoadDataToCloud((result) =>
         {
-            _createCharacterProfile.Open();
+            if(result == false)
+            {
+                _createCharacterProfile.Open();
 
-            return;
-        }
+                return;
+            }
 
-        UiManager.instance.OpenPopup(string.Empty, "저장된 데이터가 존재합니다." + "\n" + " 이어서 하시겠습니까?", string.Empty, string.Empty, () =>
-        {
-            GameManager.instance.dataManager.LoadDataToCloud(() => 
+            UiManager.instance.OpenPopup(string.Empty, "저장된 데이터가 존재합니다." + "\n" + " 이어서 하시겠습니까?", string.Empty, string.Empty, () =>
             {
                 GameManager.instance.tools.SceneChange(eScene.Game);
-            });
 
-        }, () =>
-        {
-            _createCharacterProfile.Open();
+            }, () =>
+            {
+                _createCharacterProfile.Open();
+            });
         });
+
     }
 
     private void OnSettings()
