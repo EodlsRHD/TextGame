@@ -29,13 +29,13 @@ public class IngameUI : MonoBehaviour
     [Header("Player Information"), SerializeField] private PlayerInformation _playerInformation = null;
 
     [SerializeField] private Button _buttonOpenPlayerInformation = null;
+    [SerializeField] private Button _buttonClosePlayerInformation = null;
 
     private Action<Action> _onViewMapCallback = null;
     private Action<eRoundClear> _onNextRoundCallback = null;
 
     private eRoundClear _type = eRoundClear.Non;
 
-    private bool _isPlayerInformationOpen = false;
     private int _resurrectionCount = 2;
 
     public void Initialize(Action<Action> onViewMapCallback, Action<eRoundClear> onNextRoundCallback, Action<string> onUpdateTextCallback, Action<string> onUpdatePopupCallback)
@@ -59,7 +59,8 @@ public class IngameUI : MonoBehaviour
         _buttonNextRound.onClick.AddListener(OnNextRound);
         _buttonGiveUp.onClick.AddListener(OnGiveUp);
         _buttonResurrection.onClick.AddListener(OnResurrection);
-        _buttonOpenPlayerInformation.onClick.AddListener(OnOpenClosePlayerInformation);
+        _buttonOpenPlayerInformation.onClick.AddListener(OnOpenPlayerInformation);
+        _buttonClosePlayerInformation.onClick.AddListener(OnClosePlayerInformation);
 
         _objNextRound.SetActive(false);
 
@@ -213,20 +214,23 @@ public class IngameUI : MonoBehaviour
         _levelPoint.Close();
     }
 
-    private void OnOpenClosePlayerInformation()
+    private void OnOpenPlayerInformation()
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
 
-        if (_isPlayerInformationOpen == true)
-        {
-            _isPlayerInformationOpen = false;
-            _playerInformation.Close();
-
-            return;
-        }
-
-        _isPlayerInformationOpen = true;
+        _buttonOpenPlayerInformation.gameObject.SetActive(false);
         _playerInformation.Open();
+
+    }
+
+    private void OnClosePlayerInformation()
+    {
+        GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+
+        _playerInformation.Close(() => 
+        {
+            _buttonOpenPlayerInformation.gameObject.SetActive(true);
+        });
     }
 
     public void HideMapButton()

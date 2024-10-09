@@ -79,10 +79,11 @@ public class PlayerInformation : MonoBehaviour
         // MOVE Open
     }
 
-    public void Close()
+    public void Close(System.Action onResultCallback)
     {
         // MOVE Hide
 
+        onResultCallback?.Invoke();
         _userData = null;
     }
 }

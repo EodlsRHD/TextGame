@@ -8,7 +8,12 @@ public class Encyclopedia : MonoBehaviour
 {
     [SerializeField] private Button _buttonClose = null;
 
+    [Header("Toggle")]
+    [SerializeField] private Toggle _toggleCreature = null;
+
     private Action _onCloseCallback = null;
+
+    private DataManager.Encyclopedia_Data _data = null;
 
     public void Initialize(Action onCloseCallback)
     {
@@ -19,15 +24,22 @@ public class Encyclopedia : MonoBehaviour
 
         _buttonClose.onClick.AddListener(OnClose);
 
-        //GameManager.instance.dataManager.LoadEncyclopediaToCloud()
-        //GameManager.instance.dataManager.CopyEncyclopediaData()
-
         this.gameObject.SetActive(false);
     }
 
     public void Open()
     {
-        this.gameObject.SetActive(true);
+        GameManager.instance.dataManager.LoadEncyclopediaToCloud((result) =>
+        {
+            if(result  == false)
+            {
+                return;
+            }
+
+            _data = GameManager.instance.dataManager.CopyEncyclopediaData();
+
+            this.gameObject.SetActive(true);
+        });
     }
 
     public void Close()
