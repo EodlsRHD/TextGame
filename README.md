@@ -5,8 +5,9 @@ use Asset
 2. NewtonSoft Json | com.unity.nuget.newtonsoft-json
 3. DoTween
 4. gradle 6.7.1
-5. Google Ad Mob
-// GPGS | in google dirve (eodls0810.dev@gmail.com)
+5. Google Ad Mob 9.2.1
+6. Google Ad Mob Native
+// GPGS 0.11.01
 
 use font
 1. NeoDunggeunmoPro-Regular SDF
