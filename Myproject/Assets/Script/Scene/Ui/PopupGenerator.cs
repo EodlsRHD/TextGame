@@ -46,7 +46,9 @@ public class PopupGenerator : MonoBehaviour
 
     public void Open_OneButton(string title, string content, string buttonText, Action onButtonCallback = null)
     {
-        if(onButtonCallback != null)
+        GameManager.instance.googleAds.ShowPopupAd();
+
+        if (onButtonCallback != null)
         {
             _onMiddleCallback = onButtonCallback;
         }
@@ -63,6 +65,8 @@ public class PopupGenerator : MonoBehaviour
 
     public void Open_TwoButton(string title, string content, string leftButtonText, string rightButtonText, Action onLeftButtonCallback = null, Action onRightButtonCallback = null)
     {
+        GameManager.instance.googleAds.ShowPopupAd();
+
         if (onLeftButtonCallback != null)
         {
             _onLeftCallback = onLeftButtonCallback;
@@ -87,6 +91,8 @@ public class PopupGenerator : MonoBehaviour
 
     public void ClosePopup()
     {
+        GameManager.instance.googleAds.HidePopupAd();
+
         _textTitle.text = string.Empty;
         _textContent.text = string.Empty;
 

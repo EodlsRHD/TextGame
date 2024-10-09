@@ -8,14 +8,22 @@ public class GoogleAds : MonoBehaviour
 {
     [SerializeField] private string _adResurrectionId = "ca-app-pub-3940256099942544/5224354917";
     [SerializeField] private string _adGameMenuId = "ca-app-pub-3940256099942544/6300978111";
+    [SerializeField] private string _adPopupId = "ca-app-pub-3940256099942544/6300978111";
 
-    private RewardedAd _rewardedAd;
-    private BannerView _bannerView;
+    private RewardedAd _rewardedAd = null;
+    private BannerView _gameMenuBannerView = null;
+    private BannerView _popupBannerView = null;
 
     public void Initialize()
     {
-        MobileAds.Initialize((InitializationStatus initStatus) => { });
+        MobileAds.Initialize((InitializationStatus initStatus) => 
+        {
+            CreateGameMenuBannerView();
+            CreatePopupBannerView();
+        });
     }
+
+    #region reward Resurrection
 
     public void ShowRewardedAd_Resurrection(Action onResultCallback)
     {
@@ -66,4 +74,108 @@ public class GoogleAds : MonoBehaviour
             _rewardedAd = ad;
         });
     }
+
+    #endregion
+
+    #region Benner Gamemenu
+
+    private void CreateGameMenuBannerView()
+    {
+        if (_popupBannerView != null)
+        {
+            DestroyGameMenuAd();
+        }
+
+        AdSize adaptiveSize = AdSize.GetPortraitAnchoredAdaptiveBannerAdSizeWithWidth(AdSize.FullWidth);
+        _gameMenuBannerView = new BannerView(_adGameMenuId, adaptiveSize, AdPosition.Top);
+
+        _gameMenuBannerView.LoadAd(new AdRequest());
+        _gameMenuBannerView.Hide();
+    }
+
+    public void ShowGameMenuAd()
+    {
+        if (_gameMenuBannerView == null)
+        {
+            CreateGameMenuBannerView();
+
+            return;
+        }
+
+        _gameMenuBannerView.Show();
+    }
+
+    public void HideGameMenuAd()
+    {
+        if(_gameMenuBannerView == null)
+        {
+            CreateGameMenuBannerView();
+
+            return;
+        }
+
+        _gameMenuBannerView.Hide();
+    }
+
+    private void DestroyGameMenuAd()
+    {
+        if (_gameMenuBannerView != null)
+        {
+            _gameMenuBannerView.Destroy();
+            _gameMenuBannerView = null;
+        }
+    }
+
+    #endregion
+
+    #region Benner Gamemenu
+
+    private void CreatePopupBannerView()
+    {
+        if (_popupBannerView != null)
+        {
+            DestroyPopupAd();
+        }
+
+        AdSize adaptiveSize = AdSize.GetPortraitAnchoredAdaptiveBannerAdSizeWithWidth(AdSize.FullWidth);
+        _popupBannerView = new BannerView(_adPopupId, adaptiveSize, AdPosition.Bottom);
+
+        _popupBannerView.LoadAd(new AdRequest());
+        _popupBannerView.Hide();
+    }
+
+    public void ShowPopupAd()
+    {
+        if (_popupBannerView == null)
+        {
+            CreateGameMenuBannerView();
+
+            return;
+        }
+
+        _popupBannerView.Show();
+    }
+
+    public void HidePopupAd()
+    {
+        if (_popupBannerView == null)
+        {
+            CreateGameMenuBannerView();
+
+            return;
+        }
+
+        _popupBannerView.Hide();
+    }
+
+    private void DestroyPopupAd()
+    {
+        if (_popupBannerView != null)
+        {
+            _popupBannerView.Destroy();
+            _popupBannerView = null;
+        }
+    }
+
+    #endregion
 }

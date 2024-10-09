@@ -150,3 +150,10 @@ public enum eLanguage
     Kor,
     Eng
 }
+
+public enum eBennerAd
+{
+    Non = -1,
+    Gamemenu,
+    Popup
+}

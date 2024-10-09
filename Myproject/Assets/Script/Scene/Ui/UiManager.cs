@@ -39,6 +39,7 @@ public class UiManager : MonoBehaviour
 
         _buttonCloseRankings.onClick.AddListener(CloseRankings);
 
+        _rankings.SetActive(false);
         ActiveBlocker(false);
     }
 

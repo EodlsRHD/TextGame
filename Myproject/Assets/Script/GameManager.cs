@@ -58,6 +58,7 @@ public class GameManager : MonoBehaviour
 
         _toolProxy.Initialize(_soundManager.VolumeDown);
         _dataManager.Initialize();
+        _googleAds.Initialize();
     }
 
     public void GameError()

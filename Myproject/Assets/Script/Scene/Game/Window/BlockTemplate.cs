@@ -34,16 +34,16 @@ public class BlockTemplate : MonoBehaviour
             _imageBlock.enabled = true;
             _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eCreature.Fog);
             color = Color.gray;
-            color.a = 0.5f;
+            color.a = 0.7f;
 
         }
         else if(isNearby == false && _isRresrarch == true)
         {
             if (blockData.isWalkable == true)
             {
-                _imageBlock.enabled = false;
+                _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eCreature.Fog);
                 color = Color.white;
-                color.a = 0.5f;
+                color.a = 0.2f;
             }
             else if (blockData.isWalkable == false)
             {
@@ -123,6 +123,11 @@ public class BlockTemplate : MonoBehaviour
 
     private void SetColor(Color color)
     {
+        if(GameManager.instance.isMapBackgroundUpdate == true)
+        {
+            color.a = 0.7f;
+        }
+
         _imageBlock.color = color;
     }
 }
