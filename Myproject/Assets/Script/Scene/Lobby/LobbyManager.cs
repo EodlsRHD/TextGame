@@ -14,6 +14,11 @@ public class LobbyManager : MonoBehaviour
     [SerializeField] private Button _buttonDictionary = null;
     [SerializeField] private TMP_Text _textVersion = null;
 
+    [Header("Mark")]
+    [SerializeField] private GameObject _objRed = null;
+    [SerializeField] private GameObject _objGreen = null;
+    [SerializeField] private GameObject _objBlue = null;
+
     private void Start()
     {
         GameManager.instance.tools.Fade(true, null);
@@ -49,6 +54,7 @@ public class LobbyManager : MonoBehaviour
 
             }, () =>
             {
+                GameManager.instance.dataManager.FailGame();
                 _createCharacterProfile.Open();
             });
         });
@@ -57,16 +63,24 @@ public class LobbyManager : MonoBehaviour
 
     private void OnSettings()
     {
+        _objBlue.SetActive(false);
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
 
-        UiManager.instance.OpenSettings();
+        UiManager.instance.OpenSettings(() => 
+        {
+            _objBlue.SetActive(true);
+        });
     }
 
     private void OnDictionary()
     {
+        _objGreen.SetActive(false);
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
 
-        UiManager.instance.OpenEncyclopedia();
+        UiManager.instance.OpenEncyclopedia(() =>
+        {
+            _objGreen.SetActive(true);
+        });
     }
 
     private void NewGame()

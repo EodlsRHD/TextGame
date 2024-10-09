@@ -11,9 +11,10 @@ public class GooglePlayGameServeice : MonoBehaviour
 {
     private Action<bool> _onSaveResultCallback = null;
     private Action<bool, string> _onLoadResultCallback = null;
-    private Action<bool> _onCheckResultCallback = null;
+    private Action<bool> _onDeleteCallback = null;
 
-    private const string SAVEFILE = "SAVEFILE";
+    private const string GPGS_SAVEFILE = "SAVEFILE";
+    private const string GPGS_ENCYCLOPEDIA = "ENCYCLOPEDIA";
 
     private string _saveJson = string.Empty;
 
@@ -47,6 +48,8 @@ public class GooglePlayGameServeice : MonoBehaviour
 
     }
 
+    #region Save
+
     public void SaveData(string json, Action<bool> onSaveResultCallback)
     {
         if(onSaveResultCallback != null)
@@ -56,25 +59,26 @@ public class GooglePlayGameServeice : MonoBehaviour
 
         _saveJson = json;
 
-        OpenSaveGame();
+        OpenSaveGame(GPGS_SAVEFILE);
     }
 
-    public void LoadData(Action<bool, string> onLoadResultCallback)
+    public void SaveEncylopediaData(string json, Action<bool> onSaveResultCallback)
     {
-        if(onLoadResultCallback !=null)
+        if (onSaveResultCallback != null)
         {
-            _onLoadResultCallback = onLoadResultCallback;
+            _onSaveResultCallback = onSaveResultCallback;
         }
 
-        OpenLoadGame();
+        _saveJson = json;
+
+        OpenSaveGame(GPGS_ENCYCLOPEDIA);
     }
 
-    private void OpenSaveGame()
+    private void OpenSaveGame(string Filename)
     {
         ISavedGameClient saveGameClient = PlayGamesPlatform.Instance.SavedGame;
 
-        // 데이터 접근
-        saveGameClient.OpenWithAutomaticConflictResolution(SAVEFILE,
+        saveGameClient.OpenWithAutomaticConflictResolution(Filename,
             DataSource.ReadCacheOrNetwork,
             ConflictResolutionStrategy.UseLastKnownGood,
             onsavedGameOpend);
@@ -112,14 +116,39 @@ public class GooglePlayGameServeice : MonoBehaviour
             return;
         }
 
+        _saveJson = string.Empty;
         _onSaveResultCallback?.Invoke(true);
     }
 
-    private void OpenLoadGame()
+    #endregion
+
+    #region Load
+
+    public void LoadData(Action<bool, string> onLoadResultCallback)
+    {
+        if (onLoadResultCallback != null)
+        {
+            _onLoadResultCallback = onLoadResultCallback;
+        }
+
+        OpenLoadGame(GPGS_SAVEFILE);
+    }
+
+    public void LoadEncylopediaData(Action<bool, string> onLoadResultCallback)
+    {
+        if (onLoadResultCallback != null)
+        {
+            _onLoadResultCallback = onLoadResultCallback;
+        }
+
+        OpenLoadGame(GPGS_ENCYCLOPEDIA);
+    }
+
+    private void OpenLoadGame(string filename)
     {
         ISavedGameClient saveGameClient = PlayGamesPlatform.Instance.SavedGame;
 
-        saveGameClient.OpenWithAutomaticConflictResolution(SAVEFILE,
+        saveGameClient.OpenWithAutomaticConflictResolution(filename,
             DataSource.ReadCacheOrNetwork,
             ConflictResolutionStrategy.UseLastKnownGood,
             LoadGameData);
@@ -137,7 +166,6 @@ public class GooglePlayGameServeice : MonoBehaviour
 
             return;
         }
-        Debug.Log("!! GoodLee");
 
         saveGameClient.ReadBinaryData(data, onSavedGameDataRead);
     }
@@ -149,6 +177,8 @@ public class GooglePlayGameServeice : MonoBehaviour
 
         if(data.Length == 0)
         {
+            Debug.LogError("onSavedGameDataRead Failed");
+
             _onLoadResultCallback?.Invoke(false, string.Empty);
 
             return;
@@ -156,4 +186,45 @@ public class GooglePlayGameServeice : MonoBehaviour
 
         _onLoadResultCallback?.Invoke(true, data);
     }
+
+    #endregion
+
+    #region Delete
+
+    public void DeleteData(Action<bool> onDeleteCallback)
+    {
+        if(onDeleteCallback != null)
+        {
+            _onDeleteCallback = onDeleteCallback;
+        }
+
+        DeleteGameData(GPGS_SAVEFILE);
+    }
+
+    void DeleteGameData(string filename)
+    {
+        // Open the file to get the metadata.
+        ISavedGameClient savedGameClient = PlayGamesPlatform.Instance.SavedGame;
+        savedGameClient.OpenWithAutomaticConflictResolution(filename, DataSource.ReadCacheOrNetwork,
+            ConflictResolutionStrategy.UseLongestPlaytime, DeleteSavedGame);
+    }
+
+    public void DeleteSavedGame(SavedGameRequestStatus status, ISavedGameMetadata game)
+    {
+        if (status != SavedGameRequestStatus.Success)
+        {
+            Debug.LogError("DeleteSavedGame Failed");
+
+            _onDeleteCallback?.Invoke(false);
+
+            return;
+        }
+
+        ISavedGameClient savedGameClient = PlayGamesPlatform.Instance.SavedGame;
+        savedGameClient.Delete(game);
+
+        _onDeleteCallback?.Invoke(true);
+    }
+
+    #endregion
 }

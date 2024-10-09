@@ -82,27 +82,32 @@ public class IngameManager : MonoBehaviour
 
     private void OpenNextRound(eRoundClear type)
     {
-        _textView.DeleteTemplate();
-
-        if (type == eRoundClear.Load)
+        if(type == eRoundClear.Restart)
         {
+            _textView.UpdateText("--- 부활하였습니다.");
+
+            Debug.LogError(type + "      " + _saveData.userData.maximumHP);
+            GameManager.instance.dataManager.ResetPlayerData();
             _ingameUI.UpdatePlayerInfo(_saveData.userData);
 
             return;
         }
 
-        if(type == eRoundClear.Restart)
-        {
-            _textView.UpdateText("--- 부활하였습니다.");
+        _textView.DeleteTemplate();
 
-            _saveData.userData.Reset();
-            _ingameUI.UpdatePlayerInfo(_saveData.userData);
+        if (type == eRoundClear.Load)
+        {
+            Debug.LogError(type + "      " + _saveData.userData.maximumHP);
+            _ingameUI.StartGame();
+            RoundSet();
 
             return;
         }
 
         if (type == eRoundClear.Fail)
         {
+            GameManager.instance.dataManager.DeleteData();
+
             GameManager.instance.tools.Fade(false, () => 
             {
                 GameManager.instance.soundManager.PlaySfx(eSfx.GotoLobby);
@@ -126,6 +131,9 @@ public class IngameManager : MonoBehaviour
         {
             _mapGenerator = new MapGenerator(GenerateMap, _saveData);
 
+            Debug.LogError(type + "      " + _saveData.userData.maximumHP);
+
+            GameManager.instance.dataManager.ResetPlayerData();
             _ingameUI.UpdatePlayerInfo(_saveData.userData);
         }); 
     }
@@ -142,6 +150,8 @@ public class IngameManager : MonoBehaviour
     {
         _textView.UpdateText(_saveData.mapData.nodeDatas[_saveData.userData.data.currentNodeIndex]);
         _ingameUI.SetRoundText(_saveData.round);
+
+        UpdateData();
 
         PlayerTurn();
 
@@ -1640,7 +1650,6 @@ public class MapGenerator
         SelectExitBlock();
         Done();
     }
-
     private void GenerateBlocker()
     {
         List<int> middlePoints = new List<int>();
@@ -2061,7 +2070,15 @@ public class CreatureGenerator
             openNodeCount++;
         }
 
-        int monsterSpawnCount = Random.Range(2, openNodeCount / _saveData.mapData.mapSize);
+        int monsterSpawnCount = 0;
+        if (_saveData.round < 3)
+        {
+            monsterSpawnCount = _saveData.round;
+        }
+        else
+        {
+            monsterSpawnCount = Random.Range(3, openNodeCount / _saveData.mapData.mapSize);
+        }
 
         for (int i = 0; i < monsterSpawnCount; i++)
         {
@@ -2085,7 +2102,7 @@ public class CreatureGenerator
 
     private void MonsterStats(ref DataManager.Creature_Data creature)
     {
-        float increasePoint = (_saveData.round * 0.1f);
+        float increasePoint = ((_saveData.round - 1) * 0.1f);
 
         creature.coin += (ushort)(creature.coin * increasePoint);
         creature.hp += (ushort)(creature.hp * increasePoint);

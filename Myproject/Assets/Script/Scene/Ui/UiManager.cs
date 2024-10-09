@@ -25,9 +25,16 @@ public class UiManager : MonoBehaviour
     [Header("Popup"), SerializeField] private PopupGenerator _popupGenerator = null;
     [Header("Game Menu"), SerializeField] private GameMenu _gameMenu = null;
     [Header("Tutorial"), SerializeField] private Tutorial _tutorial = null;
-    [Header("Rankings"), SerializeField] private GameObject _rankings = null;
+    [Header("Settings"), SerializeField] private Settings _settings = null;
+    [Header("Encyclopedia"), SerializeField] private Encyclopedia _encyclopedias = null;
 
+    [Space(10)]
+
+    [Header("Rankings"), SerializeField] private GameObject _rankings = null;
     [SerializeField] private Button _buttonCloseRankings = null;
+
+    [Header("Cradit"), SerializeField] private GameObject _cradit = null;
+    [SerializeField] private Button _buttonCloseCradit = null;
 
     private void Awake()
     {
@@ -36,11 +43,17 @@ public class UiManager : MonoBehaviour
         _popupGenerator.Initialize(ClosePopup);
         _gameMenu.Initialize(CloseMenu);
         _tutorial.Initialize(CloseTutorial);
+        _settings.Initialize(ClsoeSettings);
+        _encyclopedias.Initialize(CloseEncyclopedia);
 
         _buttonCloseRankings.onClick.AddListener(CloseRankings);
+        _buttonCloseCradit.onClick.AddListener(CloseCradit);
 
         _rankings.SetActive(false);
+        _cradit.SetActive(false);
         ActiveBlocker(false);
+
+        this.gameObject.SetActive(true);
     }
 
     private void ActiveBlocker(bool isActive)
@@ -99,16 +112,26 @@ public class UiManager : MonoBehaviour
 
     #region Settings
 
-    public void OpenSettings()
-    {
-        //ActiveBlocker(true);
+    private Action _onSettingsCloseResultCallback = null;
 
-        OpenPopup("시스템", "아직 준비중입니다.", string.Empty, null);
+    public void OpenSettings(Action onCloseResultCallback = null)
+    {
+        ActiveBlocker(true);
+
+        if(onCloseResultCallback != null)
+        {
+            _onSettingsCloseResultCallback = onCloseResultCallback;
+        }
+
+        _settings.Open();
     }
 
     private void ClsoeSettings()
     {
-        //ActiveBlocker(false);
+        ActiveBlocker(false);
+
+        _settings.Close();
+        _onSettingsCloseResultCallback?.Invoke();
     }
 
     #endregion
@@ -133,16 +156,26 @@ public class UiManager : MonoBehaviour
 
     #region Encyclopedia
 
-    public void OpenEncyclopedia()
-    {
-        //ActiveBlocker(true);
+    private Action _onEncyclopediaCloseResultCallback = null;
 
-        OpenPopup("시스템", "아직 준비중입니다.", string.Empty, null);
+    public void OpenEncyclopedia(Action onCloseResultCallback = null)
+    {
+        ActiveBlocker(true);
+
+        if(onCloseResultCallback != null)
+        {
+            _onEncyclopediaCloseResultCallback = onCloseResultCallback;
+        }
+
+        _encyclopedias.Open();
     }
 
-    private void CloseEncyclopedia()
+    public void CloseEncyclopedia()
     {
-        //ActiveBlocker(false);
+        ActiveBlocker(false);
+
+        _encyclopedias.Close();
+        _onEncyclopediaCloseResultCallback?.Invoke();
     }
 
     #endregion
@@ -159,6 +192,24 @@ public class UiManager : MonoBehaviour
     private void CloseTutorial()
     {
         //ActiveBlocker(false);
+    }
+
+    #endregion
+
+    #region Cradit
+
+    public void OpenCradit()
+    {
+        ActiveBlocker(true);
+
+        _cradit.SetActive(true);
+    }
+
+    public void CloseCradit()
+    {
+        ActiveBlocker(false);
+
+        _cradit.SetActive(false);
     }
 
     #endregion

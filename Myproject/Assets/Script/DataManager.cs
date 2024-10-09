@@ -95,19 +95,16 @@ public class DataManager : MonoBehaviour
         public ushort maximumHP
         {
             get { return (ushort)(_defultHP * data.hp); }
-            set { data.hp = (ushort)value; }
         }
 
         public ushort maximumMP
         {
             get { return (ushort)(_defultMP * data.mp); }
-            set { data.mp = (ushort)value; }
         }
 
         public ushort maximumAP
         {
             get { return (ushort)(_defultAP * data.ap); }
-            set { data.ap = (ushort)value; }
         }
 
         public ushort maximumEXP
@@ -118,55 +115,24 @@ public class DataManager : MonoBehaviour
         public ushort maximumATTACK
         {
             get { return (ushort)((_defultATTACK * data.attack) + ((_defultATTACK * data.attack) * 0.01f * Attack_Effect_Per)); }
-            set { data.attack = (ushort)value; }
         }
 
         public ushort maximumDEFENCE
         {
             get { return (ushort)(_defultDEFENCE * data.defence + ((_defultDEFENCE * data.defence) * 0.01f * Defence_Effect_Per)); }
-            set { data.defence = (ushort)value; }
         }
 
         public ushort maximumVISION
         {
             get { return (ushort)(_defultVISION * data.vision); }
-            set 
-            { 
-                if(value > 5)
-                {
-                    return;
-                }
-
-                data.vision = (ushort)value; 
-            }
         }
 
         public ushort maximumATTACKRANGE
         {
             get { return (ushort)(_defultATTACKRANGE * data.attackRange); }
-            set
-            {
-                if (value > 5)
-                {
-                    return;
-                }
-
-                data.attackRange = (ushort)value;
-            }
         }
 
         #endregion
-
-        public void Reset()
-        {
-            currentHP = maximumHP;
-            currentMP = maximumMP;
-            currentAP = maximumAP;
-            currentATTACK = maximumATTACK;
-            currentDEFENCE = maximumDEFENCE;
-            currentVISION = maximumVISION;
-            currentATTACKRANGE = maximumATTACKRANGE;
-        }
     }
 
     [Serializable]
@@ -292,6 +258,7 @@ public class DataManager : MonoBehaviour
     [Serializable]
     public class Save_Data
     {
+        public bool isLoadData = false;
         public ushort round = 0;
 
         public User_Data userData = null;
@@ -323,6 +290,7 @@ public class DataManager : MonoBehaviour
     [Header("Creature Sprite Template"), SerializeField] private List<BlockImageTemplate> _creatureSpriteTemplate = null;
 
     private Save_Data _saveData = null;
+    private Encyclopedia_Data _encyclopediaData = null;
 
     private List<Creature_Data> _creatureDatas = null;
     private List<Npc_Data> _npcDatas = null;
@@ -349,6 +317,13 @@ public class DataManager : MonoBehaviour
         ReadSkillsData();
     }
 
+    public void saveAllData()
+    {
+        SaveDataToCloud(_saveData);
+        OrganizeEncyclopedia(_saveData);
+        SaveEncyclopediaToCloud(_encyclopediaData);
+    }
+
     #region SaveData
 
     public void CreateNewSaveData()
@@ -370,7 +345,7 @@ public class DataManager : MonoBehaviour
         _saveData.userData.coolDownSkill = new List<Skill_CoolDown>();
 
         _saveData.userData.data = new Creature_Data();
-        _saveData.userData.data.hp = 1;
+        _saveData.userData.data.hp = 10;
         _saveData.userData.data.mp = 10;
         _saveData.userData.data.ap = 10;
         _saveData.userData.data.attack = 100;
@@ -386,10 +361,10 @@ public class DataManager : MonoBehaviour
         _saveData.mapData.itemDatas = new List<Item_Data>();
         _saveData.mapData.npcData = new Npc_Data();
 
-        _saveData.encyclopediaData = new Encyclopedia_Data();
-        _saveData.encyclopediaData.creatureDatas = new List<Creature_Data>();
-        _saveData.encyclopediaData.itemDatas = new List<Item_Data>();
-        _saveData.encyclopediaData.skillData = new List<Skill_Data>();
+        _encyclopediaData = new Encyclopedia_Data();
+        _encyclopediaData.creatureDatas = new List<Creature_Data>();
+        _encyclopediaData.itemDatas = new List<Item_Data>();
+        _encyclopediaData.skillData = new List<Skill_Data>();
     }
 
     public Save_Data CopySaveData()
@@ -397,30 +372,63 @@ public class DataManager : MonoBehaviour
         return _saveData;
     }
 
+    public Encyclopedia_Data CopyEncyclopediaData()
+    {
+        return _encyclopediaData;
+    }
+
     public void SaveDataToCloud(Save_Data saveData = null, Action<bool> onSaveOrLoadCallback = null)
     {
-        if(saveData != null)
+        OrganizeEncyclopedia(saveData);
+
+        if (saveData != null)
         {
             _saveData = saveData;
         }
 
-        var request = new
+        Debug.LogError("SaveDataToCloud        " + _saveData.userData.maximumHP);
+
+        var saveRequest = new
         {
             data = _saveData
         };
 
-        string json = JsonConvert.SerializeObject(request);
+        string savejson = JsonConvert.SerializeObject(saveRequest);
 
 #if UNITY_EDITOR
 
-        PlayerPrefs.SetString("SAVE", json);
+        PlayerPrefs.SetString("SAVE", savejson);
 
         onSaveOrLoadCallback?.Invoke(true);
 
         return;
 #endif
 
-        GameManager.instance.googlePlayGameServeice.SaveData(json, (result) =>
+        GameManager.instance.googlePlayGameServeice.SaveData(savejson, (result) =>
+        {
+            onSaveOrLoadCallback?.Invoke(result);
+        });
+    }
+
+    public void SaveEncyclopediaToCloud(Encyclopedia_Data data, Action<bool> onSaveOrLoadCallback = null)
+    {
+        var enRequest = new
+        {
+            data = _encyclopediaData
+        };
+
+        string enjson = JsonConvert.SerializeObject(enRequest);
+
+#if UNITY_EDITOR
+
+        PlayerPrefs.SetString("SAVE_EncylopediaData", enjson);
+
+        onSaveOrLoadCallback?.Invoke(true);
+
+        return;
+#endif
+
+        GameManager.instance.googlePlayGameServeice.SaveEncylopediaData(enjson, (result) =>
         {
             onSaveOrLoadCallback?.Invoke(result);
         });
@@ -429,9 +437,9 @@ public class DataManager : MonoBehaviour
     public void LoadDataToCloud(Action<bool> onSaveOrLoadCallback = null)
     {
 #if UNITY_EDITOR
-        string pjson = PlayerPrefs.GetString("SAVE");
+        string sapjson = PlayerPrefs.GetString("SAVE");
 
-        if(pjson.Length == 0)
+        if (sapjson.Length == 0)
         {
             onSaveOrLoadCallback?.Invoke(false);
 
@@ -443,8 +451,11 @@ public class DataManager : MonoBehaviour
             data = new Save_Data()
         };
 
-        var presult = JsonConvert.DeserializeAnonymousType(pjson, prespons);
+        var presult = JsonConvert.DeserializeAnonymousType(sapjson, prespons);
         _saveData = presult.data;
+        _saveData.isLoadData = true;
+
+        Debug.LogError("LoadDataToCloud        " + _saveData.userData.maximumHP);
 
         onSaveOrLoadCallback?.Invoke(true);
 
@@ -472,39 +483,79 @@ public class DataManager : MonoBehaviour
         });
     }
 
-    public void FailGame(Save_Data saveData)
+    public void LoadEncyclopediaToCloud(Action<bool> onSaveOrLoadCallback = null)
     {
-        OrganizeEncyclopedia(saveData);
+#if UNITY_EDITOR
+        string enpjson = PlayerPrefs.GetString("SAVE_EncylopediaData");
 
-        _saveData = new Save_Data();
-        _saveData.round = 1;
+        if (enpjson.Length == 0)
+        {
+            onSaveOrLoadCallback?.Invoke(false);
 
-        _saveData.userData = new User_Data();
-        _saveData.userData.itemDataIndexs = new List<ushort>();
-        _saveData.userData.itemDataIndexs.Add(501);
+            return;
+        }
 
-        _saveData.userData.skillDataIndexs = new List<ushort>();
-        _saveData.userData.skillDataIndexs.Add(301);
+        var prespons = new
+        {
+            data = new Encyclopedia_Data()
+        };
 
-        _saveData.userData.useSkill = new List<Duration>();
-        _saveData.userData.useItem = new List<Duration>();
-        _saveData.userData.coolDownSkill = new List<Skill_CoolDown>();
+        var presult = JsonConvert.DeserializeAnonymousType(enpjson, prespons);
+        _encyclopediaData = presult.data;
 
-        _saveData.userData.data = new Creature_Data();
-        _saveData.userData.data.hp = 1;
-        _saveData.userData.data.mp = 1;
-        _saveData.userData.data.ap = 10;
-        _saveData.userData.data.attack = 1;
-        _saveData.userData.data.defence = 0;
-        _saveData.userData.data.vision = 1;
-        _saveData.userData.data.attackRange = 1;
+        onSaveOrLoadCallback?.Invoke(true);
 
-        _saveData.mapData = new Map_Data();
-        _saveData.mapData.mapSize = _mapSize;
-        _saveData.mapData.nodeDatas = new List<Node_Data>();
-        _saveData.mapData.monsterDatas = new List<Creature_Data>();
+        return;
+#endif
 
-        SaveDataToCloud(_saveData);
+        GameManager.instance.googlePlayGameServeice.LoadEncylopediaData((result, json) =>
+        {
+            if (result == false)
+            {
+                onSaveOrLoadCallback?.Invoke(false);
+
+                return;
+            }
+
+            var respons = new
+            {
+                data = new Encyclopedia_Data()
+            };
+
+            var data = JsonConvert.DeserializeAnonymousType(json, respons);
+            _encyclopediaData = data.data;
+
+            onSaveOrLoadCallback?.Invoke(true);
+        });
+    }
+
+    public void DeleteData()
+    {
+#if UNITY_EDITOR
+        PlayerPrefs.DeleteKey("SAVE");
+        _saveData = null;
+
+        return;
+#endif
+        GameManager.instance.googlePlayGameServeice.DeleteData((result) =>
+        {
+            if(result == false)
+            {
+                return;
+            }
+
+            _saveData = null;
+        });
+    }
+
+    public void FailGame(Save_Data saveData = null)
+    {
+        if (saveData != null)
+        {
+            OrganizeEncyclopedia(saveData);
+        }
+
+        DeleteData();
     }
 
     public void ChangePlayerData(string name)
@@ -519,27 +570,33 @@ public class DataManager : MonoBehaviour
 
     private void OrganizeEncyclopedia(Save_Data lastData)
     {
-        if(_saveData.encyclopediaData == null)
+        if(lastData == null)
         {
-            _saveData.encyclopediaData = new Encyclopedia_Data();
-            _saveData.encyclopediaData.creatureDatas = new List<Creature_Data>();
-            _saveData.encyclopediaData.itemDatas = new List<Item_Data>();
-            _saveData.encyclopediaData.skillData = new List<Skill_Data>();
+            SaveEncyclopediaToCloud(_encyclopediaData);
+            return;
         }
 
-        if (_saveData.encyclopediaData.maxLevel < lastData.userData.level)
+        if(_encyclopediaData == null)
         {
-            _saveData.encyclopediaData.maxLevel = lastData.userData.level;
-            _saveData.encyclopediaData.maxLevelDate = DateTime.Now.ToString("yyyy-MM-d HH:m:ss:fff");
+            _encyclopediaData = new Encyclopedia_Data();
+            _encyclopediaData.creatureDatas = new List<Creature_Data>();
+            _encyclopediaData.itemDatas = new List<Item_Data>();
+            _encyclopediaData.skillData = new List<Skill_Data>();
         }
 
-        if (_saveData.encyclopediaData.maxRound < lastData.round)
+        if (_encyclopediaData.maxLevel < lastData.userData.level)
         {
-            _saveData.encyclopediaData.maxRound = lastData.round;
-            _saveData.encyclopediaData.maxRoundDate = DateTime.Now.ToString("yyyy-MM-d HH:m:ss:fff");
+            _encyclopediaData.maxLevel = lastData.userData.level;
+            _encyclopediaData.maxLevelDate = DateTime.Now.ToString("yyyy-MM-d HH:m:ss:fff");
         }
 
-        foreach (var saveCreature in _saveData.encyclopediaData.creatureDatas)
+        if (_encyclopediaData.maxRound < lastData.round)
+        {
+            _encyclopediaData.maxRound = lastData.round;
+            _encyclopediaData.maxRoundDate = DateTime.Now.ToString("yyyy-MM-d HH:m:ss:fff");
+        }
+
+        foreach (var saveCreature in _encyclopediaData.creatureDatas)
         {
             foreach (var lastCreature in lastData.encyclopediaData.creatureDatas)
             {
@@ -548,11 +605,11 @@ public class DataManager : MonoBehaviour
                     continue;
                 }
 
-                _saveData.encyclopediaData.creatureDatas.Add(lastCreature);
+                _encyclopediaData.creatureDatas.Add(lastCreature);
             }
         }
 
-        foreach (var saveItem in _saveData.encyclopediaData.itemDatas)
+        foreach (var saveItem in _encyclopediaData.itemDatas)
         {
             foreach (var lastItem in lastData.encyclopediaData.itemDatas)
             {
@@ -561,11 +618,11 @@ public class DataManager : MonoBehaviour
                     continue;
                 }
 
-                _saveData.encyclopediaData.itemDatas.Add(lastItem);
+                _encyclopediaData.itemDatas.Add(lastItem);
             }
         }
 
-        foreach (var saveSkill in _saveData.encyclopediaData.skillData)
+        foreach (var saveSkill in _encyclopediaData.skillData)
         {
             foreach (var lastSkill in lastData.encyclopediaData.skillData)
             {
@@ -574,9 +631,22 @@ public class DataManager : MonoBehaviour
                     continue;
                 }
 
-                _saveData.encyclopediaData.skillData.Add(lastSkill);
+                _encyclopediaData.skillData.Add(lastSkill);
             }
         }
+
+        SaveEncyclopediaToCloud(_encyclopediaData);
+    }
+
+    public void ResetPlayerData()
+    {
+        _saveData.userData.currentHP = _saveData.userData.maximumHP;
+        _saveData.userData.currentMP = _saveData.userData.maximumMP;
+        _saveData.userData.currentAP = _saveData.userData.maximumAP;
+        _saveData.userData.currentATTACK = _saveData.userData.maximumATTACK;
+        _saveData.userData.currentDEFENCE = _saveData.userData.maximumDEFENCE;
+        _saveData.userData.currentVISION = _saveData.userData.maximumVISION;
+        _saveData.userData.currentATTACKRANGE = _saveData.userData.maximumATTACKRANGE;
     }
 
     #endregion

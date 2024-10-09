@@ -815,7 +815,7 @@ MonoBehaviour:
   _dataManager: {fileID: 1344980027}
   _soundManager: {fileID: 1344980028}
   _googleAds: {fileID: 1293898995}
-  _googlePlayGameServeice: {fileID: 0}
+  _googlePlayGameServeice: {fileID: 1293898996}
 --- !u!4 &1344980025
 Transform:
   m_ObjectHideFlags: 0

@@ -68,9 +68,8 @@ public class GameManager : MonoBehaviour
         _googlePlayGameServeice.Initialize();
     }
 
-    public void GameError()
+    private void OnApplicationQuit()
     {
-        _dataManager.SaveDataToCloud();
-        Application.Quit();
+        //_dataManager.saveAllData();
     }
 }
