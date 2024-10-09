@@ -6,16 +6,11 @@ using System;
 
 public class GoogleAds : MonoBehaviour
 {
-
-#if UNITY_ANDROID
-    private string _adUnitId = "ca-app-pub-3940256099942544/5224354917";
-#elif UNITY_IPHONE
-    private string _adUnitId = "ca-app-pub-3940256099942544/1712485313";
-#else
-    private string _adUnitId = "unused";
-#endif
+    [SerializeField] private string _adResurrectionId = "ca-app-pub-3940256099942544/5224354917";
+    [SerializeField] private string _adGameMenuId = "ca-app-pub-3940256099942544/6300978111";
 
     private RewardedAd _rewardedAd;
+    private BannerView _bannerView;
 
     public void Initialize()
     {
@@ -24,6 +19,8 @@ public class GoogleAds : MonoBehaviour
 
     public void ShowRewardedAd_Resurrection(Action onResultCallback)
     {
+        LoadRewardedAd();
+
         const string rewardMsg =
             "Rewarded ad rewarded the user. Type: {0}, amount: {1}.";
 
@@ -55,7 +52,7 @@ public class GoogleAds : MonoBehaviour
         var adRequest = new AdRequest();
 
         // send the request to load the ad.
-        RewardedAd.Load(_adUnitId, adRequest,(RewardedAd ad, LoadAdError error) =>
+        RewardedAd.Load(_adResurrectionId, adRequest,(RewardedAd ad, LoadAdError error) =>
         {
             // if error is not null, the load request failed.
             if (error != null || ad == null)
@@ -68,63 +65,5 @@ public class GoogleAds : MonoBehaviour
             Debug.Log("Rewarded ad loaded with response : " + ad.GetResponseInfo());
             _rewardedAd = ad;
         });
-    }
-
-    private void RegisterReloadHandler(RewardedAd ad)
-    {
-        // Raised when the ad closed full screen content.
-        ad.OnAdFullScreenContentClosed += () =>
-        {
-            Debug.Log("Rewarded Ad full screen content closed.");
-
-            // Reload the ad so that we can show another as soon as possible.
-            LoadRewardedAd();
-        };
-        // Raised when the ad failed to open full screen content.
-        ad.OnAdFullScreenContentFailed += (AdError error) =>
-        {
-            Debug.LogError("Rewarded ad failed to open full screen content " +
-                           "with error : " + error);
-
-            // Reload the ad so that we can show another as soon as possible.
-            LoadRewardedAd();
-        };
-    }
-
-    private void RegisterEventHandlers(RewardedAd ad)
-    {
-        // Raised when the ad is estimated to have earned money.
-        ad.OnAdPaid += (AdValue adValue) =>
-        {
-            Debug.Log(String.Format("Rewarded ad paid {0} {1}.",
-                adValue.Value,
-                adValue.CurrencyCode));
-        };
-        // Raised when an impression is recorded for an ad.
-        ad.OnAdImpressionRecorded += () =>
-        {
-            Debug.Log("Rewarded ad recorded an impression.");
-        };
-        // Raised when a click is recorded for an ad.
-        ad.OnAdClicked += () =>
-        {
-            Debug.Log("Rewarded ad was clicked.");
-        };
-        // Raised when an ad opened full screen content.
-        ad.OnAdFullScreenContentOpened += () =>
-        {
-            Debug.Log("Rewarded ad full screen content opened.");
-        };
-        // Raised when the ad closed full screen content.
-        ad.OnAdFullScreenContentClosed += () =>
-        {
-            Debug.Log("Rewarded ad full screen content closed.");
-        };
-        // Raised when the ad failed to open full screen content.
-        ad.OnAdFullScreenContentFailed += (AdError error) =>
-        {
-            Debug.LogError("Rewarded ad failed to open full screen content " +
-                           "with error : " + error);
-        };
     }
 }

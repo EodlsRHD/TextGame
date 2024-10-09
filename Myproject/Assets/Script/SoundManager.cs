@@ -166,14 +166,14 @@ public class SoundManager : MonoBehaviour
         {
             yield return null;
 
-            if (_audioBGM.volume >= 0.8f)
+            if (_audioBGM.volume >= 0.4f)
             {
-                _audioBGM.volume = 0.8f;
+                _audioBGM.volume = 0.4f;
 
                 break;
             }
 
-            _audioBGM.volume += 0.01f;
+            _audioBGM.volume += 0.005f;
         }
 
         yield return null;
@@ -202,7 +202,7 @@ public class SoundManager : MonoBehaviour
                 break;
             }
 
-            _audioBGM.volume -= 0.05f;
+            _audioBGM.volume -= 0.005f;
         }
 
         onResultCallback?.Invoke();

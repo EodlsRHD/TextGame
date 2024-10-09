@@ -103,7 +103,7 @@ public class IngameUI : MonoBehaviour
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
 
-        _onNextRoundCallback?.Invoke(_type);
+        _onNextRoundCallback?.Invoke(eRoundClear.Fail);
         _type = eRoundClear.Non;
     }
 
@@ -118,7 +118,10 @@ public class IngameUI : MonoBehaviour
 
         GameManager.instance.googleAds.ShowRewardedAd_Resurrection(() =>
         {
-            _onNextRoundCallback?.Invoke(_type);
+            _onNextRoundCallback?.Invoke(eRoundClear.Restart);
+
+            _objNextRound.SetActive(false);
+
             _resurrectionCount--;
             _type = eRoundClear.Non;
         });

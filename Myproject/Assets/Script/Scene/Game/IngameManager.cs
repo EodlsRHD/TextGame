@@ -93,6 +93,8 @@ public class IngameManager : MonoBehaviour
 
         if(type == eRoundClear.Restart)
         {
+            _textView.UpdateText("--- 부활하였습니다.");
+
             _saveData.userData.Reset();
             _ingameUI.UpdatePlayerInfo(_saveData.userData);
 

@@ -17,6 +17,8 @@ public class GameMenu : MonoBehaviour
     [SerializeField] private GameObject _objSfxMute = null;
     [SerializeField] private GameObject _objBgmMute = null;
 
+    [Header("AD"), SerializeField] private Transform _trADPosition = null;
+
     [Space(10)]
 
     [SerializeField] private Button _buttonViewMap = null;
@@ -42,6 +44,8 @@ public class GameMenu : MonoBehaviour
 
         _buttonViewMap.onClick.AddListener(OnViewMap);
         _buttonCredit.onClick.AddListener(OnCredit);
+
+        LoadAD();
 
         GameManager.instance.isMapBackgroundUpdate = PlayerPrefs.GetInt("MAP_BACKGROUND", 0) == 1 ? true : false;
 
@@ -154,5 +158,10 @@ public class GameMenu : MonoBehaviour
 
         // bgm by https://makotohiramatsu.itch.io/
         // sfx by https://zombieham.itch.io/ (book sound)
+    }
+
+    private void LoadAD()
+    {
+        GameManager.instance.googleAds.RequestBanner();
     }
 }
