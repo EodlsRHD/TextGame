@@ -97,7 +97,6 @@ public class IngameManager : MonoBehaviour
 
         if (type == eRoundClear.Load)
         {
-            Debug.LogError(type + "      " + _saveData.userData.maximumHP);
             _ingameUI.StartGame();
             RoundSet();
 
@@ -130,8 +129,6 @@ public class IngameManager : MonoBehaviour
         GameManager.instance.dataManager.SaveDataToCloud(_saveData, (result) => 
         {
             _mapGenerator = new MapGenerator(GenerateMap, _saveData);
-
-            Debug.LogError(type + "      " + _saveData.userData.maximumHP);
 
             GameManager.instance.dataManager.ResetPlayerData();
             _ingameUI.UpdatePlayerInfo(_saveData.userData);
@@ -702,11 +699,14 @@ public class IngameManager : MonoBehaviour
 
         _saveData.userData.data.coin -= price;
         _saveData.userData.itemDataIndexs.Add((ushort)index);
+
+        GameManager.instance.dataManager.AddEncyclopedia_Item(index);
     }
 
     private void Attack(int nodeMonsterIndex, System.Action onLastCallback = null)
     {
         DataManager.Creature_Data monster = _saveData.mapData.monsterDatas.Find(x => x.currentNodeIndex == nodeMonsterIndex);
+        GameManager.instance.dataManager.AddEncyclopedia_Creature(monster.id);
 
         _ingameUI.CallAttacker(_saveData.userData, monster, onLastCallback, (result, damage) => 
         {
@@ -803,6 +803,7 @@ public class IngameManager : MonoBehaviour
                             for (int i = 0; i < monster.itemIndexs.Count; i++)
                             {
                                 _saveData.userData.itemDataIndexs.Add(monster.itemIndexs[i]);
+                                GameManager.instance.dataManager.AddEncyclopedia_Item(monster.itemIndexs[i]);
                             }
                         }
                     }

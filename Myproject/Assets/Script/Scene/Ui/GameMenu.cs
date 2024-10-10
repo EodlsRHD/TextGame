@@ -87,6 +87,7 @@ public class GameMenu : MonoBehaviour
     private void OnEncyclopedia()
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+        GameManager.instance.googleAds.HideGameMenuAd();
 
         UiManager.instance.OpenEncyclopedia();
     }

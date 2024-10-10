@@ -79,6 +79,8 @@ public class LobbyManager : MonoBehaviour
 
         UiManager.instance.OpenEncyclopedia(() =>
         {
+            GameManager.instance.soundManager.PlaySfx(eSfx.GotoLobby);
+
             _objGreen.SetActive(true);
         });
     }

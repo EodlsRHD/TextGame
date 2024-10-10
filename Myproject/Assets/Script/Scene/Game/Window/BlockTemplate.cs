@@ -27,22 +27,23 @@ public class BlockTemplate : MonoBehaviour
         }
 
         Color color = new Color();
-        color = Color.white;
 
         if (isNearby == false && _isRresrarch == false)
         {
             _imageBlock.enabled = true;
             _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eCreature.Fog);
             color = Color.gray;
-            color.a = 0.7f;
+            color.a = 1f;
 
         }
         else if(isNearby == false && _isRresrarch == true)
         {
             if (blockData.isWalkable == true)
             {
+                //_imageBlock.enabled = false; 
+                _imageBlock.enabled = true;
                 _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eCreature.Fog);
-                color = Color.white;
+                color = Color.black;
                 color.a = 0.2f;
             }
             else if (blockData.isWalkable == false)
@@ -66,7 +67,7 @@ public class BlockTemplate : MonoBehaviour
             if (blockData.isWalkable == true)
             {
                 _imageBlock.enabled = false;
-                color.a = 1f;
+                color.a = 0f;
             }
             else if (blockData.isWalkable == false)
             {
@@ -97,7 +98,7 @@ public class BlockTemplate : MonoBehaviour
                 _imageBlock.enabled = true;
                 _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eCreature.Exit);
                 color = Color.red;
-                color.a = 1f;
+                color.a = 0.8f;
             }
         }
 
@@ -105,8 +106,8 @@ public class BlockTemplate : MonoBehaviour
         {
             _imageBlock.enabled = true;
             _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eCreature.Player);
-            color = Color.white;
-            color.a = 1f;
+            color = Color.gray;
+            color.a = 0.8f;
         }
 
         SetColor(color);
@@ -125,7 +126,7 @@ public class BlockTemplate : MonoBehaviour
     {
         if(GameManager.instance.isMapBackgroundUpdate == true)
         {
-            color.a = 0.7f;
+            color.a *= 0.8f;
         }
 
         _imageBlock.color = color;

@@ -252,7 +252,6 @@ public class DataManager : MonoBehaviour
 
         public List<Creature_Data> creatureDatas = null;
         public List<Item_Data> itemDatas = null;
-        public List<Skill_Data> skillData = null;
     }
 
     [Serializable]
@@ -364,7 +363,6 @@ public class DataManager : MonoBehaviour
         _encyclopediaData = new Encyclopedia_Data();
         _encyclopediaData.creatureDatas = new List<Creature_Data>();
         _encyclopediaData.itemDatas = new List<Item_Data>();
-        _encyclopediaData.skillData = new List<Skill_Data>();
     }
 
     public Save_Data CopySaveData()
@@ -385,8 +383,6 @@ public class DataManager : MonoBehaviour
         {
             _saveData = saveData;
         }
-
-        Debug.LogError("SaveDataToCloud        " + _saveData.userData.maximumHP);
 
         var saveRequest = new
         {
@@ -454,8 +450,6 @@ public class DataManager : MonoBehaviour
         var presult = JsonConvert.DeserializeAnonymousType(sapjson, prespons);
         _saveData = presult.data;
         _saveData.isLoadData = true;
-
-        Debug.LogError("LoadDataToCloud        " + _saveData.userData.maximumHP);
 
         onSaveOrLoadCallback?.Invoke(true);
 
@@ -568,6 +562,54 @@ public class DataManager : MonoBehaviour
         _saveData = newData;
     }
 
+    public void AddEncyclopedia_Creature(int id)
+    {
+        if (_encyclopediaData == null)
+        {
+            _encyclopediaData = new Encyclopedia_Data();
+            _encyclopediaData.creatureDatas = new List<Creature_Data>();
+            _encyclopediaData.itemDatas = new List<Item_Data>();
+        }
+
+        foreach (var saveCreature in _encyclopediaData.creatureDatas)
+        {
+            if (saveCreature.id == id)
+            {
+                continue;
+            }
+
+            _encyclopediaData.creatureDatas.Add(GetCreatureData(id));
+
+            break;
+        }
+
+        SaveEncyclopediaToCloud(_encyclopediaData);
+    }
+
+    public void AddEncyclopedia_Item(int id)
+    {
+        if (_encyclopediaData == null)
+        {
+            _encyclopediaData = new Encyclopedia_Data();
+            _encyclopediaData.creatureDatas = new List<Creature_Data>();
+            _encyclopediaData.itemDatas = new List<Item_Data>();
+        }
+
+        foreach (var saveItem in _encyclopediaData.itemDatas)
+        {
+            if (saveItem.id == id)
+            {
+                continue;
+            }
+
+            _encyclopediaData.itemDatas.Add(GetItemData(id));
+
+            break;
+        }
+
+        SaveEncyclopediaToCloud(_encyclopediaData);
+    }
+
     private void OrganizeEncyclopedia(Save_Data lastData)
     {
         if(lastData == null)
@@ -581,7 +623,6 @@ public class DataManager : MonoBehaviour
             _encyclopediaData = new Encyclopedia_Data();
             _encyclopediaData.creatureDatas = new List<Creature_Data>();
             _encyclopediaData.itemDatas = new List<Item_Data>();
-            _encyclopediaData.skillData = new List<Skill_Data>();
         }
 
         if (_encyclopediaData.maxLevel < lastData.userData.level)
@@ -619,19 +660,6 @@ public class DataManager : MonoBehaviour
                 }
 
                 _encyclopediaData.itemDatas.Add(lastItem);
-            }
-        }
-
-        foreach (var saveSkill in _encyclopediaData.skillData)
-        {
-            foreach (var lastSkill in lastData.encyclopediaData.skillData)
-            {
-                if (saveSkill.id == lastSkill.id)
-                {
-                    continue;
-                }
-
-                _encyclopediaData.skillData.Add(lastSkill);
             }
         }
 

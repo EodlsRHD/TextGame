@@ -167,6 +167,8 @@ public class UiManager : MonoBehaviour
             _onEncyclopediaCloseResultCallback = onCloseResultCallback;
         }
 
+        GameManager.instance.soundManager.PlaySfx(eSfx.SceneChange);
+
         _encyclopedias.Open();
     }
 
