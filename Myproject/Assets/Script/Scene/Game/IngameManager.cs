@@ -96,7 +96,6 @@ public class IngameManager : MonoBehaviour
 
         if (type == eRoundClear.Load)
         {
-            _ingameUI.StartGame();
             RoundSet();
 
             return;
@@ -136,7 +135,6 @@ public class IngameManager : MonoBehaviour
 
     private void GenerateMap(DataManager.Map_Data mapData)
     {
-        _ingameUI.StartGame();
         _saveData.mapData = mapData;
         
         RoundSet();

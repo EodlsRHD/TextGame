@@ -59,9 +59,12 @@ public class GameMenu : MonoBehaviour
 
     public void Open()
     {
-        GameManager.instance.googleAds.ShowGameMenuAd();
-
         this.gameObject.SetActive(true);
+
+        GameManager.instance.tools.Move_Local_XY(eDir.Y, this.GetComponent<RectTransform>(), 0, 00.5f, 0, Ease.OutBack, () => 
+        {
+            GameManager.instance.googleAds.ShowGameMenuAd();
+        });
     }
 
     public void Close()
@@ -74,7 +77,10 @@ public class GameMenu : MonoBehaviour
 
     private void OnClose()
     {
-        _onCloseCallback?.Invoke();
+        GameManager.instance.tools.Move_Local_XY(eDir.Y, this.GetComponent<RectTransform>(), 4444, 0.5f, 0, Ease.InBack, () =>
+        {
+            _onCloseCallback?.Invoke();
+        });
     }
 
     private void OnRankings()

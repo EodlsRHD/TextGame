@@ -161,13 +161,18 @@ public class Encyclopedia : MonoBehaviour
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
 
         _objPlayerInformation.SetActive(true);
+
+        GameManager.instance.tools.Move_Local_XY(eDir.X, _objPlayerInformation.GetComponent<RectTransform>(), 0f, 0.5f, 0, Ease.OutBack, null);
     }
 
     private void ClosePlayerInformation()
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
 
-        _objPlayerInformation.SetActive(false);
+        GameManager.instance.tools.Move_Local_XY(eDir.X, _objPlayerInformation.GetComponent<RectTransform>(), 2039f, 0.5f, 0, Ease.InBack, () => 
+        {
+            _objPlayerInformation.SetActive(false);
+        });
     }
 
     private void Toggle(int value)

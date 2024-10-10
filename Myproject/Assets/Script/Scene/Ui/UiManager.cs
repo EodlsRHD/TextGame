@@ -141,15 +141,22 @@ public class UiManager : MonoBehaviour
     public void OpenRankings()
     {
         ActiveBlocker(true);
+
         _rankings.SetActive(true);
+
+        GameManager.instance.tools.Move_Local_XY(eDir.Y, _rankings.GetComponent<RectTransform>(), 0, 0.5f, 0, Ease.OutBack, null);
     }
 
     private void CloseRankings()
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
 
-        ActiveBlocker(false);
-        _rankings.SetActive(false);
+        GameManager.instance.tools.Move_Local_XY(eDir.Y, _rankings.GetComponent<RectTransform>(), 4444, 0.5f, 0, Ease.InBack, () =>
+        {
+            ActiveBlocker(false);
+
+            _rankings.SetActive(false);
+        });
     }
 
     #endregion
@@ -205,13 +212,20 @@ public class UiManager : MonoBehaviour
         ActiveBlocker(true);
 
         _cradit.SetActive(true);
+
+        GameManager.instance.tools.Move_Local_XY(eDir.Y, _cradit.GetComponent<RectTransform>(), 0, 0.5f, 0, Ease.OutBack, null);
     }
 
     public void CloseCradit()
     {
-        ActiveBlocker(false);
+        GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
 
-        _cradit.SetActive(false);
+        GameManager.instance.tools.Move_Local_XY(eDir.Y, _cradit.GetComponent<RectTransform>(), 4444, 0.5f, 0, Ease.InBack, () =>
+        {
+            ActiveBlocker(false);
+
+            _cradit.SetActive(false);
+        });
     }
 
     #endregion

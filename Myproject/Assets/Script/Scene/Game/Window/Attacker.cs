@@ -129,6 +129,8 @@ public class Attacker : MonoBehaviour
 
         _objButtons.SetActive(true);
         this.gameObject.SetActive(true);
+
+        GameManager.instance.tools.Move_Local_XY(eDir.Y, this.GetComponent<RectTransform>(), -1338f, 0.5f, 0, Ease.OutBack, null);
     }
 
     public void Close()
@@ -160,7 +162,10 @@ public class Attacker : MonoBehaviour
 
     private void OnClose()
     {
-        _onCloseCallback?.Invoke();
+        GameManager.instance.tools.Move_Local_XY(eDir.Y, this.GetComponent<RectTransform>(), -2671f, 0.5f, 0, Ease.InBack, () => 
+        {
+            _onCloseCallback?.Invoke();
+        });
     }
 
     private void OnBat(bool isPlayer, ref int coin, ref int bat)
@@ -330,6 +335,8 @@ public class Attacker : MonoBehaviour
             _onUpdateTextCallback?.Invoke("--- " + (_turnCount + 1) + "번째 턴");
         }
 
+        CardOpen();
+
         if (_turnCount < 4 && _playerCoinCount == 0)
         {
             _onUpdateTextCallback?.Invoke("남은 Hp가 없어 Call할 수 없습니다.");
@@ -340,7 +347,6 @@ public class Attacker : MonoBehaviour
         }
 
         ButtonControl();
-        CardOpen();
     }
 
     IEnumerator Co_EnemyTurn()

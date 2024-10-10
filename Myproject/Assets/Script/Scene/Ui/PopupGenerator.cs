@@ -61,6 +61,8 @@ public class PopupGenerator : MonoBehaviour
         _buttonMiddle.gameObject.SetActive(true);
 
         this.gameObject.SetActive(true);
+
+        GameManager.instance.tools.Move_Local_XY(eDir.Y, this.GetComponent<RectTransform>(), 0, 0.5f, 0, Ease.OutBack, null);
     }
 
     public void Open_TwoButton(string title, string content, string leftButtonText, string rightButtonText, Action onLeftButtonCallback = null, Action onRightButtonCallback = null)
@@ -87,6 +89,8 @@ public class PopupGenerator : MonoBehaviour
         _buttonRight.gameObject.SetActive(true);
 
         this.gameObject.SetActive(true);
+
+        GameManager.instance.tools.Move_Local_XY(eDir.Y, this.GetComponent<RectTransform>(), 0, 0.5f, 0, Ease.OutBack, null);
     }
 
     public void ClosePopup()
@@ -106,7 +110,11 @@ public class PopupGenerator : MonoBehaviour
     private void onClosePopup()
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
-        _onClosePopupCallback?.Invoke();
+
+        GameManager.instance.tools.Move_Local_XY(eDir.Y, this.GetComponent<RectTransform>(), 4444, 0.5f, 0, Ease.InBack, () => 
+        {
+            _onClosePopupCallback?.Invoke();
+        });
     }
 
     private void OnMiddle()

@@ -16,6 +16,8 @@ public class MapController : MonoBehaviour
 
     private Action _onCloseCallback = null;
 
+    private bool _isOpen = false;
+
     public void Initialize(int mapSize)
     {
         _buttonCloseViewMap?.onClick.AddListener(CloseMap);
@@ -33,6 +35,7 @@ public class MapController : MonoBehaviour
 
         _trTemplateParant_Back.gameObject.SetActive(GameManager.instance.isMapBackgroundUpdate);
 
+        _buttonCloseViewMap.gameObject.SetActive(false);
         this.gameObject.SetActive(false);
     }
 
@@ -75,19 +78,38 @@ public class MapController : MonoBehaviour
         }
 
         this.gameObject.SetActive(true);
+        _buttonCloseViewMap.gameObject.SetActive(true);
+
+        _isOpen = true;
+
+        GameManager.instance.tools.Move_Local_XY(eDir.Y, this.GetComponent<RectTransform>(), 720f, 0.5f, 0, Ease.OutBack, null);
     }
 
     private void CloseMap()
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
 
-        this.gameObject.SetActive(false);
-        _onCloseCallback?.Invoke();
+        if(_isOpen == false)
+        {
+            return;
+        }
+
+        _isOpen = false;
+
+        GameManager.instance.tools.Move_Local_XY(eDir.Y, this.GetComponent<RectTransform>(), 3400, 0.5f, 0, Ease.InBack, () =>
+        {
+            _buttonCloseViewMap.gameObject.SetActive(false);
+            this.gameObject.SetActive(false);
+
+            _onCloseCallback?.Invoke();
+        });
     }
 
     public void Close()
     {
+        _buttonCloseViewMap.gameObject.SetActive(false);
         this.gameObject.SetActive(false);
+
         _onCloseCallback?.Invoke();
     }
 

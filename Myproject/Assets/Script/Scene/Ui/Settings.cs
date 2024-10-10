@@ -51,6 +51,8 @@ public class Settings : MonoBehaviour
     public void Open()
     {
         this.gameObject.SetActive(true);
+
+        GameManager.instance.tools.Move_Local_XY(eDir.Y, this.GetComponent<RectTransform>(), 0, 0.5f, 0, Ease.OutBack, null);
     }
 
     public void Close()
@@ -60,14 +62,17 @@ public class Settings : MonoBehaviour
 
     private void OnClose()
     {
-        _onCloseCallback?.Invoke();
+        GameManager.instance.tools.Move_Local_XY(eDir.Y, this.GetComponent<RectTransform>(), 4444, 0.5f, 0, Ease.InBack, () =>
+        {
+            _onCloseCallback?.Invoke();
+        });
     }
 
     private void OnTutorial()
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
 
-        UiManager.instance.OpenRankings();
+        UiManager.instance.OpenTutorial();
     }
 
     private void OnRankings()
@@ -81,14 +86,16 @@ public class Settings : MonoBehaviour
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
 
-        UiManager.instance.OpenRankings();
+        UiManager.instance.OpenPopup("시스템", "아직 준비중입니다.", string.Empty, null);
+
+        //UiManager.instance.OpenLanguage();
     }
 
     private void OnCradit()
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
 
-        UiManager.instance.OpenRankings();
+        UiManager.instance.OpenCradit();
     }
 
     private void OnBgm()

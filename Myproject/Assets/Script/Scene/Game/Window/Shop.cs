@@ -118,33 +118,41 @@ public class Shop : MonoBehaviour
         }
 
         this.gameObject.SetActive(true);
+
+        GameManager.instance.tools.Move_Local_XY(eDir.X, this.GetComponent<RectTransform>(), 0f, 0.5f, 0, Ease.OutBack, null);
     }
 
     private void OnClose()
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
 
-        this.gameObject.SetActive(false);
-        _objInformation.SetActive(false);
-
-        _textName.text = string.Empty;
-        _textDescription.text = string.Empty;
-
-        _textCoin.text = string.Empty;
-
-        _selectTemplateIndex = -1;
-
-        for (int i = 0; i < _template.Count; i++)
+        GameManager.instance.tools.Move_Local_XY(eDir.X, this.GetComponent<RectTransform>(), -1986f, 0.5f, 0, Ease.InBack, () =>
         {
-            _template[i].Clear();
-        }
+            this.gameObject.SetActive(false);
+            _objInformation.SetActive(false);
+
+            _textName.text = string.Empty;
+            _textDescription.text = string.Empty;
+
+            _textCoin.text = string.Empty;
+
+            _selectTemplateIndex = -1;
+
+            for (int i = 0; i < _template.Count; i++)
+            {
+                _template[i].Clear();
+            }
+        });
     }
 
     private void OnBuy()
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
 
-        _objInformation.SetActive(false);
+        GameManager.instance.tools.Move_Local_XY(eDir.Y, _objInformation.GetComponent<RectTransform>(), -2671f, 0.5f, 0, Ease.InBack, () => 
+        {
+            _objInformation.SetActive(false);
+        });
 
         var template = _template[_selectTemplateIndex];
 
@@ -179,6 +187,8 @@ public class Shop : MonoBehaviour
         _textPrice.text = template.item.price.ToString();
 
         _objInformation.SetActive(true);
+
+        GameManager.instance.tools.Move_Local_XY(eDir.Y, _objInformation.GetComponent<RectTransform>(), -1338f, 0.5f, 0, Ease.OutBack, null);
     }
 
     private void OnGoodsButton(ShopTemplate data)

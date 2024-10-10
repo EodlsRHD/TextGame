@@ -66,12 +66,9 @@ public class IngameUI : MonoBehaviour
 
         _objBlocker.SetActive(false);
 
-        this.gameObject.SetActive(true);
-    }
-
-    public void StartGame()
-    {
         _buttonViewMap.gameObject.SetActive(!GameManager.instance.isMapBackgroundUpdate);
+
+        this.gameObject.SetActive(true);
     }
 
     private void OnMap()
@@ -96,7 +93,7 @@ public class IngameUI : MonoBehaviour
 
         _onNextRoundCallback?.Invoke(_type);
 
-        _objNextRound.SetActive(false);
+        CloseNextRound();
         _type = eRoundClear.Non;
     }
 
@@ -121,10 +118,18 @@ public class IngameUI : MonoBehaviour
         {
             _onNextRoundCallback?.Invoke(eRoundClear.Restart);
 
-            _objNextRound.SetActive(false);
+            CloseNextRound();
 
             _resurrectionCount--;
             _type = eRoundClear.Non;
+        });
+    }
+
+    private void CloseNextRound()
+    {
+        GameManager.instance.tools.Move_Local_XY(eDir.Y, _objNextRound.GetComponent<RectTransform>(), -2671f, 0.5f, 0, Ease.InBack, () => 
+        {
+            _objNextRound.SetActive(false);
         });
     }
 
@@ -178,6 +183,8 @@ public class IngameUI : MonoBehaviour
         }
 
         _objNextRound.SetActive(true);
+
+        GameManager.instance.tools.Move_Local_XY(eDir.Y, _objNextRound.GetComponent<RectTransform>(), -1338f, 0.5f, 0, Ease.OutBack, null);
     }
 
     public void UpdatePlayerInfo(DataManager.User_Data userData)
@@ -218,19 +225,14 @@ public class IngameUI : MonoBehaviour
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
 
-        _buttonOpenPlayerInformation.gameObject.SetActive(false);
         _playerInformation.Open();
-
     }
 
     private void OnClosePlayerInformation()
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
 
-        _playerInformation.Close(() => 
-        {
-            _buttonOpenPlayerInformation.gameObject.SetActive(true);
-        });
+        _playerInformation.Close();
     }
 
     public void HideMapButton()

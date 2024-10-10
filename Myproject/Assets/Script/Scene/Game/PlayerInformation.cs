@@ -6,8 +6,6 @@ using TMPro;
 
 public class PlayerInformation : MonoBehaviour
 {
-    [SerializeField] private GameObject _objInformation = null;
-
     [Header("Horizontal")]
     [SerializeField] private TMP_Text _textLevel = null;
     [SerializeField] private TMP_Text _textHP = null;
@@ -16,6 +14,7 @@ public class PlayerInformation : MonoBehaviour
     [SerializeField] private TMP_Text _textEXP = null;
 
     [Header("Vertical")]
+    [SerializeField] private GameObject _objInformation = null;
     [SerializeField] private TMP_Text _textCoin = null;
     [SerializeField] private TMP_Text _textAttack = null;
     [SerializeField] private TMP_Text _textDefence = null;
@@ -26,7 +25,7 @@ public class PlayerInformation : MonoBehaviour
 
     public void Initialize()
     {
-        // MOVE Hide
+        _objInformation.SetActive(false);
     }
 
     public void UpdatePlayerInfo(DataManager.User_Data userData)
@@ -76,14 +75,18 @@ public class PlayerInformation : MonoBehaviour
         _textVision.text = _userData.currentVISION.ToString();
         _textAttackRange.text = _userData.currentATTACKRANGE.ToString();
 
-        // MOVE Open
+        _objInformation.SetActive(true);
+
+        GameManager.instance.tools.Move_Local_XY(eDir.X, _objInformation.GetComponent<RectTransform>(), 0f, 0.5f, 0, Ease.OutBack, null);
     }
 
-    public void Close(System.Action onResultCallback)
+    public void Close(System.Action onResultCallback = null)
     {
-        // MOVE Hide
+        GameManager.instance.tools.Move_Local_XY(eDir.X, _objInformation.GetComponent<RectTransform>(), 1841f, 0.5f, 0, Ease.InBack, () => 
+        {
+            _objInformation.SetActive(false);
 
-        onResultCallback?.Invoke();
-        _userData = null;
+            onResultCallback?.Invoke();
+        });
     }
 }

@@ -53,6 +53,7 @@ public class ControlPad : MonoBehaviour
     private DataManager.User_Data _data;
 
     private eControl _eOpenPad = eControl.Non;
+    private bool _isOpen = false;
 
     public void Initialize(Action<eControl> onMoveCallback, Action<eControl> onActionCallback)
     {
@@ -77,8 +78,8 @@ public class ControlPad : MonoBehaviour
         _buttomRest.onClick.AddListener(() => { OnAction(eControl.Rest); });
         _buttomSearchNearby.onClick.AddListener(() => OnAction(eControl.SearchNearby));
 
-        _buttonCloseSkillAndBagPad.onClick.AddListener(OnCloseSecControlPad);
-        _buttonUseSkillAndBagPad.onClick.AddListener(OnUseSecControlPad);
+        _buttonCloseSkillAndBagPad.onClick.AddListener(OnCloseSkillAndBagPad);
+        _buttonUseSkillAndBagPad.onClick.AddListener(OnUseSkillAndBagPad);
 
         _objInformation.SetActive(false);
         _textName.text = string.Empty;
@@ -108,7 +109,7 @@ public class ControlPad : MonoBehaviour
     {
         _data = data;
 
-        OnOpenSecContolPad(_eOpenPad);
+        OnOpenSkillAndBagPad(_eOpenPad);
     }
 
     public void Skill(DataManager.User_Data data, Action<int> onSkillResultCallback)
@@ -120,7 +121,7 @@ public class ControlPad : MonoBehaviour
             _onResultCallback = onSkillResultCallback;
         }
 
-        OnOpenSecContolPad(eControl.Skill);
+        OnOpenSkillAndBagPad(eControl.Skill);
     }
 
     public void Bag(DataManager.User_Data data, Action<int> onBagResultCallback)
@@ -132,10 +133,10 @@ public class ControlPad : MonoBehaviour
             _onResultCallback = onBagResultCallback;
         }
 
-        OnOpenSecContolPad(eControl.Bag);
+        OnOpenSkillAndBagPad(eControl.Bag);
     }
 
-    private void OnOpenSecContolPad(eControl type)
+    private void OnOpenSkillAndBagPad(eControl type)
     {
         _textSkillAndBagPadTitle.text = type.ToString();
         _eOpenPad = type;
@@ -152,9 +153,13 @@ public class ControlPad : MonoBehaviour
         } 
 
         _objSkillAndBagPad.SetActive(true);
+
+        _isOpen = true;
+
+        GameManager.instance.tools.Move_Local_XY(eDir.Y, _objSkillAndBagPad.GetComponent<RectTransform>(), -1338f, 0.5f, 0, Ease.OutBack, null);
     }
 
-    private void OnUseSecControlPad()
+    private void OnUseSkillAndBagPad()
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
 
@@ -175,42 +180,70 @@ public class ControlPad : MonoBehaviour
         _onResultCallback = null;
     }
 
-    private void OnCloseSecControlPad()
+    private void OnCloseSkillAndBagPad()
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
 
-        _objSkillAndBagPad.SetActive(false);
-
-        CloseInformation();
-
-        switch (_eOpenPad)
+        if(_isOpen == false)
         {
-            case eControl.Skill:
-                _skillPad.Close();
-                break;
-
-            case eControl.Bag:
-                _BagPad.Close();
-                break;
+            return;
         }
 
-        _textSkillAndBagPadTitle.text = string.Empty;
-        _eOpenPad = eControl.Non;
+        _isOpen = false;
+
+        GameManager.instance.tools.Move_Local_XY(eDir.X, _objInformation.GetComponent<RectTransform>(), 1713f, 0.4f, 0, Ease.InBack, () =>
+        {
+            _objInformation.SetActive(false);
+
+            _textName.text = string.Empty;
+            _textDescription.text = string.Empty;
+        });
+
+        GameManager.instance.tools.Move_Local_XY(eDir.Y, _objSkillAndBagPad.GetComponent<RectTransform>(), -2671f, 0.5f, 0, Ease.InBack, () =>
+        {
+            _objSkillAndBagPad.SetActive(false);
+
+            CloseInformation();
+
+            switch (_eOpenPad)
+            {
+                case eControl.Skill:
+                    _skillPad.Close();
+                    break;
+
+                case eControl.Bag:
+                    _BagPad.Close();
+                    break;
+            }
+
+            _textSkillAndBagPadTitle.text = string.Empty;
+            _eOpenPad = eControl.Non;
+        });
     }
 
     private void OpenInformation(string name, string description)
     {
+        if (_isOpen == false)
+        {
+            return;
+        }
+
         _textName.text = name;
         _textDescription.text = description;
 
         _objInformation.SetActive(true);
+
+        GameManager.instance.tools.Move_Local_XY(eDir.X, _objInformation.GetComponent<RectTransform>(), 283f, 0.5f, 0, Ease.OutBack, null);
     }
 
     private void CloseInformation()
     {
-        _objInformation.SetActive(false);
+        GameManager.instance.tools.Move_Local_XY(eDir.X, _objInformation.GetComponent<RectTransform>(), 1713f, 0.5f, 0, Ease.InBack, () => 
+        {
+            _objInformation.SetActive(false);
 
-        _textName.text = string.Empty;
-        _textDescription.text = string.Empty;
+            _textName.text = string.Empty;
+            _textDescription.text = string.Empty;
+        });
     }
 }

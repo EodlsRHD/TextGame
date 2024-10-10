@@ -77,6 +77,8 @@ public class LevelPoint : MonoBehaviour
         _point = maxPoint;
 
         this.gameObject.SetActive(true);
+
+        GameManager.instance.tools.Move_Local_XY(eDir.Y, this.GetComponent<RectTransform>(), 0f, 0.5f, 0, Ease.OutBack, null);
     }
 
     public void Close()
@@ -105,7 +107,10 @@ public class LevelPoint : MonoBehaviour
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
 
-        _onCloseCallback?.Invoke();
+        GameManager.instance.tools.Move_Local_XY(eDir.Y, this.GetComponent<RectTransform>(), 3400f, 0.5f, 0, Ease.InBack, () => 
+        {
+            _onCloseCallback?.Invoke();
+        });
     }
 
     private void ResetPoint()
