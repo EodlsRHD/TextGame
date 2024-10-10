@@ -51,6 +51,8 @@ public class PadTemplate : MonoBehaviour
 
     public void Set(DataManager.Item_Data itemData)
     {
+        _textCoolDown.gameObject.SetActive(false);
+
         _isItem = true;
         _itemData = itemData;
 

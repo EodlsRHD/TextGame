@@ -85,8 +85,7 @@ public class IngameManager : MonoBehaviour
         if(type == eRoundClear.Restart)
         {
             _textView.UpdateText("--- 부활하였습니다.");
-
-            Debug.LogError(type + "      " + _saveData.userData.maximumHP);
+            
             GameManager.instance.dataManager.ResetPlayerData();
             _ingameUI.UpdatePlayerInfo(_saveData.userData);
 
@@ -131,7 +130,7 @@ public class IngameManager : MonoBehaviour
             _mapGenerator = new MapGenerator(GenerateMap, _saveData);
 
             GameManager.instance.dataManager.ResetPlayerData();
-            _ingameUI.UpdatePlayerInfo(_saveData.userData);
+            UpdateData();
         }); 
     }
 
