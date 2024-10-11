@@ -46,24 +46,11 @@ public class ToolProxy : MonoBehaviour
 
             return;
         }
-
-        if(_onVolumeDown == null)
-        {
-            com.FadeOut(() => 
-            {
-                _onResultCallback?.Invoke();
-                Destroy(obj);
-            });
-
-            return;
-        }
-
-        _onVolumeDown?.Invoke(() => 
+        _onVolumeDown?.Invoke(() =>
         {
             com.FadeOut(() =>
             {
                 _onResultCallback?.Invoke();
-                Destroy(obj);
             });
         });
     }

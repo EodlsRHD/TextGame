@@ -11,15 +11,17 @@ public class FadeScreen : MonoBehaviour
 
     public void Initialize()
     {
-         
+        _cgSplashScreen.gameObject.SetActive(false);
     }
 
     public void FadeIn(Action _onResultCallback)
     {
+        _cgSplashScreen.gameObject.SetActive(false);
         StartCoroutine(Co_FadeIn(_onResultCallback));
     }
     public void FadeOut(Action _onResultCallback)
     {
+        _cgSplashScreen.gameObject.SetActive(false);
         StartCoroutine(Co_FadeOut(_onResultCallback));
     }
 
@@ -27,10 +29,17 @@ public class FadeScreen : MonoBehaviour
     {
         _cgSplashScreen.alpha = 1.0f;
 
+        _cgSplashScreen.gameObject.SetActive(true);
+
         yield return null;
 
-        while (_cgSplashScreen.alpha != 0)
+        while (true)
         {
+            if(_cgSplashScreen.alpha <= 0)
+            {
+                break;
+            }
+
             _cgSplashScreen.alpha -= _minusValue;
 
             yield return null;
@@ -46,11 +55,18 @@ public class FadeScreen : MonoBehaviour
     {
         _cgSplashScreen.alpha = 0f;
 
+        _cgSplashScreen.gameObject.SetActive(true);
+
         yield return null;
 
-        while (_cgSplashScreen.alpha != 0)
+        while (true)
         {
-            _cgSplashScreen.alpha -= _minusValue;
+            if (_cgSplashScreen.alpha >= 1.0f)
+            {
+                break;
+            }
+
+            _cgSplashScreen.alpha += _minusValue;
 
             yield return null;
         }
