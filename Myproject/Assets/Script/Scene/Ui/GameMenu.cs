@@ -86,8 +86,12 @@ public class GameMenu : MonoBehaviour
     private void OnRankings()
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+        GameManager.instance.googleAds.HideGameMenuAd();
 
-        UiManager.instance.OpenRankings();
+        UiManager.instance.OpenRankings(() =>
+        {
+            GameManager.instance.googleAds.ShowGameMenuAd();
+        });
     }
 
     private void OnEncyclopedia()
@@ -95,7 +99,10 @@ public class GameMenu : MonoBehaviour
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
         GameManager.instance.googleAds.HideGameMenuAd();
 
-        UiManager.instance.OpenEncyclopedia();
+        UiManager.instance.OpenEncyclopedia(() => 
+        {
+            GameManager.instance.googleAds.ShowGameMenuAd();
+        });
     }
 
     private void OnGotoMainMenu()
@@ -165,7 +172,11 @@ public class GameMenu : MonoBehaviour
     private void OnCredit()
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+        GameManager.instance.googleAds.HideGameMenuAd();
 
-        UiManager.instance.OpenCradit();
+        UiManager.instance.OpenCradit(() =>
+        {
+            GameManager.instance.googleAds.ShowGameMenuAd();
+        });
     }
 }

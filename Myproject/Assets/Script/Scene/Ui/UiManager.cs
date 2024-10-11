@@ -138,8 +138,15 @@ public class UiManager : MonoBehaviour
 
     #region Rankings
 
-    public void OpenRankings()
+    private Action _onRankingsCallback = null;
+
+    public void OpenRankings(Action onResultCallback = null)
     {
+        if(onResultCallback != null)
+        {
+            _onRankingsCallback = onResultCallback;
+        }
+
         ActiveBlocker(true);
 
         _rankings.SetActive(true);
@@ -156,6 +163,7 @@ public class UiManager : MonoBehaviour
             ActiveBlocker(false);
 
             _rankings.SetActive(false);
+            _onRankingsCallback?.Invoke();
         });
     }
 
@@ -165,13 +173,13 @@ public class UiManager : MonoBehaviour
 
     private Action _onEncyclopediaCloseResultCallback = null;
 
-    public void OpenEncyclopedia(Action onCloseResultCallback = null)
+    public void OpenEncyclopedia(Action onResultCallback = null)
     {
         ActiveBlocker(true);
 
-        if(onCloseResultCallback != null)
+        if(onResultCallback != null)
         {
-            _onEncyclopediaCloseResultCallback = onCloseResultCallback;
+            _onEncyclopediaCloseResultCallback = onResultCallback;
         }
 
         GameManager.instance.soundManager.PlaySfx(eSfx.SceneChange);
@@ -207,8 +215,15 @@ public class UiManager : MonoBehaviour
 
     #region Cradit
 
-    public void OpenCradit()
+    private Action _onCraditCallback = null;
+
+    public void OpenCradit(Action onResultCallback = null)
     {
+        if(onResultCallback != null)
+        {
+            _onCraditCallback = onResultCallback;
+        }
+
         ActiveBlocker(true);
 
         _cradit.SetActive(true);
@@ -225,6 +240,7 @@ public class UiManager : MonoBehaviour
             ActiveBlocker(false);
 
             _cradit.SetActive(false);
+            _onCraditCallback?.Invoke();
         });
     }
 
