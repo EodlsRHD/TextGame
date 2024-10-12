@@ -36,6 +36,11 @@ public class UiManager : MonoBehaviour
 
     [Header("Cradit"), SerializeField] private GameObject _cradit = null;
     [SerializeField] private Button _buttonCloseCradit = null;
+    [SerializeField] private Button _buttonSupport = null;
+
+    [Header("Loading Progress")]
+    [SerializeField] private GameObject _objLoading = null;
+    [SerializeField] private LoadSpinner _loadSpinner = null;
 
     private bool _openGameMenu = false;
     private bool _openSettings = false;
@@ -49,10 +54,13 @@ public class UiManager : MonoBehaviour
         _tutorial.Initialize(CloseTutorial);
         _settings.Initialize(ClsoeSettings);
         _encyclopedias.Initialize(CloseEncyclopedia);
+        _loadSpinner.Initialize();
 
         _buttonCloseRankings.onClick.AddListener(CloseRankings);
         _buttonCloseCradit.onClick.AddListener(CloseCradit);
+        _buttonSupport.onClick.AddListener(OnSupportDeveloper);
 
+        _objLoading.SetActive(false);
         _rankings.SetActive(false);
         _cradit.SetActive(false);
         ActiveBlocker(false);
@@ -219,17 +227,18 @@ public class UiManager : MonoBehaviour
 
     #region Turorial
 
-    public void OpenTutorial()
+    public void OpenTutorial(bool isMenu = false)
     {
-        //ActiveBlocker(true);
+        ActiveBlocker(true);
 
-        OpenPopup("시스템", "튜토리얼이 아직 준비중입니다.", string.Empty, null);
-        //_tutorial.Open();
+        _tutorial.Open(isMenu);
     }
 
     private void CloseTutorial()
     {
-        //ActiveBlocker(false);
+        ActiveBlocker(false);
+
+        _tutorial.Close();
     }
 
     #endregion
@@ -263,6 +272,27 @@ public class UiManager : MonoBehaviour
             _cradit.SetActive(false);
             _onCraditCallback?.Invoke();
         });
+    }
+
+    private void OnSupportDeveloper()
+    {
+        Application.OpenURL(@"https://buymeacoffee.com/eodls0810de");
+    }
+
+    #endregion
+
+    #region Loading Progress
+
+    public void StartLoad()
+    {
+        _loadSpinner.StartLoading();
+        _objLoading.SetActive(true);
+    }
+
+    public void StopLoad()
+    {
+        _objLoading.SetActive(false);
+        _loadSpinner.StopLoading();
     }
 
     #endregion
