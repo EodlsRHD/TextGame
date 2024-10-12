@@ -40,7 +40,8 @@ public enum eCreature
     Exit,
     Blocker,
     Player,
-    Fog
+    Fog,
+    Bonfire
 }
 
 

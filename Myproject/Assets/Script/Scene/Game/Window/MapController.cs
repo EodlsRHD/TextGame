@@ -96,24 +96,31 @@ public class MapController : MonoBehaviour
 
         _isOpen = false;
 
+        Close(true);
+    }
+
+    public void Close(bool isCloseButton = false, Action onResultCallbacl = null)
+    {
         GameManager.instance.tools.Move_Local_XY(eDir.Y, this.GetComponent<RectTransform>(), 3400, 0.5f, 0, Ease.InBack, () =>
         {
             _buttonCloseViewMap.gameObject.SetActive(false);
             this.gameObject.SetActive(false);
 
+            onResultCallbacl?.Invoke();
+
+            if (GameManager.instance.isMapBackgroundUpdate == false)
+            {
+                if (isCloseButton == false)
+                {
+                    RemoveTemplate();
+                }
+            }
+
             _onCloseCallback?.Invoke();
         });
     }
 
-    public void Close()
-    {
-        _buttonCloseViewMap.gameObject.SetActive(false);
-        this.gameObject.SetActive(false);
-
-        _onCloseCallback?.Invoke();
-    }
-
-    public void RemoveTemplate()
+    private void RemoveTemplate()
     {
         for (int i = 0; i < _pool.Count; i++)
         {

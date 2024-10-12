@@ -83,7 +83,9 @@ public class LevelPoint : MonoBehaviour
 
     public void Close()
     {
-        if(_point > 0)
+        GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+
+        if (_point > 0)
         {
             UiManager.instance.OpenPopup(string.Empty, "아직 사용 가능한 포인트가 남았습니다", string.Empty, null);
 
@@ -92,25 +94,25 @@ public class LevelPoint : MonoBehaviour
 
         UiManager.instance.OpenPopup(string.Empty, "적용하시겠습니까?", string.Empty, string.Empty, () =>
         {
-            foreach (var item in _templates)
-            {
-                item.Result();
-            }
-
             _onResultCallback?.Invoke(_userData);
-            this.gameObject.SetActive(false);
 
+            GameManager.instance.tools.Move_Local_XY(eDir.Y, this.GetComponent<RectTransform>(), 3400f, 0.5f, 0, Ease.InBack, () =>
+            {
+                this.gameObject.SetActive(false);
+
+                foreach (var item in _templates)
+                {
+                    item.Result();
+                }
+
+                _onResultCallback?.Invoke(_userData);
+            });
         }, null);
     }
 
     private void OnClose()
     {
-        GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
-
-        GameManager.instance.tools.Move_Local_XY(eDir.Y, this.GetComponent<RectTransform>(), 3400f, 0.5f, 0, Ease.InBack, () => 
-        {
-            _onCloseCallback?.Invoke();
-        });
+        _onCloseCallback?.Invoke();
     }
 
     private void ResetPoint()

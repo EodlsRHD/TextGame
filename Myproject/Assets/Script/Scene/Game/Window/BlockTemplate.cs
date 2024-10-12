@@ -85,7 +85,7 @@ public class BlockTemplate : MonoBehaviour
                 color.a = 1f;
             }
 
-            if (blockData.isShop == true)
+            if (blockData.isNpc == true)
             {
                 _imageBlock.enabled = true;
                 _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eCreature.Shop);

@@ -45,7 +45,7 @@ public class GameMenu : MonoBehaviour
 
         GameManager.instance.isMapBackgroundUpdate = PlayerPrefs.GetInt("MAP_BACKGROUND", 0) == 1 ? true : false;
 
-        bool isSFX = PlayerPrefs.GetInt("SFX") == 0 ? false : true;
+        bool isSFX = PlayerPrefs.GetInt("SFX", 1) == 0 ? false : true;
         bool isBGM = PlayerPrefs.GetInt("BGM") == 0 ? false : true;
 
         GameManager.instance.soundManager.MuteSfx(!isSFX);

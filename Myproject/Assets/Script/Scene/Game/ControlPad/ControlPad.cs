@@ -191,19 +191,11 @@ public class ControlPad : MonoBehaviour
 
         _isOpen = false;
 
-        GameManager.instance.tools.Move_Local_XY(eDir.X, _objInformation.GetComponent<RectTransform>(), 1713f, 0.4f, 0, Ease.InBack, () =>
-        {
-            _objInformation.SetActive(false);
-
-            _textName.text = string.Empty;
-            _textDescription.text = string.Empty;
-        });
+        CloseInformation();
 
         GameManager.instance.tools.Move_Local_XY(eDir.Y, _objSkillAndBagPad.GetComponent<RectTransform>(), -2671f, 0.5f, 0, Ease.InBack, () =>
         {
             _objSkillAndBagPad.SetActive(false);
-
-            CloseInformation();
 
             switch (_eOpenPad)
             {

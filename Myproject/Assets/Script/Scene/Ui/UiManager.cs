@@ -21,6 +21,7 @@ public class UiManager : MonoBehaviour
     }
 
     [SerializeField] private GameObject _objBlocker = null;
+    [SerializeField] private GameObject _objPopupBlocker = null;
 
     [Header("Popup"), SerializeField] private PopupGenerator _popupGenerator = null;
     [Header("Game Menu"), SerializeField] private GameMenu _gameMenu = null;
@@ -35,6 +36,9 @@ public class UiManager : MonoBehaviour
 
     [Header("Cradit"), SerializeField] private GameObject _cradit = null;
     [SerializeField] private Button _buttonCloseCradit = null;
+
+    private bool _openGameMenu = false;
+    private bool _openSettings = false;
 
     private void Awake()
     {
@@ -58,6 +62,16 @@ public class UiManager : MonoBehaviour
 
     private void ActiveBlocker(bool isActive)
     {
+        if(_openGameMenu == true)
+        {
+            return;
+        }
+
+        if(_openSettings == true)
+        {
+            return;
+        }
+
         _objBlocker.SetActive(isActive);
     }
 
@@ -68,7 +82,7 @@ public class UiManager : MonoBehaviour
     /// </summary>
     public void OpenPopup(string title, string content, string buttonText, Action onButtonCallback)
     {
-        ActiveBlocker(true);
+        _objPopupBlocker.SetActive(true);
 
         _popupGenerator.Open_OneButton(title, content, buttonText, onButtonCallback);
     }
@@ -78,14 +92,14 @@ public class UiManager : MonoBehaviour
     /// </summary>
     public void OpenPopup(string title, string content, string leftButtonText, string rightButtonText, Action onLeftButtonCallback, Action onRightButtonCallback)
     {
-        ActiveBlocker(true);
+        _objPopupBlocker.SetActive(true);
 
         _popupGenerator.Open_TwoButton(title, content, leftButtonText, rightButtonText, onLeftButtonCallback, onRightButtonCallback);
     }
 
     private void ClosePopup()
     {
-        ActiveBlocker(false);
+        _objPopupBlocker.SetActive(false);
 
         _popupGenerator.ClosePopup();
     }
@@ -99,10 +113,13 @@ public class UiManager : MonoBehaviour
         ActiveBlocker(true);
 
         _gameMenu.Open();
+        _openGameMenu = true;
     }
 
     private void CloseMenu()
     {
+        _openGameMenu = false;
+
         ActiveBlocker(false);
 
         _gameMenu.Close();
@@ -124,10 +141,13 @@ public class UiManager : MonoBehaviour
         }
 
         _settings.Open();
+        _openSettings = true;
     }
 
     private void ClsoeSettings()
     {
+        _openSettings = false;
+
         ActiveBlocker(false);
 
         _settings.Close();
@@ -203,7 +223,8 @@ public class UiManager : MonoBehaviour
     {
         //ActiveBlocker(true);
 
-        OpenPopup("시스템", "아직 준비중입니다.", string.Empty, null);
+        OpenPopup("시스템", "튜토리얼이 아직 준비중입니다.", string.Empty, null);
+        //_tutorial.Open();
     }
 
     private void CloseTutorial()

@@ -48,11 +48,14 @@ public class LobbyManager : MonoBehaviour
                 return;
             }
 
-            if(GameManager.instance.dataManager.CopySaveData().round == 1)
+            if(GameManager.instance.dataManager.CopySaveData() != null)
             {
-                _createCharacterProfile.Open();
+                if (GameManager.instance.dataManager.CopySaveData().round == 1)
+                {
+                    _createCharacterProfile.Open();
 
-                return;
+                    return;
+                }
             }
 
             UiManager.instance.OpenPopup(string.Empty, "저장된 데이터가 존재합니다." + "\n" + " 이어서 하시겠습니까?", string.Empty, string.Empty, () =>

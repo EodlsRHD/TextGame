@@ -102,6 +102,8 @@ public class IngameUI : MonoBehaviour
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
 
         _onNextRoundCallback?.Invoke(eRoundClear.Fail);
+
+        CloseNextRound();
         _type = eRoundClear.Non;
     }
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System;
+using TMPro;
 
 public class Encyclopedia : MonoBehaviour
 {
@@ -30,6 +31,10 @@ public class Encyclopedia : MonoBehaviour
     [SerializeField] private Button _buttonClosePlayerInformation = null;
     [SerializeField] private GameObject _objPlayerInformation = null;
     [SerializeField] private GameObject _objPlayerInformationMaker = null;
+
+    [Header("Information")]
+    [SerializeField] private TMP_Text _textName = null;
+    [SerializeField] private TMP_Text _textDescription = null;
 
     private Action _onCloseCallback = null;
 
@@ -80,7 +85,7 @@ public class Encyclopedia : MonoBehaviour
 
         _toggleAchievements.onValueChanged.AddListener((isOn) =>
         {
-            if(isOn == false)
+            if (isOn == false)
             {
                 return;
             }
@@ -93,6 +98,11 @@ public class Encyclopedia : MonoBehaviour
             Toggle(2);
         });
 
+        _templateAchievements.Initialize(SetInformation);
+
+        _textName.text = string.Empty;
+        _textDescription.text = string.Empty;
+
         _objEmptyLabel.SetActive(false);
         _objPlayerInformation.SetActive(false);
         this.gameObject.SetActive(false);
@@ -102,13 +112,10 @@ public class Encyclopedia : MonoBehaviour
     {
         GameManager.instance.dataManager.LoadEncyclopediaToCloud((result) =>
         {
-            if(result  == false)
-            {
-                return;
-            }
-
             _data = GameManager.instance.dataManager.CopyEncyclopediaData();
             _templates = new Dictionary<int, List<EncyclopediaTemplate>>();
+
+            
 
             _templates.Add(0, new List<EncyclopediaTemplate>());
             for (int i = 0; i < _data.creatureDatas.Count; i++)
@@ -116,7 +123,7 @@ public class Encyclopedia : MonoBehaviour
                 var obj = Instantiate(_templateCreature_Item, _trCreature_Item);
                 var com = obj.GetComponent<EncyclopediaTemplate>();
 
-                com.Initialize();
+                com.Initialize(SetInformation);
                 com.Set(_data.creatureDatas[i]);
 
                 _templates[0].Add(com);
@@ -128,13 +135,23 @@ public class Encyclopedia : MonoBehaviour
                 var obj = Instantiate(_templateCreature_Item, _trCreature_Item);
                 var com = obj.GetComponent<EncyclopediaTemplate>();
 
-                com.Initialize();
+                com.Initialize(SetInformation);
                 com.Set(_data.itemDatas[i]);
 
                 _templates[1].Add(com);
             }
 
             _templates.Add(2, new List<EncyclopediaTemplate>());
+            for (int i = 0; i < _data._achievementsDatas.Count; i++)
+            {
+                var obj = Instantiate(_templateAchievements, _trAchievements);
+                var com = obj.GetComponent<EncyclopediaTemplate>();
+
+                com.Initialize(SetInformation);
+                com.Set(_data._achievementsDatas[i]);
+
+                _templates[2].Add(com);
+            }
 
             _toggleCreature.isOn = true;
             _toggleItem.isOn = false;
@@ -149,6 +166,8 @@ public class Encyclopedia : MonoBehaviour
     public void Close()
     {
         this.gameObject.SetActive(false);
+
+        DeleteTemplate();
     }
 
     private void OnClose()
@@ -169,7 +188,7 @@ public class Encyclopedia : MonoBehaviour
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
 
-        GameManager.instance.tools.Move_Local_XY(eDir.X, _objPlayerInformation.GetComponent<RectTransform>(), 2039f, 0.5f, 0, Ease.InBack, () => 
+        GameManager.instance.tools.Move_Local_XY(eDir.X, _objPlayerInformation.GetComponent<RectTransform>(), 2039f, 0.5f, 0, Ease.InBack, () =>
         {
             _objPlayerInformation.SetActive(false);
         });
@@ -185,19 +204,15 @@ public class Encyclopedia : MonoBehaviour
             }
         }
 
-        if(value <= 1)
+        _objEmptyLabel.SetActive(_templates[value].Count == 0);
+
+        if (value <= 1)
         {
             _objCreature_Item.SetActive(true);
             _objAchievements.SetActive(false);
-
-            if (_templates[value].Count == 0)
-            {
-                _objEmptyLabel.SetActive(true);
-
-                return;
-            }
         }
-        if(value == 2)
+
+        if (value == 2)
         {
             _objEmptyLabel.SetActive(false);
             _objCreature_Item.SetActive(false);
@@ -207,6 +222,35 @@ public class Encyclopedia : MonoBehaviour
         for (int i = 0; i < _templates[value].Count; i++)
         {
             _templates[value][i].Active(true);
+        }
+    }
+
+    private void SetInformation(string name, string description)
+    {
+        _textName.text = name;
+        _textDescription.text = description;
+    }
+
+    public void DeleteTemplate()
+    {
+        var child = _trCreature_Item.transform.GetComponentsInChildren<Transform>();
+
+        foreach (var iter in child)
+        {
+            if (iter != _trCreature_Item.transform)
+            {
+                Destroy(iter.gameObject);
+            }
+        }
+
+        var child2 = _trAchievements.transform.GetComponentsInChildren<Transform>();
+
+        foreach (var iter in child2)
+        {
+            if (iter != _trAchievements.transform)
+            {
+                Destroy(iter.gameObject);
+            }
         }
     }
 }

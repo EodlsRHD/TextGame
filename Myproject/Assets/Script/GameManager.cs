@@ -62,6 +62,8 @@ public class GameManager : MonoBehaviour
         _instance = this;
         DontDestroyOnLoad(this.gameObject);
 
+        PlayerPrefs.DeleteAll();
+
         _toolProxy.Initialize(_soundManager.VolumeDown);
         _dataManager.Initialize();
         _googleAds.Initialize();
@@ -70,6 +72,7 @@ public class GameManager : MonoBehaviour
 
     private void OnApplicationQuit()
     {
-        //_dataManager.saveAllData();
+        Debug.Log("OnApplicationQuit");
+        _dataManager.saveAllData();
     }
 }

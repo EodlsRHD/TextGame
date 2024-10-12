@@ -336,17 +336,14 @@ public class Attacker : MonoBehaviour
         }
 
         CardOpen();
+        ButtonControl();
 
         if (_turnCount < 4 && _playerCoinCount == 0)
         {
             _onUpdateTextCallback?.Invoke("남은 Hp가 없어 Call할 수 없습니다.");
 
             StartCoroutine(Co_EnemyTurn());
-
-            return;
         }
-
-        ButtonControl();
     }
 
     IEnumerator Co_EnemyTurn()
@@ -434,6 +431,13 @@ public class Attacker : MonoBehaviour
 
     private void ButtonControl()
     {
+        if (_turnCount == 4)
+        {
+            _objButtons.SetActive(false);
+
+            return;
+        }
+
         _buttonBat.gameObject.SetActive(true);
         _buttonRaise.gameObject.SetActive(true);
         _buttonAllin.gameObject.SetActive(true);
@@ -578,6 +582,10 @@ public class Attacker : MonoBehaviour
         }
 
         yield return new WaitForSecondsRealtime(1f);
+
+        Debug.LogError("TEST");
+        _resultDamage = 100;
+        _isPlayerWin = eWinorLose.Win;
 
         Done(_isPlayerWin);
     }

@@ -25,6 +25,7 @@ public class IngameManager : MonoBehaviour
     [Header("MapController"), SerializeField] private MapController _mapController = null;
     [Header("Ingame Popup"), SerializeField] private IngamePopup _ingamePopup = null;
     [Header("Shop"), SerializeField] private Shop _shop = null;
+    [Header("Bonfire"), SerializeField] private Bonfire _bonfire = null;
 
     private DataManager.Save_Data _saveData = null;
     private MapGenerator _mapGenerator = null;
@@ -47,6 +48,7 @@ public class IngameManager : MonoBehaviour
         _mapController.Initialize(GameManager.instance.dataManager.MapSize);
         _ingamePopup.Initialize();
         _shop.Initialize(_textView.UpdateText, _ingamePopup.UpdateText, Buy);
+        _bonfire.Initialize(_textView.UpdateText, _ingamePopup.UpdateText, SelectSkill, _controlPad.Skill);
 
         FirstSet();
 
@@ -160,7 +162,6 @@ public class IngameManager : MonoBehaviour
         GameManager.instance.dataManager.ChangePlayerData(_saveData);
 
         _mapController.Close();
-        _mapController.RemoveTemplate();
         _saveData.round++;
 
         _ingameUI.OpenNextRoundWindow(eRoundClear.Success);
@@ -258,12 +259,12 @@ public class IngameManager : MonoBehaviour
             return -1;
         }
 
-        if (_saveData.mapData.nodeDatas[result].isShop == true)
+        if (_saveData.mapData.nodeDatas[result].isNpc == true)
         {
             _saveData.userData.currentAP -= 1;
             _ingameUI.UpdatePlayerInfo(eStats.AP, _saveData.userData);
 
-            Shop();
+            Npc(result);
 
             return -1;
         }
@@ -402,7 +403,7 @@ public class IngameManager : MonoBehaviour
                 continue;
             }
 
-            if (_saveData.mapData.nodeDatas[index].isShop == true)
+            if (_saveData.mapData.nodeDatas[index].isNpc == true)
             {
                 actions.Add(() =>
                 {
@@ -571,7 +572,7 @@ public class IngameManager : MonoBehaviour
                 continue;
             }
 
-            if (_saveData.mapData.nodeDatas[NearbyIndexs[i]].isShop == true)
+            if (_saveData.mapData.nodeDatas[NearbyIndexs[i]].isNpc == true)
             {
                 continue;
             }
@@ -666,28 +667,46 @@ public class IngameManager : MonoBehaviour
 
     #region Action
 
-    private void Shop()
+    private void Npc(int nodeIndex)
     {
-        if(_saveData.mapData.npcData.itemIndexs.Count == 0)
+        DataManager.Npc_Data npc = _saveData.mapData.npcDatas.Find(x => x.currentNodeIndex == nodeIndex);
+
+        if(npc.isBonfire == true)
         {
-            _textView.UpdateText("@상인 : 물건이 다 떨어졌어요 다음에 들러주세요!");
-
-            return;
+            if(npc.isUseBonfire == true)
+            {
+                _textView.UpdateText("--- 모닥불의 불꽃이 사그라들었습니다.");
+            }
+            else
+            {
+                _bonfire.Open(npc, _saveData.userData);
+            }
         }
+        else if(npc.isShop == true)
+        {
+            if (npc.itemIndexs.Count == 0)
+            {
+                _textView.UpdateText("@상인 : 물건이 다 떨어졌어요 다음에 들러주세요!");
 
-        _textView.UpdateText("@상인 : 안녕하세요! 좋은 물건 구경해보세요!");
+                return;
+            }
+            else
+            {
+                _textView.UpdateText("@상인 : 안녕하세요! 좋은 물건 구경해보세요!");
 
-        _shop.Open(_saveData.mapData.npcData, _saveData.userData.data.coin);
+                _shop.Open(npc, _saveData.userData.data.coin);
+            }
+        }
     }
 
-    private void Buy(int index, ushort price)
+    private void Buy(int currentIndex, int index, ushort price)
     {
         if(index < 0)
         {
             return;
         }
 
-        _saveData.mapData.npcData.itemIndexs.Remove(_saveData.mapData.npcData.itemIndexs.Find(x => x == index));
+        _saveData.mapData.npcDatas.Find(x => x.currentNodeIndex == currentIndex).itemIndexs.Remove(_saveData.mapData.npcDatas[0].itemIndexs.Find(x => x == index));
 
         GameManager.instance.soundManager.PlaySfx(eSfx.Coin);
 
@@ -698,6 +717,20 @@ public class IngameManager : MonoBehaviour
         _saveData.userData.itemDataIndexs.Add((ushort)index);
 
         GameManager.instance.dataManager.AddEncyclopedia_Item(index);
+    }
+
+    private void SelectSkill(int currentIndex, int getIndex, int removeIndex)
+    {
+        _saveData.mapData.npcDatas.Find(x => x.currentNodeIndex == currentIndex).isUseBonfire = true;
+
+        if (getIndex == 0 && removeIndex == 0)
+        {
+            // Rest
+
+            return;
+        }
+
+
     }
 
     private void Attack(int nodeMonsterIndex, System.Action onLastCallback = null)
@@ -877,6 +910,7 @@ public class IngameManager : MonoBehaviour
                 _saveData.userData.currentHP = _saveData.userData.maximumHP;
                 _saveData.userData.currentMP = _saveData.userData.maximumMP;
                 _saveData.userData.currentAP = _saveData.userData.maximumAP;
+                _saveData.userData.currentVISION = _saveData.userData.maximumVISION;
 
                 UpdateData();
             });
@@ -886,8 +920,8 @@ public class IngameManager : MonoBehaviour
     private void Skill(int id)
     {
         if (id == -1)
-            _ingamePopup.UpdateText("선택된 스킬이 없습니다.");
         {
+            _ingamePopup.UpdateText("선택된 스킬이 없습니다.");
             return;
         }
 
@@ -1419,6 +1453,17 @@ public class IngameManager : MonoBehaviour
 
     public void UpdateMap()
     {
+        if(GameManager.instance.isMapBackgroundUpdate == true)
+        {
+            _mapController.Close(false, () => 
+            {
+                _ingameUI.HideMapButton();
+                _mapController.UpdateMapData(_saveData, PlayerVision());
+            });
+
+            return;
+        }
+
         _ingameUI.HideMapButton();
         _mapController.UpdateMapData(_saveData, PlayerVision());
     }
@@ -2012,6 +2057,7 @@ public class CreatureGenerator
         if (_saveData.round % 5 == 0)
         {
             GenerateShop();
+            GeneratorBonfire();
         }
         else
         {
@@ -2029,12 +2075,14 @@ public class CreatureGenerator
 
     private void GenerateShop()
     {
-        int mapSize = (int)Mathf.Sqrt(_saveData.mapData.nodeDatas.Count);
-        int currentIndex = mapSize * (int)(mapSize * 0.5f);
+        _saveData.mapData.npcDatas = new List<DataManager.Npc_Data>();
+
+        int currentIndex = (int)(_saveData.mapData.mapSize * 6) +  2;
 
         DataManager.Npc_Data npc = GameManager.instance.dataManager.GetNpcData(201);
         npc.currentNodeIndex = currentIndex;
         npc.itemIndexs = new List<ushort>(3);
+        npc.isShop = true;
 
         for (int i = 0; i < 3; i++)
         {
@@ -2043,13 +2091,28 @@ public class CreatureGenerator
             npc.itemIndexs.Add((ushort)ran);
         }
 
-        if (_saveData.mapData.npcData == null)
+        _saveData.mapData.nodeDatas[currentIndex].isNpc = true;
+        _saveData.mapData.npcDatas.Add(npc);
+    }
+
+    private void GeneratorBonfire()
+    {
+        int currentIndex = (int)(_saveData.mapData.mapSize * 6) + 6;
+
+        DataManager.Npc_Data npc = GameManager.instance.dataManager.GetNpcData(202);
+        npc.currentNodeIndex = currentIndex;
+        npc.SkillIndexs = new List<ushort>(3);
+        npc.isBonfire = true;
+
+        for (int i = 0; i < 3; i++)
         {
-            _saveData.mapData.npcData = new DataManager.Npc_Data();
+            int ran = Random.Range(301, 300 + GameManager.instance.dataManager.GetSkillDataCount());
+
+            npc.SkillIndexs.Add((ushort)ran);
         }
 
-        _saveData.mapData.nodeDatas[currentIndex].isShop = true;
-        _saveData.mapData.npcData = npc;
+        _saveData.mapData.nodeDatas[currentIndex].isNpc = true;
+        _saveData.mapData.npcDatas.Add(npc);
     }
 
     private void GenerateMonster()

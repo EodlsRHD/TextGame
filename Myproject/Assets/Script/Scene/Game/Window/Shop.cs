@@ -36,7 +36,7 @@ public class Shop : MonoBehaviour
 
         public void Buy()
         {
-            buttonImage.color = Color.black;
+            buttonImage.color = Color.gray;
             isBuy = true;
         }
 
@@ -66,13 +66,13 @@ public class Shop : MonoBehaviour
     
     private Action<string> _onUpdateTextCallback = null;
     private Action<string> _onUpdatePopupCallback = null;
-    private Action<int, ushort> _onBuyCallback = null;
+    private Action<int, int, ushort> _onBuyCallback = null;
 
     private DataManager.Npc_Data _npc = null;
     private int _userCoin = 0;
     private int _selectTemplateIndex = 0;
 
-    public void Initialize(Action<string> onUpdateTextCallback, Action<string> onUpdatePopupCallback, Action<int, ushort> onBuyCallback)
+    public void Initialize(Action<string> onUpdateTextCallback, Action<string> onUpdatePopupCallback, Action<int, int, ushort> onBuyCallback)
     {
         if(onUpdateTextCallback != null)
         {
@@ -119,20 +119,18 @@ public class Shop : MonoBehaviour
 
         this.gameObject.SetActive(true);
 
-        GameManager.instance.tools.Move_Local_XY(eDir.X, this.GetComponent<RectTransform>(), 0f, 0.5f, 0, Ease.OutBack, null);
+        GameManager.instance.tools.Move_Local_XY(eDir.Y, this.GetComponent<RectTransform>(), -1338f, 0.5f, 0, Ease.OutBack, null);
     }
 
     private void OnClose()
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
 
-        GameManager.instance.tools.Move_Local_XY(eDir.X, this.GetComponent<RectTransform>(), -1986f, 0.5f, 0, Ease.InBack, () =>
+        CloseInformation();
+
+        GameManager.instance.tools.Move_Local_XY(eDir.Y, this.GetComponent<RectTransform>(), -2671f, 0.5f, 0, Ease.InBack, () =>
         {
             this.gameObject.SetActive(false);
-            _objInformation.SetActive(false);
-
-            _textName.text = string.Empty;
-            _textDescription.text = string.Empty;
 
             _textCoin.text = string.Empty;
 
@@ -149,10 +147,7 @@ public class Shop : MonoBehaviour
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
 
-        GameManager.instance.tools.Move_Local_XY(eDir.Y, _objInformation.GetComponent<RectTransform>(), -2671f, 0.5f, 0, Ease.InBack, () => 
-        {
-            _objInformation.SetActive(false);
-        });
+        CloseInformation();
 
         var template = _template[_selectTemplateIndex];
 
@@ -175,7 +170,7 @@ public class Shop : MonoBehaviour
         _userCoin -= template.item.price;
         _textCoin.text = _userCoin.ToString();
 
-        _onBuyCallback?.Invoke(template.item.id, template.item.price);
+        _onBuyCallback?.Invoke(_npc.currentNodeIndex, template.item.id, template.item.price);
     }
 
     private void OpenInformation()
@@ -188,7 +183,18 @@ public class Shop : MonoBehaviour
 
         _objInformation.SetActive(true);
 
-        GameManager.instance.tools.Move_Local_XY(eDir.Y, _objInformation.GetComponent<RectTransform>(), -1338f, 0.5f, 0, Ease.OutBack, null);
+        GameManager.instance.tools.Move_Local_XY(eDir.X, _objInformation.GetComponent<RectTransform>(), 283f, 0.5f, 0, Ease.OutBack, null);
+    }
+
+    private void CloseInformation()
+    {
+        GameManager.instance.tools.Move_Local_XY(eDir.X, _objInformation.GetComponent<RectTransform>(), 1713f, 0.5f, 0, Ease.InBack, () =>
+        {
+            _objInformation.SetActive(false);
+
+            _textName.text = string.Empty;
+            _textDescription.text = string.Empty;
+        });
     }
 
     private void OnGoodsButton(ShopTemplate data)
