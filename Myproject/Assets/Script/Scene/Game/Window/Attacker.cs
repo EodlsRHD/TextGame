@@ -583,10 +583,6 @@ public class Attacker : MonoBehaviour
 
         yield return new WaitForSecondsRealtime(1f);
 
-        Debug.LogError("TEST");
-        _resultDamage = 100;
-        _isPlayerWin = eWinorLose.Win;
-
         Done(_isPlayerWin);
     }
 
