@@ -32,6 +32,12 @@ public class IngameManager : MonoBehaviour
 
     private bool _isPlayerTurn = false;
     private bool _isAllMonsterDead = true;
+    private bool _isHuntMonster = false;
+
+    public bool isHuntMonster 
+    {
+        get { return _isHuntMonster; }
+    }
 
     void Start()
     {
@@ -74,7 +80,6 @@ public class IngameManager : MonoBehaviour
         }
 
         _ingameUI.OpenNextRoundWindow(eRoundClear.First);
-        UiManager.instance.OpenTutorial();
     }
 
     private void OpenMap(System.Action onCallback)
@@ -259,12 +264,19 @@ public class IngameManager : MonoBehaviour
             return -1;
         }
 
-        if (_saveData.mapData.nodeDatas[result].isNpc == true)
+        if (_saveData.mapData.nodeDatas[result].isShop == true || _saveData.mapData.nodeDatas[result].isBonfire == true)
         {
             _saveData.userData.currentAP -= 1;
             _ingameUI.UpdatePlayerInfo(eStats.AP, _saveData.userData);
 
             Npc(result);
+
+            return -1;
+        }
+
+        if (_saveData.mapData.nodeDatas[result].isGuide == true)
+        {
+            UiManager.instance.OpenTutorial(false);
 
             return -1;
         }
@@ -403,11 +415,35 @@ public class IngameManager : MonoBehaviour
                 continue;
             }
 
-            if (_saveData.mapData.nodeDatas[index].isNpc == true)
+            if (_saveData.mapData.nodeDatas[index].isShop == true)
             {
                 actions.Add(() =>
                 {
                     _textView.UpdateText(eCreature.Shop, _saveData.mapData.nodeDatas[index], _saveData.mapData.nodeDatas[_saveData.userData.data.currentNodeIndex]);
+                });
+
+                Non = true;
+
+                continue;
+            }
+
+            if (_saveData.mapData.nodeDatas[index].isBonfire == true)
+            {
+                actions.Add(() =>
+                {
+                    _textView.UpdateText(eCreature.Bonfire, _saveData.mapData.nodeDatas[index], _saveData.mapData.nodeDatas[_saveData.userData.data.currentNodeIndex]);
+                });
+
+                Non = true;
+
+                continue;
+            }
+
+            if (_saveData.mapData.nodeDatas[index].isUseBonfire == true)
+            {
+                actions.Add(() =>
+                {
+                    _textView.UpdateText(eCreature.UseBonfire, _saveData.mapData.nodeDatas[index], _saveData.mapData.nodeDatas[_saveData.userData.data.currentNodeIndex]);
                 });
 
                 Non = true;
@@ -420,6 +456,18 @@ public class IngameManager : MonoBehaviour
                 actions.Add(() =>
                 {
                     _textView.UpdateText(eCreature.Monster, _saveData.mapData.nodeDatas[index], _saveData.mapData.nodeDatas[_saveData.userData.data.currentNodeIndex]);
+                });
+
+                Non = true;
+
+                continue;
+            }
+
+            if (_saveData.mapData.nodeDatas[index].isGuide == true)
+            {
+                actions.Add(() =>
+                {
+                    _textView.UpdateText(eCreature.Guide, _saveData.mapData.nodeDatas[index], _saveData.mapData.nodeDatas[_saveData.userData.data.currentNodeIndex]);
                 });
 
                 Non = true;
@@ -572,7 +620,7 @@ public class IngameManager : MonoBehaviour
                 continue;
             }
 
-            if (_saveData.mapData.nodeDatas[NearbyIndexs[i]].isNpc == true)
+            if (_saveData.mapData.nodeDatas[NearbyIndexs[i]].isShop == true)
             {
                 continue;
             }
@@ -710,7 +758,7 @@ public class IngameManager : MonoBehaviour
 
         GameManager.instance.soundManager.PlaySfx(eSfx.Coin);
 
-        _textView.UpdateText("@상인 : 구매해주셔서 감사합니다!");
+        _textView.UpdateText("@상인 : 구매해주셔서 고마워요");
         _ingamePopup.UpdateText("가방에 보관되었습니다.");
 
         _saveData.userData.data.coin -= price;
@@ -722,21 +770,45 @@ public class IngameManager : MonoBehaviour
     private void SelectSkill(int currentIndex, int getIndex, int removeIndex)
     {
         _saveData.mapData.npcDatas.Find(x => x.currentNodeIndex == currentIndex).isUseBonfire = true;
+        _saveData.mapData.nodeDatas[currentIndex].isUseBonfire = true;
+        UpdateData();
+
+        _textView.UpdateText("모닥불의 불꽃이 사그라들고 있다.");
 
         if (getIndex == 0 && removeIndex == 0)
         {
-            // Rest
+            _ingamePopup.UpdateText("체력과 마나가 회복되었습니다.");
+
+            _saveData.userData.currentHP += (ushort)(_saveData.userData.maximumHP * 0.2f);
+            _saveData.userData.currentMP += (ushort)(_saveData.userData.maximumMP * 0.2f);
+            UpdateData();
 
             return;
         }
 
+        if(removeIndex != 0)
+        {
+            for (int i = 0; i < _saveData.userData.skillDataIndexs.Count; i++)
+            {
+                if (_saveData.userData.skillDataIndexs[i] != removeIndex)
+                {
+                    continue;
+                }
 
+                _saveData.userData.skillDataIndexs[i] = (ushort)getIndex;
+                break;
+            }
+        }
+
+        _saveData.userData.skillDataIndexs.Add((ushort)getIndex);
     }
 
     private void Attack(int nodeMonsterIndex, System.Action onLastCallback = null)
     {
         DataManager.Creature_Data monster = _saveData.mapData.monsterDatas.Find(x => x.currentNodeIndex == nodeMonsterIndex);
         GameManager.instance.dataManager.AddEncyclopedia_Creature(monster.id);
+
+        _isHuntMonster = true;
 
         _ingameUI.CallAttacker(_saveData.userData, monster, onLastCallback, (result, damage) => 
         {
@@ -1685,9 +1757,13 @@ public class MapGenerator
             }
         }
 
-        if(_saveData.round % 5 != 0)
+        if (_saveData.round % 5 != 0)
         {
             GenerateBlocker();
+        }
+        else
+        {
+            _nodes[14].isEnter = true;
         }
 
         SelectExitBlock();
@@ -2054,17 +2130,37 @@ public class CreatureGenerator
 
         GeneratePlayer();
 
-        if (_saveData.round % 5 == 0)
+         if (_saveData.round % 5 == 0)
         {
             GenerateShop();
             GeneratorBonfire();
         }
         else
         {
+            if (_saveData.round == 1)
+            {
+                GenerateGuide();
+            }
+
             GenerateMonster();
         }
 
         Done();
+    }
+
+    private void GenerateGuide()
+    {
+        _saveData.mapData.npcDatas = new List<DataManager.Npc_Data>();
+
+        int currentIndex = _saveData.mapData.enterNodeIndex + 1;
+
+        DataManager.Npc_Data npc = GameManager.instance.dataManager.GetNpcData(203);
+        npc.id = 203;
+        npc.currentNodeIndex = currentIndex;
+        npc.isGuide = true;
+
+        _saveData.mapData.nodeDatas[currentIndex].isGuide = true;
+        _saveData.mapData.npcDatas.Add(npc);
     }
 
     private void GeneratePlayer()
@@ -2080,6 +2176,7 @@ public class CreatureGenerator
         int currentIndex = (int)(_saveData.mapData.mapSize * 6) +  2;
 
         DataManager.Npc_Data npc = GameManager.instance.dataManager.GetNpcData(201);
+        npc.id = 201;
         npc.currentNodeIndex = currentIndex;
         npc.itemIndexs = new List<ushort>(3);
         npc.isShop = true;
@@ -2091,7 +2188,7 @@ public class CreatureGenerator
             npc.itemIndexs.Add((ushort)ran);
         }
 
-        _saveData.mapData.nodeDatas[currentIndex].isNpc = true;
+        _saveData.mapData.nodeDatas[currentIndex].isShop = true;
         _saveData.mapData.npcDatas.Add(npc);
     }
 
@@ -2100,6 +2197,7 @@ public class CreatureGenerator
         int currentIndex = (int)(_saveData.mapData.mapSize * 6) + 6;
 
         DataManager.Npc_Data npc = GameManager.instance.dataManager.GetNpcData(202);
+        npc.id = 202;
         npc.currentNodeIndex = currentIndex;
         npc.SkillIndexs = new List<ushort>(3);
         npc.isBonfire = true;
@@ -2111,7 +2209,7 @@ public class CreatureGenerator
             npc.SkillIndexs.Add((ushort)ran);
         }
 
-        _saveData.mapData.nodeDatas[currentIndex].isNpc = true;
+        _saveData.mapData.nodeDatas[currentIndex].isBonfire = true;
         _saveData.mapData.npcDatas.Add(npc);
     }
 
@@ -2190,32 +2288,62 @@ public class CreatureGenerator
 
         int newIndex = index;
 
-        if(_saveData.mapData.nodeDatas[index].isWalkable == false)
+        if (_saveData.mapData.nodeDatas[index].isWalkable == false)
         {
             newIndex += 1;
         }
-        
-        if(_saveData.mapData.nodeDatas[index].isMonster == true)
+
+        if (newIndex >= _saveData.mapData.nodeDatas.Count)
+        {
+            newIndex -= _saveData.mapData.nodeDatas.Count;
+        }
+
+        if (_saveData.mapData.nodeDatas[newIndex].isMonster == true)
         {
             newIndex += 5;
         }
 
-        if(_saveData.mapData.nodeDatas[index].isUser == true)
+        if (newIndex >= _saveData.mapData.nodeDatas.Count)
+        {
+            newIndex -= _saveData.mapData.nodeDatas.Count;
+        }
+
+        if (_saveData.mapData.nodeDatas[newIndex].isUser == true)
         {
             newIndex += 5;
         }
-        
-        if(index == _saveData.mapData.enterNodeIndex)
+
+        if (newIndex >= _saveData.mapData.nodeDatas.Count)
+        {
+            newIndex -= _saveData.mapData.nodeDatas.Count;
+        }
+
+        if (_saveData.mapData.nodeDatas[newIndex].isGuide == true)
+        {
+            newIndex += 5;
+        }
+
+        if (newIndex >= _saveData.mapData.nodeDatas.Count)
+        {
+            newIndex -= _saveData.mapData.nodeDatas.Count;
+        }
+
+        if (newIndex == _saveData.mapData.enterNodeIndex)
         {
             newIndex += 4;
         }
 
-        if(index == _saveData.mapData.exitNodeIndex)
+        if (newIndex >= _saveData.mapData.nodeDatas.Count)
+        {
+            newIndex -= _saveData.mapData.nodeDatas.Count;
+        }
+
+        if (newIndex == _saveData.mapData.exitNodeIndex)
         {
             newIndex += 4;
         }
 
-        if(newIndex >= _saveData.mapData.nodeDatas.Count)
+        if (newIndex >= _saveData.mapData.nodeDatas.Count)
         {
             newIndex -= _saveData.mapData.nodeDatas.Count;
         }

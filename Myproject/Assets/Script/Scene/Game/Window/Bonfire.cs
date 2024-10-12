@@ -171,7 +171,7 @@ public class Bonfire : MonoBehaviour
 
         _objSelectSkill.SetActive(true);
 
-        GameManager.instance.tools.Move_Local_XY(eDir.Y, _objSelectSkill.GetComponent<RectTransform>(), -1338f, 0.5f, 0, Ease.OutBack, null);
+        GameManager.instance.tools.Move_Local_XY(eDir.Y, _objSelectSkill.GetComponent<RectTransform>(), 0f, 0.5f, 0, Ease.OutBack, null);
     }
 
     private void OnCloseSelectSkill() 
@@ -180,7 +180,7 @@ public class Bonfire : MonoBehaviour
 
         CloseInformation();
 
-        GameManager.instance.tools.Move_Local_XY(eDir.Y, _objSelectSkill.GetComponent<RectTransform>(), -2671f, 0.5f, 0, Ease.InBack, () =>
+        GameManager.instance.tools.Move_Local_XY(eDir.Y, _objSelectSkill.GetComponent<RectTransform>(), -1333f, 0.5f, 0, Ease.InBack, () =>
         {
             _objSelectSkill.gameObject.SetActive(false);
 

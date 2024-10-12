@@ -97,8 +97,20 @@ public class TextView : MonoBehaviour
                 findType = "상인";
                 break;
 
+            case eCreature.Bonfire:
+                findType = "모닥불";
+                break;
+
+            case eCreature.UseBonfire:
+                findType = "꺼진 모닥불";
+                break;
+
             case eCreature.Exit:
-                findType = "탈출구";
+                findType = "아래로 가는 계단";
+                break;
+
+            case eCreature.Guide:
+                findType = "길잡이";
                 break;
         }
 
