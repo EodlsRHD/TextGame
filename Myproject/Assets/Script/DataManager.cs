@@ -46,6 +46,7 @@ public class DataManager : MonoBehaviour
 
         public bool isShop = false;
         public bool isBonfire = false;
+        public bool isGuide = false;
 
         public bool isUseBonfire = false;
 
@@ -242,8 +243,12 @@ public class DataManager : MonoBehaviour
         public bool isWalkable = false;
         public bool isMonster = false;
         public bool isUser = false;
-        public bool isNpc = false;
+        public bool isShop = false;
+        public bool isBonfire = false;
         public bool isItem = false;
+        public bool isGuide = false;
+
+        public bool isUseBonfire = false;
     }
 
     #endregion
@@ -281,6 +286,24 @@ public class DataManager : MonoBehaviour
     }
 
     [Serializable]
+    public class Tutorial_Data
+    {
+        public int id = 0;
+
+        public string content = string.Empty;
+        public List<Tutorial_answer> answers = null;
+
+        public int isQuest = -1;
+    }
+
+    [Serializable]
+    public class Tutorial_answer
+    {
+        public string answer = string.Empty;
+        public int next = 0;
+    }
+
+    [Serializable]
     public class BlockImageTemplate
     {
         public eCreature type = eCreature.Non;
@@ -300,6 +323,10 @@ public class DataManager : MonoBehaviour
     [SerializeField] private string _npcDataPath = string.Empty;
     [SerializeField] private string _itemDataPath = string.Empty;
     [SerializeField] private string _skillDataPath = string.Empty;
+
+    [Header("Scriptable Object")]
+    [SerializeField] private SO_TutorialData _soTutorial = null;
+
     [Header("Map Size"), Tooltip("3의 배수이되 홀수여야함"), SerializeField] private int _mapSize = 9;
     [Header("Creature Sprite Template"), SerializeField] private List<BlockImageTemplate> _creatureSpriteTemplate = null;
 
@@ -329,6 +356,8 @@ public class DataManager : MonoBehaviour
         ReadNpcData();
         ReadItemsData();
         ReadSkillsData();
+
+        _soTutorial.Initialize();
     }
 
     public void saveAllData()
@@ -408,6 +437,11 @@ public class DataManager : MonoBehaviour
 
     public void SaveDataToCloud(Save_Data saveData = null, Action<bool> onSaveOrLoadCallback = null)
     {
+        if(UiManager.instance != null)
+        {
+            UiManager.instance.StartLoad();
+        }
+
         OrganizeEncyclopedia(saveData);
 
         if (saveData != null)
@@ -426,6 +460,11 @@ public class DataManager : MonoBehaviour
 
         PlayerPrefs.SetString("SAVE", savejson);
 
+        if (UiManager.instance != null)
+        {
+            UiManager.instance.StopLoad();
+        }
+
         onSaveOrLoadCallback?.Invoke(true);
 
         return;
@@ -433,12 +472,22 @@ public class DataManager : MonoBehaviour
 
         GameManager.instance.googlePlayGameServeice.SaveData(savejson, (result) =>
         {
+            if (UiManager.instance != null)
+            {
+                UiManager.instance.StopLoad();
+            }
+
             onSaveOrLoadCallback?.Invoke(result);
         });
     }
 
     public void SaveEncyclopediaToCloud(Encyclopedia_Data data, Action<bool> onSaveOrLoadCallback = null)
     {
+        if (UiManager.instance != null)
+        {
+            UiManager.instance.StartLoad();
+        }
+
         var enRequest = new
         {
             data = _encyclopediaData
@@ -450,6 +499,11 @@ public class DataManager : MonoBehaviour
 
         PlayerPrefs.SetString("SAVE_EncylopediaData", enjson);
 
+        if (UiManager.instance != null)
+        {
+            UiManager.instance.StopLoad();
+        }
+
         onSaveOrLoadCallback?.Invoke(true);
 
         return;
@@ -457,17 +511,32 @@ public class DataManager : MonoBehaviour
 
         GameManager.instance.googlePlayGameServeice.SaveEncylopediaData(enjson, (result) =>
         {
+            if (UiManager.instance != null)
+            {
+                UiManager.instance.StopLoad();
+            }
+
             onSaveOrLoadCallback?.Invoke(result);
         });
     }
 
     public void LoadDataToCloud(Action<bool> onSaveOrLoadCallback = null)
     {
+        if (UiManager.instance != null)
+        {
+            UiManager.instance.StartLoad();
+        }
+
 #if UNITY_EDITOR
         string sapjson = PlayerPrefs.GetString("SAVE");
 
         if (sapjson.Length == 0)
         {
+            if (UiManager.instance != null)
+            {
+                UiManager.instance.StopLoad();
+            }
+
             onSaveOrLoadCallback?.Invoke(false);
 
             return;
@@ -481,6 +550,11 @@ public class DataManager : MonoBehaviour
         var presult = JsonConvert.DeserializeAnonymousType(sapjson, prespons);
         _saveData = presult.data;
 
+        if (UiManager.instance != null)
+        {
+            UiManager.instance.StopLoad();
+        }
+
         onSaveOrLoadCallback?.Invoke(true);
 
         return;
@@ -488,7 +562,12 @@ public class DataManager : MonoBehaviour
 
         GameManager.instance.googlePlayGameServeice.LoadData((result, json) =>
         {
-            if(result == false)
+            if (UiManager.instance != null)
+            {
+                UiManager.instance.StopLoad();
+            }
+
+            if (result == false)
             {
                 onSaveOrLoadCallback?.Invoke(false);
 
@@ -509,6 +588,11 @@ public class DataManager : MonoBehaviour
 
     public void LoadEncyclopediaToCloud(Action<bool> onSaveOrLoadCallback = null)
     {
+        if (UiManager.instance != null)
+        {
+            UiManager.instance.StartLoad();
+        }
+
 #if UNITY_EDITOR
         string enpjson = PlayerPrefs.GetString("SAVE_EncylopediaData");
 
@@ -527,6 +611,11 @@ public class DataManager : MonoBehaviour
         var presult = JsonConvert.DeserializeAnonymousType(enpjson, prespons);
         _encyclopediaData = presult.data;
 
+        if (UiManager.instance != null)
+        {
+            UiManager.instance.StopLoad();
+        }
+
         onSaveOrLoadCallback?.Invoke(true);
 
         return;
@@ -534,6 +623,11 @@ public class DataManager : MonoBehaviour
 
         GameManager.instance.googlePlayGameServeice.LoadEncylopediaData((result, json) =>
         {
+            if (UiManager.instance != null)
+            {
+                UiManager.instance.StopLoad();
+            }
+
             if (result == false)
             {
                 onSaveOrLoadCallback?.Invoke(false);
@@ -853,6 +947,15 @@ public class DataManager : MonoBehaviour
     public int GetSkillDataCount()
     {
         return _skillDatas.Count;
+    }
+
+    #endregion
+
+    #region Tutorial
+
+    public Tutorial_Data GetTutorialData(int id)
+    {
+        return _soTutorial.GetData(id);
     }
 
     #endregion

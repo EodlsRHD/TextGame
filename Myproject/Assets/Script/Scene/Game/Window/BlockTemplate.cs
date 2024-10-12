@@ -40,7 +40,6 @@ public class BlockTemplate : MonoBehaviour
         {
             if (blockData.isWalkable == true)
             {
-                //_imageBlock.enabled = false; 
                 _imageBlock.enabled = true;
                 _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eCreature.Fog);
                 color = Color.black;
@@ -54,11 +53,44 @@ public class BlockTemplate : MonoBehaviour
                 color.a = 0.5f;
             }
 
+            if (blockData.isGuide == true)
+            {
+                _imageBlock.enabled = true;
+                _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eCreature.Guide);
+                color = Color.white;
+                color.a = 0.5f;
+            }
+
+            if (blockData.isShop == true)
+            {
+                _imageBlock.enabled = true;
+                _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eCreature.Shop);
+                color = Color.white;
+                color.a = 0.5f;
+            }
+
+            if (blockData.isBonfire == true)
+            {
+                _imageBlock.enabled = true;
+
+                if (blockData.isUseBonfire == true)
+                {
+                    _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eCreature.UseBonfire);
+                }
+                else
+                {
+                    _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eCreature.Bonfire);
+                }
+
+                color = Color.white;
+                color.a = 0.5f;
+            }
+
             if (isExit == true)
             {
                 _imageBlock.enabled = true;
                 _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eCreature.Exit);
-                color = Color.red;
+                color = Color.white;
                 color.a = 0.5f;
             }
         }
@@ -85,10 +117,35 @@ public class BlockTemplate : MonoBehaviour
                 color.a = 1f;
             }
 
-            if (blockData.isNpc == true)
+            if (blockData.isGuide == true)
+            {
+                _imageBlock.enabled = true;
+                _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eCreature.Guide);
+                color = Color.white;
+                color.a = 1f;
+            }
+
+            if (blockData.isShop == true)
             {
                 _imageBlock.enabled = true;
                 _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eCreature.Shop);
+                color = Color.white;
+                color.a = 1f;
+            }
+
+            if (blockData.isBonfire == true)
+            {
+                _imageBlock.enabled = true;
+
+                if (blockData.isUseBonfire == true)
+                {
+                    _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eCreature.UseBonfire);
+                }
+                else
+                {
+                    _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eCreature.Bonfire);
+                }
+
                 color = Color.white;
                 color.a = 1f;
             }
@@ -97,8 +154,8 @@ public class BlockTemplate : MonoBehaviour
             {
                 _imageBlock.enabled = true;
                 _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eCreature.Exit);
-                color = Color.red;
-                color.a = 0.8f;
+                color = Color.white;
+                color.a = 1f;
             }
         }
 
@@ -106,8 +163,8 @@ public class BlockTemplate : MonoBehaviour
         {
             _imageBlock.enabled = true;
             _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eCreature.Player);
-            color = Color.gray;
-            color.a = 0.8f;
+            color = Color.white;
+            color.a = 1f;
         }
 
         SetColor(color);

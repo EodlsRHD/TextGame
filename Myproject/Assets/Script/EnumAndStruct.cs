@@ -41,7 +41,9 @@ public enum eCreature
     Blocker,
     Player,
     Fog,
-    Bonfire
+    Bonfire,
+    UseBonfire,
+    Guide
 }
 
 
@@ -204,4 +206,10 @@ public enum Ease
     InFlash = 33,
     OutFlash = 34,
     InOutFlash = 35,
+}
+
+public enum eTutorialQuest
+{
+    Non = -1,
+    Attack
 }
