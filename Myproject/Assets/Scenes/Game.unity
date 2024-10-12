@@ -177,8 +177,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 1833532935, guid: 11267d786b3bd3c4a95e29b7c8044b8a, type: 3}
-  m_Type: 1
+  m_Sprite: {fileID: -6614373457484812694, guid: ab6b213d85b87cd43a67af4c6a593b2c, type: 3}
+  m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -1065,8 +1065,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -102.5}
-  m_SizeDelta: {x: -110, y: -315}
+  m_AnchoredPosition: {x: 0, y: -137.5}
+  m_SizeDelta: {x: -110, y: -385}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &128323154
 MonoBehaviour:
@@ -2561,7 +2561,7 @@ MonoBehaviour:
     m_Top: 0
     m_Bottom: 0
   m_ChildAlignment: 1
-  m_Spacing: 20
+  m_Spacing: 40
   m_ChildForceExpandWidth: 0
   m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 0
@@ -11251,15 +11251,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.627451}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.8627451}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 1833532935, guid: 11267d786b3bd3c4a95e29b7c8044b8a, type: 3}
-  m_Type: 1
+  m_Sprite: {fileID: -6614373457484812694, guid: ab6b213d85b87cd43a67af4c6a593b2c, type: 3}
+  m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -17992,8 +17992,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -102.5}
-  m_SizeDelta: {x: -110, y: -315}
+  m_AnchoredPosition: {x: 0, y: -137.5}
+  m_SizeDelta: {x: -110, y: -385}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1467254105
 MonoBehaviour:
@@ -23270,7 +23270,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Content: {fileID: 236281053}
   m_Horizontal: 0
-  m_Vertical: 1
+  m_Vertical: 0
   m_MovementType: 1
   m_Elasticity: 0.1
   m_Inertia: 1
