@@ -43,16 +43,8 @@ public class GameMenu : MonoBehaviour
         _buttonViewMap.onClick.AddListener(OnViewMap);
         _buttonCredit.onClick.AddListener(OnCredit);
 
-        GameManager.instance.isMapBackgroundUpdate = PlayerPrefs.GetInt("MAP_BACKGROUND", 0) == 1 ? true : false;
-
-        bool isSFX = PlayerPrefs.GetInt("SFX", 1) == 0 ? false : true;
-        bool isBGM = PlayerPrefs.GetInt("BGM") == 0 ? false : true;
-
-        GameManager.instance.soundManager.MuteSfx(!isSFX);
-        GameManager.instance.soundManager.MuteBgm(!isBGM);
-
-        _objSfxMute.SetActive(!isSFX);
-        _objBgmMute.SetActive(!isBGM);
+        _objSfxMute.SetActive(GameManager.instance.soundManager.isMuteBGM);
+        _objBgmMute.SetActive(GameManager.instance.soundManager.isMuteSFX);
 
         this.gameObject.SetActive(false);
     }

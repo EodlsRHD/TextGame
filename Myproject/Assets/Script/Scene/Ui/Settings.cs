@@ -34,16 +34,8 @@ public class Settings : MonoBehaviour
         _buttonBgm.onClick.AddListener(OnBgm);
         _buttonSfx.onClick.AddListener(OnSfx);
 
-        GameManager.instance.isMapBackgroundUpdate = PlayerPrefs.GetInt("MAP_BACKGROUND", 0) == 1 ? true : false;
-
-        bool isSFX = PlayerPrefs.GetInt("SFX") == 0 ? false : true;
-        bool isBGM = PlayerPrefs.GetInt("BGM") == 0 ? false : true;
-
-        GameManager.instance.soundManager.MuteSfx(!isSFX);
-        GameManager.instance.soundManager.MuteBgm(!isBGM);
-
-        _objSfxMute.SetActive(!isSFX);
-        _objBgmMute.SetActive(!isBGM);
+        _objSfxMute.SetActive(GameManager.instance.soundManager.isMuteBGM);
+        _objBgmMute.SetActive(GameManager.instance.soundManager.isMuteSFX);
 
         this.gameObject.SetActive(false);
     }
@@ -72,7 +64,7 @@ public class Settings : MonoBehaviour
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
 
-        UiManager.instance.OpenTutorial();
+        UiManager.instance.OpenTutorial(true);
     }
 
     private void OnRankings()
