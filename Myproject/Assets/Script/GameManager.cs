@@ -53,7 +53,11 @@ public class GameManager : MonoBehaviour
         get { return _googlePlayGameServeice; }
     }
 
-    public bool isMapBackgroundUpdate { get; set; }
+    public bool isMapBackgroundUpdate 
+    {
+        get { return _isMapBackgroundUpdate; }
+        set { _isMapBackgroundUpdate = value; }
+    }
 
     #endregion
 
@@ -64,8 +68,11 @@ public class GameManager : MonoBehaviour
 
         PlayerPrefs.DeleteAll();
 
+        _isMapBackgroundUpdate = PlayerPrefs.GetInt("MAP_BACKGROUND", 0) == 1 ? true : false;
+
         _toolProxy.Initialize(_soundManager.VolumeDown);
         _dataManager.Initialize();
+        _soundManager.Initialize();
         _googleAds.Initialize();
         _googlePlayGameServeice.Initialize();
     }

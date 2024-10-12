@@ -23,9 +23,23 @@ public class SoundManager : MonoBehaviour
 
     [Header("SFX Clip"), SerializeField] private List<DataManager.SoundTemplate> _sfxTemplate = null;
 
+    public bool isMuteBGM
+    {
+        get { return _audioBGM.mute; }
+    }
+
+    public bool isMuteSFX
+    {
+        get { return _audioSFX.mute; }
+    }
+
     public void Initialize()
     {
-        _audioBGM.volume = 0;
+        bool isSFX = PlayerPrefs.GetInt("SFX") == 0 ? true : false;
+        bool isBGM = PlayerPrefs.GetInt("BGM") == 0 ? true : false;
+
+        MuteSfx(!isSFX);
+        MuteBgm(!isBGM);
     }
 
     public void PlayBgm(eBgm type)
@@ -166,9 +180,9 @@ public class SoundManager : MonoBehaviour
         {
             yield return null;
 
-            if (_audioBGM.volume >= 0.4f)
+            if (_audioBGM.volume >= 0.65f)
             {
-                _audioBGM.volume = 0.4f;
+                _audioBGM.volume = 0.65f;
 
                 break;
             }
