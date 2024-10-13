@@ -96,6 +96,7 @@ public class Attacker : MonoBehaviour
 
     public void CallAttacker(DataManager.User_Data userData, DataManager.Creature_Data monster, Action onLastCallback, Action<eWinorLose, int> onResultCallback)
     {
+        GameManager.instance.soundManager.PlaySfx(eSfx.MenuOpen);
         PlayBgm(eBgm.Battle);
 
         if (onLastCallback != null)
@@ -165,6 +166,8 @@ public class Attacker : MonoBehaviour
 
     private void OnClose()
     {
+        GameManager.instance.soundManager.PlaySfx(eSfx.MenuClose);
+
         GameManager.instance.tools.Move_Local_XY(eDir.Y, this.GetComponent<RectTransform>(), -2671f, 0.5f, 0, Ease.InBack, () => 
         {
             _onCloseCallback?.Invoke();
@@ -304,7 +307,6 @@ public class Attacker : MonoBehaviour
         _turnCount = 4;
         _resultDamage = _totalCount - _playerBat;
 
-        Debug.LogError(_resultDamage + "          " + _totalCount + "          " + _playerBat);
         ButtonControl();
         Done(_isPlayerWin);
     }

@@ -42,6 +42,8 @@ public class Settings : MonoBehaviour
 
     public void Open()
     {
+        GameManager.instance.soundManager.PlaySfx(eSfx.Map);
+
         this.gameObject.SetActive(true);
 
         GameManager.instance.tools.Move_Local_XY(eDir.Y, this.GetComponent<RectTransform>(), 0, 0.5f, 0, Ease.OutBack, null);
@@ -49,12 +51,14 @@ public class Settings : MonoBehaviour
 
     public void Close()
     {
-        GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
         this.gameObject.SetActive(false);
     }
 
     private void OnClose()
     {
+        GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+        GameManager.instance.soundManager.PlaySfx(eSfx.Map);
+
         GameManager.instance.tools.Move_Local_XY(eDir.Y, this.GetComponent<RectTransform>(), 4444, 0.5f, 0, Ease.InBack, () =>
         {
             _onCloseCallback?.Invoke();

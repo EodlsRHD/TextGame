@@ -169,6 +169,8 @@ public class UiManager : MonoBehaviour
             _onRankingsCallback = onResultCallback;
         }
 
+        GameManager.instance.soundManager.PlaySfx(eSfx.MenuOpen);
+
         ActiveBlocker(true);
 
         _rankings.SetActive(true);
@@ -179,6 +181,7 @@ public class UiManager : MonoBehaviour
     private void CloseRankings()
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+        GameManager.instance.soundManager.PlaySfx(eSfx.MenuClose);
 
         GameManager.instance.tools.Move_Local_XY(eDir.Y, _rankings.GetComponent<RectTransform>(), 4444, 0.5f, 0, Ease.InBack, () =>
         {
@@ -204,7 +207,7 @@ public class UiManager : MonoBehaviour
             _onEncyclopediaCloseResultCallback = onResultCallback;
         }
 
-        GameManager.instance.soundManager.PlaySfx(eSfx.SceneChange);
+        GameManager.instance.soundManager.PlaySfx(eSfx.TurnPage);
 
         _encyclopedias.Open();
     }
@@ -248,6 +251,8 @@ public class UiManager : MonoBehaviour
             _onCraditCallback = onResultCallback;
         }
 
+        GameManager.instance.soundManager.PlaySfx(eSfx.MenuOpen);
+
         ActiveBlocker(true);
 
         _cradit.SetActive(true);
@@ -258,6 +263,7 @@ public class UiManager : MonoBehaviour
     public void CloseCradit()
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+        GameManager.instance.soundManager.PlaySfx(eSfx.MenuClose);
 
         GameManager.instance.tools.Move_Local_XY(eDir.Y, _cradit.GetComponent<RectTransform>(), 4444, 0.5f, 0, Ease.InBack, () =>
         {

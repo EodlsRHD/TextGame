@@ -90,6 +90,7 @@ public class IngameUI : MonoBehaviour
     private void OnNextRound()
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+        GameManager.instance.soundManager.PlaySfx(eSfx.MenuOpen);
 
         _onNextRoundCallback?.Invoke(_type);
 
@@ -129,6 +130,8 @@ public class IngameUI : MonoBehaviour
 
     private void CloseNextRound()
     {
+        GameManager.instance.soundManager.PlaySfx(eSfx.MenuOpen);
+
         GameManager.instance.tools.Move_Local_XY(eDir.Y, _objNextRound.GetComponent<RectTransform>(), -2671f, 0.5f, 0, Ease.InBack, () => 
         {
             _objNextRound.SetActive(false);
@@ -226,6 +229,7 @@ public class IngameUI : MonoBehaviour
     private void OnOpenPlayerInformation()
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+        GameManager.instance.soundManager.PlaySfx(eSfx.Map);
 
         _playerInformation.Open();
     }
@@ -233,6 +237,7 @@ public class IngameUI : MonoBehaviour
     private void OnClosePlayerInformation()
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+        GameManager.instance.soundManager.PlaySfx(eSfx.Map);
 
         _playerInformation.Close();
     }

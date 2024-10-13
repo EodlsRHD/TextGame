@@ -67,7 +67,6 @@ public class IngameManager : MonoBehaviour
         _instance = this;
 
         GameManager.instance.tools.Fade(true, null);
-        GameManager.instance.soundManager.PlaySfx(eSfx.SceneChange);
 
         _saveData = GameManager.instance.dataManager.CopySaveData();
 
@@ -153,7 +152,7 @@ public class IngameManager : MonoBehaviour
         if(type == eRoundClear.Success)
         {
             UpdateText("--- " + _saveData.round + " 라운드 입니다.");
-            GameManager.instance.soundManager.PlaySfx(eSfx.SceneChange);
+            GameManager.instance.soundManager.PlaySfx(eSfx.TurnPage);
         }
 
         GameManager.instance.dataManager.SaveDataToCloud(_saveData, (result) => 

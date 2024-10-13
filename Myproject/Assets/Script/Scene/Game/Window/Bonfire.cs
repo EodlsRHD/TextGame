@@ -117,7 +117,8 @@ public class Bonfire : MonoBehaviour
 
     public void Open(DataManager.Npc_Data npc, DataManager.User_Data user)
     {
-        GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+        GameManager.instance.soundManager.PlaySfx(eSfx.Bonfire);
+        GameManager.instance.soundManager.PlaySfx(eSfx.MenuOpen);
 
         _npc = npc;
         _user = user;
@@ -130,6 +131,7 @@ public class Bonfire : MonoBehaviour
     private void OnClose()
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+        GameManager.instance.soundManager.PlaySfx(eSfx.MenuClose);
 
         GameManager.instance.tools.Move_Local_XY(eDir.Y, this.GetComponent<RectTransform>(), -2671f, 0.5f, 0, Ease.InBack, () =>
         {

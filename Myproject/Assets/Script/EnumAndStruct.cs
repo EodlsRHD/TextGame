@@ -134,8 +134,12 @@ public enum eSfx
     Death, //
     RoundSuccess,
     RoundFail,
-    SceneChange, //
-    GotoLobby //
+    TurnPage, //
+    GotoLobby, //
+    Bonfire,
+    MenuOpen,
+    MenuClose,
+    Map
 }
 
 public enum eBgm

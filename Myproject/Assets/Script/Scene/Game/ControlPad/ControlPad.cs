@@ -138,6 +138,8 @@ public class ControlPad : MonoBehaviour
 
     private void OnOpenSkillAndBagPad(eControl type)
     {
+        GameManager.instance.soundManager.PlaySfx(eSfx.MenuOpen);
+
         _textSkillAndBagPadTitle.text = type.ToString();
         _eOpenPad = type;
 
@@ -183,8 +185,9 @@ public class ControlPad : MonoBehaviour
     private void OnCloseSkillAndBagPad()
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+        GameManager.instance.soundManager.PlaySfx(eSfx.MenuClose);
 
-        if(_isOpen == false)
+        if (_isOpen == false)
         {
             return;
         }

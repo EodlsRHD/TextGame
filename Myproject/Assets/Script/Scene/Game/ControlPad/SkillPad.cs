@@ -80,7 +80,7 @@ public class SkillPad : MonoBehaviour
                 }
             }
 
-            com.Set(GameManager.instance.dataManager.GetskillData(id), coolDown - 1, isCoolDown);
+            com.Set(GameManager.instance.dataManager.GetskillData(id), coolDown, isCoolDown);
         }
     }
 

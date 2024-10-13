@@ -67,7 +67,7 @@ public class Encyclopedia : MonoBehaviour
             _toggleItem.isOn = false;
             _toggleAchievements.isOn = false;
 
-            GameManager.instance.soundManager.PlaySfx(eSfx.SceneChange);
+            GameManager.instance.soundManager.PlaySfx(eSfx.TurnPage);
 
             Toggle(0);
         });
@@ -82,7 +82,7 @@ public class Encyclopedia : MonoBehaviour
             _toggleCreature.isOn = false;
             _toggleAchievements.isOn = false;
 
-            GameManager.instance.soundManager.PlaySfx(eSfx.SceneChange);
+            GameManager.instance.soundManager.PlaySfx(eSfx.TurnPage);
 
             Toggle(1);
         });
@@ -97,7 +97,7 @@ public class Encyclopedia : MonoBehaviour
             _toggleCreature.isOn = false;
             _toggleItem.isOn = false;
 
-            GameManager.instance.soundManager.PlaySfx(eSfx.SceneChange);
+            GameManager.instance.soundManager.PlaySfx(eSfx.TurnPage);
 
             Toggle(2);
         });
@@ -114,6 +114,8 @@ public class Encyclopedia : MonoBehaviour
 
     public void Open()
     {
+        GameManager.instance.soundManager.PlaySfx(eSfx.TurnPage);
+
         GameManager.instance.dataManager.LoadEncyclopediaToCloud((result) =>
         {
             _data = GameManager.instance.dataManager.CopyEncyclopediaData();
@@ -176,6 +178,8 @@ public class Encyclopedia : MonoBehaviour
 
     private void OnClose()
     {
+        GameManager.instance.soundManager.PlaySfx(eSfx.TurnPage);
+
         _onCloseCallback?.Invoke();
     }
 

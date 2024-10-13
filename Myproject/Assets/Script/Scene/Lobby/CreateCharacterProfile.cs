@@ -31,6 +31,8 @@ public class CreateCharacterProfile : MonoBehaviour
 
     public void Open()
     {
+        GameManager.instance.soundManager.PlaySfx(eSfx.TurnPage);
+
         this.gameObject.SetActive(true);
     }
 
@@ -49,6 +51,8 @@ public class CreateCharacterProfile : MonoBehaviour
 
         UiManager.instance.OpenPopup("캐릭터 생성", str_new + "\n\n" + "이대로 시작하시겠습니까?", string.Empty, string.Empty, () =>
         {
+            GameManager.instance.soundManager.PlaySfx(eSfx.TurnPage);
+
             GameManager.instance.dataManager.CreateNewSaveData((result) => 
             {
                 GameManager.instance.dataManager.UpdatePlayerData(str_new);

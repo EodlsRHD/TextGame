@@ -99,7 +99,7 @@ public class SoundManager : MonoBehaviour
             return;
         }
 
-        if (type == eSfx.SceneChange)
+        if (type == eSfx.TurnPage)
         {
             Play(_audioBook, template);
 

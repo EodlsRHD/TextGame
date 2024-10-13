@@ -51,6 +51,8 @@ public class GameMenu : MonoBehaviour
 
     public void Open()
     {
+        GameManager.instance.soundManager.PlaySfx(eSfx.MenuOpen);
+
         this.gameObject.SetActive(true);
 
         GameManager.instance.tools.Move_Local_XY(eDir.Y, this.GetComponent<RectTransform>(), 0, 00.5f, 0, Ease.OutBack, () => 
@@ -61,7 +63,6 @@ public class GameMenu : MonoBehaviour
 
     public void Close()
     {
-        GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
         GameManager.instance.googleAds.HideGameMenuAd();
 
         this.gameObject.SetActive(false);
@@ -69,6 +70,9 @@ public class GameMenu : MonoBehaviour
 
     private void OnClose()
     {
+        GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+        GameManager.instance.soundManager.PlaySfx(eSfx.MenuClose);
+
         GameManager.instance.tools.Move_Local_XY(eDir.Y, this.GetComponent<RectTransform>(), 4444, 0.5f, 0, Ease.InBack, () =>
         {
             _onCloseCallback?.Invoke();
@@ -166,6 +170,7 @@ public class GameMenu : MonoBehaviour
     private void OnCredit()
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+
         GameManager.instance.googleAds.HideGameMenuAd();
 
         UiManager.instance.OpenCradit(() =>

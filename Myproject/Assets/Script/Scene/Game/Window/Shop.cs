@@ -99,6 +99,7 @@ public class Shop : MonoBehaviour
     public void Open(DataManager.Npc_Data npc, int userCoin)
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.ShopEnter);
+        GameManager.instance.soundManager.PlaySfx(eSfx.MenuOpen);
 
         _npc = npc;
         _userCoin = userCoin;
@@ -125,6 +126,7 @@ public class Shop : MonoBehaviour
     private void OnClose()
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+        GameManager.instance.soundManager.PlaySfx(eSfx.MenuClose);
 
         CloseInformation();
 

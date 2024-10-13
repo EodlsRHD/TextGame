@@ -74,6 +74,8 @@ public class Tutorial : MonoBehaviour
 
         if (isMenu == true)
         {
+            GameManager.instance.soundManager.PlaySfx(eSfx.TurnPage);
+
             _pageCount = 0;
 
             SetImage();

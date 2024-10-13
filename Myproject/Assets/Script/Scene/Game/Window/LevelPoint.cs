@@ -58,6 +58,8 @@ public class LevelPoint : MonoBehaviour
 
     public void Open(int maxPoint, DataManager.User_Data userData, Action<DataManager.User_Data> onResultCallback)
     {
+        GameManager.instance.soundManager.PlaySfx(eSfx.MenuOpen);
+
         if (onResultCallback != null)
         {
             _onResultCallback = onResultCallback;
@@ -84,6 +86,7 @@ public class LevelPoint : MonoBehaviour
     public void Close()
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+        GameManager.instance.soundManager.PlaySfx(eSfx.MenuClose);
 
         if (_point > 0)
         {

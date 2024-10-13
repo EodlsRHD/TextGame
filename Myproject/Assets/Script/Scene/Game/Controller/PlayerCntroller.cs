@@ -14,14 +14,14 @@ public class PlayerCntroller : MonoBehaviour
     {
         if (IngameManager.instance.isPlayerTurn == false)
         {
-            IngameManager.instance.UpdatePopup(IngameManager.instance.saveData.userData.data.name + "의 순서가 아닙니다.");
+            IngameManager.instance.UpdatePopup("순서가 아닙니다.");
 
             return;
         }
 
         if (IngameManager.instance.saveData.userData.currentAP == 0)
         {
-            IngameManager.instance.UpdatePopup("ap가 부족합니다.");
+            IngameManager.instance.UpdatePopup("행동력이 부족합니다");
 
             return;
         }
@@ -94,6 +94,7 @@ public class PlayerCntroller : MonoBehaviour
         {
             if(IngameManager.instance.saveData.userData.currentAP < 2)
             {
+                IngameManager.instance.UpdatePopup("행동력이 부족합니다");
                 return -1;
             }
 
@@ -109,6 +110,8 @@ public class PlayerCntroller : MonoBehaviour
         {
             if (IngameManager.instance.saveData.userData.currentAP < 1)
             {
+                IngameManager.instance.UpdatePopup("행동력이 부족합니다");
+
                 return -1;
             }
 
@@ -152,7 +155,7 @@ public class PlayerCntroller : MonoBehaviour
     {
         if (IngameManager.instance.isPlayerTurn == false)
         {
-            IngameManager.instance.UpdateText(IngameManager.instance.saveData.userData.data.name + "의 순서가 아닙니다.");
+            IngameManager.instance.UpdatePopup("순서가 아닙니다.");
 
             return;
         }
