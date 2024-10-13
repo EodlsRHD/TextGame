@@ -2725,6 +2725,9 @@ GameObject:
   m_Component:
   - component: {fileID: 264511981}
   - component: {fileID: 264511980}
+  - component: {fileID: 264511983}
+  - component: {fileID: 264511982}
+  - component: {fileID: 264511984}
   m_Layer: 0
   m_Name: Manager
   m_TagString: Untagged
@@ -2744,6 +2747,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 141d1bbe316d97a4bb7b9ba900d36599, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _monsterController: {fileID: 264511983}
+  _playerController: {fileID: 264511982}
+  _actionController: {fileID: 264511984}
   _ingameUI: {fileID: 1037030123}
   _textView: {fileID: 2033365083}
   _controlPad: {fileID: 453098887}
@@ -2766,6 +2772,42 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &264511982
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 264511979}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 817fea333206fdc4ebdb1b4134163c32, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &264511983
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 264511979}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6228a9b3a799e30438820dacdd32c017, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &264511984
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 264511979}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a279c4e48a970574da9b898f148d413c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &265077707
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,7 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using UnityEditor.Overlays;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class IngameManager : MonoBehaviour
 {
@@ -19,6 +21,11 @@ public class IngameManager : MonoBehaviour
         }
     }
 
+    [Header("Controllers")]
+    [SerializeField] private MonsterController _monsterController = null;
+    [SerializeField] private PlayerCntroller _playerController = null;
+    [SerializeField] private ActionController _actionController = null;
+
     [Header("Ingame UI"), SerializeField] private IngameUI _ingameUI = null;
     [Header("TextView"), SerializeField] private TextView _textView = null;
     [Header("Control"), SerializeField] private ControlPad _controlPad = null;
@@ -31,12 +38,29 @@ public class IngameManager : MonoBehaviour
     private MapGenerator _mapGenerator = null;
 
     private bool _isPlayerTurn = false;
-    private bool _isAllMonsterDead = true;
     private bool _isHuntMonster = false;
+
+    public DataManager.Save_Data saveData
+    {
+        get { return _saveData; }
+    }
+
+    public bool isAllMonsterDead
+    {
+        get { return _monsterController.isAllMonsterDead; }
+        set { _monsterController.isAllMonsterDead = value; }
+    }
+
+    public bool isPlayerTurn
+    {
+        get { return _isPlayerTurn; }
+        set { _isPlayerTurn = value; }
+    }
 
     public bool isHuntMonster 
     {
         get { return _isHuntMonster; }
+        set { _isHuntMonster = value; }
     }
 
     void Start()
@@ -48,13 +72,17 @@ public class IngameManager : MonoBehaviour
 
         _saveData = GameManager.instance.dataManager.CopySaveData();
 
+        _monsterController.Initialize();
+        _playerController.Initialize();
+        _actionController.Initialize();
+
         _ingameUI.Initialize(OpenMap, OpenNextRound, _textView.UpdateText, _ingamePopup.UpdateText);
         _textView.Initialize();
-        _controlPad.Initialize(PlayerMove, PlayerAction);
+        _controlPad.Initialize(_playerController.PlayerMove, _playerController.PlayerAction);
         _mapController.Initialize(GameManager.instance.dataManager.MapSize);
         _ingamePopup.Initialize();
-        _shop.Initialize(_textView.UpdateText, _ingamePopup.UpdateText, Buy);
-        _bonfire.Initialize(_textView.UpdateText, _ingamePopup.UpdateText, SelectSkill, _controlPad.Skill);
+        _shop.Initialize(_textView.UpdateText, _ingamePopup.UpdateText, _actionController.Buy);
+        _bonfire.Initialize(_textView.UpdateText, _ingamePopup.UpdateText, _actionController.SelectSkill, _controlPad.Skill);
 
         FirstSet();
 
@@ -156,11 +184,11 @@ public class IngameManager : MonoBehaviour
 
         if (_saveData.mapData.monsterDatas.Count > 0)
         {
-            _isAllMonsterDead = false;
+            _monsterController.isAllMonsterDead = false;
         }
     }
 
-    private void RoundClear()
+    public void RoundClear()
     {
         GameManager.instance.dataManager.UpdatePlayerData(_saveData);
 
@@ -170,1406 +198,198 @@ public class IngameManager : MonoBehaviour
         _ingameUI.OpenNextRoundWindow(eRoundClear.Success);
     }
 
-    #region Player
-
-    private void PlayerMove(eControl type)
+    public void ControlPad_Skill()
     {
-        if(_isPlayerTurn == false)
-        {
-            _ingamePopup.UpdateText(_saveData.userData.data.name + "의 순서가 아닙니다.");
-
-            return;
-        }
-
-        if (_saveData.userData.currentAP <= 0)
-        {
-            _ingamePopup.UpdateText("ap가 부족합니다.");
-
-            return;
-        }
-
-        int nearbyBlockIndex = PlayerMoveType(type, _saveData.userData.data.currentNodeIndex);
-
-        if (nearbyBlockIndex == -1)
-        {
-            return;
-        }
-
-        _textView.UpdateText(_saveData.mapData.nodeDatas[nearbyBlockIndex]);
-
-        _saveData.mapData.nodeDatas[_saveData.userData.data.currentNodeIndex].isUser = false;
-        _saveData.mapData.nodeDatas[nearbyBlockIndex].isUser = true;
-
-        _saveData.userData.data.currentNodeIndex = nearbyBlockIndex;
-        _saveData.userData.currentAP -= 1;
-
-        _ingameUI.UpdatePlayerInfo(eStats.AP, _saveData.userData);
-
-        UpdateData();
+        _controlPad.Skill(_saveData.userData, _actionController.Skill);
     }
 
-    private int PlayerMoveType(eControl type, int currentIndex)
+    public void ControlPad_Bag()
     {
-        int x = 0;
-        int y = 0;
-
-        switch (type)
-        {
-            case eControl.Up:
-                x = 0;
-                y = 1;
-                break;
-
-            case eControl.Left:
-                x = -1;
-                y = 0;
-                break;
-
-            case eControl.Right:
-                x = 1;
-                y = 0;
-                break;
-
-            case eControl.Down:
-                x = 0;
-                y = -1;
-                break;
-        }
-
-        int result = GetNearbyBlocks(x, y, currentIndex);
-
-        if (result == -1)
-        {
-            _ingamePopup.UpdateText("이동할 수 없습니다.");
-
-            return result;
-        }
-
-        if (_saveData.mapData.nodeDatas[result].isWalkable == false)
-        {
-            _ingamePopup.UpdateText("이동할 수 없습니다.");
-
-            return -1;
-        }
-
-        if (_saveData.mapData.nodeDatas[result].isMonster == true)
-        {
-            _saveData.userData.currentAP -= 2;
-            _ingameUI.UpdatePlayerInfo(eStats.AP, _saveData.userData);
-
-            Attack(result);
-
-            return -1;
-        }
-
-        if (_saveData.mapData.nodeDatas[result].isShop == true || _saveData.mapData.nodeDatas[result].isBonfire == true)
-        {
-            _saveData.userData.currentAP -= 1;
-            _ingameUI.UpdatePlayerInfo(eStats.AP, _saveData.userData);
-
-            Npc(result);
-
-            return -1;
-        }
-
-        if (_saveData.mapData.nodeDatas[result].isGuide == true)
-        {
-            UiManager.instance.OpenTutorial(false);
-
-            return -1;
-        }
-
-        if (_saveData.mapData.exitNodeIndex == result)
-        {
-            if(_isAllMonsterDead == false)
-            {
-                _textView.UpdateText("--- 남아있는 몬스터가 있습니다.");
-
-                return -1;
-            }
-
-            UiManager.instance.OpenPopup(string.Empty, "다음 라운드로 넘어가시겠습니까?", string.Empty, string.Empty, () =>
-            {
-                GameManager.instance.soundManager.PlaySfx(eSfx.RoundSuccess);
-                RoundClear();
-            }, null);
-
-            return -1;
-        }
-
-        return result;
+        _controlPad.Bag(_saveData.userData, _actionController.Bag);
     }
 
-    private void PlayerAction(eControl type)
+    public void SetMap(List<int> nearbyIndexs)
     {
-        if(_isPlayerTurn == false)
-        {
-            _ingamePopup.UpdateText(_saveData.userData.data.name + "의 순서가 아닙니다.");
-
-            return;
-        }
-
-        switch(type)
-        {
-            case eControl.Defence:
-                {
-                    UiManager.instance.OpenPopup(string.Empty, "방어력을 높히시겠습니까? 남은 행동력을 모두 소진합니다.", "확인", "취소", () =>
-                    {
-                        Defence();
-                    }, null);
-                }
-                break;
-
-            case eControl.Skill:
-                {
-                    _controlPad.Skill(_saveData.userData, Skill);
-                }
-                break;
-
-            case eControl.Bag:
-                {
-                    _controlPad.Bag(_saveData.userData, Bag);
-                }
-                break;
-
-            case eControl.Rest:
-                {
-                    UiManager.instance.OpenPopup(string.Empty, "휴식하시겠습니까?", "확인", "취소", () =>
-                    {
-                        PlayerTurnOut();
-                        StartCoroutine(MonsterTurn());
-                    }, null);
-                }
-                break;
-
-            case eControl.SearchNearby:
-                {
-                    PlayerSearchNearby();
-                }
-                break;
-        }
+        _mapController.SetMap(_saveData, nearbyIndexs);
     }
 
-    private void PlayerTurn()
+    public void PlayBgm(eBgm type)
     {
-        _isPlayerTurn = true;
-
-        _saveData.userData.currentAP = _saveData.userData.maximumAP;
-        _ingameUI.UpdatePlayerInfo(eStats.AP, _saveData.userData);
-
-        _textView.UpdateText("행동력이 " + _saveData.userData.currentAP + "만큼 남았습니다.");
-
-        List<int> NearbyIndexs = PlayerSearchNearby();
-
-        _mapController.SetMap(_saveData, NearbyIndexs);
+        GameManager.instance.soundManager.PlayBgm(type);
     }
 
-    private List<int> PlayerVision()
+    #region ActionController
+
+    public void BonfireOpen(DataManager.Npc_Data npc)
     {
-        List<int> dx = new List<int>();
-        List<int> dy = new List<int>();
-
-        for (int i = -_saveData.userData.currentVISION; i <= _saveData.userData.currentVISION; i++)
-        {
-            dx.Add(i);
-            dy.Add(i);
-        }
-
-        return GetNearbyBlocks_Diagonal(dx, dy, _saveData.userData.data.currentNodeIndex);
+        _bonfire.Open(npc, _saveData.userData);
     }
 
-    private List<int> PlayerSearchNearby()
+    public void ShopOpen(DataManager.Npc_Data npc)
     {
-        List<System.Action> actions = new List<System.Action>();
-        List<int> NearbyIndexs = PlayerVision();
-
-        bool Non = false;
-
-        for (int i = 0; i < NearbyIndexs.Count; i++)
-        {
-            int index = NearbyIndexs[i];
-
-            if (_saveData.mapData.exitNodeIndex == index)
-            {
-                actions.Add(() => 
-                {
-                    _textView.UpdateText(eCreature.Exit, _saveData.mapData.nodeDatas[index], _saveData.mapData.nodeDatas[_saveData.userData.data.currentNodeIndex]);
-                });
-
-                Non = true;
-
-                continue;
-            }
-
-            if (_saveData.mapData.nodeDatas[index].isItem == true)
-            {
-                actions.Add(() =>
-                {
-                    _textView.UpdateText(eCreature.Item, _saveData.mapData.nodeDatas[index], _saveData.mapData.nodeDatas[_saveData.userData.data.currentNodeIndex]);
-                });
-
-                Non = true;
-
-                continue;
-            }
-
-            if (_saveData.mapData.nodeDatas[index].isShop == true)
-            {
-                actions.Add(() =>
-                {
-                    _textView.UpdateText(eCreature.Shop, _saveData.mapData.nodeDatas[index], _saveData.mapData.nodeDatas[_saveData.userData.data.currentNodeIndex]);
-                });
-
-                Non = true;
-
-                continue;
-            }
-
-            if (_saveData.mapData.nodeDatas[index].isBonfire == true)
-            {
-                actions.Add(() =>
-                {
-                    _textView.UpdateText(eCreature.Bonfire, _saveData.mapData.nodeDatas[index], _saveData.mapData.nodeDatas[_saveData.userData.data.currentNodeIndex]);
-                });
-
-                Non = true;
-
-                continue;
-            }
-
-            if (_saveData.mapData.nodeDatas[index].isUseBonfire == true)
-            {
-                actions.Add(() =>
-                {
-                    _textView.UpdateText(eCreature.UseBonfire, _saveData.mapData.nodeDatas[index], _saveData.mapData.nodeDatas[_saveData.userData.data.currentNodeIndex]);
-                });
-
-                Non = true;
-
-                continue;
-            }
-
-            if (_saveData.mapData.nodeDatas[index].isMonster == true)
-            {
-                actions.Add(() =>
-                {
-                    _textView.UpdateText(eCreature.Monster, _saveData.mapData.nodeDatas[index], _saveData.mapData.nodeDatas[_saveData.userData.data.currentNodeIndex]);
-                });
-
-                Non = true;
-
-                continue;
-            }
-
-            if (_saveData.mapData.nodeDatas[index].isGuide == true)
-            {
-                actions.Add(() =>
-                {
-                    _textView.UpdateText(eCreature.Guide, _saveData.mapData.nodeDatas[index], _saveData.mapData.nodeDatas[_saveData.userData.data.currentNodeIndex]);
-                });
-
-                Non = true;
-
-                continue;
-            }
-        }
-
-        if (Non == false)
-        {
-            _textView.UpdateText("--- 주변에 발견된게 없습니다.");
-
-            return NearbyIndexs;
-        }
-
-        _textView.UpdateText("--- 주변 검색을 시작합니다.");
-
-        foreach (var action in actions)
-        {
-            action?.Invoke();
-        }
-
-        _textView.UpdateText("--- 주변 검색이 끝났습니다.");
-
-        return NearbyIndexs;
+        _shop.Open(npc, _saveData.userData.data.coin);
     }
 
-    private void PlayerTurnOut()
+    public void CallAttacker(DataManager.Creature_Data monster, Action onLastCallback, Action<eWinorLose, int> onResultCallback)
     {
-        _isPlayerTurn = false;
-
-        SkillRemindDuration();
-        ItemRemindDuration();
-
-        _textView.UpdateText("--- " + _saveData.userData.data.name + "의 순서가 종료됩니다.");
+        _ingameUI.CallAttacker(_saveData.userData, monster, onLastCallback, onResultCallback);
     }
 
-    #endregion
-
-    #region Monster
-
-    IEnumerator MonsterTurn()
+    public void OpneLevelPoint()
     {
-        if (_isAllMonsterDead == true)
+        _ingameUI.OpneLevelPoint(_saveData.userData, (newData) =>
         {
-            _textView.UpdateText("--- 살아있는 몬스터가 없습니다. 순서를 건너뜁니다.");
-            PlayerTurn();
-
-            yield break;
-        }
-
-        _textView.UpdateText("--- 몬스터의 순서입니다.");
-
-        int attackMonsterIndex = 0;
-        bool isAttack = false;
-
-        for (int m = 0; m < _saveData.mapData.monsterDatas.Count; m++)
-        {
-            yield return new WaitForSeconds(0.5f);
-
-            if(isAttack == false)
-            {
-                if (MonsterAttack(m) == true)
-                {
-                    attackMonsterIndex = m;
-
-                    isAttack = true;
-                }
-            }
-
-            MonsterMove(m, 1);
-        }
-
-        if(isAttack == true)
-        {
-            Attack(_saveData.mapData.monsterDatas[attackMonsterIndex].currentNodeIndex, () =>
-            {
-                MonsterTurnOut();
-            });
-
-            yield break;
-        }
-
-        MonsterTurnOut();
-    }
-
-    private void MonsterTurnOut()
-    {
-        _textView.UpdateText("--- 몬스터의 순서가 종료되었습니다.");
-
-        UpdateData();
-        PlayerTurn();
-    }
-
-    private bool MonsterAttack(int m)
-    {
-        List<int> dx = new List<int>();
-        List<int> dy = new List<int>();
-
-        for (int i = -_saveData.mapData.monsterDatas[m].attackRange; i <= _saveData.mapData.monsterDatas[m].attackRange; i++)
-        {
-            dx.Add(i);
-            dy.Add(i);
-        }
-
-        bool isAttack = false;
-        List<int> NearbyIndexs = GetNearbyBlocks(_saveData.mapData.monsterDatas[m].currentNodeIndex);
-
-        for (int i = 0; i < NearbyIndexs.Count; i++)
-        {
-            if (_saveData.userData.data.currentNodeIndex == NearbyIndexs[i])
-            {
-                isAttack = true;
-
-                break;
-            }
-        }
-
-        if (isAttack == true)
-        {
-            return isAttack;
-        }
-
-        return isAttack;
-    }
-
-    private void MonsterMove(int m, int ap)
-    {
-        List<int> dx = new List<int>();
-        List<int> dy = new List<int>();
-
-        for (int i = -_saveData.mapData.monsterDatas[m].vision; i <= _saveData.mapData.monsterDatas[m].vision; i++)
-        {
-            dx.Add(i);
-            dy.Add(i);
-        }
-
-        bool isFindPlayer = false;
-        List<int> NearbyIndexs = GetNearbyBlocks_Diagonal(dx, dy, _saveData.mapData.monsterDatas[m].currentNodeIndex);
-
-        for (int i = 0; i < NearbyIndexs.Count; i++)
-        {
-            if (_saveData.mapData.nodeDatas[NearbyIndexs[i]].isWalkable == false)
-            {
-                continue;
-            }
-
-            if (_saveData.mapData.nodeDatas[NearbyIndexs[i]].isMonster == true)
-            {
-                continue;
-            }
-
-            if (_saveData.mapData.nodeDatas[NearbyIndexs[i]].isShop == true)
-            {
-                continue;
-            }
-
-            if (_saveData.userData.data.currentNodeIndex == NearbyIndexs[i])
-            {
-                isFindPlayer = true;
-
-                break;
-            }
-        }
-
-        if (isFindPlayer == true)
-        {
-            MonsterTargetPlayer(m);
-
-            return;
-        }
-
-        List<int> nearbyBlocks = GetNearbyBlocks(_saveData.mapData.monsterDatas[m].currentNodeIndex);
-
-        if (nearbyBlocks.Count == 0)
-        {
-            return;
-        }
-
-        MonsterSelectMoveBlock(m, ap, ref nearbyBlocks);
-    }
-
-    private void MonsterDead(DataManager.Creature_Data monster)
-    {
-        _saveData.mapData.nodeDatas[monster.currentNodeIndex].isMonster = false;
-
-        _saveData.mapData.monsterDatas.Remove(_saveData.mapData.monsterDatas.Find(x => x.id == monster.id));
-
-        UpdateData();
-    }
-
-    private void MonsterSelectMoveBlock(int m, int ap, ref List<int> nearbyBlocks)
-    {
-        if (ap <= 0)
-        {
-            return;
-        }
-
-        int randomIndex = Random.Range(0, nearbyBlocks.Count);
-
-        if (_saveData.mapData.nodeDatas[nearbyBlocks[randomIndex]].isUser == true)
-        {
-            ap -= 1;
-            MonsterTargetPlayer(m);
-
-            return;
-        }
-
-        if (_saveData.mapData.nodeDatas[nearbyBlocks[randomIndex]].isWalkable == false)
-        {
-            MonsterSelectMoveBlock(m, ap, ref nearbyBlocks);
-
-            return;
-        }
-
-        if (_saveData.mapData.nodeDatas[nearbyBlocks[randomIndex]].isMonster == true)
-        {
-            MonsterSelectMoveBlock(m, ap, ref nearbyBlocks);
-
-            return;
-        }
-
-        _saveData.mapData.nodeDatas[_saveData.mapData.monsterDatas[m].currentNodeIndex].isMonster = false;
-        _saveData.mapData.nodeDatas[nearbyBlocks[randomIndex]].isMonster = true;
-
-        _saveData.mapData.monsterDatas[m].currentNodeIndex = nearbyBlocks[randomIndex];
-        ap -= 1;
-
-        MonsterSelectMoveBlock(m, ap, ref nearbyBlocks);
-    }
-
-    private void MonsterTargetPlayer(int m)
-    {
-        DataManager.Creature_Data player = _saveData.userData.data;
-
-        int result = _mapGenerator.PathFinding(ref _saveData.mapData, _saveData.mapData.monsterDatas[m].currentNodeIndex, player.currentNodeIndex);
-
-        _saveData.mapData.nodeDatas[_saveData.mapData.monsterDatas[m].currentNodeIndex].isMonster = false;
-        _saveData.mapData.nodeDatas[result].isMonster = true;
-
-        _saveData.mapData.monsterDatas[m].currentNodeIndex = result;
-    }
-
-    #endregion
-
-    #region Action
-
-    private void Npc(int nodeIndex)
-    {
-        DataManager.Npc_Data npc = _saveData.mapData.npcDatas.Find(x => x.currentNodeIndex == nodeIndex);
-
-        if(npc.isBonfire == true)
-        {
-            if(npc.isUseBonfire == true)
-            {
-                _textView.UpdateText("--- 모닥불의 불꽃이 사그라들었습니다.");
-            }
-            else
-            {
-                _bonfire.Open(npc, _saveData.userData);
-            }
-        }
-        else if(npc.isShop == true)
-        {
-            if (npc.itemIndexs.Count == 0)
-            {
-                _textView.UpdateText("@상인 : 물건이 다 떨어졌어요 다음에 들러주세요!");
-
-                return;
-            }
-            else
-            {
-                _textView.UpdateText("@상인 : 안녕하세요! 좋은 물건 구경해보세요!");
-
-                _shop.Open(npc, _saveData.userData.data.coin);
-            }
-        }
-    }
-
-    private void Buy(int currentIndex, int index, ushort price)
-    {
-        if(index < 0)
-        {
-            return;
-        }
-
-        _saveData.mapData.npcDatas.Find(x => x.currentNodeIndex == currentIndex).itemIndexs.Remove(_saveData.mapData.npcDatas[0].itemIndexs.Find(x => x == index));
-
-        GameManager.instance.soundManager.PlaySfx(eSfx.Coin);
-
-        _textView.UpdateText("@상인 : 구매해주셔서 고마워요");
-        _ingamePopup.UpdateText("가방에 보관되었습니다.");
-
-        _saveData.userData.data.coin -= price;
-        _saveData.userData.itemDataIndexs.Add((ushort)index);
-
-        GameManager.instance.dataManager.AddEncyclopedia_Item(index);
-    }
-
-    private void SelectSkill(int currentIndex, int getIndex, int removeIndex)
-    {
-        _saveData.mapData.npcDatas.Find(x => x.currentNodeIndex == currentIndex).isUseBonfire = true;
-        _saveData.mapData.nodeDatas[currentIndex].isUseBonfire = true;
-        UpdateData();
-
-        _textView.UpdateText("모닥불의 불꽃이 사그라들고 있다.");
-
-        if (getIndex == 0 && removeIndex == 0)
-        {
-            _ingamePopup.UpdateText("체력과 마나가 회복되었습니다.");
-
-            ushort hp = (ushort)(_saveData.userData.maximumHP * 0.35f);
-            ushort mp = (ushort)(_saveData.userData.maximumMP * 0.35f);
-
-            if(_saveData.userData.currentHP + hp > _saveData.userData.maximumHP)
-            {
-                _saveData.userData.currentHP = _saveData.userData.maximumHP;
-            }
-            else
-            {
-                _saveData.userData.currentHP += hp;
-            }
-
-            if (_saveData.userData.currentHP + hp > _saveData.userData.maximumMP)
-            {
-                _saveData.userData.currentHP = _saveData.userData.maximumMP;
-            }
-            else
-            {
-                _saveData.userData.currentHP += mp;
-            }
-
-            UpdateData();
-
-            return;
-        }
-
-        if(removeIndex != 0)
-        {
-            for (int i = 0; i < _saveData.userData.skillDataIndexs.Count; i++)
-            {
-                if (_saveData.userData.skillDataIndexs[i] != removeIndex)
-                {
-                    continue;
-                }
-
-                _saveData.userData.skillDataIndexs[i] = (ushort)getIndex;
-                break;
-            }
-        }
-
-        _saveData.userData.skillDataIndexs.Add((ushort)getIndex);
-    }
-
-    private void Attack(int nodeMonsterIndex, System.Action onLastCallback = null)
-    {
-        DataManager.Creature_Data monster = _saveData.mapData.monsterDatas.Find(x => x.currentNodeIndex == nodeMonsterIndex);
-        GameManager.instance.dataManager.AddEncyclopedia_Creature(monster.id);
-
-        _isHuntMonster = true;
-
-        _ingameUI.CallAttacker(_saveData.userData, monster, onLastCallback, (result, damage) => 
-        {
-            PlayBgm(eBgm.Ingame);
-
-            if (result == eWinorLose.Lose)
-            {
-                _textView.UpdateText("--- " + monster.name + " (이)가 승리했습니다.");
-
-                int monsterAttack = (int)(damage + ((damage * 0.1f) * monster.attack));
-                int playerDef = _saveData.userData.currentDEFENCE + (int)(_saveData.userData.currentDEFENCE * (0.1f * _saveData.userData.Defence_Effect_Per)) + _saveData.userData.Defence_Effect;
-                int resultDamage = (playerDef - monsterAttack);
-
-                if(resultDamage >= 0)
-                {
-                    GameManager.instance.soundManager.PlaySfx(eSfx.Blocked);
-                    _textView.UpdateText("--- " + monster.name + " 의 공격이 방어도에 막혔습니다.");
-
-                    return;
-                }
-
-                _saveData.userData.currentHP -= (ushort)Mathf.Abs(resultDamage);
-
-                int soundHP = _saveData.userData.currentHP / 3;
-
-                if (soundHP > (ushort)Mathf.Abs(resultDamage))
-                {
-                    GameManager.instance.soundManager.PlaySfx(eSfx.Hit_hard);
-                }
-                else
-                {
-                    GameManager.instance.soundManager.PlaySfx(eSfx.Hit_light);
-                }
-
-                _textView.UpdateText("--- " + Mathf.Abs(resultDamage) + " 의 피해를 입었습니다.");
-
-                if(_saveData.userData.currentHP > 60000 || _saveData.userData.currentHP == 0)
-                {
-                    _saveData.userData.currentHP = 0;
-
-                    GameManager.instance.soundManager.PlaySfx(eSfx.RoundFail);
-                    UpdateData(Mathf.Abs(resultDamage) + " 의 피해를 입어 패배하였습니다.");
-
-                    return;
-                }
-
-                UpdateData();
-
-                return;
-            }
-
-            if(result == eWinorLose.Draw)
-            {
-                _textView.UpdateText("--- 무승부입니다.");
-
-                UpdateData();
-
-                return;
-            }
-
-            _textView.UpdateText("--- " + _saveData.userData.data.name + " (이)가 승리했습니다.");
-
-            int playerDamage = _saveData.userData.currentATTACK + damage + (int)(_saveData.userData.currentATTACK * (0.1f * _saveData.userData.Attack_Effect_Per)) + _saveData.userData.Attack_Effect ;
-            int _damage = monster.defence - playerDamage;
-
-            if(_damage >= 0)
-            {
-                _textView.UpdateText("--- " + _saveData.userData.data.name + " 의 공격이 방어도에 막혔습니다.");
-                GameManager.instance.soundManager.PlaySfx(eSfx.Blocked);
-
-                return;
-            }
-            else
-            {
-                GameManager.instance.soundManager.PlaySfx(eSfx.Attack);
-                _textView.UpdateText("--- " + _saveData.userData.data.name + " (이)가 " + playerDamage + " 의 공격력으로 공격합니다.");
-                _textView.UpdateText("방어도를 제외한 " + Mathf.Abs(_damage) + " 의 데미지를 가했습니다.");
-
-                monster.hp -= (ushort)Mathf.Abs(_damage);
-
-                if (monster.hp >= 60000 || monster.hp == 0)
-                {
-                    _saveData.mapData.monsterDatas.Find(x => x.currentNodeIndex == nodeMonsterIndex).hp = 0;
-
-                    _textView.UpdateText(monster.name + " (을)를 처치하였습니다");
-                    _textView.UpdateText("--- 경험치 " + monster.exp + " , 코인 " + monster.coin + "을 획득했습니다");
-                    
-                    if(monster.itemIndexs != null)
-                    {
-                        if(monster.itemIndexs.Count > 0)
-                        {
-                            _textView.UpdateText("--- 아이템 " + monster.itemIndexs.Count + " 개를 획득했습니다.");
-
-                            for (int i = 0; i < monster.itemIndexs.Count; i++)
-                            {
-                                _saveData.userData.itemDataIndexs.Add(monster.itemIndexs[i]);
-                                GameManager.instance.dataManager.AddEncyclopedia_Item(monster.itemIndexs[i]);
-                            }
-                        }
-                    }
-                     
-                    _saveData.userData.data.coin += (ushort)(monster.coin + (monster.coin * 0.0f * _saveData.userData.Coin_Effect_Per));
-                    _saveData.userData.currentEXP += (ushort)(monster.exp + (monster.exp * 0.1f * _saveData.userData.EXP_Effect_Per));
-
-                    LevelUp();
-
-                    MonsterDead(monster);
-                }
-                else
-                {
-                    _textView.UpdateText(monster.name + "의 체력이 " + monster.hp + " 만큼 남았습니다.");
-
-                    _saveData.mapData.monsterDatas.Find(x => x.currentNodeIndex == nodeMonsterIndex).hp = monster.hp;
-                }
-
-                if(_saveData.mapData.monsterDatas.Count == 0)
-                {
-                    GameManager.instance.soundManager.PlaySfx(eSfx.ExitOpen);
-                    _isAllMonsterDead = true;
-                }
-
-                UpdateData();
-            }
+            _saveData.userData.data.hp = newData.data.hp;
+            _saveData.userData.data.mp = newData.data.mp;
+            _saveData.userData.data.ap = newData.data.ap;
+            _saveData.userData.data.attack = newData.data.attack;
+            _saveData.userData.data.defence = newData.data.defence;
+            _saveData.userData.data.vision = newData.data.vision;
+            _saveData.userData.data.attackRange = newData.data.attackRange;
+
+            _saveData.userData.currentHP = _saveData.userData.maximumHP;
+            _saveData.userData.currentMP = _saveData.userData.maximumMP;
+            _saveData.userData.currentAP = _saveData.userData.maximumAP;
+            _saveData.userData.currentVISION = _saveData.userData.maximumVISION;
 
             UpdateData();
         });
     }
 
-    private void Defence()
+    public void ControlPadUpdateData()
     {
-        if (_saveData.userData.currentAP == 0)
-        {
-            _textView.UpdateText("--- 남아있는 행동력이 없습니다.");
-
-            return;
-        }
-
-        ushort ap = _saveData.userData.currentAP;
-        _saveData.userData.currentDEFENCE += ap;
-        _saveData.userData.currentAP = 0;
-
-        _textView.UpdateText("행동력을 모드 소진하였습니다.");
-        _textView.UpdateText("방어도가 " + ap + "만큼 증가했습니다.");
-
-        _ingameUI.UpdatePlayerInfo(eStats.AP, _saveData.userData);
-        _ingameUI.UpdatePlayerInfo(eStats.Defence, _saveData.userData);
-    }
-
-    private void LevelUp()
-    {
-        if (_saveData.userData.maximumEXP <= _saveData.userData.currentEXP)
-        {
-            _textView.UpdateText("레벨이 증가했습니다 !");
-
-            _saveData.userData.level += 1;
-            _saveData.userData.currentEXP = (ushort)Mathf.Abs(_saveData.userData.maximumEXP - _saveData.userData.currentEXP);
-
-            _ingameUI.UpdatePlayerInfo(eStats.EXP, _saveData.userData);
-            _ingameUI.UpdatePlayerInfo(eStats.Level, _saveData.userData);
-
-            _ingameUI.OpneLevelPoint(_saveData.userData, (newData) =>
-            {
-                _saveData.userData.data.hp = newData.data.hp;
-                _saveData.userData.data.mp = newData.data.mp;
-                _saveData.userData.data.ap = newData.data.ap;
-                _saveData.userData.data.attack = newData.data.attack;
-                _saveData.userData.data.defence = newData.data.defence;
-                _saveData.userData.data.vision = newData.data.vision;
-                _saveData.userData.data.attackRange = newData.data.attackRange;
-
-                _saveData.userData.currentHP = _saveData.userData.maximumHP;
-                _saveData.userData.currentMP = _saveData.userData.maximumMP;
-                _saveData.userData.currentAP = _saveData.userData.maximumAP;
-                _saveData.userData.currentVISION = _saveData.userData.maximumVISION;
-
-                UpdateData();
-            });
-        }
-    }
-
-    private void Skill(int id)
-    {
-        if (id == -1)
-        {
-            _ingamePopup.UpdateText("선택된 스킬이 없습니다.");
-            return;
-        }
-
-        int reCooldown = 0;
-        if(SkillCheckCoolDown(id, ref reCooldown) == false)
-        {
-            _textView.UpdateText("대기순서가 " + reCooldown  + "만큼 남았습니다.");
-
-            return;
-        }
-
-        DataManager.Skill_Data data = GameManager.instance.dataManager.GetskillData(id);
-
-        DataManager.Skill_CoolDown cooldown = new DataManager.Skill_CoolDown();
-        cooldown.id = data.id;
-        cooldown.name = data.name;
-        cooldown.coolDown = data.coolDown + 1;
-        _saveData.userData.coolDownSkill.Add(cooldown);
-
-        int useMP = data.usemp;
-        int reMP = _saveData.userData.currentMP - useMP;
-        _saveData.userData.currentMP = (ushort)(reMP < 0 ? 0 : reMP);
-
-        SkillConsumptionCheck(data, eStats.HP, data.hp);
-        SkillConsumptionCheck(data, eStats.MP, data.mp);
-        SkillConsumptionCheck(data, eStats.AP, data.ap);
-
-        SkillConsumptionCheck(data, eStats.EXP, data.exp);
-        SkillConsumptionCheck(data, eStats.EXP, data.expPercentIncreased, true);
-
-        SkillConsumptionCheck(data, eStats.Coin, data.coin);
-        SkillConsumptionCheck(data, eStats.Coin, data.coinPercentIncreased, true);
-
-        SkillConsumptionCheck(data, eStats.Attack, data.attack);
-        SkillConsumptionCheck(data, eStats.Attack, data.attackPercentIncreased, true);
-
-        SkillConsumptionCheck(data, eStats.Defence, data.defence);
-        SkillConsumptionCheck(data, eStats.Defence, data.defencePercentIncreased, true);
-
         _controlPad.UpdateData(_saveData.userData);
-        UpdateData();
-
-        _textView.UpdateText("스킬 " + data.name + " (을)를 발동하셨습니다.");
     }
 
-    private bool SkillCheckCoolDown(int id, ref int cooldown)
+    public void Attack(int index, Action onLastCallback = null)
     {
-        for (int i = 0; i < _saveData.userData.coolDownSkill.Count; i++)
-        {
-            if (_saveData.userData.coolDownSkill[i].id == id)
-            {
-                cooldown = _saveData.userData.coolDownSkill[i].coolDown;
-                return false;
-            }
-        }
-
-        return true;
+        _actionController.Attack(index, onLastCallback);
     }
 
-    private void SkillConsumptionCheck(DataManager.Skill_Data data, eStats type, int useValue, bool isPercent = false)
+    public void Defence()
     {
-        eEffect_IncreaseDecrease result = eEffect_IncreaseDecrease.Non;
-
-        if (useValue == 0)
-        {
-            return;
-        }
-
-        if (useValue < 0)
-        {
-            result = eEffect_IncreaseDecrease.Decrease;
-        }
-
-        if (useValue == -9999)
-        {
-            result = eEffect_IncreaseDecrease.ALLDecrease;
-        }
-
-        if (useValue > 0)
-        {
-            result = eEffect_IncreaseDecrease.Increase;
-        }
-
-        DataManager.Duration temp = new DataManager.Duration();
-        temp.ID = data.id;
-        temp.name = data.name;
-        temp.stats = type;
-        temp.inDe = result;
-        temp.isPercent = isPercent;
-        temp.value = useValue;
-        temp.remaindCooldown = data.coolDown + 1;
-        temp.remaindDuration = data.duration + 1;
-
-        if (data.duration == 0)
-        {
-            ApplyEffect(temp);
-
-            return;
-        }
-
-        _saveData.userData.useSkill.Add(temp);
+        _actionController.Defence();
     }
 
-    private void SkillRemindDuration()
+    public void Npc(int index)
     {
-        for (int i = _saveData.userData.useSkill.Count - 1; i >= 0; i--)
-        {
-            if(_saveData.userData.useSkill[i].remaindDuration == 0)
-            {
-                RemoveEffect(_saveData.userData.useSkill[i]);
-
-                _saveData.userData.useSkill.Remove(_saveData.userData.useSkill[i]);
-
-                continue;
-            }
-
-            ApplyEffect(_saveData.userData.useSkill[i]);
-            _saveData.userData.useSkill[i].remaindDuration -= 1;
-        }
-
-        for (int i = _saveData.userData.coolDownSkill.Count - 1; i >= 0; i--)
-        {
-            if(_saveData.userData.coolDownSkill[i].coolDown == 0)
-            {
-                _textView.UpdateText(_saveData.userData.coolDownSkill[i].name + " (을)를 다시 사용 할 수 있습니다.");
-
-                _saveData.userData.coolDownSkill.Remove(_saveData.userData.coolDownSkill[i]);
-
-                continue;
-            }
-
-            _saveData.userData.coolDownSkill[i].coolDown -= 1;
-        }
-
-        UpdateData();
-    }
-
-    private void Bag(int id)
-    {
-        if (id == -1)
-        {
-            _ingamePopup.UpdateText("선택된 아이템이 없습니다.");
-
-            return;
-        }
-
-        for (int i = _saveData.userData.itemDataIndexs.Count -  1; i >= 0; i--)
-        {
-            if(_saveData.userData.itemDataIndexs[i] == id)
-            {
-                _saveData.userData.itemDataIndexs.Remove(_saveData.userData.itemDataIndexs[i]);
-
-                break;
-            }
-        }
-
-        DataManager.Item_Data data = GameManager.instance.dataManager.GetItemData(id);
-
-        ItemConsumptionCheck(data, eStats.HP, data.hp);
-        ItemConsumptionCheck(data, eStats.MP, data.mp);
-        ItemConsumptionCheck(data, eStats.AP, data.ap);
-
-        ItemConsumptionCheck(data, eStats.EXP, data.exp);
-        ItemConsumptionCheck(data, eStats.EXP, data.expPercentIncreased, true);
-
-        ItemConsumptionCheck(data, eStats.Coin, data.coin);
-        ItemConsumptionCheck(data, eStats.Coin, data.coinPercentIncreased, true);
-
-        ItemConsumptionCheck(data, eStats.Attack, data.attack);
-        ItemConsumptionCheck(data, eStats.Attack, data.attackPercentIncreased, true);
-
-        ItemConsumptionCheck(data, eStats.Defence, data.defence);
-        ItemConsumptionCheck(data, eStats.Defence, data.defencePercentIncreased, true);
-
-        _controlPad.UpdateData(_saveData.userData);
-        UpdateData();
-    }
-
-    private void ItemConsumptionCheck(DataManager.Item_Data data, eStats type, int useValue, bool isPercent = false)
-    {
-        eEffect_IncreaseDecrease result = eEffect_IncreaseDecrease.Non;
-
-        if (useValue == 0)
-        {
-            return;
-        }
-
-        if (useValue < 0)
-        {
-            result = eEffect_IncreaseDecrease.Decrease;
-        }
-
-        if (useValue == -9999)
-        {
-            result = eEffect_IncreaseDecrease.ALLDecrease;
-        }
-
-        if (useValue > 0)
-        {
-            result = eEffect_IncreaseDecrease.Increase;
-        }
-
-        DataManager.Duration temp = new DataManager.Duration();
-        temp.ID = data.id;
-        temp.name = data.name;
-        temp.stats = type;
-        temp.inDe = result;
-        temp.isPercent = isPercent;
-        temp.value = useValue;
-        temp.remaindDuration = data.duration + 1;
-
-        if(data.duration == 0)
-        {
-            ApplyEffect(temp);
-
-            return;
-        }
-
-        _saveData.userData.useItem.Add(temp);
-    }
-
-    private void ItemRemindDuration()
-    {
-        for (int i = _saveData.userData.useItem.Count - 1; i >= 0; i--)
-        {
-            if (_saveData.userData.useItem[i].remaindDuration == 0)
-            {
-                RemoveEffect(_saveData.userData.useItem[i]);
-
-                _saveData.userData.useItem.Remove(_saveData.userData.useItem[i]);
-
-                continue;
-            }
-
-            ApplyEffect(_saveData.userData.useItem[i]);
-            _saveData.userData.useItem[i].remaindDuration -= 1;
-        }
-
-        UpdateData();
-    }
-
-    private void RemoveEffect(DataManager.Duration use)
-    {
-        _textView.UpdateText(use.name + " 의 효과가 끝났습니다.");
-
-        switch (use.stats)
-        {
-            case eStats.HP:
-                {
-                    ushort value = (ushort)(use.inDe == eEffect_IncreaseDecrease.Increase ? use.value : (use.value * -1));
-
-                    if (_saveData.userData.currentHP - value < 0)
-                    {
-                        _saveData.userData.currentHP = 0;
-                    }
-                    else
-                    {
-                        _saveData.userData.currentHP -= value;
-                    }
-                }
-                break;
-
-            case eStats.MP:
-                {
-                    ushort value = (ushort)(use.inDe == eEffect_IncreaseDecrease.Increase ? use.value : (use.value * -1));
-
-                    if (_saveData.userData.currentMP - value < 0)
-                    {
-                        _saveData.userData.currentMP = 0;
-                    }
-                    else
-                    {
-                        _saveData.userData.currentMP -= value;
-                    }
-                }
-                break;
-
-            case eStats.AP:
-                {
-                    ushort value = (ushort)(use.inDe == eEffect_IncreaseDecrease.Increase ? use.value : (use.value * -1));
-
-                    if (_saveData.userData.currentAP - value < 0)
-                    {
-                        _saveData.userData.currentAP = 0;
-
-                        return;
-                    }
-
-                    _saveData.userData.currentAP -= value;
-                }
-                break;
-
-            case eStats.EXP:
-                {
-                    ushort value = (ushort)(use.inDe == eEffect_IncreaseDecrease.Increase ? use.value : (use.value * -1));
-
-                    if (use.isPercent == true)
-                    {
-                        if(_saveData.userData.EXP_Effect_Per - (short)value < 0)
-                        {
-                            _saveData.userData.EXP_Effect_Per = 0;
-
-                            return;
-                        }
-
-                        _saveData.userData.EXP_Effect_Per -= (short)value;
-
-                        return;
-                    }
-
-                    if (_saveData.userData.currentEXP - value < 0)
-                    {
-                        _saveData.userData.currentEXP = 0;
-
-                        return;
-                    }
-
-                    _saveData.userData.currentEXP -= (ushort)value;
-                }
-                break;
-
-            case eStats.Coin:
-                {
-                    ushort value = (ushort)(use.inDe == eEffect_IncreaseDecrease.Increase ? use.value : (use.value * -1));
-
-                    if (use.isPercent == true)
-                    {
-                        if (_saveData.userData.Coin_Effect_Per - (short)value < 0)
-                        {
-                            _saveData.userData.Coin_Effect_Per = 0;
-
-                            return;
-                        }
-
-                        _saveData.userData.Coin_Effect_Per -= (short)value;
-
-                        return;
-                    }
-
-                    if (_saveData.userData.data.coin - value < 0)
-                    {
-                        _saveData.userData.data.coin = 0;
-
-                        return;
-                    }
-
-                    _saveData.userData.data.coin -= value;
-                }
-                break;
-
-            case eStats.Attack:
-                {
-                    ushort value = (ushort)(use.inDe == eEffect_IncreaseDecrease.Increase ? use.value : (use.value * -1));
-
-                    if (use.isPercent == true)
-                    {
-                        if (_saveData.userData.Attack_Effect_Per - (short)value < 0)
-                        {
-                            _saveData.userData.Attack_Effect_Per = 0;
-
-                            return;
-                        }
-
-                        _saveData.userData.Attack_Effect_Per -= (short)value;
-
-                        return;
-                    }
-
-                    if (_saveData.userData.Attack_Effect - value < 0)
-                    {
-                        _saveData.userData.Attack_Effect = 0;
-
-                        return;
-                    }
-
-                    _saveData.userData.Attack_Effect -= (short)value;
-                }
-                break;
-
-            case eStats.Defence:
-                {
-                    ushort value = (ushort)(use.inDe == eEffect_IncreaseDecrease.Increase ? use.value : (use.value * -1));
-
-                    if (use.isPercent == true)
-                    {
-                        if (_saveData.userData.Defence_Effect_Per - (short)value < 0)
-                        {
-                            _saveData.userData.Defence_Effect_Per = 0;
-
-                            return;
-                        }
-
-                        _saveData.userData.Defence_Effect_Per -= (short)value;
-
-                        return;
-                    }
-
-                    if (_saveData.userData.Defence_Effect - value < 0)
-                    {
-                        _saveData.userData.Defence_Effect = 0;
-
-                        return;
-                    }
-
-                    _saveData.userData.Defence_Effect -= (short)value;
-                }
-                break;
-        }
-    }
-
-    private void ApplyEffect(DataManager.Duration use)
-    {
-        _textView.UpdateText(use.name + " 의 효과가 적용되었습니다.");
-
-        switch (use.stats)
-        {
-            case eStats.HP:
-                {
-                    ushort value = (ushort)(use.inDe == eEffect_IncreaseDecrease.Increase ? use.value : (use.value * -1));
-
-                    if (_saveData.userData.currentHP + value > _saveData.userData.maximumHP)
-                    {
-                        _saveData.userData.currentHP = _saveData.userData.maximumHP;
-                    }
-                    else
-                    {
-                        _saveData.userData.currentHP += value;
-                    }
-                }
-                break;
-
-            case eStats.MP:
-                {
-                    ushort value = (ushort)(use.inDe == eEffect_IncreaseDecrease.Increase ? use.value : (use.value * -1));
-
-                    if (_saveData.userData.currentMP + value > _saveData.userData.maximumMP)
-                    {
-                        _saveData.userData.currentMP = _saveData.userData.maximumMP;
-                    }
-                    else
-                    {
-                        _saveData.userData.currentMP += value;
-                    }
-                }
-                break;
-
-            case eStats.AP:
-                {
-                    ushort value = (ushort)(use.inDe == eEffect_IncreaseDecrease.Increase ? use.value : (use.value * -1));
-
-                    if (_saveData.userData.currentAP + value > _saveData.userData.maximumAP)
-                    {
-                        _saveData.userData.currentAP = _saveData.userData.maximumAP;
-                    }
-                    else
-                    {
-                        _saveData.userData.currentAP += value;
-                    }
-                }
-                break;
-
-            case eStats.EXP:
-                {
-                    ushort value = (ushort)(use.inDe == eEffect_IncreaseDecrease.Increase ? use.value : (use.value * -1));
-
-                    if (use.isPercent == true)
-                    {
-                        _saveData.userData.EXP_Effect_Per += (short)value;
-
-                        return;
-                    }
-
-                    _saveData.userData.currentEXP += (ushort)value;
-
-                    LevelUp();
-                }
-                break;
-
-            case eStats.Coin:
-                {
-                    ushort value = (ushort)(use.inDe == eEffect_IncreaseDecrease.Increase ? use.value : (use.value * -1));
-
-                    if (use.isPercent == true)
-                    {
-                        _saveData.userData.Coin_Effect_Per += (short)value;
-
-                        return;
-                    }
-
-                    _saveData.userData.data.coin += value;
-                }
-                break;
-
-            case eStats.Attack:
-                {
-                    ushort value = (ushort)(use.inDe == eEffect_IncreaseDecrease.Increase ? use.value : (use.value * -1));
-
-                    if (use.isPercent == true)
-                    {
-                        _saveData.userData.Attack_Effect_Per += (short)value;
-
-                        return;
-                    }
-
-                    _saveData.userData.Attack_Effect += (short)value;
-                }
-                break;
-
-            case eStats.Defence:
-                {
-                    ushort value = (ushort)(use.inDe == eEffect_IncreaseDecrease.Increase ? use.value : (use.value * -1));
-
-                    if (use.isPercent == true)
-                    {
-                        _saveData.userData.Defence_Effect_Per += (short)value;
-
-                        return;
-                    }
-
-                    _saveData.userData.Defence_Effect += (short)value;
-                }
-                break;
-        }
+        _actionController.Npc(index);
     }
 
     #endregion
 
-    #region Function
+    #region Creature
+
+    public void PlayerTurn()
+    {
+        _isPlayerTurn = true;
+
+        _saveData.userData.currentAP = _saveData.userData.maximumAP;
+        UpdatePlayerInfo(eStats.AP);
+
+        UpdateText("행동력이 " + IngameManager.instance.saveData.userData.currentAP + "만큼 남았습니다.");
+
+        List<int> NearbyIndexs = _playerController.PlayerSearchNearby();
+
+        SetMap(NearbyIndexs);
+    }
+
+    public void PlayerTurnOut()
+    {
+        _isPlayerTurn = false;
+
+        _actionController.SkillRemindDuration();
+        _actionController.ItemRemindDuration();
+
+        UpdateText("--- " + _saveData.userData.data.name + "의 순서가 종료됩니다.");
+    }
+
+    public void MonsterTurn()
+    {
+        StartCoroutine(_monsterController.MonsterTurn());
+    }
+
+    public void MonsterDead(DataManager.Creature_Data monster)
+    {
+        _monsterController.MonsterDead(monster);
+    }
+
+    public void MonsterTurnOut()
+    {
+        UpdateText("--- 몬스터의 순서가 종료되었습니다.");
+
+        UpdateData();
+        PlayerTurn();
+    }
+
+    #endregion
+
+    #region Update
+
+    public void UpdateText(string message)
+    {
+        _textView.UpdateText(message);
+    }
+
+    public void UpdateText(int nearbyBlockIndex)
+    {
+        _textView.UpdateText(_saveData.mapData.nodeDatas[nearbyBlockIndex]);
+    }
+
+    public void UpdateText(eCreature type, int monsterNodeIndex)
+    {
+        _textView.UpdateText(type, _saveData.mapData.nodeDatas[monsterNodeIndex], _saveData.mapData.nodeDatas[_saveData.userData.data.currentNodeIndex]);
+    }
+
+    public void UpdatePopup(string message)
+    {
+        _ingamePopup.UpdateText(message);
+    }
+
+    public void UpdatePlayerInfo(eStats type)
+    {
+        _ingameUI.UpdatePlayerInfo(type, _saveData.userData);
+    }
 
     public void UpdateMap()
     {
-        if(GameManager.instance.isMapBackgroundUpdate == true)
+        if (GameManager.instance.isMapBackgroundUpdate == true)
         {
-            _mapController.Close(false, () => 
+            _mapController.Close(false, () =>
             {
                 _ingameUI.HideMapButton();
-                _mapController.UpdateMapData(_saveData, PlayerVision());
+                _mapController.UpdateMapData(_saveData, Vision(_saveData.userData.currentVISION, _saveData.userData.data.currentNodeIndex));
             });
 
             return;
         }
 
         _ingameUI.HideMapButton();
-        _mapController.UpdateMapData(_saveData, PlayerVision());
+        _mapController.UpdateMapData(_saveData, Vision(_saveData.userData.currentVISION, _saveData.userData.data.currentNodeIndex));
     }
 
-    private void UpdateData(string contnet = null)
+    public void UpdateData(string contnet = null)
     {
         _ingameUI.UpdatePlayerInfo(_saveData.userData);
 
-        if(_saveData.userData.currentHP == 0)
+        if (_saveData.userData.currentHP == 0)
         {
             _ingameUI.OpenNextRoundWindow(eRoundClear.Fail, contnet);
         }
 
-        _mapController.UpdateMapData(_saveData, PlayerVision());
+        _mapController.UpdateMapData(_saveData, Vision(_saveData.userData.currentVISION, _saveData.userData.data.currentNodeIndex));
     }
 
-    private int GetNearbyBlocks(int x, int y, int index)
+    #endregion
+
+    #region Function
+
+    public int PathFinding(ref DataManager.Map_Data mapData, int startNodeIndex, int endNodeIndex)
+    {
+        return _mapGenerator.PathFinding(ref mapData, startNodeIndex, endNodeIndex);
+    }
+
+    public int GetNearbyBlocks(int x, int y, int index)
     {
         int result = 0;
 
@@ -1607,7 +427,7 @@ public class IngameManager : MonoBehaviour
 
     int[] dx = new int[] { -1, 0, 1 };
     int[] dy = new int[] { -1, 0, 1 };
-    private List<int> GetNearbyBlocks(int index)
+    public List<int> GetNearbyBlocks(int index)
     {
         List<int> result = new List<int>();
 
@@ -1654,7 +474,7 @@ public class IngameManager : MonoBehaviour
         return result;
     }
 
-    private List<int> GetNearbyBlocks_Diagonal(List<int> dx, List<int> dy, int index)
+    public List<int> GetNearbyBlocks_Diagonal(List<int> dx, List<int> dy, int index)
     {
         List<int> result = new List<int>();
 
@@ -1662,7 +482,7 @@ public class IngameManager : MonoBehaviour
         {
             for (int x = 0; x < dx.Count; x++)
             {
-                if(Mathf.Abs(dx[x]) + Mathf.Abs(dy[y]) <= Mathf.Abs(dx[dx.Count - 1]) || 
+                if (Mathf.Abs(dx[x]) + Mathf.Abs(dy[y]) <= Mathf.Abs(dx[dx.Count - 1]) ||
                     Mathf.Abs(dx[x]) <= 1 && Mathf.Abs(dy[y]) <= 1)
                 {
                     int nearbyX = (index % _saveData.mapData.mapSize) + dx[x];
@@ -1697,13 +517,24 @@ public class IngameManager : MonoBehaviour
         return result;
     }
 
-    #endregion
-
-    private void PlayBgm(eBgm type)
+    public List<int> Vision(int vision, int currentIndex)
     {
-        GameManager.instance.soundManager.PlayBgm(type);
+        List<int> dx = new List<int>();
+        List<int> dy = new List<int>();
+
+        for (int i = -vision; i <= vision; i++)
+        {
+            dx.Add(i);
+            dy.Add(i);
+        }
+
+        return GetNearbyBlocks_Diagonal(dx, dy, currentIndex);
     }
+
+    #endregion
 }
+
+#region Generator
 
 public class MapGenerator
 {
@@ -1874,7 +705,7 @@ public class MapGenerator
             openMiddlePoints.Add(middlePoints[i]);
         }
 
-        _nodes[openMiddlePoints[Random.Range(0, openMiddlePoints.Count)]].isEnter = true;
+        _nodes[openMiddlePoints[UnityEngine.Random.Range(0, openMiddlePoints.Count)]].isEnter = true;
     }
 
     private void SelectExitBlock()
@@ -2369,3 +1200,5 @@ public class CreatureGenerator
         SpawnMonsterNodeSelect(newIndex, ref node);
     }
 }
+
+#endregion
