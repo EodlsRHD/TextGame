@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.Overlays;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -119,7 +118,7 @@ public class IngameManager : MonoBehaviour
     {
         if(type == eRoundClear.Restart)
         {
-            _textView.UpdateText("--- 부활하였습니다.");
+            UpdateText("--- 부활하였습니다.");
             
             GameManager.instance.dataManager.ResetPlayerData();
             _ingameUI.UpdatePlayerInfo(_saveData.userData);
@@ -153,7 +152,7 @@ public class IngameManager : MonoBehaviour
 
         if(type == eRoundClear.Success)
         {
-            _textView.UpdateText("--- " + _saveData.round + " 라운드 입니다.");
+            UpdateText("--- " + _saveData.round + " 라운드 입니다.");
             GameManager.instance.soundManager.PlaySfx(eSfx.SceneChange);
         }
 
@@ -175,7 +174,7 @@ public class IngameManager : MonoBehaviour
      
     private void RoundSet()
     {
-        _textView.UpdateText(_saveData.mapData.nodeDatas[_saveData.userData.data.currentNodeIndex]);
+        UpdatePlayerCoord();
         _ingameUI.SetRoundText(_saveData.round);
 
         UpdateData();
@@ -325,6 +324,11 @@ public class IngameManager : MonoBehaviour
     #endregion
 
     #region Update
+
+    public void UpdatePlayerCoord()
+    {
+        _textView.UpdateText(_saveData.mapData.nodeDatas[_saveData.userData.data.currentNodeIndex]);
+    }
 
     public void UpdateText(string message)
     {

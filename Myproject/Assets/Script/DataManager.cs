@@ -6,6 +6,7 @@ using System;
 using System.IO;
 using System.Text;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Security.Cryptography;
 
 public class DataManager : MonoBehaviour
 {

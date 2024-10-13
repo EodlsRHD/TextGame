@@ -49,6 +49,7 @@ public class Settings : MonoBehaviour
 
     public void Close()
     {
+        GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
         this.gameObject.SetActive(false);
     }
 
