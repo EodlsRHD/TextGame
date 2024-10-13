@@ -1030,14 +1030,14 @@ public class CreatureGenerator
         DataManager.Npc_Data npc = GameManager.instance.dataManager.GetNpcData(201);
         npc.id = 201;
         npc.currentNodeIndex = currentIndex;
-        npc.itemIndexs = new List<ushort>(3);
+        npc.itemIndexs = new List<short>(3);
         npc.isShop = true;
 
         for (int i = 0; i < 3; i++)
         {
             int ran = Random.Range(501, 500 + GameManager.instance.dataManager.GetItemDataCount());
 
-            npc.itemIndexs.Add((ushort)ran);
+            npc.itemIndexs.Add((short)ran);
         }
 
         _saveData.mapData.nodeDatas[currentIndex].isShop = true;
@@ -1051,14 +1051,14 @@ public class CreatureGenerator
         DataManager.Npc_Data npc = GameManager.instance.dataManager.GetNpcData(202);
         npc.id = 202;
         npc.currentNodeIndex = currentIndex;
-        npc.SkillIndexs = new List<ushort>(3);
+        npc.SkillIndexs = new List<short>(3);
         npc.isBonfire = true;
 
         for (int i = 0; i < 3; i++)
         {
             int ran = Random.Range(301, 300 + GameManager.instance.dataManager.GetSkillDataCount());
 
-            npc.SkillIndexs.Add((ushort)ran);
+            npc.SkillIndexs.Add((short)ran);
         }
 
         _saveData.mapData.nodeDatas[currentIndex].isBonfire = true;
@@ -1101,7 +1101,7 @@ public class CreatureGenerator
             
             if (creature != null)
             {
-                creature.id = (ushort)i;
+                creature.id = (short)i;
                 creature.currentNodeIndex = node.index;
                 _saveData.mapData.nodeDatas[node.index].isMonster = true;
 
@@ -1116,11 +1116,11 @@ public class CreatureGenerator
     {
         float increasePoint = ((_saveData.round - 1) * 0.1f);
 
-        creature.coin += (ushort)(creature.coin * increasePoint);
-        creature.hp += (ushort)(creature.hp * increasePoint);
-        creature.exp += (ushort)(creature.exp * increasePoint);
-        creature.attack += (ushort)(creature.attack * increasePoint);
-        creature.defence += (ushort)(creature.defence * (increasePoint * 0.5f));
+        creature.coin += (short)(creature.coin * increasePoint);
+        creature.hp += (short)(creature.hp * increasePoint);
+        creature.exp += (short)(creature.exp * increasePoint);
+        creature.attack += (short)(creature.attack * increasePoint);
+        creature.defence += (short)(creature.defence * (increasePoint * 0.5f));
     }
 
     private void Done()

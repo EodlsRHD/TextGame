@@ -168,31 +168,31 @@ public class LevelPoint : MonoBehaviour
         switch(type)
         {
             case eStats.HP:
-                _userData.data.hp = (ushort)point;
+                _userData.data.hp = (short)point;
                 break;
 
             case eStats.MP:
-                _userData.data.mp = (ushort)point;
+                _userData.data.mp = (short)point;
                 break;
 
             case eStats.AP:
-                _userData.data.ap = (ushort)point;
+                _userData.data.ap = (short)point;
                 break;
 
             case eStats.Attack:
-                _userData.data.attack = (ushort)point;
+                _userData.data.attack = (short)point;
                 break;
 
             case eStats.Defence:
-                _userData.data.defence = (ushort)point;
+                _userData.data.defence = (short)point;
                 break;
 
             case eStats.Vision:
-                _userData.data.vision = (ushort)point;
+                _userData.data.vision = (short)point;
                 break;
 
             case eStats.AttackRange:
-                _userData.data.attackRange = (ushort)point;
+                _userData.data.attackRange = (short)point;
                 break;
         }
     }

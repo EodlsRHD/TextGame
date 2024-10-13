@@ -39,7 +39,7 @@ public class ActionController : MonoBehaviour
         }
     }
 
-    public void Buy(int currentIndex, int index, ushort price)
+    public void Buy(int currentIndex, int index, short price)
     {
         if (index < 0)
         {
@@ -54,7 +54,7 @@ public class ActionController : MonoBehaviour
         IngameManager.instance.UpdateText("가방에 보관되었습니다.");
 
         IngameManager.instance.saveData.userData.data.coin -= price;
-        IngameManager.instance.saveData.userData.itemDataIndexs.Add((ushort)index);
+        IngameManager.instance.saveData.userData.itemDataIndexs.Add((short)index);
 
         GameManager.instance.dataManager.AddEncyclopedia_Item(index);
     }
@@ -71,8 +71,8 @@ public class ActionController : MonoBehaviour
         {
             IngameManager.instance.UpdateText("체력과 마나가 회복되었습니다.");
 
-            ushort hp = (ushort)(IngameManager.instance.saveData.userData.maximumHP * 0.35f);
-            ushort mp = (ushort)(IngameManager.instance.saveData.userData.maximumMP * 0.35f);
+            short hp = (short)(IngameManager.instance.saveData.userData.maximumHP * 0.35f);
+            short mp = (short)(IngameManager.instance.saveData.userData.maximumMP * 0.35f);
 
             if (IngameManager.instance.saveData.userData.currentHP + hp > IngameManager.instance.saveData.userData.maximumHP)
             {
@@ -106,12 +106,12 @@ public class ActionController : MonoBehaviour
                     continue;
                 }
 
-                IngameManager.instance.saveData.userData.skillDataIndexs[i] = (ushort)getIndex;
+                IngameManager.instance.saveData.userData.skillDataIndexs[i] = (short)getIndex;
                 break;
             }
         }
 
-        IngameManager.instance.saveData.userData.skillDataIndexs.Add((ushort)getIndex);
+        IngameManager.instance.saveData.userData.skillDataIndexs.Add((short)getIndex);
     }
 
     public void Attack(int nodeMonsterIndex, System.Action onLastCallback = null)
@@ -141,11 +141,11 @@ public class ActionController : MonoBehaviour
                     return;
                 }
 
-                IngameManager.instance.saveData.userData.currentHP -= (ushort)Mathf.Abs(resultDamage);
+                IngameManager.instance.saveData.userData.currentHP -= (short)Mathf.Abs(resultDamage);
 
                 int soundHP = IngameManager.instance.saveData.userData.currentHP / 3;
 
-                if (soundHP > (ushort)Mathf.Abs(resultDamage))
+                if (soundHP > (short)Mathf.Abs(resultDamage))
                 {
                     GameManager.instance.soundManager.PlaySfx(eSfx.Hit_hard);
                 }
@@ -156,7 +156,7 @@ public class ActionController : MonoBehaviour
 
                 IngameManager.instance.UpdateText("--- " + Mathf.Abs(resultDamage) + " 의 피해를 입었습니다.");
 
-                if (IngameManager.instance.saveData.userData.currentHP > 60000 || IngameManager.instance.saveData.userData.currentHP == 0)
+                if (IngameManager.instance.saveData.userData.currentHP <= 0)
                 {
                     IngameManager.instance.saveData.userData.currentHP = 0;
 
@@ -198,7 +198,7 @@ public class ActionController : MonoBehaviour
                 IngameManager.instance.UpdateText("--- " + IngameManager.instance.saveData.userData.data.name + " (이)가 " + playerDamage + " 의 공격력으로 공격합니다.");
                 IngameManager.instance.UpdateText("방어도를 제외한 " + Mathf.Abs(_damage) + " 의 데미지를 가했습니다.");
 
-                monster.hp -= (ushort)Mathf.Abs(_damage);
+                monster.hp -= (short)Mathf.Abs(_damage);
 
                 if (monster.hp >= 60000 || monster.hp == 0)
                 {
@@ -221,8 +221,8 @@ public class ActionController : MonoBehaviour
                         }
                     }
 
-                    IngameManager.instance.saveData.userData.data.coin += (ushort)(monster.coin + (monster.coin * 0.0f * IngameManager.instance.saveData.userData.Coin_Effect_Per));
-                    IngameManager.instance.saveData.userData.currentEXP += (ushort)(monster.exp + (monster.exp * 0.1f * IngameManager.instance.saveData.userData.EXP_Effect_Per));
+                    IngameManager.instance.saveData.userData.data.coin += (short)(monster.coin + (monster.coin * 0.0f * IngameManager.instance.saveData.userData.Coin_Effect_Per));
+                    IngameManager.instance.saveData.userData.currentEXP += (short)(monster.exp + (monster.exp * 0.1f * IngameManager.instance.saveData.userData.EXP_Effect_Per));
 
                     LevelUp();
 
@@ -257,7 +257,7 @@ public class ActionController : MonoBehaviour
             return;
         }
 
-        ushort ap = IngameManager.instance.saveData.userData.currentAP;
+        short ap = IngameManager.instance.saveData.userData.currentAP;
         IngameManager.instance.saveData.userData.currentDEFENCE += ap;
         IngameManager.instance.saveData.userData.currentAP = 0;
 
@@ -275,7 +275,7 @@ public class ActionController : MonoBehaviour
             IngameManager.instance.UpdateText("레벨이 증가했습니다 !");
 
             IngameManager.instance.saveData.userData.level += 1;
-            IngameManager.instance.saveData.userData.currentEXP = (ushort)Mathf.Abs(IngameManager.instance.saveData.userData.maximumEXP - IngameManager.instance.saveData.userData.currentEXP);
+            IngameManager.instance.saveData.userData.currentEXP = (short)Mathf.Abs(IngameManager.instance.saveData.userData.maximumEXP - IngameManager.instance.saveData.userData.currentEXP);
 
             IngameManager.instance.UpdatePlayerInfo(eStats.EXP);
             IngameManager.instance.UpdatePlayerInfo(eStats.Level);
@@ -310,7 +310,7 @@ public class ActionController : MonoBehaviour
 
         int useMP = data.usemp;
         int reMP = IngameManager.instance.saveData.userData.currentMP - useMP;
-        IngameManager.instance.saveData.userData.currentMP = (ushort)(reMP < 0 ? 0 : reMP);
+        IngameManager.instance.saveData.userData.currentMP = (short)(reMP < 0 ? 0 : reMP);
 
         SkillConsumptionCheck(data, eStats.HP, data.hp);
         SkillConsumptionCheck(data, eStats.MP, data.mp);
@@ -538,7 +538,7 @@ public class ActionController : MonoBehaviour
         {
             case eStats.HP:
                 {
-                    ushort value = (ushort)(use.inDe == eEffect_IncreaseDecrease.Increase ? use.value : (use.value * -1));
+                    short value = (short)(use.inDe == eEffect_IncreaseDecrease.Increase ? use.value : (use.value * -1));
 
                     if (IngameManager.instance.saveData.userData.currentHP - value < 0)
                     {
@@ -553,7 +553,7 @@ public class ActionController : MonoBehaviour
 
             case eStats.MP:
                 {
-                    ushort value = (ushort)(use.inDe == eEffect_IncreaseDecrease.Increase ? use.value : (use.value * -1));
+                    short value = (short)(use.inDe == eEffect_IncreaseDecrease.Increase ? use.value : (use.value * -1));
 
                     if (IngameManager.instance.saveData.userData.currentMP - value < 0)
                     {
@@ -568,7 +568,7 @@ public class ActionController : MonoBehaviour
 
             case eStats.AP:
                 {
-                    ushort value = (ushort)(use.inDe == eEffect_IncreaseDecrease.Increase ? use.value : (use.value * -1));
+                    short value = (short)(use.inDe == eEffect_IncreaseDecrease.Increase ? use.value : (use.value * -1));
 
                     if (IngameManager.instance.saveData.userData.currentAP - value < 0)
                     {
@@ -583,18 +583,18 @@ public class ActionController : MonoBehaviour
 
             case eStats.EXP:
                 {
-                    ushort value = (ushort)(use.inDe == eEffect_IncreaseDecrease.Increase ? use.value : (use.value * -1));
+                    short value = (short)(use.inDe == eEffect_IncreaseDecrease.Increase ? use.value : (use.value * -1));
 
                     if (use.isPercent == true)
                     {
-                        if (IngameManager.instance.saveData.userData.EXP_Effect_Per - (short)value < 0)
+                        if (IngameManager.instance.saveData.userData.EXP_Effect_Per - value < 0)
                         {
                             IngameManager.instance.saveData.userData.EXP_Effect_Per = 0;
 
                             return;
                         }
 
-                        IngameManager.instance.saveData.userData.EXP_Effect_Per -= (short)value;
+                        IngameManager.instance.saveData.userData.EXP_Effect_Per -= value;
 
                         return;
                     }
@@ -606,24 +606,24 @@ public class ActionController : MonoBehaviour
                         return;
                     }
 
-                    IngameManager.instance.saveData.userData.currentEXP -= (ushort)value;
+                    IngameManager.instance.saveData.userData.currentEXP -= value;
                 }
                 break;
 
             case eStats.Coin:
                 {
-                    ushort value = (ushort)(use.inDe == eEffect_IncreaseDecrease.Increase ? use.value : (use.value * -1));
+                    short value = (short)(use.inDe == eEffect_IncreaseDecrease.Increase ? use.value : (use.value * -1));
 
                     if (use.isPercent == true)
                     {
-                        if (IngameManager.instance.saveData.userData.Coin_Effect_Per - (short)value < 0)
+                        if (IngameManager.instance.saveData.userData.Coin_Effect_Per - value < 0)
                         {
                             IngameManager.instance.saveData.userData.Coin_Effect_Per = 0;
 
                             return;
                         }
 
-                        IngameManager.instance.saveData.userData.Coin_Effect_Per -= (short)value;
+                        IngameManager.instance.saveData.userData.Coin_Effect_Per -= value;
 
                         return;
                     }
@@ -641,18 +641,18 @@ public class ActionController : MonoBehaviour
 
             case eStats.Attack:
                 {
-                    ushort value = (ushort)(use.inDe == eEffect_IncreaseDecrease.Increase ? use.value : (use.value * -1));
+                    short value = (short)(use.inDe == eEffect_IncreaseDecrease.Increase ? use.value : (use.value * -1));
 
                     if (use.isPercent == true)
                     {
-                        if (IngameManager.instance.saveData.userData.Attack_Effect_Per - (short)value < 0)
+                        if (IngameManager.instance.saveData.userData.Attack_Effect_Per - value < 0)
                         {
                             IngameManager.instance.saveData.userData.Attack_Effect_Per = 0;
 
                             return;
                         }
 
-                        IngameManager.instance.saveData.userData.Attack_Effect_Per -= (short)value;
+                        IngameManager.instance.saveData.userData.Attack_Effect_Per -= value;
 
                         return;
                     }
@@ -664,24 +664,24 @@ public class ActionController : MonoBehaviour
                         return;
                     }
 
-                    IngameManager.instance.saveData.userData.Attack_Effect -= (short)value;
+                    IngameManager.instance.saveData.userData.Attack_Effect -= value;
                 }
                 break;
 
             case eStats.Defence:
                 {
-                    ushort value = (ushort)(use.inDe == eEffect_IncreaseDecrease.Increase ? use.value : (use.value * -1));
+                    short value = (short)(use.inDe == eEffect_IncreaseDecrease.Increase ? use.value : (use.value * -1));
 
                     if (use.isPercent == true)
                     {
-                        if (IngameManager.instance.saveData.userData.Defence_Effect_Per - (short)value < 0)
+                        if (IngameManager.instance.saveData.userData.Defence_Effect_Per - value < 0)
                         {
                             IngameManager.instance.saveData.userData.Defence_Effect_Per = 0;
 
                             return;
                         }
 
-                        IngameManager.instance.saveData.userData.Defence_Effect_Per -= (short)value;
+                        IngameManager.instance.saveData.userData.Defence_Effect_Per -= value;
 
                         return;
                     }
@@ -693,7 +693,7 @@ public class ActionController : MonoBehaviour
                         return;
                     }
 
-                    IngameManager.instance.saveData.userData.Defence_Effect -= (short)value;
+                    IngameManager.instance.saveData.userData.Defence_Effect -= value;
                 }
                 break;
         }
@@ -707,7 +707,7 @@ public class ActionController : MonoBehaviour
         {
             case eStats.HP:
                 {
-                    ushort value = (ushort)(use.inDe == eEffect_IncreaseDecrease.Increase ? use.value : (use.value * -1));
+                    short value = (short)(use.inDe == eEffect_IncreaseDecrease.Increase ? use.value : (use.value * -1));
 
                     if (IngameManager.instance.saveData.userData.currentHP + value > IngameManager.instance.saveData.userData.maximumHP)
                     {
@@ -722,7 +722,7 @@ public class ActionController : MonoBehaviour
 
             case eStats.MP:
                 {
-                    ushort value = (ushort)(use.inDe == eEffect_IncreaseDecrease.Increase ? use.value : (use.value * -1));
+                    short value = (short)(use.inDe == eEffect_IncreaseDecrease.Increase ? use.value : (use.value * -1));
 
                     if (IngameManager.instance.saveData.userData.currentMP + value > IngameManager.instance.saveData.userData.maximumMP)
                     {
@@ -737,7 +737,7 @@ public class ActionController : MonoBehaviour
 
             case eStats.AP:
                 {
-                    ushort value = (ushort)(use.inDe == eEffect_IncreaseDecrease.Increase ? use.value : (use.value * -1));
+                    short value = (short)(use.inDe == eEffect_IncreaseDecrease.Increase ? use.value : (use.value * -1));
 
                     if (IngameManager.instance.saveData.userData.currentAP + value > IngameManager.instance.saveData.userData.maximumAP)
                     {
@@ -752,16 +752,16 @@ public class ActionController : MonoBehaviour
 
             case eStats.EXP:
                 {
-                    ushort value = (ushort)(use.inDe == eEffect_IncreaseDecrease.Increase ? use.value : (use.value * -1));
+                    short value = (short)(use.inDe == eEffect_IncreaseDecrease.Increase ? use.value : (use.value * -1));
 
                     if (use.isPercent == true)
                     {
-                        IngameManager.instance.saveData.userData.EXP_Effect_Per += (short)value;
+                        IngameManager.instance.saveData.userData.EXP_Effect_Per += value;
 
                         return;
                     }
 
-                    IngameManager.instance.saveData.userData.currentEXP += (ushort)value;
+                    IngameManager.instance.saveData.userData.currentEXP += value;
 
                     LevelUp();
                 }
@@ -769,11 +769,11 @@ public class ActionController : MonoBehaviour
 
             case eStats.Coin:
                 {
-                    ushort value = (ushort)(use.inDe == eEffect_IncreaseDecrease.Increase ? use.value : (use.value * -1));
+                    short value = (short)(use.inDe == eEffect_IncreaseDecrease.Increase ? use.value : (use.value * -1));
 
                     if (use.isPercent == true)
                     {
-                        IngameManager.instance.saveData.userData.Coin_Effect_Per += (short)value;
+                        IngameManager.instance.saveData.userData.Coin_Effect_Per += value;
 
                         return;
                     }
@@ -784,31 +784,31 @@ public class ActionController : MonoBehaviour
 
             case eStats.Attack:
                 {
-                    ushort value = (ushort)(use.inDe == eEffect_IncreaseDecrease.Increase ? use.value : (use.value * -1));
+                    short value = (short)(use.inDe == eEffect_IncreaseDecrease.Increase ? use.value : (use.value * -1));
 
                     if (use.isPercent == true)
                     {
-                        IngameManager.instance.saveData.userData.Attack_Effect_Per += (short)value;
+                        IngameManager.instance.saveData.userData.Attack_Effect_Per += value;
 
                         return;
                     }
 
-                    IngameManager.instance.saveData.userData.Attack_Effect += (short)value;
+                    IngameManager.instance.saveData.userData.Attack_Effect += value;
                 }
                 break;
 
             case eStats.Defence:
                 {
-                    ushort value = (ushort)(use.inDe == eEffect_IncreaseDecrease.Increase ? use.value : (use.value * -1));
+                    short value = (short)(use.inDe == eEffect_IncreaseDecrease.Increase ? use.value : (use.value * -1));
 
                     if (use.isPercent == true)
                     {
-                        IngameManager.instance.saveData.userData.Defence_Effect_Per += (short)value;
+                        IngameManager.instance.saveData.userData.Defence_Effect_Per += value;
 
                         return;
                     }
 
-                    IngameManager.instance.saveData.userData.Defence_Effect += (short)value;
+                    IngameManager.instance.saveData.userData.Defence_Effect += value;
                 }
                 break;
         }

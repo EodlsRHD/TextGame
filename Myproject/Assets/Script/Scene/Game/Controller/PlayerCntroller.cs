@@ -19,7 +19,7 @@ public class PlayerCntroller : MonoBehaviour
             return;
         }
 
-        if (IngameManager.instance.saveData.userData.currentAP <= 0)
+        if (IngameManager.instance.saveData.userData.currentAP == 0)
         {
             IngameManager.instance.UpdatePopup("ap가 부족합니다.");
 
@@ -92,6 +92,11 @@ public class PlayerCntroller : MonoBehaviour
 
         if (IngameManager.instance.saveData.mapData.nodeDatas[result].isMonster == true)
         {
+            if(IngameManager.instance.saveData.userData.currentAP < 2)
+            {
+                return -1;
+            }
+
             IngameManager.instance.saveData.userData.currentAP -= 2;
             IngameManager.instance.UpdatePlayerInfo(eStats.AP);
 
@@ -102,6 +107,11 @@ public class PlayerCntroller : MonoBehaviour
 
         if (IngameManager.instance.saveData.mapData.nodeDatas[result].isShop == true || IngameManager.instance.saveData.mapData.nodeDatas[result].isBonfire == true)
         {
+            if (IngameManager.instance.saveData.userData.currentAP < 1)
+            {
+                return -1;
+            }
+
             IngameManager.instance.saveData.userData.currentAP -= 1;
             IngameManager.instance.UpdatePlayerInfo(eStats.AP);
 

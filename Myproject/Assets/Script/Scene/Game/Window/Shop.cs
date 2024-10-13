@@ -66,13 +66,13 @@ public class Shop : MonoBehaviour
     
     private Action<string> _onUpdateTextCallback = null;
     private Action<string> _onUpdatePopupCallback = null;
-    private Action<int, int, ushort> _onBuyCallback = null;
+    private Action<int, int, short> _onBuyCallback = null;
 
     private DataManager.Npc_Data _npc = null;
     private int _userCoin = 0;
     private int _selectTemplateIndex = 0;
 
-    public void Initialize(Action<string> onUpdateTextCallback, Action<string> onUpdatePopupCallback, Action<int, int, ushort> onBuyCallback)
+    public void Initialize(Action<string> onUpdateTextCallback, Action<string> onUpdatePopupCallback, Action<int, int, short> onBuyCallback)
     {
         if(onUpdateTextCallback != null)
         {

@@ -15,21 +15,21 @@ public class DataManager : MonoBehaviour
     [Serializable]
     public class Creature_Data
     {
-        public ushort id = 0;
+        public short id = 0;
 
         public string name = string.Empty;
         public string description = string.Empty;
-        public ushort coin = 0;
+        public short coin = 0;
 
-        public ushort hp = 0;
-        public ushort mp = 0;
-        public ushort ap = 0; // Active Point 
-        public ushort exp = 0;
-        public ushort attack = 0;
-        public ushort defence = 0;
-        public ushort vision = 0;
-        public ushort attackRange = 0;
-        public ushort evasion = 0;
+        public short hp = 0;
+        public short mp = 0;
+        public short ap = 0; // Active Point 
+        public short exp = 0;
+        public short attack = 0;
+        public short defence = 0;
+        public short vision = 0;
+        public short attackRange = 0;
+        public short evasion = 0;
 
         public eStats defultStatus = eStats.Non;
 
@@ -40,8 +40,8 @@ public class DataManager : MonoBehaviour
         public byte recoveryCount = 0;
 
         public bool useSkill = false;
-        public List<ushort> skillIndexs = null;
-        public List<ushort> itemIndexs = null;
+        public List<short> skillIndexs = null;
+        public List<short> itemIndexs = null;
 
         public int currentNodeIndex = 0;
     }
@@ -49,7 +49,7 @@ public class DataManager : MonoBehaviour
     [Serializable]
     public class Npc_Data
     {
-        public ushort id = 0;
+        public short id = 0;
 
         public string name = string.Empty;
         public string description = string.Empty;
@@ -60,8 +60,8 @@ public class DataManager : MonoBehaviour
 
         public bool isUseBonfire = false;
 
-        public List<ushort> itemIndexs = null;
-        public List<ushort> SkillIndexs = null;
+        public List<short> itemIndexs = null;
+        public List<short> SkillIndexs = null;
 
         public int currentNodeIndex = 0;
     }
@@ -73,23 +73,23 @@ public class DataManager : MonoBehaviour
 
         public ushort level = 1; // 1레벨 (경험치 * 0.4) * 레벨수
 
-        private ushort _defultHP = 10;
-        private ushort _defultMP = 10;
-        private ushort _defultAP = 3;
-        private ushort _defultEXP = 15;
-        private ushort _defultATTACK = 5;
-        private ushort _defultDEFENCE = 0;
-        private ushort _defultVISION = 1;
-        private ushort _defultATTACKRANGE = 1;
+        private short _defultHP = 10;
+        private short _defultMP = 10;
+        private short _defultAP = 3;
+        private short _defultEXP = 15;
+        private short _defultATTACK = 5;
+        private short _defultDEFENCE = 0;
+        private short _defultVISION = 1;
+        private short _defultATTACKRANGE = 1;
 
-        public ushort currentHP = 10;
-        public ushort currentMP = 10;
-        public ushort currentAP = 3;
-        public ushort currentEXP = 0;
-        public ushort currentATTACK = 5;
-        public ushort currentDEFENCE = 0;
-        public ushort currentVISION = 3;
-        public ushort currentATTACKRANGE = 10;
+        public short currentHP = 10;
+        public short currentMP = 10;
+        public short currentAP = 3;
+        public short currentEXP = 0;
+        public short currentATTACK = 5;
+        public short currentDEFENCE = 0;
+        public short currentVISION = 3;
+        public short currentATTACKRANGE = 10;
 
         public short Attack_Effect = 0;
         public short Defence_Effect = 0;
@@ -100,8 +100,8 @@ public class DataManager : MonoBehaviour
         public short EXP_Effect_Per = 0;
         public short Coin_Effect_Per = 0;
 
-        public List<ushort> itemDataIndexs = null;
-        public List<ushort> skillDataIndexs = null;
+        public List<short> itemDataIndexs = null;
+        public List<short> skillDataIndexs = null;
 
         public List<Duration> useSkill = null;
         public List<Duration> useItem = null;
@@ -110,44 +110,44 @@ public class DataManager : MonoBehaviour
 
         #region GetSet
 
-        public ushort maximumHP
+        public short maximumHP
         {
-            get { return (ushort)(_defultHP * data.hp); }
+            get { return (short)(_defultHP * data.hp); }
         }
 
-        public ushort maximumMP
+        public short maximumMP
         {
-            get { return (ushort)(_defultMP * data.mp); }
+            get { return (short)(_defultMP * data.mp); }
         }
 
-        public ushort maximumAP
+        public short maximumAP
         {
-            get { return (ushort)(_defultAP * data.ap); }
+            get { return (short)(_defultAP * data.ap); }
         }
 
-        public ushort maximumEXP
+        public short maximumEXP
         {
-            get { return (ushort)(level * _defultEXP); }
+            get { return (short)(level * _defultEXP); }
         }
 
-        public ushort maximumATTACK
+        public short maximumATTACK
         {
-            get { return (ushort)((_defultATTACK * data.attack) + ((_defultATTACK * data.attack) * 0.01f * Attack_Effect_Per)); }
+            get { return (short)((_defultATTACK * data.attack) + ((_defultATTACK * data.attack) * 0.01f * Attack_Effect_Per)); }
         }
 
-        public ushort maximumDEFENCE
+        public short maximumDEFENCE
         {
-            get { return (ushort)(_defultDEFENCE * data.defence + ((_defultDEFENCE * data.defence) * 0.01f * Defence_Effect_Per)); }
+            get { return (short)(_defultDEFENCE * data.defence + ((_defultDEFENCE * data.defence) * 0.01f * Defence_Effect_Per)); }
         }
 
-        public ushort maximumVISION
+        public short maximumVISION
         {
-            get { return (ushort)(_defultVISION * data.vision); }
+            get { return (short)(_defultVISION * data.vision); }
         }
 
-        public ushort maximumATTACKRANGE
+        public short maximumATTACKRANGE
         {
-            get { return (ushort)(_defultATTACKRANGE * data.attackRange); }
+            get { return (short)(_defultATTACKRANGE * data.attackRange); }
         }
 
         #endregion
@@ -156,7 +156,7 @@ public class DataManager : MonoBehaviour
     [Serializable]
     public class Skill_Data
     {
-        public ushort id = 0;
+        public short id = 0;
 
         public string name = string.Empty;
         public string description = string.Empty;
@@ -186,7 +186,7 @@ public class DataManager : MonoBehaviour
 
         public string name = string.Empty;
         public string description = string.Empty;
-        public ushort price = 0;
+        public short price = 0;
 
         public short hp = 0;
         public short mp = 0;
@@ -280,7 +280,7 @@ public class DataManager : MonoBehaviour
     [Serializable]
     public class Save_Data
     {
-        public ushort round = 0;
+        public short round = 0;
 
         public User_Data userData = null;
         public Map_Data mapData = null;
@@ -387,8 +387,8 @@ public class DataManager : MonoBehaviour
         _saveData.round = 1;
 
         _saveData.userData = new User_Data();
-        _saveData.userData.itemDataIndexs = new List<ushort>() { 501 };
-        _saveData.userData.skillDataIndexs = new List<ushort>() { 301 };
+        _saveData.userData.itemDataIndexs = new List<short>() { 501 };
+        _saveData.userData.skillDataIndexs = new List<short>() { 301 };
 
         _saveData.userData.useSkill = new List<Duration>();
         _saveData.userData.useItem = new List<Duration>();
