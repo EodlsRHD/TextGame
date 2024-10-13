@@ -115,6 +115,8 @@ public class Attacker : MonoBehaviour
         _monsterCoinCount = monster.hp;
 
         _batCount = userData.level;
+        _totalCount += _batCount * 2;
+        _playerBat += _batCount;
 
         _textPlayerNameLabel.text = userData.data.name;
 
@@ -142,6 +144,7 @@ public class Attacker : MonoBehaviour
         _textCommunityCard.text = string.Empty;
         _textTotal.text = string.Empty;
 
+        _playerBat = 0;
         _turnCount = 0;
         _totalCount = 0;
         _playerBattleAction = eBattleAction.Non;
@@ -290,13 +293,20 @@ public class Attacker : MonoBehaviour
         if (isPlayer == true)
         {
             _playerBattleAction = eBattleAction.Fold;
+            _isPlayerWin = eWinorLose.Lose;
         }
         else
         {
             _monsterBattleAction = eBattleAction.Fold;
+            _isPlayerWin = eWinorLose.Win;
         }
 
-        Check(isPlayer);
+        _turnCount = 4;
+        _resultDamage = _totalCount - _playerBat;
+
+        Debug.LogError(_resultDamage + "          " + _totalCount + "          " + _playerBat);
+        ButtonControl();
+        Done(_isPlayerWin);
     }
 
     private void Check(bool isPlayer)

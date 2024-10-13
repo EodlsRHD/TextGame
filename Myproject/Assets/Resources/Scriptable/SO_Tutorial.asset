@@ -13,3 +13,8 @@ MonoBehaviour:
   m_Name: SO_Tutorial
   m_EditorClassIdentifier: 
   _dataPath: Data/TutorialData
+  _images:
+  - {fileID: 21300000, guid: be3d56685adc85c4db636b9a6c5f1e8d, type: 3}
+  - {fileID: 21300000, guid: 0b5479ecad4364f4d988efefa1baac36, type: 3}
+  - {fileID: 21300000, guid: 769cda120ce287e45b5ae453cd29f3fd, type: 3}
+  - {fileID: 21300000, guid: 6841e9644bfb3de4d85683240619782a, type: 3}

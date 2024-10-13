@@ -63,7 +63,7 @@ public class IngameManager : MonoBehaviour
 
     private void FirstSet()
     {
-        if(_saveData.round % 5 == 0)
+        if (_saveData.round % 5 == 0)
         {
             PlayBgm(eBgm.Shop);
         }
@@ -110,8 +110,6 @@ public class IngameManager : MonoBehaviour
 
         if (type == eRoundClear.Fail)
         {
-            GameManager.instance.dataManager.DeleteData();
-
             GameManager.instance.tools.Fade(false, () => 
             {
                 GameManager.instance.soundManager.PlaySfx(eSfx.GotoLobby);
@@ -164,7 +162,7 @@ public class IngameManager : MonoBehaviour
 
     private void RoundClear()
     {
-        GameManager.instance.dataManager.ChangePlayerData(_saveData);
+        GameManager.instance.dataManager.UpdatePlayerData(_saveData);
 
         _mapController.Close();
         _saveData.round++;
@@ -779,8 +777,27 @@ public class IngameManager : MonoBehaviour
         {
             _ingamePopup.UpdateText("체력과 마나가 회복되었습니다.");
 
-            _saveData.userData.currentHP += (ushort)(_saveData.userData.maximumHP * 0.2f);
-            _saveData.userData.currentMP += (ushort)(_saveData.userData.maximumMP * 0.2f);
+            ushort hp = (ushort)(_saveData.userData.maximumHP * 0.35f);
+            ushort mp = (ushort)(_saveData.userData.maximumMP * 0.35f);
+
+            if(_saveData.userData.currentHP + hp > _saveData.userData.maximumHP)
+            {
+                _saveData.userData.currentHP = _saveData.userData.maximumHP;
+            }
+            else
+            {
+                _saveData.userData.currentHP += hp;
+            }
+
+            if (_saveData.userData.currentHP + hp > _saveData.userData.maximumMP)
+            {
+                _saveData.userData.currentHP = _saveData.userData.maximumMP;
+            }
+            else
+            {
+                _saveData.userData.currentHP += mp;
+            }
+
             UpdateData();
 
             return;
@@ -818,8 +835,8 @@ public class IngameManager : MonoBehaviour
             {
                 _textView.UpdateText("--- " + monster.name + " (이)가 승리했습니다.");
 
-                int monsterAttack = damage + monster.attack;
-                int playerDef = _saveData.userData.currentDEFENCE + (int)(_saveData.userData.currentDEFENCE * (0.01f * _saveData.userData.Defence_Effect_Per)) + _saveData.userData.Defence_Effect;
+                int monsterAttack = (int)(damage + ((damage * 0.1f) * monster.attack));
+                int playerDef = _saveData.userData.currentDEFENCE + (int)(_saveData.userData.currentDEFENCE * (0.1f * _saveData.userData.Defence_Effect_Per)) + _saveData.userData.Defence_Effect;
                 int resultDamage = (playerDef - monsterAttack);
 
                 if(resultDamage >= 0)
@@ -871,7 +888,7 @@ public class IngameManager : MonoBehaviour
 
             _textView.UpdateText("--- " + _saveData.userData.data.name + " (이)가 승리했습니다.");
 
-            int playerDamage = _saveData.userData.currentATTACK + damage + (int)(_saveData.userData.currentATTACK * (0.01f * _saveData.userData.Attack_Effect_Per)) + _saveData.userData.Attack_Effect ;
+            int playerDamage = _saveData.userData.currentATTACK + damage + (int)(_saveData.userData.currentATTACK * (0.1f * _saveData.userData.Attack_Effect_Per)) + _saveData.userData.Attack_Effect ;
             int _damage = monster.defence - playerDamage;
 
             if(_damage >= 0)
@@ -910,8 +927,8 @@ public class IngameManager : MonoBehaviour
                         }
                     }
                      
-                    _saveData.userData.data.coin += (ushort)(monster.coin + (monster.coin * 0.01f * _saveData.userData.Coin_Effect_Per));
-                    _saveData.userData.currentEXP += (ushort)(monster.exp + (monster.exp * 0.01f * _saveData.userData.EXP_Effect_Per));
+                    _saveData.userData.data.coin += (ushort)(monster.coin + (monster.coin * 0.0f * _saveData.userData.Coin_Effect_Per));
+                    _saveData.userData.currentEXP += (ushort)(monster.exp + (monster.exp * 0.1f * _saveData.userData.EXP_Effect_Per));
 
                     LevelUp();
 
@@ -2244,7 +2261,8 @@ public class CreatureGenerator
             DataManager.Node_Data node = new DataManager.Node_Data();
             SpawnMonsterNodeSelect(Random.Range(0, _saveData.mapData.nodeDatas.Count), ref node);
 
-            DataManager.Creature_Data creature = GameManager.instance.dataManager.GetCreatureData(_saveData.round + i);
+            int id = Random.Range(0, GameManager.instance.dataManager.GetCreaturDataCount());
+            DataManager.Creature_Data creature = GameManager.instance.dataManager.GetCreatureData(id);
             
             if (creature != null)
             {

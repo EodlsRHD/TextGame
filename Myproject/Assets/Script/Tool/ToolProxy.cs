@@ -39,24 +39,23 @@ public class ToolProxy : MonoBehaviour
         if (isIn == true)
         {
             com.FadeIn(() => 
-            { 
-                _onResultCallback?.Invoke();  
-                Destroy(obj); 
+            {
+                _onResultCallback?.Invoke(); 
+                Destroy(obj);
             });
 
             return;
         }
-        _onVolumeDown?.Invoke(() =>
+
+        _onVolumeDown?.Invoke(null);
+        com.FadeOut(() =>
         {
-            com.FadeOut(() =>
-            {
-                _onResultCallback?.Invoke();
-            });
+            _onResultCallback?.Invoke();
         });
     }
 
     public void SceneChange(eScene _scene, Action _onResultCallback = null)
-    {
+    { 
         var obj = Instantiate(_prefabSceneChanger, _parentSceneChanger);
         var com = obj.GetComponent<SceneChanger>();
 

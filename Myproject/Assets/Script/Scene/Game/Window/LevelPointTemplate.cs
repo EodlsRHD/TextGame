@@ -38,8 +38,8 @@ public class LevelPointTemplate : MonoBehaviour
             _onMinusCallback = onMinusCallback;
         }
 
-        _buttonPlus.onClick.AddListener(Plus);
-        _buttonMinus.onClick.AddListener(Minus);
+        _buttonPlus.onClick.AddListener(OnPlus);
+        _buttonMinus.onClick.AddListener(OnMinus);
 
         _textLabel.text = type.ToString();
 
@@ -67,7 +67,7 @@ public class LevelPointTemplate : MonoBehaviour
         _onResultCallback?.Invoke(_type, _point);
     }
 
-    private void Plus()
+    private void OnPlus()
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
 
@@ -93,7 +93,7 @@ public class LevelPointTemplate : MonoBehaviour
         });
     }
 
-    private void Minus()
+    private void OnMinus()
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
 
@@ -104,10 +104,17 @@ public class LevelPointTemplate : MonoBehaviour
                 return;
             }
 
-            if(_point -1 <= 0)
+            if(_point - 1 <= 0)
             {
                 return;
             }
+
+            if(_point == _oriPoint)
+            {
+                return;
+            }
+
+            _buttonPlus.gameObject.SetActive(true);
 
             _point -= 1;
             _textPoint.text = _point.ToString();

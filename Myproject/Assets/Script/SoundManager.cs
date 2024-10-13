@@ -211,12 +211,16 @@ public class SoundManager : MonoBehaviour
         {
             yield return null;
 
-            if (_audioBGM.volume == 0)
+            if (_audioBGM.volume != 0)
             {
-                break;
+                _audioBGM.volume -= 0.005f;
+
+                continue;
             }
 
-            _audioBGM.volume -= 0.005f;
+            _audioBGM.volume = 0;
+
+            break;
         }
 
         onResultCallback?.Invoke();

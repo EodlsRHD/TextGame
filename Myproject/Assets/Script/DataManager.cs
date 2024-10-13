@@ -28,6 +28,15 @@ public class DataManager : MonoBehaviour
         public ushort defence = 0;
         public ushort vision = 0;
         public ushort attackRange = 0;
+        public ushort evasion = 0;
+
+        public eStats defultStatus = eStats.Non;
+
+        public eStatus _status = eStatus.Non;
+        public byte _statusCount = 0;
+
+        public bool recovery = false;
+        public byte recoveryCount = 0;
 
         public bool useSkill = false;
         public List<ushort> skillIndexs = null;
@@ -65,7 +74,7 @@ public class DataManager : MonoBehaviour
 
         private ushort _defultHP = 10;
         private ushort _defultMP = 10;
-        private ushort _defultAP = 10;
+        private ushort _defultAP = 3;
         private ushort _defultEXP = 15;
         private ushort _defultATTACK = 5;
         private ushort _defultDEFENCE = 0;
@@ -74,7 +83,7 @@ public class DataManager : MonoBehaviour
 
         public ushort currentHP = 10;
         public ushort currentMP = 10;
-        public ushort currentAP = 10;
+        public ushort currentAP = 3;
         public ushort currentEXP = 0;
         public ushort currentATTACK = 5;
         public ushort currentDEFENCE = 0;
@@ -369,33 +378,30 @@ public class DataManager : MonoBehaviour
 
     #region SaveData
 
-    public void CreateNewSaveData()
+    public void CreateNewSaveData(Action<bool> onResultCallback)
     {
-        Debug.Log("TEST Stat Set");
+        UnityEngine.Debug.LogError("TEST Stat Set");
 
         _saveData = new Save_Data();
         _saveData.round = 1;
 
         _saveData.userData = new User_Data();
-        _saveData.userData.itemDataIndexs = new List<ushort>();
-        _saveData.userData.itemDataIndexs.Add(501);
-
-        _saveData.userData.skillDataIndexs = new List<ushort>();
-        _saveData.userData.skillDataIndexs.Add(301);
+        _saveData.userData.itemDataIndexs = new List<ushort>() { 501 };
+        _saveData.userData.skillDataIndexs = new List<ushort>() { 301 };
 
         _saveData.userData.useSkill = new List<Duration>();
         _saveData.userData.useItem = new List<Duration>();
         _saveData.userData.coolDownSkill = new List<Skill_CoolDown>();
 
         _saveData.userData.data = new Creature_Data();
-        _saveData.userData.data.hp = 10;
-        _saveData.userData.data.mp = 10;
-        _saveData.userData.data.ap = 10;
-        _saveData.userData.data.attack = 100;
+        _saveData.userData.data.hp = 1;
+        _saveData.userData.data.mp = 1;
+        _saveData.userData.data.ap = 1;
+        _saveData.userData.data.attack = 0;
         _saveData.userData.data.defence = 0;
-        _saveData.userData.data.vision = 3;
+        _saveData.userData.data.vision = 1;
         _saveData.userData.data.attackRange = 1;
-        _saveData.userData.data.coin = 1000;
+        _saveData.userData.data.coin = 0;
 
         _saveData.mapData = new Map_Data();
         _saveData.mapData.mapSize = _mapSize;
@@ -415,6 +421,13 @@ public class DataManager : MonoBehaviour
         _encyclopediaData.creatureDatas = new List<Creature_Data>();
         _encyclopediaData.itemDatas = new List<Item_Data>();
         _encyclopediaData._achievementsDatas = new List<Achievements_Data>();
+
+        ResetPlayerData();
+
+        SaveDataToCloud(_saveData, (result) => 
+        {
+            onResultCallback?.Invoke(result);
+        });
     }
 
     public Save_Data CopySaveData()
@@ -437,10 +450,7 @@ public class DataManager : MonoBehaviour
 
     public void SaveDataToCloud(Save_Data saveData = null, Action<bool> onSaveOrLoadCallback = null)
     {
-        if(UiManager.instance != null)
-        {
-            UiManager.instance.StartLoad();
-        }
+        GameManager.instance.StartLoad();
 
         OrganizeEncyclopedia(saveData);
 
@@ -460,10 +470,7 @@ public class DataManager : MonoBehaviour
 
         PlayerPrefs.SetString("SAVE", savejson);
 
-        if (UiManager.instance != null)
-        {
-            UiManager.instance.StopLoad();
-        }
+        GameManager.instance.StopLoad();
 
         onSaveOrLoadCallback?.Invoke(true);
 
@@ -472,10 +479,7 @@ public class DataManager : MonoBehaviour
 
         GameManager.instance.googlePlayGameServeice.SaveData(savejson, (result) =>
         {
-            if (UiManager.instance != null)
-            {
-                UiManager.instance.StopLoad();
-            }
+            GameManager.instance.StopLoad();
 
             onSaveOrLoadCallback?.Invoke(result);
         });
@@ -483,10 +487,7 @@ public class DataManager : MonoBehaviour
 
     public void SaveEncyclopediaToCloud(Encyclopedia_Data data, Action<bool> onSaveOrLoadCallback = null)
     {
-        if (UiManager.instance != null)
-        {
-            UiManager.instance.StartLoad();
-        }
+        GameManager.instance.StartLoad();
 
         var enRequest = new
         {
@@ -499,10 +500,7 @@ public class DataManager : MonoBehaviour
 
         PlayerPrefs.SetString("SAVE_EncylopediaData", enjson);
 
-        if (UiManager.instance != null)
-        {
-            UiManager.instance.StopLoad();
-        }
+        GameManager.instance.StopLoad();
 
         onSaveOrLoadCallback?.Invoke(true);
 
@@ -511,36 +509,18 @@ public class DataManager : MonoBehaviour
 
         GameManager.instance.googlePlayGameServeice.SaveEncylopediaData(enjson, (result) =>
         {
-            if (UiManager.instance != null)
-            {
-                UiManager.instance.StopLoad();
-            }
+            GameManager.instance.StopLoad();
 
             onSaveOrLoadCallback?.Invoke(result);
         });
     }
 
-    public void LoadDataToCloud(Action<bool> onSaveOrLoadCallback = null)
+    public void LoadDataToCloud(Action<bool, Save_Data> onSaveOrLoadCallback = null)
     {
-        if (UiManager.instance != null)
-        {
-            UiManager.instance.StartLoad();
-        }
+        GameManager.instance.StartLoad();
 
 #if UNITY_EDITOR
         string sapjson = PlayerPrefs.GetString("SAVE");
-
-        if (sapjson.Length == 0)
-        {
-            if (UiManager.instance != null)
-            {
-                UiManager.instance.StopLoad();
-            }
-
-            onSaveOrLoadCallback?.Invoke(false);
-
-            return;
-        }
 
         var prespons = new
         {
@@ -548,28 +528,32 @@ public class DataManager : MonoBehaviour
         };
 
         var presult = JsonConvert.DeserializeAnonymousType(sapjson, prespons);
-        _saveData = presult.data;
 
-        if (UiManager.instance != null)
+        if (presult == null)
         {
-            UiManager.instance.StopLoad();
+            GameManager.instance.StopLoad();
+
+            onSaveOrLoadCallback?.Invoke(false, null);
+
+            return;
         }
 
-        onSaveOrLoadCallback?.Invoke(true);
+        _saveData = presult.data;
+
+        GameManager.instance.StopLoad();
+
+        onSaveOrLoadCallback?.Invoke(true, presult.data);
 
         return;
 #endif
 
         GameManager.instance.googlePlayGameServeice.LoadData((result, json) =>
         {
-            if (UiManager.instance != null)
-            {
-                UiManager.instance.StopLoad();
-            }
+            GameManager.instance.StopLoad();
 
             if (result == false)
             {
-                onSaveOrLoadCallback?.Invoke(false);
+                onSaveOrLoadCallback?.Invoke(false, null);
 
                 return;
             }
@@ -582,22 +566,21 @@ public class DataManager : MonoBehaviour
             var data = JsonConvert.DeserializeAnonymousType(json, respons);
             _saveData = data.data;
 
-            onSaveOrLoadCallback?.Invoke(true);
+            onSaveOrLoadCallback?.Invoke(true, data.data);
         });
     }
 
     public void LoadEncyclopediaToCloud(Action<bool> onSaveOrLoadCallback = null)
     {
-        if (UiManager.instance != null)
-        {
-            UiManager.instance.StartLoad();
-        }
+        GameManager.instance.StartLoad();
 
 #if UNITY_EDITOR
         string enpjson = PlayerPrefs.GetString("SAVE_EncylopediaData");
 
         if (enpjson.Length == 0)
         {
+            GameManager.instance.StopLoad();
+
             onSaveOrLoadCallback?.Invoke(false);
 
             return;
@@ -611,10 +594,7 @@ public class DataManager : MonoBehaviour
         var presult = JsonConvert.DeserializeAnonymousType(enpjson, prespons);
         _encyclopediaData = presult.data;
 
-        if (UiManager.instance != null)
-        {
-            UiManager.instance.StopLoad();
-        }
+        GameManager.instance.StopLoad();
 
         onSaveOrLoadCallback?.Invoke(true);
 
@@ -623,10 +603,7 @@ public class DataManager : MonoBehaviour
 
         GameManager.instance.googlePlayGameServeice.LoadEncylopediaData((result, json) =>
         {
-            if (UiManager.instance != null)
-            {
-                UiManager.instance.StopLoad();
-            }
+            GameManager.instance.StopLoad();
 
             if (result == false)
             {
@@ -647,10 +624,12 @@ public class DataManager : MonoBehaviour
         });
     }
 
-    public void DeleteData()
+    private void DeleteData()
     {
 #if UNITY_EDITOR
-        PlayerPrefs.DeleteKey("SAVE");
+
+        UnityEngine.Debug.LogError("DeleteData");
+        PlayerPrefs.SetString("SAVE", string.Empty);
         _saveData = null;
 
         return;
@@ -676,12 +655,12 @@ public class DataManager : MonoBehaviour
         DeleteData();
     }
 
-    public void ChangePlayerData(string name)
+    public void UpdatePlayerData(string name)
     {
         _saveData.userData.data.name = name;
     }
 
-    public void ChangePlayerData(Save_Data newData)
+    public void UpdatePlayerData(Save_Data newData)
     {
         _saveData = newData;
     }
@@ -843,6 +822,11 @@ public class DataManager : MonoBehaviour
         return _creatureDatas.Find(x => x.id == (index + 101)).DeepCopy();
     }
 
+    public int GetCreaturDataCount()
+    {
+        return _creatureDatas.Count;
+    }
+
     #endregion
 
 
@@ -952,6 +936,16 @@ public class DataManager : MonoBehaviour
     #endregion
 
     #region Tutorial
+
+    public int GetSpriteCount()
+    {
+        return _soTutorial.GetSpriteCount();
+    }
+
+    public Sprite GetTutorialSprite(int id)
+    {
+        return _soTutorial.GetSprite(id);
+    }
 
     public Tutorial_Data GetTutorialData(int id)
     {

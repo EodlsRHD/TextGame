@@ -112,6 +112,8 @@ public class GameMenu : MonoBehaviour
 
             GameManager.instance.googleAds.HideGameMenuAd();
 
+            OnClose();
+
             GameManager.instance.tools.Fade(false, () =>
             {
                 GameManager.instance.soundManager.PlaySfx(eSfx.GotoLobby);

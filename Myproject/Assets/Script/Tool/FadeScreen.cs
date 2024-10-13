@@ -6,8 +6,6 @@ using System;
 public class FadeScreen : MonoBehaviour
 {
     [SerializeField] private CanvasGroup _cgSplashScreen = null;
-    [Space(10)]
-    [SerializeField] private float _minusValue = 0.01f;
 
     public void Initialize()
     {
@@ -16,12 +14,11 @@ public class FadeScreen : MonoBehaviour
 
     public void FadeIn(Action _onResultCallback)
     {
-        _cgSplashScreen.gameObject.SetActive(false);
         StartCoroutine(Co_FadeIn(_onResultCallback));
     }
+
     public void FadeOut(Action _onResultCallback)
     {
-        _cgSplashScreen.gameObject.SetActive(false);
         StartCoroutine(Co_FadeOut(_onResultCallback));
     }
 
@@ -40,7 +37,7 @@ public class FadeScreen : MonoBehaviour
                 break;
             }
 
-            _cgSplashScreen.alpha -= _minusValue;
+            _cgSplashScreen.alpha -= 0.05f;
 
             yield return null;
         }
@@ -48,6 +45,8 @@ public class FadeScreen : MonoBehaviour
         _cgSplashScreen.alpha = 0f;
 
         _onResultCallback?.Invoke();
+
+        _cgSplashScreen.gameObject.SetActive(false);
         yield break;
     }
 
@@ -66,7 +65,7 @@ public class FadeScreen : MonoBehaviour
                 break;
             }
 
-            _cgSplashScreen.alpha += _minusValue;
+            _cgSplashScreen.alpha += 0.05f;
 
             yield return null;
         }
@@ -74,6 +73,7 @@ public class FadeScreen : MonoBehaviour
         _cgSplashScreen.alpha = 1.0f;
 
         _onResultCallback?.Invoke();
+
         yield break;
     }
 }

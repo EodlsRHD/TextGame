@@ -7,6 +7,7 @@ using System;
 public class SO_TutorialData : ScriptableObject
 {
     [SerializeField] private string _dataPath = string.Empty;
+    [SerializeField] private List<Sprite> _images = new List<Sprite>(); 
 
     private List<DataManager.Tutorial_Data> _list = new List<DataManager.Tutorial_Data>();
 
@@ -36,9 +37,14 @@ public class SO_TutorialData : ScriptableObject
         _list = result.datas;
     }
 
-    public DataManager.Tutorial_Data GetData_First()
+    public int GetSpriteCount()
     {
-        return _list[0];
+        return _images.Count; 
+    }
+
+    public Sprite GetSprite(int id)
+    {
+        return _images[id];
     }
 
     public DataManager.Tutorial_Data GetData(int id)

@@ -213,3 +213,26 @@ public enum eTutorialQuest
     Non = -1,
     Attack
 }
+
+public enum eStatus
+{
+    Non = -1,
+    UnableAct, // 행동 불능
+    ContinuousDamage, // 지속 데미지
+    Recovery,
+    Slowdown, // 둔화
+    Incubation, // 잠복
+    Camouflage, // 위장
+    split, // 분열
+    BloodSucking, // 흡혈
+    Hardness, // 강성
+    ReductionHalf, // 반감
+    AttackBlocking, // 방어
+    Stealth // 은신
+}
+
+public enum eAttackDirection
+{
+    Non = -1,
+
+}

@@ -39,9 +39,9 @@ public class LobbyManager : MonoBehaviour
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
 
-        GameManager.instance.dataManager.LoadDataToCloud((result) =>
+        GameManager.instance.dataManager.LoadDataToCloud((result, data) =>
         {
-            if(result == false)
+            if (result == false)
             {
                 _createCharacterProfile.Open();
 

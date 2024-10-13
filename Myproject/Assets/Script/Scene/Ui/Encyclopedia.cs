@@ -31,6 +31,10 @@ public class Encyclopedia : MonoBehaviour
     [SerializeField] private Button _buttonClosePlayerInformation = null;
     [SerializeField] private GameObject _objPlayerInformation = null;
     [SerializeField] private GameObject _objPlayerInformationMaker = null;
+    [SerializeField] private TMP_Text _textMaxRound = null;
+    [SerializeField] private TMP_Text _textMaxRoundDate = null;
+    [SerializeField] private TMP_Text _textMexLevel = null;
+    [SerializeField] private TMP_Text _textMaxLevelDate = null;
 
     [Header("Information")]
     [SerializeField] private TMP_Text _textName = null;
@@ -179,6 +183,12 @@ public class Encyclopedia : MonoBehaviour
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
 
+        _textMaxRound.text = _data.maxRound.ToString();
+        _textMaxRoundDate.text = _data.maxRoundDate.ToString();
+
+        _textMexLevel.text = _data.maxLevel.ToString();
+        _textMaxLevelDate.text = _data.maxLevelDate.ToString();
+
         _objPlayerInformation.SetActive(true);
 
         GameManager.instance.tools.Move_Local_XY(eDir.X, _objPlayerInformation.GetComponent<RectTransform>(), 0f, 0.5f, 0, Ease.OutBack, null);
@@ -191,6 +201,12 @@ public class Encyclopedia : MonoBehaviour
         GameManager.instance.tools.Move_Local_XY(eDir.X, _objPlayerInformation.GetComponent<RectTransform>(), 2039f, 0.5f, 0, Ease.InBack, () =>
         {
             _objPlayerInformation.SetActive(false);
+
+            _textMaxRound.text = string.Empty;
+            _textMaxRoundDate.text = string.Empty;
+
+            _textMexLevel.text = string.Empty;
+            _textMaxLevelDate.text = string.Empty;
         });
     }
 

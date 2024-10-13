@@ -27,5 +27,6 @@ public class SceneChanger : MonoBehaviour
     private void LoadedsceneEvent(Scene scene, LoadSceneMode mode)
     {
         _onResultCallback?.Invoke();
-}
+        _onResultCallback = null;
+    }
 }

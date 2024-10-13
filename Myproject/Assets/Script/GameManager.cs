@@ -24,6 +24,10 @@ public class GameManager : MonoBehaviour
     [Header("Google Ads"), SerializeField] private GoogleAds _googleAds = null;
     [Header("Google Play Game Serveices"), SerializeField] private GooglePlayGameServeice _googlePlayGameServeice = null;
 
+    [Header("Loading Progress")]
+    [SerializeField] private GameObject _objLoading = null;
+    [SerializeField] private LoadSpinner _loadSpinner = null;
+
     private bool _isMapBackgroundUpdate = false;
 
     #region GetSet
@@ -66,20 +70,41 @@ public class GameManager : MonoBehaviour
         _instance = this;
         DontDestroyOnLoad(this.gameObject);
 
-        PlayerPrefs.DeleteAll();
-
         _isMapBackgroundUpdate = PlayerPrefs.GetInt("MAP_BACKGROUND", 0) == 1 ? true : false;
+
+#if UNITY_EDITOR
+        PlayerPrefs.DeleteAll();
+#endif
 
         _toolProxy.Initialize(_soundManager.VolumeDown);
         _dataManager.Initialize();
         _soundManager.Initialize();
         _googleAds.Initialize();
         _googlePlayGameServeice.Initialize();
+        _loadSpinner.Initialize();
+
+        _objLoading.SetActive(false);
     }
 
     private void OnApplicationQuit()
     {
-        Debug.Log("OnApplicationQuit");
+        Debug.LogError("OnApplicationQuit");
         _dataManager.saveAllData();
     }
+
+    #region Loading Progress
+
+    public void StartLoad()
+    {
+        _loadSpinner.StartLoading();
+        _objLoading.SetActive(true);
+    }
+
+    public void StopLoad()
+    {
+        _objLoading.SetActive(false);
+        _loadSpinner.StopLoading();
+    }
+
+    #endregion
 }
