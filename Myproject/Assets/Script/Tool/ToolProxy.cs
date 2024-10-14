@@ -17,6 +17,9 @@ public class ToolProxy : MonoBehaviour
 
     private Action<Action> _onVolumeDown = null;
 
+    private const int currentScreenWidth = 1920;
+    private const int currentScreenHeight = 3414;
+
     public void Initialize(Action<Action> onVolumeDown)
     {
         if(onVolumeDown != null)
@@ -82,24 +85,47 @@ public class ToolProxy : MonoBehaviour
         }
     }
 
-    // Ease.OutBack
-    // Ease.InBack
-
     public void Move_Local(RectTransform tr, Vector3 targetPosition, float duration, float delay, Ease ease, Action onResultCallback)
     {
         _uiControl.Move_Local(tr, targetPosition, duration, delay, ease, onResultCallback);
     }
+
+    // h : 1920, w : 1080
 
     public void Move_Local_XY(eDir type, RectTransform tr, float targetPosition, float duration, float delay, Ease ease, Action onResultCallback)
     {
         switch (type)
         {
             case eDir.X:
-                _uiControl.Move_Local_X(tr, targetPosition, duration, delay, ease, onResultCallback);
+                {
+                    float screenWidth = Screen.width;
+                    float x = targetPosition;
+                    float ratio = 0;
+
+                    if (screenWidth != currentScreenWidth)
+                    {
+                        ratio = screenWidth / currentScreenWidth;
+                        x *= ratio;
+                    }
+
+                    _uiControl.Move_Local_X(tr, x, duration, delay, ease, onResultCallback);
+                }
                 break;
 
             case eDir.Y:
-                _uiControl.Move_Local_Y(tr, targetPosition, duration, delay, ease, onResultCallback);
+                {
+                    float screenHeight = Screen.height;
+                    float x = targetPosition;
+                    float ratio = 0;
+
+                    if (screenHeight != currentScreenHeight)
+                    {
+                        ratio = screenHeight / currentScreenHeight;
+                        x *= ratio;
+                    }
+
+                    _uiControl.Move_Local_Y(tr, x, duration, delay, ease, onResultCallback);
+                }
                 break;
         }
     }
