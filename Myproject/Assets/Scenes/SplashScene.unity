@@ -1261,24 +1261,43 @@ MonoBehaviour:
   _creatureSpriteTemplate:
   - type: 0
     sprite: {fileID: 3671900364904746485, guid: 3d521ae897b89844fb54b11d02fec449, type: 3}
+    sprites: []
   - type: 1
     sprite: {fileID: 8787490208024810661, guid: ab6b213d85b87cd43a67af4c6a593b2c, type: 3}
+    sprites: []
   - type: 2
     sprite: {fileID: 5228109309645807972, guid: 08f004b97cd87d0419574a56796b2906, type: 3}
+    sprites: []
   - type: 3
     sprite: {fileID: -9067255232676971120, guid: ab6b213d85b87cd43a67af4c6a593b2c, type: 3}
+    sprites: []
   - type: 4
     sprite: {fileID: 1639214462598301798, guid: ab6b213d85b87cd43a67af4c6a593b2c, type: 3}
+    sprites: []
   - type: 5
     sprite: {fileID: -4187769825804618121, guid: 08f004b97cd87d0419574a56796b2906, type: 3}
+    sprites: []
   - type: 6
     sprite: {fileID: -22973045, guid: 06ad8a00384fb7b498997e4f54cf1c28, type: 3}
+    sprites: []
   - type: 7
     sprite: {fileID: 21300000, guid: 58004cff2687ab845ad577e611305a3a, type: 3}
+    sprites: []
   - type: 8
     sprite: {fileID: 21300000, guid: 77f9b11e4cabc0b4d868ab93fafb0f00, type: 3}
+    sprites: []
   - type: 9
     sprite: {fileID: 3078493119409997294, guid: 08f004b97cd87d0419574a56796b2906, type: 3}
+    sprites: []
+  - type: 10
+    sprite: {fileID: 5541110501864291823, guid: ab6b213d85b87cd43a67af4c6a593b2c, type: 3}
+    sprites:
+    - {fileID: 61205593611490087, guid: ab6b213d85b87cd43a67af4c6a593b2c, type: 3}
+    - {fileID: -7052531943125621977, guid: ab6b213d85b87cd43a67af4c6a593b2c, type: 3}
+    - {fileID: -6835276744072785760, guid: ab6b213d85b87cd43a67af4c6a593b2c, type: 3}
+    - {fileID: -3254853038742249471, guid: ab6b213d85b87cd43a67af4c6a593b2c, type: 3}
+    - {fileID: 922424046108175333, guid: ab6b213d85b87cd43a67af4c6a593b2c, type: 3}
+    - {fileID: -4016574229998233168, guid: ab6b213d85b87cd43a67af4c6a593b2c, type: 3}
 --- !u!114 &1344980028
 MonoBehaviour:
   m_ObjectHideFlags: 0
