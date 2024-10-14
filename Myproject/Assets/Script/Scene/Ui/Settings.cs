@@ -59,7 +59,7 @@ public class Settings : MonoBehaviour
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
         GameManager.instance.soundManager.PlaySfx(eSfx.Map);
 
-        GameManager.instance.tools.Move_Local_XY(eDir.Y, this.GetComponent<RectTransform>(), 4444, 0.5f, 0, Ease.InBack, () =>
+        GameManager.instance.tools.Move_Local_XY(eDir.Y, this.GetComponent<RectTransform>(), 3000f, 0.5f, 0, Ease.InBack, () =>
         {
             _onCloseCallback?.Invoke();
         });

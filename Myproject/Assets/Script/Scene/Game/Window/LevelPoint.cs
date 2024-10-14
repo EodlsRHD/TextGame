@@ -8,6 +8,7 @@ using TMPro;
 public class LevelPoint : MonoBehaviour
 {
     [SerializeField] private Button _buttonClose = null;
+    [SerializeField] private Button _buttonApply = null;
     [SerializeField] private Button _buttonReset = null;
     [SerializeField] private TMP_Text _textMaxPoint = null;
 
@@ -99,7 +100,7 @@ public class LevelPoint : MonoBehaviour
         {
             _onResultCallback?.Invoke(_userData);
 
-            GameManager.instance.tools.Move_Local_XY(eDir.Y, this.GetComponent<RectTransform>(), 3400f, 0.5f, 0, Ease.InBack, () =>
+            GameManager.instance.tools.Move_Local_XY(eDir.Y, this.GetComponent<RectTransform>(), 1800f, 0.5f, 0, Ease.InBack, () =>
             {
                 this.gameObject.SetActive(false);
 

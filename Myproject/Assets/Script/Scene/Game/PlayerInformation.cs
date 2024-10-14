@@ -82,7 +82,7 @@ public class PlayerInformation : MonoBehaviour
 
     public void Close(System.Action onResultCallback = null)
     {
-        GameManager.instance.tools.Move_Local_XY(eDir.X, _objInformation.GetComponent<RectTransform>(), 1841f, 0.5f, 0, Ease.InBack, () => 
+        GameManager.instance.tools.Move_Local_XY(eDir.X, _objInformation.GetComponent<RectTransform>(), 1000f, 0.5f, 0, Ease.InBack, () => 
         {
             _objInformation.SetActive(false);
 

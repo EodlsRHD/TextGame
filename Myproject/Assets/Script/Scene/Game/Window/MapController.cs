@@ -158,7 +158,7 @@ public class MapController : MonoBehaviour
 
         _isOpen = true;
 
-        GameManager.instance.tools.Move_Local_XY(eDir.Y, this.GetComponent<RectTransform>(), 485, 0.5f, 0, Ease.OutBack, null);
+        GameManager.instance.tools.Move_Local_XY(eDir.Y, this.GetComponent<RectTransform>(), 276f, 0.5f, 0, Ease.OutBack, null);
     }
 
     private void CloseMap()
@@ -179,7 +179,7 @@ public class MapController : MonoBehaviour
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.Map);
 
-        GameManager.instance.tools.Move_Local_XY(eDir.Y, this.GetComponent<RectTransform>(), 3400, 0.5f, 0, Ease.InBack, () =>
+        GameManager.instance.tools.Move_Local_XY(eDir.Y, this.GetComponent<RectTransform>(), 1800f, 0.5f, 0, Ease.InBack, () =>
         {
             _buttonCloseViewMap.gameObject.SetActive(false);
             this.gameObject.SetActive(false);

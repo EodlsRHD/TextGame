@@ -183,7 +183,7 @@ public class UiManager : MonoBehaviour
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
         GameManager.instance.soundManager.PlaySfx(eSfx.MenuClose);
 
-        GameManager.instance.tools.Move_Local_XY(eDir.Y, _rankings.GetComponent<RectTransform>(), 4444, 0.5f, 0, Ease.InBack, () =>
+        GameManager.instance.tools.Move_Local_XY(eDir.Y, _rankings.GetComponent<RectTransform>(), 3000f, 0.5f, 0, Ease.InBack, () =>
         {
             ActiveBlocker(false);
 
@@ -265,7 +265,7 @@ public class UiManager : MonoBehaviour
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
         GameManager.instance.soundManager.PlaySfx(eSfx.MenuClose);
 
-        GameManager.instance.tools.Move_Local_XY(eDir.Y, _cradit.GetComponent<RectTransform>(), 4444, 0.5f, 0, Ease.InBack, () =>
+        GameManager.instance.tools.Move_Local_XY(eDir.Y, _cradit.GetComponent<RectTransform>(), 3000f, 0.5f, 0, Ease.InBack, () =>
         {
             ActiveBlocker(false);
 
