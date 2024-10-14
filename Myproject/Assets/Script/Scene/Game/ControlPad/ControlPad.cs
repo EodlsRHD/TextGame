@@ -158,7 +158,7 @@ public class ControlPad : MonoBehaviour
 
         _isOpen = true;
 
-        GameManager.instance.tools.Move_Local_XY(eDir.Y, _objSkillAndBagPad.GetComponent<RectTransform>(), -1338f, 0.5f, 0, Ease.OutBack, null);
+        GameManager.instance.tools.Move_Local_XY(eDir.Y, _objSkillAndBagPad.GetComponent<RectTransform>(), -1082f, 0.5f, 0, Ease.OutBack, null);
     }
 
     private void OnUseSkillAndBagPad()
@@ -196,7 +196,7 @@ public class ControlPad : MonoBehaviour
 
         CloseInformation();
 
-        GameManager.instance.tools.Move_Local_XY(eDir.Y, _objSkillAndBagPad.GetComponent<RectTransform>(), -2671f, 0.5f, 0, Ease.InBack, () =>
+        GameManager.instance.tools.Move_Local_XY(eDir.Y, _objSkillAndBagPad.GetComponent<RectTransform>(), -2405f, 0.5f, 0, Ease.InBack, () =>
         {
             _objSkillAndBagPad.SetActive(false);
 

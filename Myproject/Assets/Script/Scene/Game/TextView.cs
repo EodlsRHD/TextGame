@@ -35,7 +35,7 @@ public class TextView : MonoBehaviour
     /// <summary>
     ///  Find Monster
     /// </summary>
-    public void UpdateText(eCreature type, DataManager.Node_Data monsterNode, DataManager.Node_Data playerNode)
+    public void UpdateText(eMapObject type, DataManager.Node_Data monsterNode, DataManager.Node_Data playerNode)
     {
         string dirStr = string.Empty;
         string findType = string.Empty;
@@ -85,31 +85,31 @@ public class TextView : MonoBehaviour
 
         switch(type)
         {
-            case eCreature.Monster:
+            case eMapObject.Monster:
                 findType = "몬스터";
                 break;
 
-            case eCreature.Item:
+            case eMapObject.Item:
                 findType = "아이템";
                 break;
 
-            case eCreature.Shop:
+            case eMapObject.Shop:
                 findType = "상인";
                 break;
 
-            case eCreature.Bonfire:
+            case eMapObject.Bonfire:
                 findType = "모닥불";
                 break;
 
-            case eCreature.UseBonfire:
+            case eMapObject.UseBonfire:
                 findType = "꺼진 모닥불";
                 break;
 
-            case eCreature.Exit:
+            case eMapObject.Exit:
                 findType = "아래로 가는 계단";
                 break;
 
-            case eCreature.Guide:
+            case eMapObject.Guide:
                 findType = "길잡이";
                 break;
         }

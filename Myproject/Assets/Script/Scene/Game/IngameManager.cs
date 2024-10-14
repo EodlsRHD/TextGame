@@ -74,13 +74,13 @@ public class IngameManager : MonoBehaviour
         _playerController.Initialize();
         _actionController.Initialize();
 
-        _ingameUI.Initialize(OpenMap, OpenNextRound, _textView.UpdateText, _ingamePopup.UpdateText);
+        _ingameUI.Initialize(OpenMap, OpenNextRound);
         _textView.Initialize();
         _controlPad.Initialize(_playerController.PlayerMove, _playerController.PlayerAction);
         _mapController.Initialize(GameManager.instance.dataManager.MapSize);
         _ingamePopup.Initialize();
-        _shop.Initialize(_textView.UpdateText, _ingamePopup.UpdateText, _actionController.Buy);
-        _bonfire.Initialize(_textView.UpdateText, _ingamePopup.UpdateText, _actionController.SelectSkill, _controlPad.Skill);
+        _shop.Initialize(_actionController.Buy);
+        _bonfire.Initialize(_actionController.SelectSkill, _controlPad.Skill);
 
         FirstSet();
 
@@ -100,12 +100,12 @@ public class IngameManager : MonoBehaviour
 
         if (_saveData.round > 1)
         {
-            _ingameUI.OpenNextRoundWindow(eRoundClear.Load);
+            OpenNextRoundWindow(eRoundClear.Load);
 
             return;
         }
 
-        _ingameUI.OpenNextRoundWindow(eRoundClear.First);
+        OpenNextRoundWindow(eRoundClear.First);
     }
 
     private void OpenMap(System.Action onCallback)
@@ -167,15 +167,16 @@ public class IngameManager : MonoBehaviour
     private void GenerateMap(DataManager.Map_Data mapData)
     {
         _saveData.mapData = mapData;
-        
+
         RoundSet();
     }
      
     private void RoundSet()
     {
         UpdatePlayerCoord();
-        _ingameUI.SetRoundText(_saveData.round);
+        UpdateRoundText();
 
+        SetMap();
         UpdateData();
 
         PlayerTurn();
@@ -193,7 +194,7 @@ public class IngameManager : MonoBehaviour
         _mapController.Close();
         _saveData.round++;
 
-        _ingameUI.OpenNextRoundWindow(eRoundClear.Success);
+        OpenNextRoundWindow(eRoundClear.Success);
     }
 
     public void ControlPad_Skill()
@@ -206,9 +207,9 @@ public class IngameManager : MonoBehaviour
         _controlPad.Bag(_saveData.userData, _actionController.Bag);
     }
 
-    public void SetMap(List<int> nearbyIndexs)
+    public void SetMap()
     {
-        _mapController.SetMap(_saveData, nearbyIndexs);
+        _mapController.SetMap(_saveData);
     }
 
     public void PlayBgm(eBgm type)
@@ -289,7 +290,7 @@ public class IngameManager : MonoBehaviour
 
         List<int> NearbyIndexs = _playerController.PlayerSearchNearby();
 
-        SetMap(NearbyIndexs);
+        UpdateMap();
     }
 
     public void PlayerTurnOut()
@@ -339,7 +340,7 @@ public class IngameManager : MonoBehaviour
         _textView.UpdateText(_saveData.mapData.nodeDatas[nearbyBlockIndex]);
     }
 
-    public void UpdateText(eCreature type, int monsterNodeIndex)
+    public void UpdateText(eMapObject type, int monsterNodeIndex)
     {
         _textView.UpdateText(type, _saveData.mapData.nodeDatas[monsterNodeIndex], _saveData.mapData.nodeDatas[_saveData.userData.data.currentNodeIndex]);
     }
@@ -352,6 +353,16 @@ public class IngameManager : MonoBehaviour
     public void UpdatePlayerInfo(eStats type)
     {
         _ingameUI.UpdatePlayerInfo(type, _saveData.userData);
+    }
+
+    public void UpdateRoundText()
+    {
+        _ingameUI.SetRoundText(_saveData.round);
+    }
+
+    public void OpenNextRoundWindow(eRoundClear type)
+    {
+        _ingameUI.OpenNextRoundWindow(type);
     }
 
     public void UpdateMap()

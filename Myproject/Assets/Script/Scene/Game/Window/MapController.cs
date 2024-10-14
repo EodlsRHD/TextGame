@@ -3,16 +3,25 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System;
+using Unity.VisualScripting;
 
 public class MapController : MonoBehaviour
 {
     [SerializeField] private Button _buttonCloseViewMap = null;
+    [SerializeField] private GameObject _map = null;
 
     [Header("Template"), SerializeField] private BlockTemplate _tempalte = null;
-    [SerializeField] private Transform _trTemplateParant = null;
-    [SerializeField] private Transform _trTemplateParant_Back = null;
 
-    private List<BlockTemplate> _pool = new List<BlockTemplate>();
+    [Header("Menu")]
+    [SerializeField] private Transform _trTemplateParant_Fog = null;
+    [SerializeField] private Transform _trTemplateParant_Creauture = null;
+    [SerializeField] private Transform _trTemplateParant_Tile = null;
+
+    [Header("Back"), SerializeField] private Transform _trBack = null;
+
+    private List<BlockTemplate> _poolFog = new List<BlockTemplate>();
+    private List<BlockTemplate> _poolCreature = new List<BlockTemplate>();
+    private List<BlockTemplate> _poolTile = new List<BlockTemplate>();
 
     private Action _onCloseCallback = null;
 
@@ -26,48 +35,113 @@ public class MapController : MonoBehaviour
 
         for (int i = 0; i < mapSize * mapSize; i++)
         {
-            var obj = Instantiate(_tempalte, _trTemplateParant);
+            var obj = Instantiate(_tempalte, _trTemplateParant_Fog);
             var com = obj.GetComponent<BlockTemplate>();
 
             com.Initialize();
-            _pool.Add(com);
+            _poolFog.Add(com);
         }
 
-        _trTemplateParant_Back.gameObject.SetActive(GameManager.instance.isMapBackgroundUpdate);
+        for (int i = 0; i < mapSize * mapSize; i++)
+        {
+            var obj = Instantiate(_tempalte, _trTemplateParant_Creauture);
+            var com = obj.GetComponent<BlockTemplate>();
+
+            com.Initialize();
+            _poolCreature.Add(com);
+        }
+
+        for (int i = 0; i < mapSize * mapSize; i++)
+        {
+            var obj = Instantiate(_tempalte, _trTemplateParant_Tile);
+            var com = obj.GetComponent<BlockTemplate>();
+
+            com.Initialize();
+            _poolTile.Add(com);
+        }
+
+        _trBack.gameObject.SetActive(GameManager.instance.isMapBackgroundUpdate);
 
         _buttonCloseViewMap.gameObject.SetActive(false);
         this.gameObject.SetActive(false);
     }
 
-    public void SetMap(DataManager.Save_Data saveData, List<int> nearbyIndexs)
+    public void SetMap(DataManager.Save_Data saveData)
     {
-        _trTemplateParant_Back.gameObject.SetActive(GameManager.instance.isMapBackgroundUpdate);
+        _trBack.gameObject.SetActive(GameManager.instance.isMapBackgroundUpdate);
 
         var blockData = saveData.mapData.nodeDatas;
 
         for (int i = 0; i < blockData.Count; i++)
         {
-            var template = _pool[i];
-            bool same = false;
+            var templateFog = _poolFog[i];
+            var templateCreature = _poolCreature[i];
+            var templateTile = _poolTile[i];
 
-            for (int j = 0; j < nearbyIndexs.Count; j++)
+            bool isExit = false;
+
+            if (i == saveData.mapData.exitNodeIndex)
             {
-                if(i == nearbyIndexs[j])
-                {
-                    same = true;
-                    
-                    break;
-                }
+                isExit = true;
             }
 
-            template.gameObject.transform.SetParent(GameManager.instance.isMapBackgroundUpdate == false ? _trTemplateParant : _trTemplateParant_Back);
-            template.SetTemplate(same, i == saveData.mapData.exitNodeIndex, blockData[i]);
+            templateFog.gameObject.transform.SetParent(_trTemplateParant_Fog);
+            templateFog.SetFog(false, blockData[i]);
+
+            templateCreature.gameObject.transform.SetParent(_trTemplateParant_Creauture);
+            templateCreature.SetCreature(isExit, blockData[i]);
+
+            templateTile.gameObject.transform.SetParent(_trTemplateParant_Tile);
+            templateTile.SetTile(blockData[i]);
         }
     }
 
     public void UpdateMapData(DataManager.Save_Data saveData, List<int> nearbyIndexs)
     {
-        SetMap(saveData, nearbyIndexs);
+        if(GameManager.instance.isMapBackgroundUpdate == true)
+        {
+            _map.transform.SetParent(_trBack);
+            _map.GetComponent<RectTransform>().localPosition = new Vector2(0, 0);
+        }
+        else
+        {
+            _map.transform.SetParent(this.transform);
+            _map.GetComponent<RectTransform>().localPosition = new Vector2(0, 0);
+        }
+
+        _trBack.gameObject.SetActive(GameManager.instance.isMapBackgroundUpdate);
+
+        var blockData = saveData.mapData.nodeDatas;
+
+        for (int i = 0; i < blockData.Count; i++)
+        {
+            var templateFog = _poolFog[i];
+            var templateCreature = _poolCreature[i];
+
+            bool isNearby = false;
+            bool isExit = false;
+
+            if (i == saveData.mapData.exitNodeIndex)
+            {
+                isExit = true;
+            }
+
+            for (int j = 0; j < nearbyIndexs.Count; j++)
+            {
+                if (i == nearbyIndexs[j])
+                {
+                    isNearby = true;
+
+                    break;
+                }
+            }
+
+            templateFog.gameObject.transform.SetParent(_trTemplateParant_Fog);
+            templateFog.SetFog(isNearby, blockData[i]);
+
+            templateCreature.gameObject.transform.SetParent(_trTemplateParant_Creauture);
+            templateCreature.SetCreature(isExit, blockData[i]);
+        }
     }
 
     public void OpenMap(Action onCallback)
@@ -77,12 +151,14 @@ public class MapController : MonoBehaviour
             _onCloseCallback = onCallback;
         }
 
+        GameManager.instance.soundManager.PlaySfx(eSfx.Map);
+
         this.gameObject.SetActive(true);
         _buttonCloseViewMap.gameObject.SetActive(true);
 
         _isOpen = true;
 
-        GameManager.instance.tools.Move_Local_XY(eDir.Y, this.GetComponent<RectTransform>(), 720f, 0.5f, 0, Ease.OutBack, null);
+        GameManager.instance.tools.Move_Local_XY(eDir.Y, this.GetComponent<RectTransform>(), 485, 0.5f, 0, Ease.OutBack, null);
     }
 
     private void CloseMap()
@@ -101,6 +177,8 @@ public class MapController : MonoBehaviour
 
     public void Close(bool isCloseButton = false, Action onResultCallbacl = null)
     {
+        GameManager.instance.soundManager.PlaySfx(eSfx.Map);
+
         GameManager.instance.tools.Move_Local_XY(eDir.Y, this.GetComponent<RectTransform>(), 3400, 0.5f, 0, Ease.InBack, () =>
         {
             _buttonCloseViewMap.gameObject.SetActive(false);
@@ -122,9 +200,19 @@ public class MapController : MonoBehaviour
 
     private void RemoveTemplate()
     {
-        for (int i = 0; i < _pool.Count; i++)
+        for (int i = 0; i < _poolFog.Count; i++)
         {
-            _pool[i].RemoveTemplate();
+            _poolFog[i].RemoveTemplate();
+        }
+
+        for (int i = 0; i < _poolCreature.Count; i++)
+        {
+            _poolCreature[i].RemoveTemplate();
+        }
+
+        for (int i = 0; i < _poolTile.Count; i++)
+        {
+            _poolTile[i].RemoveTemplate();
         }
     }
 }

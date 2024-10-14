@@ -17,10 +17,8 @@ public class BlockTemplate : MonoBehaviour
         this.gameObject.SetActive(false);
     }
 
-    public void SetTemplate(bool isNearby, bool isExit, DataManager.Node_Data blockData)
+    public void SetFog(bool isNearby, DataManager.Node_Data blockData)
     {
-        _imageBlock.enabled = true;
-
         if (isNearby == true)
         {
             _isRresrarch = true;
@@ -30,139 +28,116 @@ public class BlockTemplate : MonoBehaviour
 
         if (isNearby == false && _isRresrarch == false)
         {
-            _imageBlock.enabled = true;
-            _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eCreature.Fog);
-            color = Color.gray;
-            color.a = 1f;
-
-        }
-        else if(isNearby == false && _isRresrarch == true)
-        {
-            if (blockData.isWalkable == true)
-            {
-                _imageBlock.enabled = true;
-                _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eCreature.Fog);
-                color = Color.black;
-                color.a = 0.2f;
-            }
-            else if (blockData.isWalkable == false)
-            {
-                _imageBlock.enabled = true;
-                _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eCreature.Blocker);
-                color = Color.white;
-                color.a = 0.5f;
-            }
-
-            if (blockData.isGuide == true)
-            {
-                _imageBlock.enabled = true;
-                _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eCreature.Guide);
-                color = Color.white;
-                color.a = 0.5f;
-            }
-
-            if (blockData.isShop == true)
-            {
-                _imageBlock.enabled = true;
-                _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eCreature.Shop);
-                color = Color.white;
-                color.a = 0.5f;
-            }
-
-            if (blockData.isBonfire == true)
-            {
-                _imageBlock.enabled = true;
-
-                if (blockData.isUseBonfire == true)
-                {
-                    _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eCreature.UseBonfire);
-                }
-                else
-                {
-                    _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eCreature.Bonfire);
-                }
-
-                color = Color.white;
-                color.a = 0.5f;
-            }
-
-            if (isExit == true)
-            {
-                _imageBlock.enabled = true;
-                _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eCreature.Exit);
-                color = Color.white;
-                color.a = 0.5f;
-            }
-        }
-        else if(isNearby == true && isNearby == true)
-        {
-            if (blockData.isWalkable == true)
+            if (blockData.isUser == true)
             {
                 _imageBlock.enabled = false;
                 color.a = 0f;
             }
-            else if (blockData.isWalkable == false)
+            else
             {
                 _imageBlock.enabled = true;
-                _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eCreature.Blocker);
-                color = Color.white;
+                _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eMapObject.Fog);
+                color = Color.gray;
                 color.a = 1f;
             }
+        }
+        else if (isNearby == false && _isRresrarch == true)
+        {
+            _imageBlock.enabled = true;
+            _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eMapObject.Fog);
+            color = Color.black;
+            color.a = 0.2f;
+        }
+        else if(isNearby == true)
+        {
+            _imageBlock.enabled = false;
+            color.a = 0f;
+        }
 
-            if (blockData.isMonster == true)
+        SetColor(color);
+        this.gameObject.SetActive(true);
+    }
+
+    public void SetCreature(bool isExit, DataManager.Node_Data blockData)
+    {
+        Color color = new Color();
+
+        if (blockData.isMonster == true)
+        {
+            _imageBlock.enabled = true;
+            _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eMapObject.Monster);
+            color = Color.white;
+            color.a = 1f;
+        }
+
+        if (blockData.isGuide == true)
+        {
+            _imageBlock.enabled = true;
+            _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eMapObject.Guide);
+            color = Color.white;
+            color.a = 1f;
+        }
+
+        if (blockData.isShop == true)
+        {
+            _imageBlock.enabled = true;
+            _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eMapObject.Shop);
+            color = Color.white;
+            color.a = 1f;
+        }
+
+        if (blockData.isBonfire == true)
+        {
+            _imageBlock.enabled = true;
+
+            if (blockData.isUseBonfire == true)
             {
-                _imageBlock.enabled = true;
-                _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eCreature.Monster);
-                color = Color.white;
-                color.a = 1f;
+                _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eMapObject.UseBonfire);
             }
-
-            if (blockData.isGuide == true)
+            else
             {
-                _imageBlock.enabled = true;
-                _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eCreature.Guide);
-                color = Color.white;
-                color.a = 1f;
+                _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eMapObject.Bonfire);
             }
 
-            if (blockData.isShop == true)
-            {
-                _imageBlock.enabled = true;
-                _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eCreature.Shop);
-                color = Color.white;
-                color.a = 1f;
-            }
+            color = Color.white;
+            color.a = 1f;
+        }
 
-            if (blockData.isBonfire == true)
-            {
-                _imageBlock.enabled = true;
-
-                if (blockData.isUseBonfire == true)
-                {
-                    _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eCreature.UseBonfire);
-                }
-                else
-                {
-                    _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eCreature.Bonfire);
-                }
-
-                color = Color.white;
-                color.a = 1f;
-            }
-
-            if (isExit == true)
-            {
-                _imageBlock.enabled = true;
-                _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eCreature.Exit);
-                color = Color.white;
-                color.a = 1f;
-            }
+        if (isExit == true)
+        {
+            _imageBlock.enabled = true;
+            _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eMapObject.Exit);
+            color = Color.white;
+            color.a = 1f;
         }
 
         if (blockData.isUser == true)
         {
             _imageBlock.enabled = true;
-            _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eCreature.Player);
+            _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eMapObject.Player);
+            color = Color.white;
+            color.a = 1f;
+        }
+
+        SetColor(color);
+        this.gameObject.SetActive(true);
+    }
+
+    public void SetTile(DataManager.Node_Data blockData)
+    {
+        Color color = new Color();
+
+        if(blockData.isWalkable == false)
+        {
+            _imageBlock.enabled = true;
+            _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eMapObject.Blocker);
+            color = Color.white;
+            color.a = 1f;
+        }
+        else if(blockData.isWalkable == true)
+        {
+            _imageBlock.enabled = true;
+            _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eMapObject.Ground);
             color = Color.white;
             color.a = 1f;
         }

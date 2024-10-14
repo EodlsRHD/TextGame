@@ -40,10 +40,24 @@ public enum eCreature
     Exit,
     Blocker,
     Player,
+    Bonfire,
+    Guide,
+}
+
+public enum eMapObject
+{
+    Non = -1,
+    Monster,
+    Item,
+    Shop,
+    Exit,
+    Blocker,
+    Player,
     Fog,
     Bonfire,
     UseBonfire,
-    Guide
+    Guide,
+    Ground
 }
 
 

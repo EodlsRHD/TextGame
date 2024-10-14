@@ -316,8 +316,10 @@ public class DataManager : MonoBehaviour
     [Serializable]
     public class BlockImageTemplate
     {
-        public eCreature type = eCreature.Non;
+        public eMapObject type = eMapObject.Non;
         public Sprite sprite = null;
+
+        public List<Sprite> sprites = null;
     }
 
     [Serializable]
@@ -955,9 +957,40 @@ public class DataManager : MonoBehaviour
 
     #endregion
 
-    public Sprite GetCreatureSprite(eCreature type)
+    public Sprite GetCreatureSprite(eMapObject type)
     {
-        return _creatureSpriteTemplate.Find(x => x.type == type).sprite;
+        BlockImageTemplate blockImageTemplate = _creatureSpriteTemplate.Find(x => x.type == type);
+
+        Debug.Log(type);
+
+        if(blockImageTemplate.sprites == null)
+        {
+            return blockImageTemplate.sprite;
+        }
+
+        if (blockImageTemplate.sprites.Count == 0)
+        {
+            return blockImageTemplate.sprite;
+        }
+
+        int index = -1;
+
+        if(type == eMapObject.Ground)
+        {
+            int ran = UnityEngine.Random.Range(0, 10);
+
+            if(ran >= 8)
+            {
+                index = UnityEngine.Random.Range(1, blockImageTemplate.sprites.Count);
+            }
+        }
+
+        if(index == -1)
+        {
+            return blockImageTemplate.sprite;
+        }
+
+        return blockImageTemplate.sprites[index];
     }
 }
 

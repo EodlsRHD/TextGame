@@ -38,7 +38,7 @@ public class IngameUI : MonoBehaviour
 
     private int _resurrectionCount = 2;
 
-    public void Initialize(Action<Action> onViewMapCallback, Action<eRoundClear> onNextRoundCallback, Action<string> onUpdateTextCallback, Action<string> onUpdatePopupCallback)
+    public void Initialize(Action<Action> onViewMapCallback, Action<eRoundClear> onNextRoundCallback)
     {
         if(onViewMapCallback != null)
         {
@@ -51,7 +51,7 @@ public class IngameUI : MonoBehaviour
         }
 
         _levelPoint.Initialize(CloseLevelPoint);
-        _Attacker.Initialize(CloseAttacker, onUpdateTextCallback, onUpdatePopupCallback);
+        _Attacker.Initialize(CloseAttacker);
         _playerInformation.Initialize();
 
         _buttonViewMap.onClick.AddListener(OnMap);
@@ -101,6 +101,7 @@ public class IngameUI : MonoBehaviour
     private void OnGiveUp()
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+        GameManager.instance.soundManager.PlaySfx(eSfx.MenuOpen);
 
         _onNextRoundCallback?.Invoke(eRoundClear.Fail);
 
@@ -116,6 +117,7 @@ public class IngameUI : MonoBehaviour
         }
 
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+        GameManager.instance.soundManager.PlaySfx(eSfx.MenuOpen);
 
         GameManager.instance.googleAds.ShowRewardedAd_Resurrection(() =>
         {
@@ -130,9 +132,9 @@ public class IngameUI : MonoBehaviour
 
     private void CloseNextRound()
     {
-        GameManager.instance.soundManager.PlaySfx(eSfx.MenuOpen);
+        GameManager.instance.soundManager.PlaySfx(eSfx.MenuClose);
 
-        GameManager.instance.tools.Move_Local_XY(eDir.Y, _objNextRound.GetComponent<RectTransform>(), -2671f, 0.5f, 0, Ease.InBack, () => 
+        GameManager.instance.tools.Move_Local_XY(eDir.Y, _objNextRound.GetComponent<RectTransform>(), -2405f, 0.5f, 0, Ease.InBack, () => 
         {
             _objNextRound.SetActive(false);
         });
@@ -189,7 +191,7 @@ public class IngameUI : MonoBehaviour
 
         _objNextRound.SetActive(true);
 
-        GameManager.instance.tools.Move_Local_XY(eDir.Y, _objNextRound.GetComponent<RectTransform>(), -1338f, 0.5f, 0, Ease.OutBack, null);
+        GameManager.instance.tools.Move_Local_XY(eDir.Y, _objNextRound.GetComponent<RectTransform>(), -1082f, 0.5f, 0, Ease.OutBack, null);
     }
 
     public void UpdatePlayerInfo(DataManager.User_Data userData)

@@ -216,7 +216,7 @@ public class PlayerCntroller : MonoBehaviour
             {
                 actions.Add(() =>
                 {
-                    IngameManager.instance.UpdateText(eCreature.Exit, index);
+                    IngameManager.instance.UpdateText(eMapObject.Exit, index);
                 });
 
                 Non = true;
@@ -228,7 +228,7 @@ public class PlayerCntroller : MonoBehaviour
             {
                 actions.Add(() =>
                 {
-                    IngameManager.instance.UpdateText(eCreature.Item, index);
+                    IngameManager.instance.UpdateText(eMapObject.Item, index);
                 });
 
                 Non = true;
@@ -240,7 +240,7 @@ public class PlayerCntroller : MonoBehaviour
             {
                 actions.Add(() =>
                 {
-                    IngameManager.instance.UpdateText(eCreature.Shop, index);
+                    IngameManager.instance.UpdateText(eMapObject.Shop, index);
                 });
 
                 Non = true;
@@ -252,7 +252,7 @@ public class PlayerCntroller : MonoBehaviour
             {
                 actions.Add(() =>
                 {
-                    IngameManager.instance.UpdateText(eCreature.Bonfire, index);
+                    IngameManager.instance.UpdateText(eMapObject.Bonfire, index);
                 });
 
                 Non = true;
@@ -264,7 +264,7 @@ public class PlayerCntroller : MonoBehaviour
             {
                 actions.Add(() =>
                 {
-                    IngameManager.instance.UpdateText(eCreature.UseBonfire, index);
+                    IngameManager.instance.UpdateText(eMapObject.UseBonfire, index);
                 });
 
                 Non = true;
@@ -276,7 +276,7 @@ public class PlayerCntroller : MonoBehaviour
             {
                 actions.Add(() =>
                 {
-                    IngameManager.instance.UpdateText(eCreature.Monster, index);
+                    IngameManager.instance.UpdateText(eMapObject.Monster, index);
                 });
 
                 Non = true;
@@ -288,7 +288,7 @@ public class PlayerCntroller : MonoBehaviour
             {
                 actions.Add(() =>
                 {
-                    IngameManager.instance.UpdateText(eCreature.Guide, index);
+                    IngameManager.instance.UpdateText(eMapObject.Guide, index);
                 });
 
                 Non = true;

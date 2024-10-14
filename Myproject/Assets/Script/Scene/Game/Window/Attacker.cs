@@ -37,8 +37,6 @@ public class Attacker : MonoBehaviour
     private Action _onCloseCallback = null;
     private Action _onLastCallback = null;
     private Action<eWinorLose, int> _onResultCallback = null;
-    private Action<string> _onUpdateTextCallback = null;
-    private Action<string> _onUpdatePopupCallback = null;
 
     private List<AttackerTemplate> _cards = null;
     private List<int> _fieldCardIndex = new List<int>();
@@ -61,21 +59,11 @@ public class Attacker : MonoBehaviour
     private eBattleAction _playerBattleAction = eBattleAction.Non;
     private eBattleAction _monsterBattleAction = eBattleAction.Non;
 
-    public void Initialize(Action onCloseCallback, Action<string> onUpdateTextCallback, Action<string> onUpdatePopupCallback)
+    public void Initialize(Action onCloseCallback)
     {
         if(onCloseCallback != null)
         {
             _onCloseCallback = onCloseCallback;
-        }
-
-        if(onUpdateTextCallback != null)
-        {
-            _onUpdateTextCallback = onUpdateTextCallback;
-        }
-
-        if(onUpdatePopupCallback != null)
-        {
-            _onUpdatePopupCallback = onUpdatePopupCallback;
         }
 
         _template.Initialize();
@@ -125,15 +113,15 @@ public class Attacker : MonoBehaviour
         _textBat.text = _batCount.ToString();
         _textTotal.text = _totalCount.ToString();
 
-        _onUpdateTextCallback?.Invoke(_monster.name + " 과 전투를 시작합니다!");
-        _onUpdateTextCallback?.Invoke("--- " + (_turnCount + 1) + "번째 턴");
+        IngameManager.instance.UpdateText(_monster.name + " 과 전투를 시작합니다!");
+        IngameManager.instance.UpdateText("--- " + (_turnCount + 1) + "번째 턴");
 
         CardDistribution();
 
         _objButtons.SetActive(true);
         this.gameObject.SetActive(true);
 
-        GameManager.instance.tools.Move_Local_XY(eDir.Y, this.GetComponent<RectTransform>(), -1338f, 0.5f, 0, Ease.OutBack, null);
+        GameManager.instance.tools.Move_Local_XY(eDir.Y, this.GetComponent<RectTransform>(), -1082f, 0.5f, 0, Ease.OutBack, null);
     }
 
     public void Close()
@@ -168,7 +156,7 @@ public class Attacker : MonoBehaviour
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.MenuClose);
 
-        GameManager.instance.tools.Move_Local_XY(eDir.Y, this.GetComponent<RectTransform>(), -2671f, 0.5f, 0, Ease.InBack, () => 
+        GameManager.instance.tools.Move_Local_XY(eDir.Y, this.GetComponent<RectTransform>(), -2405f, 0.5f, 0, Ease.InBack, () => 
         {
             _onCloseCallback?.Invoke();
         });
@@ -182,14 +170,14 @@ public class Attacker : MonoBehaviour
 
             if (coin < bat)
             {
-                _onUpdatePopupCallback?.Invoke("남은 체력이 부족합니다.");
+                IngameManager.instance.UpdatePopup("남은 체력이 부족합니다.");
 
                 return;
             }
         }
 
         string str_name = isPlayer == true ? _userData.data.name : _monster.name;
-        _onUpdateTextCallback?.Invoke(str_name + " (이)가 " + bat + " 만큼 Call 했습니다.");
+        IngameManager.instance.UpdateText(str_name + " (이)가 " + bat + " 만큼 Call 했습니다.");
 
         coin -= bat;
         _totalCount += bat;
@@ -220,14 +208,14 @@ public class Attacker : MonoBehaviour
 
             if (coin < (bat * 2))
             {
-                _onUpdatePopupCallback?.Invoke("남은 체력이 부족합니다.");
+                IngameManager.instance.UpdatePopup("남은 체력이 부족합니다.");
 
                 return;
             }
         }
 
         string str_name = isPlayer == true ? _userData.data.name : _monster.name;
-        _onUpdateTextCallback?.Invoke(str_name + " (이)가 Raise를 했습니다.");
+        IngameManager.instance.UpdateText(str_name + " (이)가 Raise를 했습니다.");
 
         bat *= 2;
         coin -= bat;
@@ -259,7 +247,7 @@ public class Attacker : MonoBehaviour
         }
 
         string str_name = isPlayer == true ? _userData.data.name : _monster.name;
-        _onUpdateTextCallback?.Invoke(str_name + "   ALL IN");
+        IngameManager.instance.UpdateText(str_name + "   ALL IN");
         
         _totalCount += coin;
         bat = coin;
@@ -291,7 +279,7 @@ public class Attacker : MonoBehaviour
         }
 
         string str_name = isPlayer == true ? _userData.data.name : _monster.name;
-        _onUpdateTextCallback?.Invoke(str_name + " (이)가 Fold 했습니다.");
+        IngameManager.instance.UpdateText(str_name + " (이)가 Fold 했습니다.");
 
         if (isPlayer == true)
         {
@@ -344,7 +332,7 @@ public class Attacker : MonoBehaviour
 
         if (_turnCount < 4)
         {
-            _onUpdateTextCallback?.Invoke("--- " + (_turnCount + 1) + "번째 턴");
+            IngameManager.instance.UpdateText("--- " + (_turnCount + 1) + "번째 턴");
         }
 
         CardOpen();
@@ -352,7 +340,7 @@ public class Attacker : MonoBehaviour
 
         if (_turnCount < 4 && _playerCoinCount == 0)
         {
-            _onUpdateTextCallback?.Invoke("남은 Hp가 없어 Call할 수 없습니다.");
+            IngameManager.instance.UpdateText("남은 Hp가 없어 Call할 수 없습니다.");
 
             StartCoroutine(Co_EnemyTurn());
         }
@@ -530,7 +518,7 @@ public class Attacker : MonoBehaviour
     {
         yield return new WaitForSecondsRealtime(1f);
 
-        _onUpdateTextCallback?.Invoke("--- 전투가 종료되었습니다.");
+        IngameManager.instance.UpdateText("--- 전투가 종료되었습니다.");
 
         List<int> nums = new List<int>(6);
 
@@ -552,8 +540,8 @@ public class Attacker : MonoBehaviour
         int monsterHighCardNum = 0;
         eRankings monsterRankings = Rankings(Sort(nums), ref monsterHighCardNum);
 
-        _onUpdateTextCallback?.Invoke("--- " + _userData.data.name + " 의 결과 : " + playerRankings);
-        _onUpdateTextCallback?.Invoke("--- " + _monster.name + " 의 결과 : " + monsterRankings);
+        IngameManager.instance.UpdateText("--- " + _userData.data.name + " 의 결과 : " + playerRankings);
+        IngameManager.instance.UpdateText("--- " + _monster.name + " 의 결과 : " + monsterRankings);
 
         _resultDamage = _totalCount;
 
@@ -571,8 +559,8 @@ public class Attacker : MonoBehaviour
         {
             _isPlayerWin = eWinorLose.Draw;
 
-            _onUpdateTextCallback?.Invoke("--- " + _userData.data.name + " 의 높은 카드 : " + ChangeCardNum(playerHighCardNum));
-            _onUpdateTextCallback?.Invoke("--- " + _monster.name + " 의 높은 카드 : " + ChangeCardNum(monsterHighCardNum));
+            IngameManager.instance.UpdateText("--- " + _userData.data.name + " 의 높은 카드 : " + ChangeCardNum(playerHighCardNum));
+            IngameManager.instance.UpdateText("--- " + _monster.name + " 의 높은 카드 : " + ChangeCardNum(monsterHighCardNum));
 
             if(playerHighCardNum == monsterHighCardNum)
             {

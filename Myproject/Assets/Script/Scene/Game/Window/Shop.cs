@@ -64,26 +64,14 @@ public class Shop : MonoBehaviour
 
     [Header("Goods"), SerializeField] private List<ShopTemplate> _template = null;
     
-    private Action<string> _onUpdateTextCallback = null;
-    private Action<string> _onUpdatePopupCallback = null;
     private Action<int, int, short> _onBuyCallback = null;
 
     private DataManager.Npc_Data _npc = null;
     private int _userCoin = 0;
     private int _selectTemplateIndex = 0;
 
-    public void Initialize(Action<string> onUpdateTextCallback, Action<string> onUpdatePopupCallback, Action<int, int, short> onBuyCallback)
+    public void Initialize(Action<int, int, short> onBuyCallback)
     {
-        if(onUpdateTextCallback != null)
-        {
-            _onUpdateTextCallback = onUpdateTextCallback;
-        }
-
-        if(onUpdatePopupCallback != null)
-        {
-            _onUpdatePopupCallback = onUpdatePopupCallback;
-        }
-
         if (onBuyCallback != null)
         {
             _onBuyCallback = onBuyCallback;
@@ -120,7 +108,7 @@ public class Shop : MonoBehaviour
 
         this.gameObject.SetActive(true);
 
-        GameManager.instance.tools.Move_Local_XY(eDir.Y, this.GetComponent<RectTransform>(), -1338f, 0.5f, 0, Ease.OutBack, null);
+        GameManager.instance.tools.Move_Local_XY(eDir.Y, this.GetComponent<RectTransform>(), -1082f, 0.5f, 0, Ease.OutBack, null);
     }
 
     private void OnClose()
@@ -130,7 +118,7 @@ public class Shop : MonoBehaviour
 
         CloseInformation();
 
-        GameManager.instance.tools.Move_Local_XY(eDir.Y, this.GetComponent<RectTransform>(), -2671f, 0.5f, 0, Ease.InBack, () =>
+        GameManager.instance.tools.Move_Local_XY(eDir.Y, this.GetComponent<RectTransform>(), -2405f, 0.5f, 0, Ease.InBack, () =>
         {
             this.gameObject.SetActive(false);
 
@@ -155,14 +143,14 @@ public class Shop : MonoBehaviour
 
         if (template.isBuy == true)
         {
-            _onUpdatePopupCallback?.Invoke("이미 구매하였습니다.");
+            IngameManager.instance.UpdatePopup("이미 구매하였습니다.");
 
             return;
         }
 
         if(_userCoin - template.item.price < 0)
         {
-            _onUpdatePopupCallback?.Invoke("구매할 수 없습니다.");
+            IngameManager.instance.UpdatePopup("구매할 수 없습니다.");
 
             return;
         }
