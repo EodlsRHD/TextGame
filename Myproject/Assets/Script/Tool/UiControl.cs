@@ -61,4 +61,20 @@ public class UiControl : MonoBehaviour
             onResultCallback?.Invoke();
         });
     }
+
+    public void Move_Anchor_X(RectTransform tr, float targetPositon_X, float duration, float delay = 0, Ease ease = Ease.Linear, Action onResultCallback = null)
+    {
+        tr.DOAnchorPosX(targetPositon_X, duration).SetEase((DG.Tweening.Ease)ease).SetDelay(delay).OnComplete(() =>
+        {
+            onResultCallback?.Invoke();
+        });
+    }
+
+    public void Move_Anchor_Y(RectTransform tr, float targetPositon_Y, float duration, float delay = 0, Ease ease = Ease.Linear, Action onResultCallback = null)
+    {
+        tr.DOAnchorPosY(targetPositon_Y, duration).SetEase((DG.Tweening.Ease)ease).SetDelay(delay).OnComplete(() =>
+        {
+            onResultCallback?.Invoke();
+        });
+    }
 }

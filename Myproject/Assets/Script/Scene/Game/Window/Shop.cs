@@ -108,7 +108,7 @@ public class Shop : MonoBehaviour
 
         this.gameObject.SetActive(true);
 
-        GameManager.instance.tools.Move_Local_XY(eDir.Y, this.GetComponent<RectTransform>(), -600f, 0.5f, 0, Ease.OutBack, null);
+        GameManager.instance.tools.Move_Anchor_XY(eDir.Y, this.GetComponent<RectTransform>(), 350f, 0.5f, 0, Ease.OutBack, null);
     }
 
     private void OnClose()
@@ -118,7 +118,7 @@ public class Shop : MonoBehaviour
 
         CloseInformation();
 
-        GameManager.instance.tools.Move_Local_XY(eDir.Y, this.GetComponent<RectTransform>(), -1320f, 0.5f, 0, Ease.InBack, () =>
+        GameManager.instance.tools.Move_Anchor_XY(eDir.Y, this.GetComponent<RectTransform>(), -360f, 0.5f, 0, Ease.InBack, () =>
         {
             this.gameObject.SetActive(false);
 
@@ -173,12 +173,12 @@ public class Shop : MonoBehaviour
 
         _objInformation.SetActive(true);
 
-        GameManager.instance.tools.Move_Local_XY(eDir.X, _objInformation.GetComponent<RectTransform>(), 108f, 0.5f, 0, Ease.OutBack, null);
+        GameManager.instance.tools.Move_Anchor_XY(eDir.X, _objInformation.GetComponent<RectTransform>(), -423f, 0.5f, 0, Ease.OutBack, null);
     }
 
     private void CloseInformation()
     {
-        GameManager.instance.tools.Move_Local_XY(eDir.X, _objInformation.GetComponent<RectTransform>(), 1000f, 0.5f, 0, Ease.InBack, () =>
+        GameManager.instance.tools.Move_Anchor_XY(eDir.X, _objInformation.GetComponent<RectTransform>(), 447f, 0.5f, 0, Ease.InBack, () =>
         {
             _objInformation.SetActive(false);
 

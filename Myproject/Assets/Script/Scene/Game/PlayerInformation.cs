@@ -77,12 +77,12 @@ public class PlayerInformation : MonoBehaviour
 
         _objInformation.SetActive(true);
 
-        GameManager.instance.tools.Move_Local_XY(eDir.X, _objInformation.GetComponent<RectTransform>(), 0f, 0.5f, 0, Ease.OutBack, null);
+        GameManager.instance.tools.Move_Anchor_XY(eDir.X, _objInformation.GetComponent<RectTransform>(), 423f, 0.5f, 0, Ease.OutBack, null);
     }
 
     public void Close(System.Action onResultCallback = null)
     {
-        GameManager.instance.tools.Move_Local_XY(eDir.X, _objInformation.GetComponent<RectTransform>(), 1000f, 0.5f, 0, Ease.InBack, () => 
+        GameManager.instance.tools.Move_Anchor_XY(eDir.X, _objInformation.GetComponent<RectTransform>(), 447f, 0.5f, 0, Ease.InBack, () => 
         {
             _objInformation.SetActive(false);
 

@@ -195,14 +195,14 @@ public class Encyclopedia : MonoBehaviour
 
         _objPlayerInformation.SetActive(true);
 
-        GameManager.instance.tools.Move_Local_XY(eDir.X, _objPlayerInformation.GetComponent<RectTransform>(), 0f, 0.5f, 0, Ease.OutBack, null);
+        GameManager.instance.tools.Move_Anchor_XY(eDir.X, _objPlayerInformation.GetComponent<RectTransform>(), 0f, 0.5f, 0, Ease.OutBack, null);
     }
 
     private void ClosePlayerInformation()
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
 
-        GameManager.instance.tools.Move_Local_XY(eDir.X, _objPlayerInformation.GetComponent<RectTransform>(), 2039f, 0.5f, 0, Ease.InBack, () =>
+        GameManager.instance.tools.Move_Anchor_XY(eDir.X, _objPlayerInformation.GetComponent<RectTransform>(), 2039f, 0.5f, 0, Ease.InBack, () =>
         {
             _objPlayerInformation.SetActive(false);
 

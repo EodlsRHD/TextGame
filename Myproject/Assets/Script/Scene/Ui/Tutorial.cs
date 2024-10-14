@@ -11,7 +11,7 @@ public class Tutorial : MonoBehaviour
     [Header("Guide")]
     [SerializeField] private GameObject _objGuide = null;
     [SerializeField] private TutorialAnswerTemplate _template = null;
-    [SerializeField] private GameObject _objAnswer = null;
+    [SerializeField] private GameObject _objAnswerParant = null;
 
     [Space(10)]
 
@@ -19,6 +19,7 @@ public class Tutorial : MonoBehaviour
 
     [Space(10)]
 
+    [SerializeField] private GameObject _objAnswer = null;
     [SerializeField] private GameObject _objSpeechBubble = null;
     [SerializeField] private TMP_Text _textSpeechBubble;
 
@@ -89,36 +90,42 @@ public class Tutorial : MonoBehaviour
         _objGuide.SetActive(true);
         this.gameObject.SetActive(true);
 
-        if (_isDone == true)
+        GameManager.instance.soundManager.PlaySfx(eSfx.MenuOpen);
+
+        GameManager.instance.tools.Move_Anchor_XY(eDir.X, _objSpeechBubble.GetComponent<RectTransform>(), 0f, 0.5f, 0, Ease.OutBack, null);
+        GameManager.instance.tools.Move_Anchor_XY(eDir.Y, _objAnswer.GetComponent<RectTransform>(), 0f, 0.5f, 0, Ease.OutBack, () => 
         {
-            ContentOutput("맵 중앙에 다음층으로 내려가는 계단이 있어!");
-            InstantiateAnswer(null, eTutorialQuest.Non);
-
-            return;
-        }
-
-        DataManager.Tutorial_Data data = GameManager.instance.dataManager.GetTutorialData(_speechIndex);
-
-        if(_start == true)
-        {
-            if (IngameManager.instance.isHuntMonster == false)
+            if (_isDone == true)
             {
-                ContentOutput("사냥하고 말해줘!");
+                ContentOutput("맵 중앙에 다음층으로 내려가는 계단이 있어!");
                 InstantiateAnswer(null, eTutorialQuest.Non);
 
                 return;
             }
-        }
 
-        ContentOutput(data.content);
-        InstantiateAnswer(data.answers, (eTutorialQuest)data.isQuest);
+            DataManager.Tutorial_Data data = GameManager.instance.dataManager.GetTutorialData(_speechIndex);
 
-        _start = true;
+            if (_start == true)
+            {
+                if (IngameManager.instance.isHuntMonster == false)
+                {
+                    ContentOutput("사냥하고 말해줘!");
+                    InstantiateAnswer(null, eTutorialQuest.Non);
+
+                    return;
+                }
+            }
+
+            ContentOutput(data.content);
+            InstantiateAnswer(data.answers, (eTutorialQuest)data.isQuest);
+
+            _start = true;
+        });
     }
 
     public void Close()
     {
-        if(_isMenu == true)
+        if (_isMenu == true)
         {
             GameManager.instance.soundManager.PlaySfx(eSfx.GotoLobby);
         }
@@ -132,7 +139,13 @@ public class Tutorial : MonoBehaviour
 
     private void OnClose()
     {
-        _onCloseCallback?.Invoke();
+        GameManager.instance.soundManager.PlaySfx(eSfx.MenuClose);
+
+        GameManager.instance.tools.Move_Anchor_XY(eDir.X, _objSpeechBubble.GetComponent<RectTransform>(), 554f, 0.5f, 0, Ease.InBack, null);
+        GameManager.instance.tools.Move_Anchor_XY(eDir.Y, _objAnswer.GetComponent<RectTransform>(), -700f, 0.5f, 0, Ease.InBack, () => 
+        {
+            _onCloseCallback?.Invoke();
+        });
     }
 
     #region Menu
@@ -245,7 +258,7 @@ public class Tutorial : MonoBehaviour
 
     private void InstantiateAnswer(List<DataManager.Tutorial_answer> answers, eTutorialQuest type)
     {
-        _objAnswer.SetActive(false);
+        _objAnswerParant.SetActive(false);
 
         if(answers == null)
         {
@@ -258,29 +271,29 @@ public class Tutorial : MonoBehaviour
 
         for (int i = 0; i < answers.Count; i++)
         {
-            var obj = Instantiate(_template, _objAnswer.transform);
+            var obj = Instantiate(_template, _objAnswerParant.transform);
             var com = obj.GetComponent<TutorialAnswerTemplate>();
 
             com.Initialize(OnClickAnswer);
             com.Set(answers[i], type);
         }
 
-        _objAnswer.SetActive(true);
+        _objAnswerParant.SetActive(true);
     }
 
     private void DeleteTemplate()
     {
-        var child = _objAnswer.transform.transform.GetComponentsInChildren<Transform>();
+        var child = _objAnswerParant.transform.transform.GetComponentsInChildren<Transform>();
 
         foreach (var iter in child)
         {
-            if (iter != _objAnswer.transform.transform)
+            if (iter != _objAnswerParant.transform.transform)
             {
                 Destroy(iter.gameObject);
             }
         }
 
-        _objAnswer.transform.transform.DetachChildren();
+        _objAnswerParant.transform.transform.DetachChildren();
     }
 
     #endregion

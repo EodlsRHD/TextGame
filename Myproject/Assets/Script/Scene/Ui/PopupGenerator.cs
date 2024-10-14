@@ -46,6 +46,7 @@ public class PopupGenerator : MonoBehaviour
 
     public void Open_OneButton(string title, string content, string buttonText, Action onButtonCallback = null)
     {
+        GameManager.instance.soundManager.PlaySfx(eSfx.Map);
         GameManager.instance.googleAds.ShowPopupAd();
 
         if (onButtonCallback != null)
@@ -62,11 +63,12 @@ public class PopupGenerator : MonoBehaviour
 
         this.gameObject.SetActive(true);
 
-        GameManager.instance.tools.Move_Local_XY(eDir.Y, this.GetComponent<RectTransform>(), 0, 0.5f, 0, Ease.OutBack, null);
+        GameManager.instance.tools.Move_Anchor_XY(eDir.Y, this.GetComponent<RectTransform>(), 0, 0.5f, 0, Ease.OutBack, null);
     }
 
     public void Open_TwoButton(string title, string content, string leftButtonText, string rightButtonText, Action onLeftButtonCallback = null, Action onRightButtonCallback = null)
     {
+        GameManager.instance.soundManager.PlaySfx(eSfx.Map);
         GameManager.instance.googleAds.ShowPopupAd();
 
         if (onLeftButtonCallback != null)
@@ -90,13 +92,11 @@ public class PopupGenerator : MonoBehaviour
 
         this.gameObject.SetActive(true);
 
-        GameManager.instance.tools.Move_Local_XY(eDir.Y, this.GetComponent<RectTransform>(), 0, 0.5f, 0, Ease.OutBack, null);
+        GameManager.instance.tools.Move_Anchor_XY(eDir.Y, this.GetComponent<RectTransform>(), 0, 0.5f, 0, Ease.OutBack, null);
     }
 
     public void ClosePopup()
     {
-        GameManager.instance.googleAds.HidePopupAd();
-
         _textTitle.text = string.Empty;
         _textContent.text = string.Empty;
 
@@ -110,8 +110,11 @@ public class PopupGenerator : MonoBehaviour
     private void onClosePopup()
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+        GameManager.instance.soundManager.PlaySfx(eSfx.Map);
 
-        GameManager.instance.tools.Move_Local_XY(eDir.Y, this.GetComponent<RectTransform>(), 3000f, 0.5f, 0, Ease.InBack, () => 
+        GameManager.instance.googleAds.HidePopupAd();
+
+        GameManager.instance.tools.Move_Anchor_XY(eDir.Y, this.GetComponent<RectTransform>(), 1800f, 0.5f, 0, Ease.InBack, () => 
         {
             _onClosePopupCallback?.Invoke();
         });

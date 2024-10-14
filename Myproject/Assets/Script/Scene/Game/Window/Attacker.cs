@@ -121,7 +121,7 @@ public class Attacker : MonoBehaviour
         _objButtons.SetActive(true);
         this.gameObject.SetActive(true);
 
-        GameManager.instance.tools.Move_Local_XY(eDir.Y, this.GetComponent<RectTransform>(), -600f, 0.5f, 0, Ease.OutBack, null);
+        GameManager.instance.tools.Move_Anchor_XY(eDir.Y, this.GetComponent<RectTransform>(), 350f, 0.5f, 0, Ease.OutBack, null);
     }
 
     public void Close()
@@ -156,7 +156,7 @@ public class Attacker : MonoBehaviour
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.MenuClose);
 
-        GameManager.instance.tools.Move_Local_XY(eDir.Y, this.GetComponent<RectTransform>(), -1320f, 0.5f, 0, Ease.InBack, () => 
+        GameManager.instance.tools.Move_Anchor_XY(eDir.Y, this.GetComponent<RectTransform>(), -360f, 0.5f, 0, Ease.InBack, () => 
         {
             _onCloseCallback?.Invoke();
         });

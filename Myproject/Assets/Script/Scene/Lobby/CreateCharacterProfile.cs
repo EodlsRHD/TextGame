@@ -69,6 +69,7 @@ public class CreateCharacterProfile : MonoBehaviour
     private void OnBack()
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+        GameManager.instance.soundManager.PlaySfx(eSfx.GotoLobby);
 
         this.gameObject.SetActive(false);
 
