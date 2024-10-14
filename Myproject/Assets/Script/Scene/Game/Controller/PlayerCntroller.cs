@@ -90,6 +90,13 @@ public class PlayerCntroller : MonoBehaviour
             return -1;
         }
 
+        if (IngameManager.instance.saveData.mapData.nodeDatas[result].isItem == false)
+        {
+            IngameManager.instance.GetFieldItem(result);
+
+            return -1;
+        }
+
         if (IngameManager.instance.saveData.mapData.nodeDatas[result].isMonster == true)
         {
             if(IngameManager.instance.saveData.userData.currentAP < 2)

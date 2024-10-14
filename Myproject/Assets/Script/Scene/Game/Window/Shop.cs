@@ -139,6 +139,13 @@ public class Shop : MonoBehaviour
 
         CloseInformation();
 
+        if(IngameManager.instance.isItemListEmpty() == false)
+        {
+            IngameManager.instance.UpdatePopup("가방이 비어있지 않습니다.");
+
+            return;
+        }
+
         var template = _template[_selectTemplateIndex];
 
         if (template.isBuy == true)
@@ -150,7 +157,7 @@ public class Shop : MonoBehaviour
 
         if(_userCoin - template.item.price < 0)
         {
-            IngameManager.instance.UpdatePopup("구매할 수 없습니다.");
+            IngameManager.instance.UpdatePopup("골드가 부족합니다.");
 
             return;
         }

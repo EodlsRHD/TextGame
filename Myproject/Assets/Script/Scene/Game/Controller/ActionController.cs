@@ -1,3 +1,4 @@
+using System.Threading;
 using UnityEngine;
 
 public class ActionController : MonoBehaviour
@@ -107,11 +108,42 @@ public class ActionController : MonoBehaviour
                 }
 
                 IngameManager.instance.saveData.userData.skillDataIndexs[i] = (short)getIndex;
+
                 break;
             }
         }
+    }
 
-        IngameManager.instance.saveData.userData.skillDataIndexs.Add((short)getIndex);
+    private int GetPlayerDamage(int battleDamage, DataManager.User_Data data)
+    {
+        return data.currentATTACK + battleDamage + (int)(data.currentATTACK * (0.1f * data.Attack_Effect_Per)) + data.Attack_Effect;
+    }
+
+    private int GetPlayerDefence(DataManager.User_Data data)
+    {
+        return data.currentDEFENCE + (int)(data.currentDEFENCE * (0.1f * data.Defence_Effect_Per)) + data.Defence_Effect; ;
+    }
+
+    private int GetMonsterDamage(int battleDamage, DataManager.Creature_Data data)
+    {
+        return (int)(battleDamage + ((battleDamage * 0.1f) * data.attack));
+    }
+
+    private int GetMonsterDefence(DataManager.Creature_Data data)
+    {
+        return data.defence;
+    }
+    
+    private void HitSfx(int damage, int value)
+    {
+        if (value < (short)Mathf.Abs(damage))
+        {
+            GameManager.instance.soundManager.PlaySfx(eSfx.Hit_hard);
+        }
+        else
+        {
+            GameManager.instance.soundManager.PlaySfx(eSfx.Hit_light);
+        }
     }
 
     public void Attack(int nodeMonsterIndex, System.Action onLastCallback = null)
@@ -129,8 +161,8 @@ public class ActionController : MonoBehaviour
             {
                 IngameManager.instance.UpdateText("--- " + monster.name + " (이)가 승리했습니다.");
 
-                int monsterAttack = (int)(damage + ((damage * 0.1f) * monster.attack));
-                int playerDef = IngameManager.instance.saveData.userData.currentDEFENCE + (int)(IngameManager.instance.saveData.userData.currentDEFENCE * (0.1f * IngameManager.instance.saveData.userData.Defence_Effect_Per)) + IngameManager.instance.saveData.userData.Defence_Effect;
+                int monsterAttack = GetMonsterDamage(damage, monster);
+                int playerDef = GetPlayerDefence(IngameManager.instance.saveData.userData);
                 int resultDamage = (playerDef - monsterAttack);
 
                 if (resultDamage >= 0)
@@ -143,16 +175,7 @@ public class ActionController : MonoBehaviour
 
                 IngameManager.instance.saveData.userData.currentHP -= (short)Mathf.Abs(resultDamage);
 
-                int soundHP = IngameManager.instance.saveData.userData.currentHP / 3;
-
-                if (soundHP > (short)Mathf.Abs(resultDamage))
-                {
-                    GameManager.instance.soundManager.PlaySfx(eSfx.Hit_hard);
-                }
-                else
-                {
-                    GameManager.instance.soundManager.PlaySfx(eSfx.Hit_light);
-                }
+                HitSfx(resultDamage, IngameManager.instance.saveData.userData.currentHP / 3);
 
                 IngameManager.instance.UpdateText("--- " + Mathf.Abs(resultDamage) + " 의 피해를 입었습니다.");
 
@@ -182,8 +205,8 @@ public class ActionController : MonoBehaviour
 
             IngameManager.instance.UpdateText("--- " + IngameManager.instance.saveData.userData.data.name + " (이)가 승리했습니다.");
 
-            int playerDamage = IngameManager.instance.saveData.userData.currentATTACK + damage + (int)(IngameManager.instance.saveData.userData.currentATTACK * (0.1f * IngameManager.instance.saveData.userData.Attack_Effect_Per)) + IngameManager.instance.saveData.userData.Attack_Effect;
-            int _damage = monster.defence - playerDamage;
+            int playerDamage = GetPlayerDamage(damage, IngameManager.instance.saveData.userData);
+            int _damage = GetMonsterDefence(monster) - playerDamage;
 
             if (_damage >= 0)
             {
@@ -192,56 +215,46 @@ public class ActionController : MonoBehaviour
 
                 return;
             }
+
+            GameManager.instance.soundManager.PlaySfx(eSfx.Attack);
+
+            IngameManager.instance.UpdateText("--- " + IngameManager.instance.saveData.userData.data.name + " (이)가 " + playerDamage + " 의 공격력으로 공격합니다.");
+            IngameManager.instance.UpdateText("방어도를 제외한 " + Mathf.Abs(_damage) + " 의 데미지를 가했습니다.");
+
+            monster.hp -= (short)Mathf.Abs(_damage);
+
+            if (monster.hp == 0)
+            {
+                IngameManager.instance.saveData.mapData.monsterDatas.Find(x => x.currentNodeIndex == nodeMonsterIndex).hp = 0;
+
+                IngameManager.instance.UpdateText(monster.name + " (을)를 처치하였습니다");
+                IngameManager.instance.UpdateText("--- 경험치 " + monster.exp + " , 코인 " + monster.coin + "을 획득했습니다");
+
+                if (monster.itemIndexs != null)
+                {
+                    for (int i = 0; i < monster.itemIndexs.Count; i++)
+                    {
+                        IngameManager.instance.GetMonsterItem(monster.itemIndexs[i]);
+                    }
+                }
+
+                IngameManager.instance.GetGold(monster.coin);
+                IngameManager.instance.GetExp(monster.exp);
+
+                IngameManager.instance.MonsterDead(monster);
+            }
             else
             {
-                GameManager.instance.soundManager.PlaySfx(eSfx.Attack);
-                IngameManager.instance.UpdateText("--- " + IngameManager.instance.saveData.userData.data.name + " (이)가 " + playerDamage + " 의 공격력으로 공격합니다.");
-                IngameManager.instance.UpdateText("방어도를 제외한 " + Mathf.Abs(_damage) + " 의 데미지를 가했습니다.");
+                IngameManager.instance.UpdateText(monster.name + "의 체력이 " + monster.hp + " 만큼 남았습니다.");
 
-                monster.hp -= (short)Mathf.Abs(_damage);
+                IngameManager.instance.saveData.mapData.monsterDatas.Find(x => x.currentNodeIndex == nodeMonsterIndex).hp = monster.hp;
+            }
 
-                if (monster.hp >= 60000 || monster.hp == 0)
-                {
-                    IngameManager.instance.saveData.mapData.monsterDatas.Find(x => x.currentNodeIndex == nodeMonsterIndex).hp = 0;
+            if (IngameManager.instance.saveData.mapData.monsterDatas.Count == 0)
+            {
+                GameManager.instance.soundManager.PlaySfx(eSfx.ExitOpen);
 
-                    IngameManager.instance.UpdateText(monster.name + " (을)를 처치하였습니다");
-                    IngameManager.instance.UpdateText("--- 경험치 " + monster.exp + " , 코인 " + monster.coin + "을 획득했습니다");
-
-                    if (monster.itemIndexs != null)
-                    {
-                        if (monster.itemIndexs.Count > 0)
-                        {
-                            IngameManager.instance.UpdateText("--- 아이템 " + monster.itemIndexs.Count + " 개를 획득했습니다.");
-
-                            for (int i = 0; i < monster.itemIndexs.Count; i++)
-                            {
-                                IngameManager.instance.saveData.userData.itemDataIndexs.Add(monster.itemIndexs[i]);
-                                GameManager.instance.dataManager.AddEncyclopedia_Item(monster.itemIndexs[i]);
-                            }
-                        }
-                    }
-
-                    IngameManager.instance.saveData.userData.data.coin += (short)(monster.coin + (monster.coin * 0.0f * IngameManager.instance.saveData.userData.Coin_Effect_Per));
-                    IngameManager.instance.saveData.userData.currentEXP += (short)(monster.exp + (monster.exp * 0.1f * IngameManager.instance.saveData.userData.EXP_Effect_Per));
-
-                    LevelUp();
-
-                    IngameManager.instance.MonsterDead(monster);
-                }
-                else
-                {
-                    IngameManager.instance.UpdateText(monster.name + "의 체력이 " + monster.hp + " 만큼 남았습니다.");
-
-                    IngameManager.instance.saveData.mapData.monsterDatas.Find(x => x.currentNodeIndex == nodeMonsterIndex).hp = monster.hp;
-                }
-
-                if (IngameManager.instance.saveData.mapData.monsterDatas.Count == 0)
-                {
-                    GameManager.instance.soundManager.PlaySfx(eSfx.ExitOpen);
-                    IngameManager.instance.isAllMonsterDead = true;
-                }
-
-                IngameManager.instance.UpdateData();
+                IngameManager.instance.isAllMonsterDead = true;
             }
 
             IngameManager.instance.UpdateData();
@@ -266,22 +279,6 @@ public class ActionController : MonoBehaviour
 
         IngameManager.instance.UpdatePlayerInfo(eStats.AP);
         IngameManager.instance.UpdatePlayerInfo(eStats.Defence);
-    }
-
-    private void LevelUp()
-    {
-        if (IngameManager.instance.saveData.userData.maximumEXP <= IngameManager.instance.saveData.userData.currentEXP)
-        {
-            IngameManager.instance.UpdateText("레벨이 증가했습니다 !");
-
-            IngameManager.instance.saveData.userData.level += 1;
-            IngameManager.instance.saveData.userData.currentEXP = (short)Mathf.Abs(IngameManager.instance.saveData.userData.maximumEXP - IngameManager.instance.saveData.userData.currentEXP);
-
-            IngameManager.instance.UpdatePlayerInfo(eStats.EXP);
-            IngameManager.instance.UpdatePlayerInfo(eStats.Level);
-
-            IngameManager.instance.OpneLevelPoint();
-        }
     }
 
     public void Skill(int id)
@@ -761,9 +758,7 @@ public class ActionController : MonoBehaviour
                         return;
                     }
 
-                    IngameManager.instance.saveData.userData.currentEXP += value;
-
-                    LevelUp();
+                    IngameManager.instance.GetExp(value);
                 }
                 break;
 

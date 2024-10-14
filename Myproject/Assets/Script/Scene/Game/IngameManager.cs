@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -215,6 +216,72 @@ public class IngameManager : MonoBehaviour
     public void PlayBgm(eBgm type)
     {
         GameManager.instance.soundManager.PlayBgm(type);
+    }
+
+    public bool isItemListEmpty()
+    {
+        return _saveData.userData.itemDataIndexs.Count <= 10; 
+    }
+
+    public void GetMonsterItem(short id)
+    {
+        if(isItemListEmpty() == false)
+        {
+            UpdatePopup("가방이 비어있지 않습니다.");
+
+            List<int> list = Vision(_saveData.userData.currentVISION, _saveData.userData.data.currentNodeIndex);
+            int ranIndex = Random.Range(0, list.Count);
+            DataManager.Item_Data item = GameManager.instance.dataManager.GetItemData(id);
+            item.currentNodeIndex = list[ranIndex];
+
+            _saveData.mapData.nodeDatas[list[ranIndex]].isItem = true;
+            _saveData.mapData.itemDatas.Add(item);
+
+            return;
+        }
+
+        _saveData.userData.itemDataIndexs.Add(id);
+        GameManager.instance.dataManager.AddEncyclopedia_Item(id);
+    }
+
+    public void GetFieldItem(int nodeIndex)
+    {
+        if (isItemListEmpty() == false)
+        {
+            UpdatePopup("가방이 비어있지 않습니다.");
+            
+            return;
+        }
+
+        UpdateText("아이템을 가방에 보관하였습니다.");
+
+        short id = _saveData.mapData.itemDatas.Find(x => x.currentNodeIndex == nodeIndex).id;
+
+        _saveData.userData.itemDataIndexs.Add(id);
+        GameManager.instance.dataManager.AddEncyclopedia_Item(id);
+    }
+
+    public void GetGold(short value)
+    {
+        _saveData.userData.data.coin += (short)(value + (value * 0.1f * _saveData.userData.Coin_Effect_Per));
+    }
+
+    public void GetExp(short value)
+    {
+        _saveData.userData.currentEXP += (short)(value + (value * 0.1f * _saveData.userData.EXP_Effect_Per));
+
+        if (_saveData.userData.maximumEXP <= _saveData.userData.currentEXP)
+        {
+            UpdateText("레벨이 증가했습니다 !");
+
+            _saveData.userData.level += 1;
+            _saveData.userData.currentEXP = (short)Mathf.Abs(_saveData.userData.maximumEXP - _saveData.userData.currentEXP);
+
+            UpdatePlayerInfo(eStats.EXP);
+            UpdatePlayerInfo(eStats.Level);
+
+            OpneLevelPoint();
+        }
     }
 
     #region ActionController

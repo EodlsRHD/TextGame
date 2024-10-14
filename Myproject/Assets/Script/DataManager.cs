@@ -182,7 +182,7 @@ public class DataManager : MonoBehaviour
     [Serializable]
     public class Item_Data
     {
-        public ushort id = 0;
+        public short id = 0;
 
         public string name = string.Empty;
         public string description = string.Empty;
@@ -201,6 +201,8 @@ public class DataManager : MonoBehaviour
         public short defence = 0;
         public short defencePercentIncreased = 0;
         public ushort duration = 0;
+
+        public int currentNodeIndex = 0;
     }
 
     public class Duration

@@ -58,7 +58,7 @@ public class BlockTemplate : MonoBehaviour
         this.gameObject.SetActive(true);
     }
 
-    public void SetCreature(bool isExit, DataManager.Node_Data blockData)
+    public void SetObject(bool isExit, DataManager.Node_Data blockData)
     {
         Color color = new Color();
 
@@ -74,6 +74,14 @@ public class BlockTemplate : MonoBehaviour
         {
             _imageBlock.enabled = true;
             _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eMapObject.Guide);
+            color = Color.white;
+            color.a = 1f;
+        }
+
+        if (blockData.isItem == true)
+        {
+            _imageBlock.enabled = true;
+            _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eMapObject.Item);
             color = Color.white;
             color.a = 1f;
         }
