@@ -19,8 +19,9 @@ public class DataManager : MonoBehaviour
 
         public string name = string.Empty;
         public string description = string.Empty;
-        public short coin = 0;
+        public short spriteIndex = 0;
 
+        public short coin = 0;
         public short hp = 0;
         public short mp = 0;
         public short ap = 0; // Active Point 
@@ -33,15 +34,16 @@ public class DataManager : MonoBehaviour
 
         public eStats defultStatus = eStats.Non;
 
-        public eStatus _status = eStatus.Non;
-        public byte _statusCount = 0;
-
         public bool recovery = false;
         public byte recoveryCount = 0;
 
         public bool useSkill = false;
         public List<short> skillIndexs = null;
+
         public List<short> itemIndexs = null;
+
+        public eStatus _status = eStatus.Non;
+        public byte _statusCount = 0;
 
         public int currentNodeIndex = 0;
     }
@@ -162,21 +164,33 @@ public class DataManager : MonoBehaviour
         public string description = string.Empty;
 
         public short coolDown = 0;
-        public short usemp = 0;
+        public short duration = 0;
+        public short useMp = 0;
 
         public short hp = 0;
+        public short hpPercentIncreased = 0;
         public short mp = 0;
+        public short mpPercentIncreased = 0;
         public short ap = 0;
+        public short apPercentIncreased = 0;
         public short exp = 0;
         public short expPercentIncreased = 0;
         public short coin = 0;
         public short coinPercentIncreased = 0;
-
         public short attack = 0;
         public short attackPercentIncreased = 0;
         public short defence = 0;
         public short defencePercentIncreased = 0;
-        public short duration = 0;
+
+        public eAttackDirection dir = eAttackDirection.Non;
+
+        public eStatus needStatus = eStatus.Non;
+        public eStatus status = eStatus.Non;
+
+        public short range = 0;
+        public float value = 0;
+
+        public bool revealMap = false;
     }
 
     [Serializable]
@@ -186,21 +200,35 @@ public class DataManager : MonoBehaviour
 
         public string name = string.Empty;
         public string description = string.Empty;
+
         public short price = 0;
+        public short duration = 0;
+        public short useMp = 0;
 
         public short hp = 0;
+        public short hpPercentIncreased = 0;
         public short mp = 0;
+        public short mpPercentIncreased = 0;
         public short ap = 0;
+        public short apPercentIncreased = 0;
         public short exp = 0;
         public short expPercentIncreased = 0;
         public short coin = 0;
         public short coinPercentIncreased = 0;
-
         public short attack = 0;
         public short attackPercentIncreased = 0;
         public short defence = 0;
         public short defencePercentIncreased = 0;
-        public ushort duration = 0;
+
+        public eAttackDirection dir = eAttackDirection.Non;
+
+        public eStatus needStatus = eStatus.Non;
+        public eStatus grantStatus = eStatus.Non;
+
+        public short range = 0;
+        public float value = 0;
+
+        public bool revealMap = false;
 
         public int currentNodeIndex = 0;
     }

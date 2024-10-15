@@ -223,6 +223,11 @@ public class IngameManager : MonoBehaviour
         return _saveData.userData.itemDataIndexs.Count <= 10; 
     }
 
+    public void SetDirCoord(int nodeIndex, eAttackDirection type)
+    {
+        _actionController.SetDirCoord(nodeIndex, type);
+    }
+
     public void GetMonsterItem(short id)
     {
         if(isItemListEmpty() == false)
@@ -468,6 +473,71 @@ public class IngameManager : MonoBehaviour
     public int PathFinding(ref DataManager.Map_Data mapData, int startNodeIndex, int endNodeIndex)
     {
         return _mapGenerator.PathFinding(ref mapData, startNodeIndex, endNodeIndex);
+    }
+
+    public void CheckNode(int x, int y, Action<int, bool> onRasultCallback)
+    {
+        int index = (x + 1) + (_saveData.mapData.mapSize * y);
+
+        if(index < 0 || index > _saveData.mapData.nodeDatas.Count)
+        {
+            onRasultCallback?.Invoke(index, false);
+
+            return;
+        }
+
+        var node = _saveData.mapData.nodeDatas[index];
+
+        if(node.isGuide == false)
+        {
+            onRasultCallback?.Invoke(index, false);
+
+            return;
+        }
+
+        if (node.isUser == false)
+        {
+            onRasultCallback?.Invoke(index, false);
+
+            return;
+        }
+
+        if (node.isWalkable == false)
+        {
+            onRasultCallback?.Invoke(index, false);
+
+            return;
+        }
+
+        if (node.isMonster == false)
+        {
+            onRasultCallback?.Invoke(index, false);
+
+            return;
+        }
+
+        if (node.isBonfire == false)
+        {
+            onRasultCallback?.Invoke(index, false);
+
+            return;
+        }
+
+        if (node.isUseBonfire == false)
+        {
+            onRasultCallback?.Invoke(index, false);
+
+            return;
+        }
+
+        if (node.isShop == false)
+        {
+            onRasultCallback?.Invoke(index, false);
+
+            return;
+        }
+
+        onRasultCallback?.Invoke(index, true);
     }
 
     public int GetNearbyBlocks(int x, int y, int index)

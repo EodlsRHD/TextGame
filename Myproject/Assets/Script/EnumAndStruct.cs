@@ -235,22 +235,39 @@ public enum eTutorialQuest
 public enum eStatus
 {
     Non = -1,
-    UnableAct, // 행동 불능
-    ContinuousDamage, // 지속 데미지
+    UnableAct,
+    ContinuousDamage, 
     Recovery,
-    Slowdown, // 둔화
-    Incubation, // 잠복
-    Camouflage, // 위장
-    split, // 분열
-    BloodSucking, // 흡혈
-    Hardness, // 강성
-    ReductionHalf, // 반감
-    AttackBlocking, // 방어
-    Stealth // 은신
+    Slowdown, 
+    Incubation, 
+    Camouflage, 
+    split, 
+    BloodSucking, 
+    Hardness,
+    ReductionHalf, 
+    AttackBlocking, 
+    Stealth,
+    SkillBlocking,
+    QuickAttack,
+    Teleportation,
+    Non_Teleportation,
+    Resurrection,
+    RecallMinion,
+    SkillReflect,
+    Remove_ContinuousDamage,
+    Invincibility,
+    OpenExit,
+    FindStealth_Incubation_Camouflage
 }
 
 public enum eAttackDirection
 {
     Non = -1,
-
+    Up,
+    Left,
+    Right,
+    Down,
+    All,
+    DesignateDirection,
+    DesignateCoordination
 }

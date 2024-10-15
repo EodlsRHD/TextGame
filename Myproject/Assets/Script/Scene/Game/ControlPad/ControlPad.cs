@@ -39,6 +39,7 @@ public class ControlPad : MonoBehaviour
 
     [SerializeField] private SkillPad _skillPad = null;
     [SerializeField] private BagPad _BagPad = null;
+    [SerializeField] private Targeting _targeting = null;
 
     [Header("Information")]
     [SerializeField] private GameObject _objInformation = null;
@@ -89,6 +90,7 @@ public class ControlPad : MonoBehaviour
 
         _skillPad.Initialize(OpenInformation);
         _BagPad.Initialize(OpenInformation);
+        _targeting.Initialize();
     }
 
     private void OnMove(eControl type)
@@ -170,16 +172,71 @@ public class ControlPad : MonoBehaviour
         switch (_eOpenPad)
         {
             case eControl.Skill:
-                value = _skillPad.Use();
+                {
+                    value = _skillPad.Use();
+
+                    _targeting.Open(_eOpenPad, value, (coordResult, dirResult) =>
+                    {
+                        if (coordResult != -1)
+                        {
+
+
+                            _onResultCallback?.Invoke(value);
+                            _onResultCallback = null;
+
+                            return;
+                        }
+
+                        if (dirResult != eAttackDirection.Non)
+                        {
+
+
+                            _onResultCallback?.Invoke(value);
+                            _onResultCallback = null;
+
+                            return;
+                        }
+
+                        _onResultCallback?.Invoke(value);
+                        _onResultCallback = null;
+                    });
+                }
                 break;
 
             case eControl.Bag:
-                value = _BagPad.Use();
+                {
+                    value = _BagPad.Use();
+
+                    _targeting.Open(_eOpenPad, value, (coordResult, dirResult) =>
+                    {
+                        if (coordResult != -1)
+                        {
+
+
+                            _onResultCallback?.Invoke(value);
+                            _onResultCallback = null;
+
+                            return;
+                        }
+
+                        if (dirResult != eAttackDirection.Non)
+                        {
+
+
+                            _onResultCallback?.Invoke(value);
+                            _onResultCallback = null;
+
+                            return;
+                        }
+
+                        _onResultCallback?.Invoke(value);
+                        _onResultCallback = null;
+                    });
+                }
                 break;
         }
 
-        _onResultCallback?.Invoke(value);
-        _onResultCallback = null;
+        CloseInformation();
     }
 
     private void OnCloseSkillAndBagPad()

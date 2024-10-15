@@ -3,6 +3,9 @@ using UnityEngine;
 
 public class ActionController : MonoBehaviour
 {
+    private eAttackDirection _dir = eAttackDirection.Non;
+    private int _nodeIndex = -1;
+
     public void Initialize()
     {
         this.gameObject.SetActive(true);
@@ -281,6 +284,12 @@ public class ActionController : MonoBehaviour
         IngameManager.instance.UpdatePlayerInfo(eStats.Defence);
     }
 
+    public void SetDirCoord(int nodeIndex, eAttackDirection type)
+    {
+        _nodeIndex = nodeIndex;
+        _dir = type;
+    }
+
     public void Skill(int id)
     {
         if (id == -1)
@@ -305,7 +314,7 @@ public class ActionController : MonoBehaviour
         cooldown.coolDown = data.coolDown + 1;
         IngameManager.instance.saveData.userData.coolDownSkill.Add(cooldown);
 
-        int useMP = data.usemp;
+        int useMP = data.useMp;
         int reMP = IngameManager.instance.saveData.userData.currentMP - useMP;
         IngameManager.instance.saveData.userData.currentMP = (short)(reMP < 0 ? 0 : reMP);
 
@@ -328,7 +337,10 @@ public class ActionController : MonoBehaviour
         IngameManager.instance.ControlPadUpdateData();
         IngameManager.instance.UpdateData();
 
-        IngameManager.instance.UpdateText("스킬 " + data.name + " (을)를 발동하셨습니다.");
+        _dir = eAttackDirection.Non;
+        _nodeIndex = -1;
+
+        IngameManager.instance.UpdateText("스킬 " + data.name + " (을)를 발동했습니다.");
     }
 
     private bool SkillCheckCoolDown(int id, ref int cooldown)
@@ -462,6 +474,11 @@ public class ActionController : MonoBehaviour
 
         IngameManager.instance.ControlPadUpdateData();
         IngameManager.instance.UpdateData();
+
+        _dir = eAttackDirection.Non;
+        _nodeIndex = -1;
+
+        IngameManager.instance.UpdateText("아이템 " + data.name + " (을)를 사용했습니다.");
     }
 
     private void ItemConsumptionCheck(DataManager.Item_Data data, eStats type, int useValue, bool isPercent = false)
