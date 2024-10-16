@@ -81,7 +81,7 @@ public class LevelPoint : MonoBehaviour
 
         this.gameObject.SetActive(true);
 
-        GameManager.instance.tools.Move_Anchor_XY(eDir.Y, this.GetComponent<RectTransform>(), 0f, 0.5f, 0, Ease.OutBack, null);
+        GameManager.instance.tools.Move_Anchor_XY(eUiDir.Y, this.GetComponent<RectTransform>(), 0f, 0.5f, 0, Ease.OutBack, null);
     }
 
     public void Close()
@@ -100,7 +100,7 @@ public class LevelPoint : MonoBehaviour
         {
             _onResultCallback?.Invoke(_userData);
 
-            GameManager.instance.tools.Move_Anchor_XY(eDir.Y, this.GetComponent<RectTransform>(), 1800f, 0.5f, 0, Ease.InBack, () =>
+            GameManager.instance.tools.Move_Anchor_XY(eUiDir.Y, this.GetComponent<RectTransform>(), 1800f, 0.5f, 0, Ease.InBack, () =>
             {
                 this.gameObject.SetActive(false);
 

@@ -128,28 +128,28 @@ public enum eEffect_IncreaseDecrease
 public enum eSfx
 {
     Non = -1,
-    Error, //
-    Confirm, //
-    ButtonPress, //
-    Window, //
-    Attack, //
-    Blocked, //
-    Hit_light,//
-    Hit_hard,//
+    Error,
+    Confirm,
+    ButtonPress,
+    Window,
+    Attack,
+    Blocked,
+    Hit_light,
+    Hit_hard,
     LevelUp,
-    Coin, //
+    Coin,
     Item, 
     ChestOpen,
-    UseItem, //
+    UseItem,
     UseSkill,
-    ExitOpen, //
-    Enter, //
-    ShopEnter, //
-    Death, //
+    ExitOpen,
+    Enter,
+    ShopEnter,
+    Death,
     RoundSuccess,
     RoundFail,
-    TurnPage, //
-    GotoLobby, //
+    TurnPage,
+    GotoLobby,
     Bonfire,
     MenuOpen,
     MenuClose,
@@ -179,7 +179,7 @@ public enum eBennerAd
     Popup
 }
 
-public enum eDir
+public enum eUiDir
 {
     Non = -1,
     X,
@@ -232,7 +232,7 @@ public enum eTutorialQuest
     Attack
 }
 
-public enum eStatus
+public enum eStrengtheningTool
 {
     Non = -1,
     UnableAct,
@@ -260,7 +260,7 @@ public enum eStatus
     FindStealth_Incubation_Camouflage
 }
 
-public enum eAttackDirection
+public enum eDir
 {
     Non = -1,
     Up,
@@ -270,4 +270,11 @@ public enum eAttackDirection
     All,
     DesignateDirection,
     DesignateCoordination
+}
+
+public enum eTool
+{
+    Non = -1,
+    Skill,
+    Item
 }

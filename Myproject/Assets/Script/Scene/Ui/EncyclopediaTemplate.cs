@@ -16,7 +16,7 @@ public class EncyclopediaTemplate : MonoBehaviour
     private Action<string, string> _onSetInformationCallback = null;
 
     private DataManager.Creature_Data _creature = null;
-    private DataManager.Item_Data _item = null;
+    private ItemData _item = null;
     private DataManager.Achievements_Data _acievement = null;
 
     public void Initialize(Action<string, string> onSetInformationCallback)
@@ -40,7 +40,7 @@ public class EncyclopediaTemplate : MonoBehaviour
         _textDescription.text = _creature.description;
     }
 
-    public void Set(DataManager.Item_Data data)
+    public void Set(ItemData data)
     {
         _item = data;
 

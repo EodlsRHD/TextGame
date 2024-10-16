@@ -21,7 +21,7 @@ public class SoundManager : MonoBehaviour
     [Header("Battle BGM Clip"), SerializeField] private List<AudioClip> _clipBattleBgm = null;
     [Header("Shop BGM Clip"), SerializeField] private List<AudioClip> _clipShopBgm = null;
 
-    [Header("SFX Clip"), SerializeField] private List<DataManager.SoundTemplate> _sfxTemplate = null;
+    [Header("SFX Clip"), SerializeField] private List<SoundTemplate> _sfxTemplate = null;
 
     public bool isMuteBGM
     {
@@ -69,7 +69,7 @@ public class SoundManager : MonoBehaviour
 
     public void PlaySfx(eSfx type)
     {
-        DataManager.SoundTemplate template = _sfxTemplate.Find(x => x.type == type);
+        SoundTemplate template = _sfxTemplate.Find(x => x.type == type);
 
         if (type == eSfx.ButtonPress)
         {
@@ -109,7 +109,7 @@ public class SoundManager : MonoBehaviour
         Play(_audioOther, template);
     }
 
-    public void Play(AudioSource souece, DataManager.SoundTemplate template)
+    public void Play(AudioSource souece, SoundTemplate template)
     {
         if (template.clip != null)
         {

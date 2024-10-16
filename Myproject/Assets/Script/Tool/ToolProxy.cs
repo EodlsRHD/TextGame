@@ -71,15 +71,15 @@ public class ToolProxy : MonoBehaviour
         _uiControl.Move(tr, targetPosition, duration, delay, ease, onResultCallback);
     }
 
-    public void Move_XY(eDir type, RectTransform tr, float targetPosition, float duration, float delay, Ease ease, Action onResultCallback)
+    public void Move_XY(eUiDir type, RectTransform tr, float targetPosition, float duration, float delay, Ease ease, Action onResultCallback)
     {
         switch (type)
         {
-            case eDir.X:
+            case eUiDir.X:
                 _uiControl.Move_X(tr, targetPosition, duration, delay, ease, onResultCallback);
                 break;
 
-            case eDir.Y:
+            case eUiDir.Y:
                 _uiControl.Move_Y(tr, targetPosition, duration, delay, ease, onResultCallback);
                 break;
         }
@@ -90,17 +90,17 @@ public class ToolProxy : MonoBehaviour
         _uiControl.Move_Local(tr, targetPosition, duration, delay, ease, onResultCallback);
     }
 
-    public void Move_Local_XY(eDir type, RectTransform tr, float targetPosition, float duration, float delay, Ease ease, Action onResultCallback)
+    public void Move_Local_XY(eUiDir type, RectTransform tr, float targetPosition, float duration, float delay, Ease ease, Action onResultCallback)
     {
         switch (type)
         {
-            case eDir.X:
+            case eUiDir.X:
                 {
                     _uiControl.Move_Local_X(tr, targetPosition, duration, delay, ease, onResultCallback);
                 }
                 break;
 
-            case eDir.Y:
+            case eUiDir.Y:
                 {
                     _uiControl.Move_Local_Y(tr, targetPosition, duration, delay, ease, onResultCallback);
                 }
@@ -108,17 +108,17 @@ public class ToolProxy : MonoBehaviour
         }
     }
 
-    public void Move_Anchor_XY(eDir type, RectTransform tr, float targetPosition, float duration, float delay, Ease ease, Action onResultCallback)
+    public void Move_Anchor_XY(eUiDir type, RectTransform tr, float targetPosition, float duration, float delay, Ease ease, Action onResultCallback)
     {
         switch (type)
         {
-            case eDir.X:
+            case eUiDir.X:
                 {
                     _uiControl.Move_Anchor_X(tr, targetPosition, duration, delay, ease, onResultCallback);
                 }
                 break;
 
-            case eDir.Y:
+            case eUiDir.Y:
                 {
                     _uiControl.Move_Anchor_Y(tr, targetPosition, duration, delay, ease, onResultCallback);
                 }

@@ -175,7 +175,7 @@ public class UiManager : MonoBehaviour
 
         _rankings.SetActive(true);
 
-        GameManager.instance.tools.Move_Anchor_XY(eDir.Y, _rankings.GetComponent<RectTransform>(), 0, 0.5f, 0, Ease.OutBack, null);
+        GameManager.instance.tools.Move_Anchor_XY(eUiDir.Y, _rankings.GetComponent<RectTransform>(), 0, 0.5f, 0, Ease.OutBack, null);
     }
 
     private void CloseRankings()
@@ -183,7 +183,7 @@ public class UiManager : MonoBehaviour
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
         GameManager.instance.soundManager.PlaySfx(eSfx.MenuClose);
 
-        GameManager.instance.tools.Move_Anchor_XY(eDir.Y, _rankings.GetComponent<RectTransform>(), 3000f, 0.5f, 0, Ease.InBack, () =>
+        GameManager.instance.tools.Move_Anchor_XY(eUiDir.Y, _rankings.GetComponent<RectTransform>(), 3000f, 0.5f, 0, Ease.InBack, () =>
         {
             ActiveBlocker(false);
 
@@ -257,7 +257,7 @@ public class UiManager : MonoBehaviour
 
         _cradit.SetActive(true);
 
-        GameManager.instance.tools.Move_Anchor_XY(eDir.Y, _cradit.GetComponent<RectTransform>(), 0, 0.5f, 0, Ease.OutBack, null);
+        GameManager.instance.tools.Move_Anchor_XY(eUiDir.Y, _cradit.GetComponent<RectTransform>(), 0, 0.5f, 0, Ease.OutBack, null);
     }
 
     public void CloseCradit()
@@ -265,7 +265,7 @@ public class UiManager : MonoBehaviour
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
         GameManager.instance.soundManager.PlaySfx(eSfx.MenuClose);
 
-        GameManager.instance.tools.Move_Anchor_XY(eDir.Y, _cradit.GetComponent<RectTransform>(), 3000f, 0.5f, 0, Ease.InBack, () =>
+        GameManager.instance.tools.Move_Anchor_XY(eUiDir.Y, _cradit.GetComponent<RectTransform>(), 3000f, 0.5f, 0, Ease.InBack, () =>
         {
             ActiveBlocker(false);
 

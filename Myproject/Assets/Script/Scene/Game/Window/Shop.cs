@@ -14,12 +14,12 @@ public class Shop : MonoBehaviour
         public Image buttonImage = null;
         public TMP_Text _textButtonLabel = null;
 
-        [HideInInspector] public DataManager.Item_Data item = null;
+        [HideInInspector] public ItemData item = null;
 
         [HideInInspector] public int index = 0;
         [HideInInspector] public bool isBuy = false;
 
-        public void AddListener(int i, DataManager.Item_Data data, Action<ShopTemplate> onCallback)
+        public void AddListener(int i, ItemData data, Action<ShopTemplate> onCallback)
         {
             index = i;
             item = data;
@@ -108,7 +108,7 @@ public class Shop : MonoBehaviour
 
         this.gameObject.SetActive(true);
 
-        GameManager.instance.tools.Move_Anchor_XY(eDir.Y, this.GetComponent<RectTransform>(), 350f, 0.5f, 0, Ease.OutBack, null);
+        GameManager.instance.tools.Move_Anchor_XY(eUiDir.Y, this.GetComponent<RectTransform>(), 350f, 0.5f, 0, Ease.OutBack, null);
     }
 
     private void OnClose()
@@ -118,7 +118,7 @@ public class Shop : MonoBehaviour
 
         CloseInformation();
 
-        GameManager.instance.tools.Move_Anchor_XY(eDir.Y, this.GetComponent<RectTransform>(), -360f, 0.5f, 0, Ease.InBack, () =>
+        GameManager.instance.tools.Move_Anchor_XY(eUiDir.Y, this.GetComponent<RectTransform>(), -360f, 0.5f, 0, Ease.InBack, () =>
         {
             this.gameObject.SetActive(false);
 
@@ -180,12 +180,12 @@ public class Shop : MonoBehaviour
 
         _objInformation.SetActive(true);
 
-        GameManager.instance.tools.Move_Anchor_XY(eDir.X, _objInformation.GetComponent<RectTransform>(), -423f, 0.5f, 0, Ease.OutBack, null);
+        GameManager.instance.tools.Move_Anchor_XY(eUiDir.X, _objInformation.GetComponent<RectTransform>(), -423f, 0.5f, 0, Ease.OutBack, null);
     }
 
     private void CloseInformation()
     {
-        GameManager.instance.tools.Move_Anchor_XY(eDir.X, _objInformation.GetComponent<RectTransform>(), 447f, 0.5f, 0, Ease.InBack, () =>
+        GameManager.instance.tools.Move_Anchor_XY(eUiDir.X, _objInformation.GetComponent<RectTransform>(), 447f, 0.5f, 0, Ease.InBack, () =>
         {
             _objInformation.SetActive(false);
 

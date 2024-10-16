@@ -15,12 +15,12 @@ public class Bonfire : MonoBehaviour
         public Image buttonImage = null;
         public TMP_Text _textButtonLabel = null;
 
-        [HideInInspector] public DataManager.Skill_Data skill = null;
+        [HideInInspector] public SkillData skill = null;
 
         [HideInInspector] public int index = 0;
         [HideInInspector] public bool isBuy = false;
 
-        public void AddListener(int i, DataManager.Skill_Data data, Action<BonfireTemplate> onCallback)
+        public void AddListener(int i, SkillData data, Action<BonfireTemplate> onCallback)
         {
             index = i;
             skill = data;
@@ -69,7 +69,7 @@ public class Bonfire : MonoBehaviour
     [Header("Goods"), SerializeField] private List<BonfireTemplate> _template = null;
 
     private Action<int, int, int> _onResultCallback = null;
-    private Action<DataManager.User_Data, Action<int>> _onOpenUserSkillCallback = null;
+    private Action<DataManager.User_Data, Action<eTool, int>> _onOpenUserSkillCallback = null;
 
     private DataManager.Npc_Data _npc = null;
     private DataManager.User_Data _user = null;
@@ -78,7 +78,7 @@ public class Bonfire : MonoBehaviour
     private int removeId = 0;
     private bool _isSelect = false;
 
-    public void Initialize(Action<int, int, int> onResultCallback, Action<DataManager.User_Data, Action<int>> onOpenUserSkillCallback)
+    public void Initialize(Action<int, int, int> onResultCallback, Action<DataManager.User_Data, Action<eTool, int>> onOpenUserSkillCallback)
     {
         if (onResultCallback != null)
         {
@@ -113,7 +113,7 @@ public class Bonfire : MonoBehaviour
 
         this.gameObject.SetActive(true);    
 
-        GameManager.instance.tools.Move_Anchor_XY(eDir.Y, this.GetComponent<RectTransform>(), 350f, 0.5f, 0, Ease.OutBack, null);
+        GameManager.instance.tools.Move_Anchor_XY(eUiDir.Y, this.GetComponent<RectTransform>(), 350f, 0.5f, 0, Ease.OutBack, null);
     }
 
     private void OnClose()
@@ -121,7 +121,7 @@ public class Bonfire : MonoBehaviour
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
         GameManager.instance.soundManager.PlaySfx(eSfx.MenuClose);
 
-        GameManager.instance.tools.Move_Anchor_XY(eDir.Y, this.GetComponent<RectTransform>(), -360f, 0.5f, 0, Ease.InBack, () =>
+        GameManager.instance.tools.Move_Anchor_XY(eUiDir.Y, this.GetComponent<RectTransform>(), -360f, 0.5f, 0, Ease.InBack, () =>
         {
             this.gameObject.SetActive(false);
         });
@@ -161,7 +161,7 @@ public class Bonfire : MonoBehaviour
 
         _objSelectSkill.SetActive(true);
 
-        GameManager.instance.tools.Move_Anchor_XY(eDir.Y, _objSelectSkill.GetComponent<RectTransform>(), 350f, 0.5f, 0, Ease.OutBack, null);
+        GameManager.instance.tools.Move_Anchor_XY(eUiDir.Y, _objSelectSkill.GetComponent<RectTransform>(), 350f, 0.5f, 0, Ease.OutBack, null);
     }
 
     private void OnCloseSelectSkill() 
@@ -170,7 +170,7 @@ public class Bonfire : MonoBehaviour
 
         CloseInformation();
 
-        GameManager.instance.tools.Move_Anchor_XY(eDir.Y, _objSelectSkill.GetComponent<RectTransform>(), -360f, 0.5f, 0, Ease.InBack, () =>
+        GameManager.instance.tools.Move_Anchor_XY(eUiDir.Y, _objSelectSkill.GetComponent<RectTransform>(), -360f, 0.5f, 0, Ease.InBack, () =>
         {
             _objSelectSkill.gameObject.SetActive(false);
 
@@ -190,7 +190,7 @@ public class Bonfire : MonoBehaviour
 
         CloseInformation();
 
-        if (_user.skillDataIndexs.Count == 3)
+        if (_user.data.skillIndexs.Count == 3)
         {
             IngameManager.instance.UpdatePopup("남은 공간이 없습니다.");
             OpenUserSkill(() => 
@@ -240,12 +240,12 @@ public class Bonfire : MonoBehaviour
 
         _objInformation.SetActive(true);
 
-        GameManager.instance.tools.Move_Anchor_XY(eDir.X, _objInformation.GetComponent<RectTransform>(), -423f, 0.5f, 0, Ease.OutBack, null);
+        GameManager.instance.tools.Move_Anchor_XY(eUiDir.X, _objInformation.GetComponent<RectTransform>(), -423f, 0.5f, 0, Ease.OutBack, null);
     }
 
     private void CloseInformation()
     {
-        GameManager.instance.tools.Move_Anchor_XY(eDir.X, _objInformation.GetComponent<RectTransform>(), 447f, 0.5f, 0, Ease.InBack, () =>
+        GameManager.instance.tools.Move_Anchor_XY(eUiDir.X, _objInformation.GetComponent<RectTransform>(), 447f, 0.5f, 0, Ease.InBack, () =>
         {
             _objInformation.SetActive(false);
 
@@ -256,7 +256,7 @@ public class Bonfire : MonoBehaviour
 
     private void OpenUserSkill(Action onResultCallback)
     {
-        _onOpenUserSkillCallback?.Invoke(_user, (result) => 
+        _onOpenUserSkillCallback?.Invoke(_user, (type, result) => 
         {
             removeId = result;
 

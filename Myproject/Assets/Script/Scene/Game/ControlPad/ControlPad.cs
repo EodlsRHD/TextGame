@@ -49,7 +49,7 @@ public class ControlPad : MonoBehaviour
     private Action<eControl> _onMoveCallback = null;
     private Action<eControl> _onActionCallback = null;
 
-    private Action<int> _onResultCallback = null;
+    private Action<eTool, int> _onResultCallback = null;
 
     private DataManager.User_Data _data;
 
@@ -114,7 +114,7 @@ public class ControlPad : MonoBehaviour
         OnOpenSkillAndBagPad(_eOpenPad);
     }
 
-    public void Skill(DataManager.User_Data data, Action<int> onSkillResultCallback)
+    public void Skill(DataManager.User_Data data, Action<eTool, int> onSkillResultCallback)
     {
         _data = data;
 
@@ -126,7 +126,7 @@ public class ControlPad : MonoBehaviour
         OnOpenSkillAndBagPad(eControl.Skill);
     }
 
-    public void Bag(DataManager.User_Data data, Action<int> onBagResultCallback)
+    public void Bag(DataManager.User_Data data, Action<eTool, int> onBagResultCallback)
     {
         _data = data;
 
@@ -160,7 +160,7 @@ public class ControlPad : MonoBehaviour
 
         _isOpen = true;
 
-        GameManager.instance.tools.Move_Anchor_XY(eDir.Y, _objSkillAndBagPad.GetComponent<RectTransform>(), 350f, 0.5f, 0, Ease.OutBack, null);
+        GameManager.instance.tools.Move_Anchor_XY(eUiDir.Y, _objSkillAndBagPad.GetComponent<RectTransform>(), 350f, 0.5f, 0, Ease.OutBack, null);
     }
 
     private void OnUseSkillAndBagPad()
@@ -179,25 +179,22 @@ public class ControlPad : MonoBehaviour
                     {
                         if (coordResult != -1)
                         {
-
-
-                            _onResultCallback?.Invoke(value);
-                            _onResultCallback = null;
+                            IngameManager.instance.UpdateText("사용할 수 없습니다.");
 
                             return;
                         }
 
-                        if (dirResult != eAttackDirection.Non)
+                        if (dirResult != eDir.Non)
                         {
 
 
-                            _onResultCallback?.Invoke(value);
+                            _onResultCallback?.Invoke(eTool.Skill, value);
                             _onResultCallback = null;
 
                             return;
                         }
 
-                        _onResultCallback?.Invoke(value);
+                        _onResultCallback?.Invoke(eTool.Skill, value);
                         _onResultCallback = null;
                     });
                 }
@@ -211,25 +208,22 @@ public class ControlPad : MonoBehaviour
                     {
                         if (coordResult != -1)
                         {
-
-
-                            _onResultCallback?.Invoke(value);
-                            _onResultCallback = null;
+                            IngameManager.instance.UpdateText("선택된 아이템이 없습니다.");
 
                             return;
                         }
 
-                        if (dirResult != eAttackDirection.Non)
+                        if (dirResult != eDir.Non)
                         {
 
 
-                            _onResultCallback?.Invoke(value);
+                            _onResultCallback?.Invoke(eTool.Item, value);
                             _onResultCallback = null;
 
                             return;
                         }
 
-                        _onResultCallback?.Invoke(value);
+                        _onResultCallback?.Invoke(eTool.Item, value);
                         _onResultCallback = null;
                     });
                 }
@@ -253,7 +247,7 @@ public class ControlPad : MonoBehaviour
 
         CloseInformation();
 
-        GameManager.instance.tools.Move_Anchor_XY(eDir.Y, _objSkillAndBagPad.GetComponent<RectTransform>(), -360f, 0.5f, 0, Ease.InBack, () =>
+        GameManager.instance.tools.Move_Anchor_XY(eUiDir.Y, _objSkillAndBagPad.GetComponent<RectTransform>(), -360f, 0.5f, 0, Ease.InBack, () =>
         {
             _objSkillAndBagPad.SetActive(false);
 
@@ -285,12 +279,12 @@ public class ControlPad : MonoBehaviour
 
         _objInformation.SetActive(true);
 
-        GameManager.instance.tools.Move_Anchor_XY(eDir.X, _objInformation.GetComponent<RectTransform>(), -423f, 0.5f, 0, Ease.OutBack, null);
+        GameManager.instance.tools.Move_Anchor_XY(eUiDir.X, _objInformation.GetComponent<RectTransform>(), -423f, 0.5f, 0, Ease.OutBack, null);
     }
 
     private void CloseInformation()
     {
-        GameManager.instance.tools.Move_Anchor_XY(eDir.X, _objInformation.GetComponent<RectTransform>(), 447f, 0.5f, 0, Ease.InBack, () => 
+        GameManager.instance.tools.Move_Anchor_XY(eUiDir.X, _objInformation.GetComponent<RectTransform>(), 447f, 0.5f, 0, Ease.InBack, () => 
         {
             _objInformation.SetActive(false);
 

@@ -63,7 +63,7 @@ public class PopupGenerator : MonoBehaviour
 
         this.gameObject.SetActive(true);
 
-        GameManager.instance.tools.Move_Anchor_XY(eDir.Y, this.GetComponent<RectTransform>(), 0, 0.5f, 0, Ease.OutBack, null);
+        GameManager.instance.tools.Move_Anchor_XY(eUiDir.Y, this.GetComponent<RectTransform>(), 0, 0.5f, 0, Ease.OutBack, null);
     }
 
     public void Open_TwoButton(string title, string content, string leftButtonText, string rightButtonText, Action onLeftButtonCallback = null, Action onRightButtonCallback = null)
@@ -92,7 +92,7 @@ public class PopupGenerator : MonoBehaviour
 
         this.gameObject.SetActive(true);
 
-        GameManager.instance.tools.Move_Anchor_XY(eDir.Y, this.GetComponent<RectTransform>(), 0, 0.5f, 0, Ease.OutBack, null);
+        GameManager.instance.tools.Move_Anchor_XY(eUiDir.Y, this.GetComponent<RectTransform>(), 0, 0.5f, 0, Ease.OutBack, null);
     }
 
     public void ClosePopup()
@@ -114,7 +114,7 @@ public class PopupGenerator : MonoBehaviour
 
         GameManager.instance.googleAds.HidePopupAd();
 
-        GameManager.instance.tools.Move_Anchor_XY(eDir.Y, this.GetComponent<RectTransform>(), 1800f, 0.5f, 0, Ease.InBack, () => 
+        GameManager.instance.tools.Move_Anchor_XY(eUiDir.Y, this.GetComponent<RectTransform>(), 1800f, 0.5f, 0, Ease.InBack, () => 
         {
             _onClosePopupCallback?.Invoke();
         });

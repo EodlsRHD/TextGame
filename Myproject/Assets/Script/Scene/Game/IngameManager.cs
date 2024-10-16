@@ -206,12 +206,12 @@ public class IngameManager : MonoBehaviour
 
     public void ControlPad_Skill()
     {
-        _controlPad.Skill(_saveData.userData, _skillitemCountroller.UseSkill);
+        _controlPad.Skill(_saveData.userData, UseTool);
     }
 
     public void ControlPad_Bag()
     {
-        _controlPad.Bag(_saveData.userData, _skillitemCountroller.UseIConsumptiontem);
+        _controlPad.Bag(_saveData.userData, UseTool);
     }
 
     public void SetMap()
@@ -226,10 +226,10 @@ public class IngameManager : MonoBehaviour
 
     public bool isItemListEmpty()
     {
-        return _saveData.userData.itemDataIndexs.Count <= 10; 
+        return _saveData.userData.data.itemIndexs.Count <= 10; 
     }
 
-    public void SetDirCoord(int nodeIndex, eAttackDirection type)
+    public void SetDirCoord(int nodeIndex, eDir type)
     {
         _skillitemCountroller.SetDirCoord(nodeIndex, type);
     }
@@ -240,9 +240,9 @@ public class IngameManager : MonoBehaviour
         {
             UpdatePopup("가방이 비어있지 않습니다.");
 
-            List<int> list = Vision(_saveData.userData.currentVISION, _saveData.userData.data.currentNodeIndex);
+            List<int> list = Vision(_saveData.userData.data.currentVISION, _saveData.userData.data.currentNodeIndex);
             int ranIndex = Random.Range(0, list.Count);
-            DataManager.Item_Data item = GameManager.instance.dataManager.GetItemData(id);
+            ItemData item = GameManager.instance.dataManager.GetItemData(id);
             item.currentNodeIndex = list[ranIndex];
 
             _saveData.mapData.nodeDatas[list[ranIndex]].isItem = true;
@@ -251,7 +251,7 @@ public class IngameManager : MonoBehaviour
             return;
         }
 
-        _saveData.userData.itemDataIndexs.Add(id);
+        _saveData.userData.data.itemIndexs.Add(id);
         GameManager.instance.dataManager.AddEncyclopedia_Item(id);
     }
 
@@ -268,31 +268,52 @@ public class IngameManager : MonoBehaviour
 
         short id = _saveData.mapData.itemDatas.Find(x => x.currentNodeIndex == nodeIndex).id;
 
-        _saveData.userData.itemDataIndexs.Add(id);
+        _saveData.userData.data.itemIndexs.Add(id);
         GameManager.instance.dataManager.AddEncyclopedia_Item(id);
     }
 
     public void GetGold(short value)
     {
-        _saveData.userData.data.coin += (short)(value + (value * 0.1f * _saveData.userData.Coin_Effect_Per));
+        _saveData.userData.data.coin += (short)(value + (value * 0.1f * _saveData.userData.data.Coin_Effect_Per));
     }
 
     public void GetExp(short value)
     {
-        _saveData.userData.currentEXP += (short)(value + (value * 0.1f * _saveData.userData.EXP_Effect_Per));
+        _saveData.userData.data.currentEXP += (short)(value + (value * 0.1f * _saveData.userData.data.EXP_Effect_Per));
 
-        if (_saveData.userData.maximumEXP <= _saveData.userData.currentEXP)
+        if (_saveData.userData.maximumEXP <= _saveData.userData.data.currentEXP)
         {
             UpdateText("레벨이 증가했습니다 !");
 
             _saveData.userData.level += 1;
-            _saveData.userData.currentEXP = (short)Mathf.Abs(_saveData.userData.maximumEXP - _saveData.userData.currentEXP);
+            _saveData.userData.data.currentEXP = (short)Mathf.Abs(_saveData.userData.maximumEXP - _saveData.userData.data.currentEXP);
 
             UpdatePlayerInfo(eStats.EXP);
             UpdatePlayerInfo(eStats.Level);
 
             OpneLevelPoint();
         }
+    }
+
+    public void CheckExp()
+    {
+        if (_saveData.userData.maximumEXP <= _saveData.userData.data.currentEXP)
+        {
+            UpdateText("레벨이 증가했습니다 !");
+
+            _saveData.userData.level += 1;
+            _saveData.userData.data.currentEXP = (short)Mathf.Abs(_saveData.userData.maximumEXP - _saveData.userData.data.currentEXP);
+
+            UpdatePlayerInfo(eStats.EXP);
+            UpdatePlayerInfo(eStats.Level);
+
+            OpneLevelPoint();
+        }
+    }
+
+    public void CheckOverValue()
+    {
+
     }
 
     #region ActionController
@@ -324,10 +345,10 @@ public class IngameManager : MonoBehaviour
             _saveData.userData.data.vision = newData.data.vision;
             _saveData.userData.data.attackRange = newData.data.attackRange;
 
-            _saveData.userData.currentHP = _saveData.userData.maximumHP;
-            _saveData.userData.currentMP = _saveData.userData.maximumMP;
-            _saveData.userData.currentAP = _saveData.userData.maximumAP;
-            _saveData.userData.currentVISION = _saveData.userData.maximumVISION;
+            _saveData.userData.data.currentHP = _saveData.userData.maximumHP;
+            _saveData.userData.data.currentMP = _saveData.userData.maximumMP;
+            _saveData.userData.data.currentAP = _saveData.userData.maximumAP;
+            _saveData.userData.data.currentVISION = _saveData.userData.maximumVISION;
 
             UpdateData();
         });
@@ -361,13 +382,12 @@ public class IngameManager : MonoBehaviour
     {
         _isPlayerTurn = true;
 
-        _saveData.userData.currentAP = _saveData.userData.maximumAP;
+        _saveData.userData.data.currentAP = _saveData.userData.maximumAP;
         UpdatePlayerInfo(eStats.AP);
 
-        UpdateText("행동력이 " + IngameManager.instance.saveData.userData.currentAP + "만큼 남았습니다.");
+        UpdateText("행동력이 " + saveData.userData.data.currentAP + "만큼 남았습니다.");
 
-        List<int> NearbyIndexs = _playerController.PlayerSearchNearby();
-
+        _playerController.PlayerSearchNearby();
         UpdateMap();
     }
 
@@ -375,7 +395,7 @@ public class IngameManager : MonoBehaviour
     {
         _isPlayerTurn = false;
 
-        _skillitemCountroller.Duration();
+        _skillitemCountroller.UserDuration(ref _saveData.userData.data);
 
         UpdateText("--- " + _saveData.userData.data.name + "의 순서가 종료됩니다.");
     }
@@ -449,26 +469,26 @@ public class IngameManager : MonoBehaviour
             _mapController.Close(false, () =>
             {
                 _ingameUI.HideMapButton();
-                _mapController.UpdateMapData(_saveData, Vision(_saveData.userData.currentVISION, _saveData.userData.data.currentNodeIndex));
+                _mapController.UpdateMapData(_saveData, Vision(_saveData.userData.data.currentVISION, _saveData.userData.data.currentNodeIndex));
             });
 
             return;
         }
 
         _ingameUI.HideMapButton();
-        _mapController.UpdateMapData(_saveData, Vision(_saveData.userData.currentVISION, _saveData.userData.data.currentNodeIndex));
+        _mapController.UpdateMapData(_saveData, Vision(_saveData.userData.data.currentVISION, _saveData.userData.data.currentNodeIndex));
     }
 
     public void UpdateData(string contnet = null)
     {
         _ingameUI.UpdatePlayerInfo(_saveData.userData);
 
-        if (_saveData.userData.currentHP == 0)
+        if (_saveData.userData.data.currentHP == 0)
         {
             _ingameUI.OpenNextRoundWindow(eRoundClear.Fail, contnet);
         }
 
-        _mapController.UpdateMapData(_saveData, Vision(_saveData.userData.currentVISION, _saveData.userData.data.currentNodeIndex));
+        _mapController.UpdateMapData(_saveData, Vision(_saveData.userData.data.currentVISION, _saveData.userData.data.currentNodeIndex));
     }
 
     #endregion
@@ -688,6 +708,22 @@ public class IngameManager : MonoBehaviour
     }
 
     #endregion
+
+    private void UseTool(eTool type, int id)
+    {
+        switch(type)
+        {
+            case eTool.Skill:
+                _skillitemCountroller.UseSkill(id, ref _saveData.userData.data);
+
+                break;
+
+            case eTool.Item:
+                _skillitemCountroller.UseConsumptionItem(id, ref _saveData.userData.data);
+
+                break;
+        }
+    }
 }
 
 #region Generator

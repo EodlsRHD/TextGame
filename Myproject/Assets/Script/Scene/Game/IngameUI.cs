@@ -134,7 +134,7 @@ public class IngameUI : MonoBehaviour
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.MenuClose);
 
-        GameManager.instance.tools.Move_Anchor_XY(eDir.Y, _objNextRound.GetComponent<RectTransform>(), -360f, 0.5f, 0, Ease.InBack, () => 
+        GameManager.instance.tools.Move_Anchor_XY(eUiDir.Y, _objNextRound.GetComponent<RectTransform>(), -360f, 0.5f, 0, Ease.InBack, () => 
         {
             _objNextRound.SetActive(false);
         });
@@ -191,7 +191,7 @@ public class IngameUI : MonoBehaviour
 
         _objNextRound.SetActive(true);
 
-        GameManager.instance.tools.Move_Anchor_XY(eDir.Y, _objNextRound.GetComponent<RectTransform>(), 350f, 0.5f, 0, Ease.OutBack, null);
+        GameManager.instance.tools.Move_Anchor_XY(eUiDir.Y, _objNextRound.GetComponent<RectTransform>(), 350f, 0.5f, 0, Ease.OutBack, null);
     }
 
     public void UpdatePlayerInfo(DataManager.User_Data userData)

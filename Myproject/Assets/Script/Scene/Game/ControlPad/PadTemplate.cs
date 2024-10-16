@@ -13,8 +13,8 @@ public class PadTemplate : MonoBehaviour
 
     private Action<int, string, string, bool> _onViewInfoCallback;
 
-    private DataManager.Skill_Data _skillData = null;
-    private DataManager.Item_Data _itemData = null;
+    private SkillData _skillData = null;
+    private ItemData _itemData = null;
 
     private bool _isItem = false;
 
@@ -31,7 +31,7 @@ public class PadTemplate : MonoBehaviour
         this.gameObject.SetActive(false);
     }
 
-    public void Set(DataManager.Skill_Data skillData, int coolDown, bool isUse)
+    public void Set(SkillData skillData, int coolDown, bool isUse)
     {
         _buttonSelect.interactable = !isUse;
         _textCoolDown.gameObject.SetActive(isUse);
@@ -49,7 +49,7 @@ public class PadTemplate : MonoBehaviour
         this.gameObject.SetActive(true);
     }
 
-    public void Set(DataManager.Item_Data itemData)
+    public void Set(ItemData itemData)
     {
         _textCoolDown.gameObject.SetActive(false);
 

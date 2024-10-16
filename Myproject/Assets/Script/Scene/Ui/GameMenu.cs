@@ -55,7 +55,7 @@ public class GameMenu : MonoBehaviour
 
         this.gameObject.SetActive(true);
 
-        GameManager.instance.tools.Move_Anchor_XY(eDir.Y, this.GetComponent<RectTransform>(), -200f, 00.5f, 0, Ease.OutBack, () => 
+        GameManager.instance.tools.Move_Anchor_XY(eUiDir.Y, this.GetComponent<RectTransform>(), -200f, 00.5f, 0, Ease.OutBack, () => 
         {
             GameManager.instance.googleAds.ShowGameMenuAd();
         });
@@ -73,7 +73,7 @@ public class GameMenu : MonoBehaviour
 
         GameManager.instance.googleAds.HideGameMenuAd();
 
-        GameManager.instance.tools.Move_Anchor_XY(eDir.Y, this.GetComponent<RectTransform>(), 1800f, 0.5f, 0, Ease.InBack, () =>
+        GameManager.instance.tools.Move_Anchor_XY(eUiDir.Y, this.GetComponent<RectTransform>(), 1800f, 0.5f, 0, Ease.InBack, () =>
         {
             _onCloseCallback?.Invoke();
         });

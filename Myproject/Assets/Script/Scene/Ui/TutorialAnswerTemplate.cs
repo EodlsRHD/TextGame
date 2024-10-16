@@ -25,7 +25,7 @@ public class TutorialAnswerTemplate : MonoBehaviour
         this.gameObject.SetActive(false);
     }
 
-    public void Set(DataManager.Tutorial_answer answer, eTutorialQuest type)
+    public void Set(Tutorial_answer answer, eTutorialQuest type)
     {
         _type = type;
 

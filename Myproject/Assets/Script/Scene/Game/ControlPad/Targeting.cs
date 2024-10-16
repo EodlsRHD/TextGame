@@ -24,9 +24,9 @@ public class Targeting : MonoBehaviour
     [SerializeField] private Button _buttonRight = null;
     [SerializeField] private Button _buttonDown = null;
 
-    [SerializeField] private Action<int, eAttackDirection> _onResultCallback = null;
+    [SerializeField] private Action<int, eDir> _onResultCallback = null;
 
-    private eAttackDirection _dir = eAttackDirection.Non;
+    private eDir _dir = eDir.Non;
     private int _nodeIndex = -1;
 
     public void Initialize()
@@ -49,7 +49,7 @@ public class Targeting : MonoBehaviour
         this.gameObject.SetActive(false);
     }
 
-    public void Open(eControl type, int id, Action<int, eAttackDirection> onResultCallback)
+    public void Open(eControl type, int id, Action<int, eDir> onResultCallback)
     {
         if(onResultCallback != null)
         {
@@ -60,18 +60,18 @@ public class Targeting : MonoBehaviour
         {
             var item = GameManager.instance.dataManager.GetItemData(id);
             
-            if(item.dir != eAttackDirection.DesignateDirection || item.dir != eAttackDirection.DesignateCoordination)
+            if(item.tool.dir != eDir.DesignateDirection || item.tool.dir != eDir.DesignateCoordination)
             {
-                _onResultCallback?.Invoke(-1, eAttackDirection.Non);
+                _onResultCallback?.Invoke(-1, eDir.Non);
 
                 return;
             }
 
-            if (item.dir == eAttackDirection.DesignateDirection)
+            if (item.tool.dir == eDir.DesignateDirection)
             {
                 _objDirection.SetActive(true);
             }
-            else if (item.dir == eAttackDirection.DesignateCoordination)
+            else if (item.tool.dir == eDir.DesignateCoordination)
             {
                 _objCoordination.SetActive(true);
             }
@@ -80,30 +80,30 @@ public class Targeting : MonoBehaviour
         {
             var skill = GameManager.instance.dataManager.GetskillData(id);
 
-            if (skill.dir != eAttackDirection.DesignateDirection || skill.dir != eAttackDirection.DesignateCoordination)
+            if (skill.tool.dir != eDir.DesignateDirection || skill.tool.dir != eDir.DesignateCoordination)
             {
-                _onResultCallback?.Invoke(-1, eAttackDirection.Non);
+                _onResultCallback?.Invoke(-1, eDir.Non);
 
                 return;
             }
 
-            if (skill.dir == eAttackDirection.DesignateDirection)
+            if (skill.tool.dir == eDir.DesignateDirection)
             {
                 _objDirection.SetActive(true);
             }
-            else if (skill.dir == eAttackDirection.DesignateCoordination)
+            else if (skill.tool.dir == eDir.DesignateCoordination)
             {
                 _objCoordination.SetActive(true);
             }
         }
 
         this.gameObject.SetActive(true);
-        GameManager.instance.tools.Move_Anchor_XY(eDir.Y, this.GetComponent<RectTransform>(), 350f, 0.5f, 0, Ease.OutBack, null);
+        GameManager.instance.tools.Move_Anchor_XY(eUiDir.Y, this.GetComponent<RectTransform>(), 350f, 0.5f, 0, Ease.OutBack, null);
     }
 
     private void OnClose()
     {
-        GameManager.instance.tools.Move_Anchor_XY(eDir.Y, this.GetComponent<RectTransform>(), -360f, 0.5f, 0, Ease.InBack, () =>
+        GameManager.instance.tools.Move_Anchor_XY(eUiDir.Y, this.GetComponent<RectTransform>(), -360f, 0.5f, 0, Ease.InBack, () =>
         {
             this.gameObject.SetActive(false);
 
@@ -111,13 +111,13 @@ public class Targeting : MonoBehaviour
             _objDirection.SetActive(false);
 
             _nodeIndex = -1;
-            _dir = eAttackDirection.Non;
+            _dir = eDir.Non;
         });
     }
 
     private void OnSelect()
     {
-        if (_dir != eAttackDirection.Non)
+        if (_dir != eDir.Non)
         {
             _onResultCallback?.Invoke(_nodeIndex, _dir);
 
@@ -157,28 +157,28 @@ public class Targeting : MonoBehaviour
 
     private void OnUp()
     {
-        _dir = eAttackDirection.Up;
+        _dir = eDir.Up;
 
         SetText("À§");
     }
 
     private void OnLeft()
     {
-        _dir = eAttackDirection.Left;
+        _dir = eDir.Left;
 
         SetText("¿Þ");
     }
 
     private void OnRight()
     {
-        _dir = eAttackDirection.Right;
+        _dir = eDir.Right;
 
         SetText("¿ì");
     }
 
     private void OnDown()
     {
-        _dir = eAttackDirection.Down;
+        _dir = eDir.Down;
 
         SetText("¾Æ·¡");
     }

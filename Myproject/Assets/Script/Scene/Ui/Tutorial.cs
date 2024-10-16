@@ -92,8 +92,8 @@ public class Tutorial : MonoBehaviour
 
         GameManager.instance.soundManager.PlaySfx(eSfx.MenuOpen);
 
-        GameManager.instance.tools.Move_Anchor_XY(eDir.X, _objSpeechBubble.GetComponent<RectTransform>(), 0f, 0.5f, 0, Ease.OutBack, null);
-        GameManager.instance.tools.Move_Anchor_XY(eDir.Y, _objAnswer.GetComponent<RectTransform>(), 0f, 0.5f, 0, Ease.OutBack, () => 
+        GameManager.instance.tools.Move_Anchor_XY(eUiDir.X, _objSpeechBubble.GetComponent<RectTransform>(), 0f, 0.5f, 0, Ease.OutBack, null);
+        GameManager.instance.tools.Move_Anchor_XY(eUiDir.Y, _objAnswer.GetComponent<RectTransform>(), 0f, 0.5f, 0, Ease.OutBack, () => 
         {
             if (_isDone == true)
             {
@@ -141,8 +141,8 @@ public class Tutorial : MonoBehaviour
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.MenuClose);
 
-        GameManager.instance.tools.Move_Anchor_XY(eDir.X, _objSpeechBubble.GetComponent<RectTransform>(), 554f, 0.5f, 0, Ease.InBack, null);
-        GameManager.instance.tools.Move_Anchor_XY(eDir.Y, _objAnswer.GetComponent<RectTransform>(), -700f, 0.5f, 0, Ease.InBack, () => 
+        GameManager.instance.tools.Move_Anchor_XY(eUiDir.X, _objSpeechBubble.GetComponent<RectTransform>(), 554f, 0.5f, 0, Ease.InBack, null);
+        GameManager.instance.tools.Move_Anchor_XY(eUiDir.Y, _objAnswer.GetComponent<RectTransform>(), -700f, 0.5f, 0, Ease.InBack, () => 
         {
             _onCloseCallback?.Invoke();
         });
@@ -256,7 +256,7 @@ public class Tutorial : MonoBehaviour
         }
     }
 
-    private void InstantiateAnswer(List<DataManager.Tutorial_answer> answers, eTutorialQuest type)
+    private void InstantiateAnswer(List<Tutorial_answer> answers, eTutorialQuest type)
     {
         _objAnswerParant.SetActive(false);
 

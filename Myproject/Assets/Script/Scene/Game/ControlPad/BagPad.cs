@@ -52,14 +52,14 @@ public class BagPad : MonoBehaviour
 
     private void MakeList()
     {
-        if (_data.itemDataIndexs.Count == 0)
+        if (_data.data.itemIndexs.Count == 0)
         {
             _objEmptyLabel.SetActive(true);
         }
 
         DeleteTemplate();
 
-        foreach (var id in _data.itemDataIndexs)
+        foreach (var id in _data.data.itemIndexs)
         {
             var obj = Instantiate(_template, _trTemplateParant);
             var com = obj.GetComponent<PadTemplate>();

@@ -32,18 +32,39 @@ public class DataManager : MonoBehaviour
         public short attackRange = 0;
         public short evasion = 0;
 
-        public eStats defultStatus = eStats.Non;
+        public short currentHP = 10;
+        public short currentMP = 10;
+        public short currentAP = 3;
+        public short currentEXP = 0;
+        public short currentATTACK = 5;
+        public short currentDEFENCE = 0;
+        public short currentVISION = 3;
+        public short currentATTACKRANGE = 10;
+
+        public short Attack_Effect = 0;
+        public short Defence_Effect = 0;
+
+        public short HP_Effect_Per = 10;
+        public short MP_Effect_Per = 10;
+        public short AP_Effect_Per = 3;
+        public short EXP_Effect_Per = 0;
+        public short Coin_Effect_Per = 0;
+        public short Attack_Effect_Per = 0;
+        public short Defence_Effect_Per = 0;
+
+        public eStrengtheningTool defultStatus = eStrengtheningTool.Non;
 
         public bool recovery = false;
         public byte recoveryCount = 0;
 
         public bool useSkill = false;
         public List<short> skillIndexs = null;
-
         public List<short> itemIndexs = null;
 
-        public eStatus _status = eStatus.Non;
-        public byte _statusCount = 0;
+        public List<Duration> Skill_Duration = null;
+        public List<Duration> item_Duration = null;
+        public List<Skill_CoolDown> coolDownSkill = null;
+        public List<AbnormalStatus> abnormalStatuses = null;
 
         public int currentNodeIndex = 0;
     }
@@ -84,32 +105,6 @@ public class DataManager : MonoBehaviour
         private short _defultVISION = 1;
         private short _defultATTACKRANGE = 1;
 
-        public short currentHP = 10;
-        public short currentMP = 10;
-        public short currentAP = 3;
-        public short currentEXP = 0;
-        public short currentATTACK = 5;
-        public short currentDEFENCE = 0;
-        public short currentVISION = 3;
-        public short currentATTACKRANGE = 10;
-
-        public short Attack_Effect = 0;
-        public short Defence_Effect = 0;
-
-        public short Attack_Effect_Per = 0;
-        public short Defence_Effect_Per = 0;
-
-        public short EXP_Effect_Per = 0;
-        public short Coin_Effect_Per = 0;
-
-        public List<short> itemDataIndexs = null;
-        public List<short> skillDataIndexs = null;
-
-        public List<Duration> useSkill = null;
-        public List<Duration> useItem = null;
-
-        public List<Skill_CoolDown> coolDownSkill = null;
-
         #region GetSet
 
         public short maximumHP
@@ -134,12 +129,12 @@ public class DataManager : MonoBehaviour
 
         public short maximumATTACK
         {
-            get { return (short)((_defultATTACK * data.attack) + ((_defultATTACK * data.attack) * 0.01f * Attack_Effect_Per)); }
+            get { return (short)((_defultATTACK * data.attack) + ((_defultATTACK * data.attack) * 0.01f * data.Attack_Effect_Per)); }
         }
 
         public short maximumDEFENCE
         {
-            get { return (short)(_defultDEFENCE * data.defence + ((_defultDEFENCE * data.defence) * 0.01f * Defence_Effect_Per)); }
+            get { return (short)(_defultDEFENCE * data.defence + ((_defultDEFENCE * data.defence) * 0.01f * data.Defence_Effect_Per)); }
         }
 
         public short maximumVISION
@@ -164,8 +159,9 @@ public class DataManager : MonoBehaviour
         public string description = string.Empty;
 
         public short coolDown = 0;
-        public short duration = 0;
         public short useMp = 0;
+
+        public short duration = 0;
 
         public short hp = 0;
         public short hpPercentIncreased = 0;
@@ -182,10 +178,10 @@ public class DataManager : MonoBehaviour
         public short defence = 0;
         public short defencePercentIncreased = 0;
 
-        public eAttackDirection dir = eAttackDirection.Non;
+        public eDir dir = eDir.Non;
 
-        public eStatus needStatus = eStatus.Non;
-        public eStatus status = eStatus.Non;
+        public eStrengtheningTool needStatus = eStrengtheningTool.Non;
+        public eStrengtheningTool grantStatus = eStrengtheningTool.Non;
 
         public short range = 0;
         public float value = 0;
@@ -202,8 +198,8 @@ public class DataManager : MonoBehaviour
         public string description = string.Empty;
 
         public short price = 0;
+
         public short duration = 0;
-        public short useMp = 0;
 
         public short hp = 0;
         public short hpPercentIncreased = 0;
@@ -220,10 +216,10 @@ public class DataManager : MonoBehaviour
         public short defence = 0;
         public short defencePercentIncreased = 0;
 
-        public eAttackDirection dir = eAttackDirection.Non;
+        public eDir dir = eDir.Non;
 
-        public eStatus needStatus = eStatus.Non;
-        public eStatus grantStatus = eStatus.Non;
+        public eStrengtheningTool needStatus = eStrengtheningTool.Non;
+        public eStrengtheningTool grantStatus = eStrengtheningTool.Non;
 
         public short range = 0;
         public float value = 0;
@@ -231,28 +227,6 @@ public class DataManager : MonoBehaviour
         public bool revealMap = false;
 
         public int currentNodeIndex = 0;
-    }
-
-    public class Duration
-    {
-        public int ID = 0;
-        public string name = string.Empty;
-
-        public int remaindDuration = 0;
-        public int remaindCooldown = 0;
-
-        public eStats stats = eStats.Non;
-        public eEffect_IncreaseDecrease inDe = eEffect_IncreaseDecrease.Non;
-        public bool isPercent = false;
-        public int value;
-    }
-
-    public class Skill_CoolDown
-    {
-        public int id = 0;
-        public string name = string.Empty;
-
-        public int coolDown = 0;
     }
 
     #endregion
@@ -269,7 +243,7 @@ public class DataManager : MonoBehaviour
 
         public List<Node_Data> nodeDatas = null;
         public List<Creature_Data> monsterDatas = null;
-        public List<Item_Data> itemDatas = null;
+        public List<ItemData> itemDatas = null;
         public List<Npc_Data> npcDatas = null;
     }
 
@@ -303,7 +277,7 @@ public class DataManager : MonoBehaviour
         public int maxLevel = 0;
 
         public List<Creature_Data> creatureDatas = null;
-        public List<Item_Data> itemDatas = null;
+        public List<ItemData> itemDatas = null;
         public List<Achievements_Data> _achievementsDatas = null;
     }
 
@@ -336,30 +310,6 @@ public class DataManager : MonoBehaviour
         public int isQuest = -1;
     }
 
-    [Serializable]
-    public class Tutorial_answer
-    {
-        public string answer = string.Empty;
-        public int next = 0;
-    }
-
-    [Serializable]
-    public class BlockImageTemplate
-    {
-        public eMapObject type = eMapObject.Non;
-        public Sprite sprite = null;
-
-        public List<Sprite> sprites = null;
-    }
-
-    [Serializable]
-    public class SoundTemplate
-    {
-        public eSfx type = eSfx.Non;
-        public AudioClip clip = null;
-        public List<AudioClip> clips = null;
-    }
-
     [Header("Data Path")]
     [SerializeField] private string _creatureDataPath = string.Empty;
     [SerializeField] private string _npcDataPath = string.Empty;
@@ -377,8 +327,8 @@ public class DataManager : MonoBehaviour
 
     private List<Creature_Data> _creatureDatas = null;
     private List<Npc_Data> _npcDatas = null;
-    private List<Item_Data> _itemDatas = null;
-    private List<Skill_Data> _skillDatas = null;
+    private List<ItemData> _itemDatas = null;
+    private List<SkillData> _skillDatas = null;
 
     private Action _onSaveOrLoadCallback = null;
 
@@ -419,14 +369,15 @@ public class DataManager : MonoBehaviour
         _saveData.round = 1;
 
         _saveData.userData = new User_Data();
-        _saveData.userData.itemDataIndexs = new List<short>() { 501 };
-        _saveData.userData.skillDataIndexs = new List<short>() { 301 };
-
-        _saveData.userData.useSkill = new List<Duration>();
-        _saveData.userData.useItem = new List<Duration>();
-        _saveData.userData.coolDownSkill = new List<Skill_CoolDown>();
-
         _saveData.userData.data = new Creature_Data();
+        _saveData.userData.data.itemIndexs = new List<short>() { 501 };
+        _saveData.userData.data.skillIndexs = new List<short>() { 301 };
+
+        _saveData.userData.data.Skill_Duration = new List<Duration>();
+        _saveData.userData.data.item_Duration = new List<Duration>();
+        _saveData.userData.data.coolDownSkill = new List<Skill_CoolDown>();
+        _saveData.userData.data.abnormalStatuses = new List<AbnormalStatus>();
+
         _saveData.userData.data.hp = 1;
         _saveData.userData.data.mp = 1;
         _saveData.userData.data.ap = 1;
@@ -440,19 +391,19 @@ public class DataManager : MonoBehaviour
         _saveData.mapData.mapSize = _mapSize;
         _saveData.mapData.nodeDatas = new List<Node_Data>();
         _saveData.mapData.monsterDatas = new List<Creature_Data>();
-        _saveData.mapData.itemDatas = new List<Item_Data>();
+        _saveData.mapData.itemDatas = new List<ItemData>();
         _saveData.mapData.npcDatas = new List<Npc_Data>();
 
         _saveData.encyclopediaData = new Encyclopedia_Data();
         _saveData.encyclopediaData.creatureDatas = new List<Creature_Data>();
-        _saveData.encyclopediaData.itemDatas = new List<Item_Data>();
+        _saveData.encyclopediaData.itemDatas = new List<ItemData>();
         _saveData.encyclopediaData._achievementsDatas = new List<Achievements_Data>();
 
 
 
         _encyclopediaData = new Encyclopedia_Data();
         _encyclopediaData.creatureDatas = new List<Creature_Data>();
-        _encyclopediaData.itemDatas = new List<Item_Data>();
+        _encyclopediaData.itemDatas = new List<ItemData>();
         _encyclopediaData._achievementsDatas = new List<Achievements_Data>();
 
         ResetPlayerData();
@@ -474,7 +425,7 @@ public class DataManager : MonoBehaviour
         {
             _encyclopediaData = new Encyclopedia_Data();
             _encyclopediaData.creatureDatas = new List<Creature_Data>();
-            _encyclopediaData.itemDatas = new List<Item_Data>();
+            _encyclopediaData.itemDatas = new List<ItemData>();
             _encyclopediaData._achievementsDatas = new List<Achievements_Data>();
         }
 
@@ -704,7 +655,7 @@ public class DataManager : MonoBehaviour
         {
             _encyclopediaData = new Encyclopedia_Data();
             _encyclopediaData.creatureDatas = new List<Creature_Data>();
-            _encyclopediaData.itemDatas = new List<Item_Data>();
+            _encyclopediaData.itemDatas = new List<ItemData>();
         }
 
         if(_encyclopediaData.creatureDatas.Count  == 0)
@@ -735,7 +686,7 @@ public class DataManager : MonoBehaviour
         {
             _encyclopediaData = new Encyclopedia_Data();
             _encyclopediaData.creatureDatas = new List<Creature_Data>();
-            _encyclopediaData.itemDatas = new List<Item_Data>();
+            _encyclopediaData.itemDatas = new List<ItemData>();
         }
 
         foreach (var saveItem in _encyclopediaData.itemDatas)
@@ -765,7 +716,7 @@ public class DataManager : MonoBehaviour
         {
             _encyclopediaData = new Encyclopedia_Data();
             _encyclopediaData.creatureDatas = new List<Creature_Data>();
-            _encyclopediaData.itemDatas = new List<Item_Data>();
+            _encyclopediaData.itemDatas = new List<ItemData>();
         }
 
         if (_encyclopediaData.maxLevel < lastData.userData.level)
@@ -811,13 +762,13 @@ public class DataManager : MonoBehaviour
 
     public void ResetPlayerData()
     {
-        _saveData.userData.currentHP = _saveData.userData.maximumHP;
-        _saveData.userData.currentMP = _saveData.userData.maximumMP;
-        _saveData.userData.currentAP = _saveData.userData.maximumAP;
-        _saveData.userData.currentATTACK = _saveData.userData.maximumATTACK;
-        _saveData.userData.currentDEFENCE = _saveData.userData.maximumDEFENCE;
-        _saveData.userData.currentVISION = _saveData.userData.maximumVISION;
-        _saveData.userData.currentATTACKRANGE = _saveData.userData.maximumATTACKRANGE;
+        _saveData.userData.data.currentHP = _saveData.userData.maximumHP;
+        _saveData.userData.data.currentMP = _saveData.userData.maximumMP;
+        _saveData.userData.data.currentAP = _saveData.userData.maximumAP;
+        _saveData.userData.data.currentATTACK = _saveData.userData.maximumATTACK;
+        _saveData.userData.data.currentDEFENCE = _saveData.userData.maximumDEFENCE;
+        _saveData.userData.data.currentVISION = _saveData.userData.maximumVISION;
+        _saveData.userData.data.currentATTACKRANGE = _saveData.userData.maximumATTACKRANGE;
     }
 
     #endregion
@@ -907,7 +858,7 @@ public class DataManager : MonoBehaviour
             _itemDatas.Clear();
         }
 
-        _itemDatas = new List<Item_Data>();
+        _itemDatas = new List<ItemData>();
 
         string json = Resources.Load<TextAsset>(_itemDataPath).text;
 
@@ -918,10 +869,40 @@ public class DataManager : MonoBehaviour
 
         var result = JsonConvert.DeserializeAnonymousType(json, respons);
 
-        _itemDatas = result.datas;
+        List<Item_Data> datas = new List<Item_Data>();
+        datas = result.datas;
+
+        for (int i = 0; i < datas.Count; i++)
+        {
+            Item_Data data = datas[i];
+
+            ItemData newData = new ItemData();
+            newData.id = data.id;
+            newData.name = data.name;  
+            newData.description = data.description;
+            newData.price = data.price;
+
+            newData.tool = new StrengtheningTool();
+            newData.tool.duration = data.duration;
+            newData.tool.hp = new Stat_In_De(data.hp, data.hpPercentIncreased);
+            newData.tool.mp = new Stat_In_De(data.mp, data.mpPercentIncreased);
+            newData.tool.ap = new Stat_In_De(data.ap, data.apPercentIncreased);
+            newData.tool.exp = new Stat_In_De(data.exp, data.expPercentIncreased);
+            newData.tool.coin = new Stat_In_De(data.coin, data.coinPercentIncreased);
+            newData.tool.attack = new Stat_In_De(data.attack, data.attackPercentIncreased);
+            newData.tool.defence = new Stat_In_De(data.defence, data.defencePercentIncreased);
+            newData.tool.dir = data.dir;
+            newData.tool.needStatus = data.needStatus;
+            newData.tool.grantStatus = data.grantStatus;
+            newData.tool.range = data.range;
+            newData.tool.value = data.value;
+            newData.tool.revealMap = data.revealMap;
+
+            _itemDatas.Add(newData);
+        }
     }
 
-    public Item_Data GetItemData(int index, bool isID= true)
+    public ItemData GetItemData(int index, bool isID= true)
     {
         return _itemDatas.Find(x => x.id == (index + (isID == true ? 0 : 501)));
     }
@@ -942,7 +923,7 @@ public class DataManager : MonoBehaviour
             _skillDatas.Clear();
         }
 
-        _skillDatas = new List<Skill_Data>();
+        _skillDatas = new List<SkillData>();
 
         string json = Resources.Load<TextAsset>(_skillDataPath).text;
 
@@ -953,10 +934,40 @@ public class DataManager : MonoBehaviour
 
         var result = JsonConvert.DeserializeAnonymousType(json, respons);
 
-        _skillDatas = result.datas;
+        List<Skill_Data> datas = new List<Skill_Data>();
+        datas = result.datas;
+
+        for (int i = 0; i < datas.Count; i++)
+        {
+            Skill_Data data = datas[i];
+
+            SkillData newData = new SkillData();
+            newData.id = data.id;
+            newData.name = data.name;
+            newData.description = data.description;
+            newData.coolDown = data.coolDown;
+
+            newData.tool = new StrengtheningTool();
+            newData.tool.duration = data.duration;
+            newData.tool.hp = new Stat_In_De(data.hp, data.hpPercentIncreased);
+            newData.tool.mp = new Stat_In_De(data.mp, data.mpPercentIncreased);
+            newData.tool.ap = new Stat_In_De(data.ap, data.apPercentIncreased);
+            newData.tool.exp = new Stat_In_De(data.exp, data.expPercentIncreased);
+            newData.tool.coin = new Stat_In_De(data.coin, data.coinPercentIncreased);
+            newData.tool.attack = new Stat_In_De(data.attack, data.attackPercentIncreased);
+            newData.tool.defence = new Stat_In_De(data.defence, data.defencePercentIncreased);
+            newData.tool.dir = data.dir;
+            newData.tool.needStatus = data.needStatus;
+            newData.tool.grantStatus = data.grantStatus;
+            newData.tool.range = data.range;
+            newData.tool.value = data.value;
+            newData.tool.revealMap = data.revealMap;
+
+            _skillDatas.Add(newData);
+        }
     }
 
-    public Skill_Data GetskillData(int index)
+    public SkillData GetskillData(int index)
     {
         return _skillDatas.Find(x => x.id == (index));
     }

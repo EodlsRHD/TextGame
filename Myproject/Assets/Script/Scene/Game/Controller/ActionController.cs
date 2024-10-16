@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class ActionController : MonoBehaviour
 {
-    private eAttackDirection _dir = eAttackDirection.Non;
+    private eDir _dir = eDir.Non;
     private int _nodeIndex = -1;
 
     public void Initialize()
@@ -58,7 +58,7 @@ public class ActionController : MonoBehaviour
         IngameManager.instance.UpdateText("가방에 보관되었습니다.");
 
         IngameManager.instance.saveData.userData.data.coin -= price;
-        IngameManager.instance.saveData.userData.itemDataIndexs.Add((short)index);
+        IngameManager.instance.saveData.userData.data.itemIndexs.Add((short)index);
 
         GameManager.instance.dataManager.AddEncyclopedia_Item(index);
     }
@@ -78,22 +78,22 @@ public class ActionController : MonoBehaviour
             short hp = (short)(IngameManager.instance.saveData.userData.maximumHP * 0.35f);
             short mp = (short)(IngameManager.instance.saveData.userData.maximumMP * 0.35f);
 
-            if (IngameManager.instance.saveData.userData.currentHP + hp > IngameManager.instance.saveData.userData.maximumHP)
+            if (IngameManager.instance.saveData.userData.data.currentHP + hp > IngameManager.instance.saveData.userData.maximumHP)
             {
-                IngameManager.instance.saveData.userData.currentHP = IngameManager.instance.saveData.userData.maximumHP;
+                IngameManager.instance.saveData.userData.data.currentHP = IngameManager.instance.saveData.userData.maximumHP;
             }
             else
             {
-                IngameManager.instance.saveData.userData.currentHP += hp;
+                IngameManager.instance.saveData.userData.data.currentHP += hp;
             }
 
-            if (IngameManager.instance.saveData.userData.currentHP + hp > IngameManager.instance.saveData.userData.maximumMP)
+            if (IngameManager.instance.saveData.userData.data.currentHP + hp > IngameManager.instance.saveData.userData.maximumMP)
             {
-                IngameManager.instance.saveData.userData.currentHP = IngameManager.instance.saveData.userData.maximumMP;
+                IngameManager.instance.saveData.userData.data.currentHP = IngameManager.instance.saveData.userData.maximumMP;
             }
             else
             {
-                IngameManager.instance.saveData.userData.currentHP += mp;
+                IngameManager.instance.saveData.userData.data.currentHP += mp;
             }
 
             IngameManager.instance.UpdateData();
@@ -103,14 +103,14 @@ public class ActionController : MonoBehaviour
 
         if (removeIndex != 0)
         {
-            for (int i = 0; i < IngameManager.instance.saveData.userData.skillDataIndexs.Count; i++)
+            for (int i = 0; i < IngameManager.instance.saveData.userData.data.skillIndexs.Count; i++)
             {
-                if (IngameManager.instance.saveData.userData.skillDataIndexs[i] != removeIndex)
+                if (IngameManager.instance.saveData.userData.data.skillIndexs[i] != removeIndex)
                 {
                     continue;
                 }
 
-                IngameManager.instance.saveData.userData.skillDataIndexs[i] = (short)getIndex;
+                IngameManager.instance.saveData.userData.data.skillIndexs[i] = (short)getIndex;
 
                 break;
             }
@@ -119,12 +119,12 @@ public class ActionController : MonoBehaviour
 
     private int GetPlayerDamage(int battleDamage, DataManager.User_Data data)
     {
-        return data.currentATTACK + battleDamage + (int)(data.currentATTACK * (0.1f * data.Attack_Effect_Per)) + data.Attack_Effect;
+        return data.data.currentATTACK + battleDamage + (int)(data.data.currentATTACK * (0.1f * data.data.Attack_Effect_Per)) + data.data.Attack_Effect;
     }
 
     private int GetPlayerDefence(DataManager.User_Data data)
     {
-        return data.currentDEFENCE + (int)(data.currentDEFENCE * (0.1f * data.Defence_Effect_Per)) + data.Defence_Effect; ;
+        return data.data.currentDEFENCE + (int)(data.data.currentDEFENCE * (0.1f * data.data.Defence_Effect_Per)) + data.data.Defence_Effect; ;
     }
 
     private int GetMonsterDamage(int battleDamage, DataManager.Creature_Data data)
@@ -176,15 +176,15 @@ public class ActionController : MonoBehaviour
                     return;
                 }
 
-                IngameManager.instance.saveData.userData.currentHP -= (short)Mathf.Abs(resultDamage);
+                IngameManager.instance.saveData.userData.data.currentHP -= (short)Mathf.Abs(resultDamage);
 
-                HitSfx(resultDamage, IngameManager.instance.saveData.userData.currentHP / 3);
+                HitSfx(resultDamage, IngameManager.instance.saveData.userData.data.currentHP / 3);
 
                 IngameManager.instance.UpdateText("--- " + Mathf.Abs(resultDamage) + " 의 피해를 입었습니다.");
 
-                if (IngameManager.instance.saveData.userData.currentHP <= 0)
+                if (IngameManager.instance.saveData.userData.data.currentHP <= 0)
                 {
-                    IngameManager.instance.saveData.userData.currentHP = 0;
+                    IngameManager.instance.saveData.userData.data.currentHP = 0;
 
                     GameManager.instance.soundManager.PlaySfx(eSfx.RoundFail);
                     IngameManager.instance.UpdateData(Mathf.Abs(resultDamage) + " 의 피해를 입어 패배하였습니다.");
@@ -266,16 +266,16 @@ public class ActionController : MonoBehaviour
 
     public void Defence()
     {
-        if (IngameManager.instance.saveData.userData.currentAP == 0)
+        if (IngameManager.instance.saveData.userData.data.currentAP == 0)
         {
             IngameManager.instance.UpdateText("--- 남아있는 행동력이 없습니다.");
 
             return;
         }
 
-        short ap = IngameManager.instance.saveData.userData.currentAP;
-        IngameManager.instance.saveData.userData.currentDEFENCE += ap;
-        IngameManager.instance.saveData.userData.currentAP = 0;
+        short ap = IngameManager.instance.saveData.userData.data.currentAP;
+        IngameManager.instance.saveData.userData.data.currentDEFENCE += ap;
+        IngameManager.instance.saveData.userData.data.currentAP = 0;
 
         IngameManager.instance.UpdateText("행동력을 모드 소진하였습니다.");
         IngameManager.instance.UpdateText("방어도가 " + ap + "만큼 증가했습니다.");
