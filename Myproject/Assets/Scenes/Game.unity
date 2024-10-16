@@ -3265,6 +3265,7 @@ GameObject:
   - component: {fileID: 264511983}
   - component: {fileID: 264511982}
   - component: {fileID: 264511984}
+  - component: {fileID: 264511985}
   m_Layer: 0
   m_Name: Manager
   m_TagString: Untagged
@@ -3287,6 +3288,7 @@ MonoBehaviour:
   _monsterController: {fileID: 264511983}
   _playerController: {fileID: 264511982}
   _actionController: {fileID: 264511984}
+  _skillitemCountroller: {fileID: 264511985}
   _ingameUI: {fileID: 1037030123}
   _textView: {fileID: 2033365083}
   _controlPad: {fileID: 453098887}
@@ -3343,6 +3345,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a279c4e48a970574da9b898f148d413c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &264511985
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 264511979}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d479585e85831df4f8d1b13ae94e2f7a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &265077707

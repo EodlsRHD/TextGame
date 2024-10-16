@@ -25,6 +25,7 @@ public class IngameManager : MonoBehaviour
     [SerializeField] private MonsterController _monsterController = null;
     [SerializeField] private PlayerCntroller _playerController = null;
     [SerializeField] private ActionController _actionController = null;
+    [SerializeField] private Skill_ItemController _skillitemCountroller = null;
 
     [Header("Ingame UI"), SerializeField] private IngameUI _ingameUI = null;
     [Header("TextView"), SerializeField] private TextView _textView = null;
@@ -39,6 +40,8 @@ public class IngameManager : MonoBehaviour
 
     private bool _isPlayerTurn = false;
     private bool _isHuntMonster = false;
+
+    #region
 
     public DataManager.Save_Data saveData
     {
@@ -63,6 +66,8 @@ public class IngameManager : MonoBehaviour
         set { _isHuntMonster = value; }
     }
 
+    #endregion
+
     void Start()
     {
         _instance = this;
@@ -74,6 +79,7 @@ public class IngameManager : MonoBehaviour
         _monsterController.Initialize();
         _playerController.Initialize();
         _actionController.Initialize();
+        _skillitemCountroller.Initialize();
 
         _ingameUI.Initialize(OpenMap, OpenNextRound);
         _textView.Initialize();
@@ -200,12 +206,12 @@ public class IngameManager : MonoBehaviour
 
     public void ControlPad_Skill()
     {
-        _controlPad.Skill(_saveData.userData, _actionController.Skill);
+        _controlPad.Skill(_saveData.userData, _skillitemCountroller.UseSkill);
     }
 
     public void ControlPad_Bag()
     {
-        _controlPad.Bag(_saveData.userData, _actionController.Bag);
+        _controlPad.Bag(_saveData.userData, _skillitemCountroller.UseIConsumptiontem);
     }
 
     public void SetMap()
@@ -225,7 +231,7 @@ public class IngameManager : MonoBehaviour
 
     public void SetDirCoord(int nodeIndex, eAttackDirection type)
     {
-        _actionController.SetDirCoord(nodeIndex, type);
+        _skillitemCountroller.SetDirCoord(nodeIndex, type);
     }
 
     public void GetMonsterItem(short id)
@@ -369,8 +375,7 @@ public class IngameManager : MonoBehaviour
     {
         _isPlayerTurn = false;
 
-        _actionController.SkillRemindDuration();
-        _actionController.ItemRemindDuration();
+        _skillitemCountroller.Duration();
 
         UpdateText("--- " + _saveData.userData.data.name + "의 순서가 종료됩니다.");
     }
