@@ -78,7 +78,7 @@
       "evasion": 0,
       "defultStatus": -1,
       "useSkill": "TRUE",
-      "skillIndexs": 401,
+      "skillIndexs": "",
       "itemIndexs": ""
     },
     {
@@ -198,7 +198,7 @@
       "evasion": 0,
       "defultStatus": 1,
       "useSkill": "TRUE",
-      "skillIndexs": 401,
+      "skillIndexs": "",
       "itemIndexs": ""
     },
     {
@@ -218,7 +218,7 @@
       "evasion": 0,
       "defultStatus": -1,
       "useSkill": "TRUE",
-      "skillIndexs": 401,
+      "skillIndexs": "",
       "itemIndexs": ""
     },
     {
@@ -318,7 +318,7 @@
       "evasion": 0,
       "defultStatus": -1,
       "useSkill": "TRUE",
-      "skillIndexs": "404,405",
+      "skillIndexs": "",
       "itemIndexs": ""
     },
     {
@@ -338,7 +338,7 @@
       "evasion": 0,
       "defultStatus": 11,
       "useSkill": "TRUE",
-      "skillIndexs": 401,
+      "skillIndexs": "",
       "itemIndexs": ""
     },
     {
@@ -358,7 +358,7 @@
       "evasion": 0,
       "defultStatus": 5,
       "useSkill": "TRUE",
-      "skillIndexs": 401,
+      "skillIndexs": "",
       "itemIndexs": ""
     },
     {
@@ -498,7 +498,7 @@
       "evasion": 0,
       "defultStatus": 1,
       "useSkill": "TRUE",
-      "skillIndexs": "404,405",
+      "skillIndexs": "",
       "itemIndexs": ""
     },
     {
@@ -558,7 +558,7 @@
       "evasion": 0,
       "defultStatus": 2,
       "useSkill": "TRUE",
-      "skillIndexs": 402,
+      "skillIndexs": "",
       "itemIndexs": ""
     },
     {
@@ -578,7 +578,7 @@
       "evasion": 0,
       "defultStatus": -1,
       "useSkill": "TRUE",
-      "skillIndexs": 403,
+      "skillIndexs": "",
       "itemIndexs": ""
     }
   ]

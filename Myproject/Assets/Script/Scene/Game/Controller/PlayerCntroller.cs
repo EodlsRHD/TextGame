@@ -90,7 +90,7 @@ public class PlayerCntroller : MonoBehaviour
             return -1;
         }
 
-        if (IngameManager.instance.saveData.mapData.nodeDatas[result].isItem == false)
+        if (IngameManager.instance.saveData.mapData.nodeDatas[result].isItem == true)
         {
             IngameManager.instance.GetFieldItem(result);
 
