@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using Unity.VisualScripting.Antlr3.Runtime.Misc;
 
 public class PlayerInformation : MonoBehaviour
 {
@@ -21,25 +22,25 @@ public class PlayerInformation : MonoBehaviour
     [SerializeField] private TMP_Text _textVision = null;
     [SerializeField] private TMP_Text _textAttackRange = null;
 
-    private DataManager.User_Data _userData = null;
+    private UserData _userData = null;
 
     public void Initialize()
     {
         _objInformation.SetActive(false);
     }
 
-    public void UpdatePlayerInfo(DataManager.User_Data userData)
+    public void UpdatePlayerInfo(UserData userData)
     {
         _userData = userData;
 
         _textLevel.text = userData.level.ToString();
-        _textHP.text = userData.data.currentHP + " / " + userData.maximumHP;
-        _textMP.text = userData.data.currentMP + " / " + userData.maximumMP;
-        _textAP.text = userData.data.currentAP + " / " + userData.maximumAP;
-        _textEXP.text = userData.data.currentEXP + " / " + userData.maximumEXP;
+        _textHP.text = userData.stats.hp.currnet + " / " + userData.stats.hp.maximum;
+        _textMP.text = userData.stats.mp.currnet + " / " + userData.stats.mp.maximum;
+        _textAP.text = userData.stats.ap.currnet + " / " + userData.stats.ap.maximum;
+        _textEXP.text = userData.stats.exp.currnet + " / " + userData.maximumEXP;
     }
 
-    public void UpdatePlayerInfo(eStats type, DataManager.User_Data userData)
+    public void UpdatePlayerInfo(eStats type, UserData userData)
     {
         _userData = userData;
 
@@ -50,34 +51,34 @@ public class PlayerInformation : MonoBehaviour
                 break;
 
             case eStats.HP:
-                _textHP.text = userData.data.currentHP + " / " + userData.maximumHP;
+                _textHP.text = userData.stats.hp.currnet + " / " + userData.stats.hp.maximum;
                 break;
 
             case eStats.MP:
-                _textMP.text = userData.data.currentMP + " / " + userData.maximumMP;
+                _textMP.text = userData.stats.mp.currnet + " / " + userData.stats.mp.maximum;
                 break;
 
             case eStats.AP:
-                _textAP.text = userData.data.currentAP + " / " + userData.maximumAP;
+                _textAP.text = userData.stats.ap.currnet + " / " + userData.stats.ap.maximum;
                 break;
 
             case eStats.EXP:
-                _textEXP.text = userData.data.currentHP + " / " + userData.maximumEXP;
+                _textEXP.text = userData.stats.exp.currnet + " / " + userData.maximumEXP;
                 break;
         }
     }
 
     public void Open()
     {
-        _textCoin.text = _userData.data.coin.ToString();
-        _textAttack.text = _userData.data.currentATTACK.ToString();
-        _textDefence.text = _userData.data.currentDEFENCE.ToString();
-        _textVision.text = _userData.data.currentVISION.ToString();
-        _textAttackRange.text = _userData.data.currentATTACKRANGE.ToString();
+        _textCoin.text = _userData.stats.coin.currnet.ToString();
+        _textAttack.text = (_userData.stats.attack.currnet + _userData.stats.attack.plus).ToString();
+        _textDefence.text = (_userData.stats.defence.currnet + _userData.stats.defence.plus).ToString();
+        _textVision.text = (_userData.stats.vision.currnet + _userData.stats.vision.plus).ToString();
+        _textAttackRange.text = (_userData.stats.attackRange.currnet + _userData.stats.attackRange.plus).ToString();
 
         _objInformation.SetActive(true);
 
-        GameManager.instance.tools.Move_Anchor_XY(eUiDir.X, _objInformation.GetComponent<RectTransform>(), 423f, 0.5f, 0, Ease.OutBack, null);
+        GameManager.instance.tools.Move_Anchor_XY(eUiDir.X, _objInformation.GetComponent<RectTransform>(), 0f, 0.5f, 0, Ease.OutBack, null);
     }
 
     public void Close(System.Action onResultCallback = null)

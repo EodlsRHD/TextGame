@@ -69,16 +69,16 @@ public class Bonfire : MonoBehaviour
     [Header("Goods"), SerializeField] private List<BonfireTemplate> _template = null;
 
     private Action<int, int, int> _onResultCallback = null;
-    private Action<DataManager.User_Data, Action<eTool, int>> _onOpenUserSkillCallback = null;
+    private Action<UserData, Action<eTool, int>> _onOpenUserSkillCallback = null;
 
     private DataManager.Npc_Data _npc = null;
-    private DataManager.User_Data _user = null;
+    private UserData _user = null;
 
     private int _selectTemplateIndex = 0;
     private int removeId = 0;
     private bool _isSelect = false;
 
-    public void Initialize(Action<int, int, int> onResultCallback, Action<DataManager.User_Data, Action<eTool, int>> onOpenUserSkillCallback)
+    public void Initialize(Action<int, int, int> onResultCallback, Action<UserData, Action<eTool, int>> onOpenUserSkillCallback)
     {
         if (onResultCallback != null)
         {
@@ -103,7 +103,7 @@ public class Bonfire : MonoBehaviour
         this.gameObject.SetActive(false);
     }
 
-    public void Open(DataManager.Npc_Data npc, DataManager.User_Data user)
+    public void Open(DataManager.Npc_Data npc, UserData user)
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.Bonfire);
         GameManager.instance.soundManager.PlaySfx(eSfx.MenuOpen);

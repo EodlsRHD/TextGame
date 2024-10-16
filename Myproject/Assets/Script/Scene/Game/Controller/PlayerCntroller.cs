@@ -19,9 +19,16 @@ public class PlayerCntroller : MonoBehaviour
             return;
         }
 
-        if (IngameManager.instance.saveData.userData.data.currentAP == 0)
+        if (IngameManager.instance.saveData.userData.stats.hp.currnet == 0)
         {
             IngameManager.instance.UpdatePopup("행동력이 부족합니다");
+
+            return;
+        }
+
+        if(IngameManager.instance.CheckAbnormalStatusEffect(eStrengtheningTool.UnableAct, IngameManager.instance.saveData.userData.data) == true)
+        {
+            IngameManager.instance.UpdateText("행동 불능 상태입니다.");
 
             return;
         }
@@ -39,7 +46,7 @@ public class PlayerCntroller : MonoBehaviour
         IngameManager.instance.saveData.mapData.nodeDatas[nearbyBlockIndex].isUser = true;
 
         IngameManager.instance.saveData.userData.data.currentNodeIndex = nearbyBlockIndex;
-        IngameManager.instance.saveData.userData.data.currentAP -= 1;
+        IngameManager.instance.saveData.userData.stats.ap.MinusCurrnet(1);
 
         IngameManager.instance.UpdatePlayerInfo(eStats.AP);
 
@@ -99,13 +106,13 @@ public class PlayerCntroller : MonoBehaviour
 
         if (IngameManager.instance.saveData.mapData.nodeDatas[result].isMonster == true)
         {
-            if(IngameManager.instance.saveData.userData.data.currentAP < 2)
+            if(IngameManager.instance.saveData.userData.stats.ap.currnet < 2)
             {
                 IngameManager.instance.UpdatePopup("행동력이 부족합니다");
                 return -1;
             }
 
-            IngameManager.instance.saveData.userData.data.currentAP -= 2;
+            IngameManager.instance.saveData.userData.stats.ap.MinusCurrnet(2);
             IngameManager.instance.UpdatePlayerInfo(eStats.AP);
 
             IngameManager.instance.Attack(result);
@@ -115,14 +122,14 @@ public class PlayerCntroller : MonoBehaviour
 
         if (IngameManager.instance.saveData.mapData.nodeDatas[result].isShop == true || IngameManager.instance.saveData.mapData.nodeDatas[result].isBonfire == true)
         {
-            if (IngameManager.instance.saveData.userData.data.currentAP < 1)
+            if (IngameManager.instance.saveData.userData.stats.ap.currnet < 1)
             {
                 IngameManager.instance.UpdatePopup("행동력이 부족합니다");
 
                 return -1;
             }
 
-            IngameManager.instance.saveData.userData.data.currentAP -= 1;
+            IngameManager.instance.saveData.userData.stats.ap.MinusCurrnet(1);
             IngameManager.instance.UpdatePlayerInfo(eStats.AP);
 
             IngameManager.instance.Npc(result);
@@ -141,7 +148,7 @@ public class PlayerCntroller : MonoBehaviour
         {
             if (IngameManager.instance.isAllMonsterDead == false)
             {
-                IngameManager.instance.UpdateText("--- 남아있는 몬스터가 있습니다.");
+                IngameManager.instance.UpdatePopup("아직 닫혀있습니다.");
 
                 return -1;
             }
@@ -210,8 +217,8 @@ public class PlayerCntroller : MonoBehaviour
 
     public List<int> PlayerSearchNearby()
     {
-        List<System.Action> actions = new List<System.Action>();
-        List<int> NearbyIndexs = IngameManager.instance.Vision(IngameManager.instance.saveData.userData.data.currentVISION, IngameManager.instance.saveData.userData.data.currentNodeIndex);
+        List<Action> actions = new List<Action>();
+        List<int> NearbyIndexs = IngameManager.instance.Vision(IngameManager.instance.saveData.userData.stats.vision.currnet, IngameManager.instance.saveData.userData.data.currentNodeIndex);
 
         bool Non = false;
 

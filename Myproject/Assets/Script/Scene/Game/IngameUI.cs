@@ -194,17 +194,17 @@ public class IngameUI : MonoBehaviour
         GameManager.instance.tools.Move_Anchor_XY(eUiDir.Y, _objNextRound.GetComponent<RectTransform>(), 350f, 0.5f, 0, Ease.OutBack, null);
     }
 
-    public void UpdatePlayerInfo(DataManager.User_Data userData)
+    public void UpdatePlayerInfo(UserData userData)
     {
         _playerInformation.UpdatePlayerInfo(userData);
     }
 
-    public void UpdatePlayerInfo(eStats type, DataManager.User_Data userData)
+    public void UpdatePlayerInfo(eStats type, UserData userData)
     {
         _playerInformation.UpdatePlayerInfo(type, userData);
     }
 
-    public void CallAttacker(DataManager.User_Data userData, DataManager.Creature_Data monster, Action onLastCallback, Action<eWinorLose, int> onResultCallback)
+    public void CallAttacker(UserData userData, CreatureData monster, Action onLastCallback, Action<eWinorLose, int> onResultCallback)
     {
         _Attacker.CallAttacker(userData, monster, onLastCallback, onResultCallback);
     }
@@ -214,7 +214,7 @@ public class IngameUI : MonoBehaviour
         _Attacker.Close();
     }
 
-    public void OpneLevelPoint(DataManager.User_Data userData, Action<DataManager.User_Data> onResultCallback)
+    public void OpneLevelPoint(UserData userData, Action<UserData> onResultCallback)
     {
         _objBlocker.SetActive(true);
 

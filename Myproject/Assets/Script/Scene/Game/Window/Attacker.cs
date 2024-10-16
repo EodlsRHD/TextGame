@@ -40,8 +40,8 @@ public class Attacker : MonoBehaviour
 
     private List<AttackerTemplate> _cards = null;
     private List<int> _fieldCardIndex = new List<int>();
-    private DataManager.User_Data _userData = null;
-    private DataManager.Creature_Data _monster = null;
+    private UserData _userData = null;
+    private CreatureData _monster = null;
 
     private int _playerCoinCount = 0;
 
@@ -82,7 +82,7 @@ public class Attacker : MonoBehaviour
         this.gameObject.SetActive(false);
     }
 
-    public void CallAttacker(DataManager.User_Data userData, DataManager.Creature_Data monster, Action onLastCallback, Action<eWinorLose, int> onResultCallback)
+    public void CallAttacker(UserData userData, CreatureData monster, Action onLastCallback, Action<eWinorLose, int> onResultCallback)
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.MenuOpen);
         PlayBgm(eBgm.Battle);
@@ -100,8 +100,8 @@ public class Attacker : MonoBehaviour
         _userData = userData;
         _monster = monster;
 
-        _playerCoinCount = userData.data.currentHP;
-        _monsterCoinCount = monster.hp;
+        _playerCoinCount = userData.stats.hp.currnet;
+        _monsterCoinCount = monster.stats.hp.currnet;
 
         _batCount = userData.level;
         _totalCount += _batCount * 2;
@@ -113,7 +113,7 @@ public class Attacker : MonoBehaviour
         _textBat.text = _batCount.ToString();
         _textTotal.text = _totalCount.ToString();
 
-        IngameManager.instance.UpdateText(_monster.name + " 과 전투를 시작합니다!");
+        IngameManager.instance.UpdateText(_monster.name + " (와)과 전투를 시작합니다!");
         IngameManager.instance.UpdateText("--- " + (_turnCount + 1) + "번째 턴");
 
         CardDistribution();

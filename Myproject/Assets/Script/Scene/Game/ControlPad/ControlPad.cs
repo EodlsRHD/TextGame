@@ -51,7 +51,7 @@ public class ControlPad : MonoBehaviour
 
     private Action<eTool, int> _onResultCallback = null;
 
-    private DataManager.User_Data _data;
+    private UserData _data;
 
     private eControl _eOpenPad = eControl.Non;
     private bool _isOpen = false;
@@ -107,14 +107,14 @@ public class ControlPad : MonoBehaviour
         _onActionCallback?.Invoke(type);
     }
 
-    public void UpdateData(DataManager.User_Data data)
+    public void UpdateData(UserData data)
     {
         _data = data;
 
         OnOpenSkillAndBagPad(_eOpenPad);
     }
 
-    public void Skill(DataManager.User_Data data, Action<eTool, int> onSkillResultCallback)
+    public void Skill(UserData data, Action<eTool, int> onSkillResultCallback)
     {
         _data = data;
 
@@ -126,7 +126,7 @@ public class ControlPad : MonoBehaviour
         OnOpenSkillAndBagPad(eControl.Skill);
     }
 
-    public void Bag(DataManager.User_Data data, Action<eTool, int> onBagResultCallback)
+    public void Bag(UserData data, Action<eTool, int> onBagResultCallback)
     {
         _data = data;
 

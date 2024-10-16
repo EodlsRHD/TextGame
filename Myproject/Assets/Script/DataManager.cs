@@ -13,7 +13,7 @@ public class DataManager : MonoBehaviour
     #region Creatures
 
     [Serializable]
-    public class Creature_Data
+    private class Creature_Data
     {
         public short id = 0;
 
@@ -24,7 +24,7 @@ public class DataManager : MonoBehaviour
         public short coin = 0;
         public short hp = 0;
         public short mp = 0;
-        public short ap = 0; // Active Point 
+        public short ap = 0;
         public short exp = 0;
         public short attack = 0;
         public short defence = 0;
@@ -32,41 +32,11 @@ public class DataManager : MonoBehaviour
         public short attackRange = 0;
         public short evasion = 0;
 
-        public short currentHP = 10;
-        public short currentMP = 10;
-        public short currentAP = 3;
-        public short currentEXP = 0;
-        public short currentATTACK = 5;
-        public short currentDEFENCE = 0;
-        public short currentVISION = 3;
-        public short currentATTACKRANGE = 10;
-
-        public short Attack_Effect = 0;
-        public short Defence_Effect = 0;
-
-        public short HP_Effect_Per = 10;
-        public short MP_Effect_Per = 10;
-        public short AP_Effect_Per = 3;
-        public short EXP_Effect_Per = 0;
-        public short Coin_Effect_Per = 0;
-        public short Attack_Effect_Per = 0;
-        public short Defence_Effect_Per = 0;
-
         public eStrengtheningTool defultStatus = eStrengtheningTool.Non;
-
-        public bool recovery = false;
-        public byte recoveryCount = 0;
 
         public bool useSkill = false;
         public List<short> skillIndexs = null;
         public List<short> itemIndexs = null;
-
-        public List<Duration> Skill_Duration = null;
-        public List<Duration> item_Duration = null;
-        public List<Skill_CoolDown> coolDownSkill = null;
-        public List<AbnormalStatus> abnormalStatuses = null;
-
-        public int currentNodeIndex = 0;
     }
 
     [Serializable]
@@ -87,67 +57,6 @@ public class DataManager : MonoBehaviour
         public List<short> SkillIndexs = null;
 
         public int currentNodeIndex = 0;
-    }
-
-    [Serializable]
-    public class User_Data
-    {
-        public Creature_Data data = null;
-
-        public ushort level = 1; // 1레벨 (경험치 * 0.4) * 레벨수
-
-        private short _defultHP = 10;
-        private short _defultMP = 10;
-        private short _defultAP = 3;
-        private short _defultEXP = 15;
-        private short _defultATTACK = 5;
-        private short _defultDEFENCE = 0;
-        private short _defultVISION = 1;
-        private short _defultATTACKRANGE = 1;
-
-        #region GetSet
-
-        public short maximumHP
-        {
-            get { return (short)(_defultHP * data.hp); }
-        }
-
-        public short maximumMP
-        {
-            get { return (short)(_defultMP * data.mp); }
-        }
-
-        public short maximumAP
-        {
-            get { return (short)(_defultAP * data.ap); }
-        }
-
-        public short maximumEXP
-        {
-            get { return (short)(level * _defultEXP); }
-        }
-
-        public short maximumATTACK
-        {
-            get { return (short)((_defultATTACK * data.attack) + ((_defultATTACK * data.attack) * 0.01f * data.Attack_Effect_Per)); }
-        }
-
-        public short maximumDEFENCE
-        {
-            get { return (short)(_defultDEFENCE * data.defence + ((_defultDEFENCE * data.defence) * 0.01f * data.Defence_Effect_Per)); }
-        }
-
-        public short maximumVISION
-        {
-            get { return (short)(_defultVISION * data.vision); }
-        }
-
-        public short maximumATTACKRANGE
-        {
-            get { return (short)(_defultATTACKRANGE * data.attackRange); }
-        }
-
-        #endregion
     }
 
     [Serializable]
@@ -242,7 +151,7 @@ public class DataManager : MonoBehaviour
         public int exitNodeIndex = 0;
 
         public List<Node_Data> nodeDatas = null;
-        public List<Creature_Data> monsterDatas = null;
+        public List<CreatureData> monsterDatas = null;
         public List<ItemData> itemDatas = null;
         public List<Npc_Data> npcDatas = null;
     }
@@ -276,7 +185,7 @@ public class DataManager : MonoBehaviour
         public string maxLevelDate = string.Empty;
         public int maxLevel = 0;
 
-        public List<Creature_Data> creatureDatas = null;
+        public List<CreatureData> creatureDatas = null;
         public List<ItemData> itemDatas = null;
         public List<Achievements_Data> _achievementsDatas = null;
     }
@@ -286,7 +195,7 @@ public class DataManager : MonoBehaviour
     {
         public short round = 0;
 
-        public User_Data userData = null;
+        public UserData userData = null;
         public Map_Data mapData = null;
         public Encyclopedia_Data encyclopediaData = null;
     }
@@ -325,7 +234,7 @@ public class DataManager : MonoBehaviour
     private Save_Data _saveData = null;
     private Encyclopedia_Data _encyclopediaData = null;
 
-    private List<Creature_Data> _creatureDatas = null;
+    private List<CreatureData> _creatureDatas = null;
     private List<Npc_Data> _npcDatas = null;
     private List<ItemData> _itemDatas = null;
     private List<SkillData> _skillDatas = null;
@@ -368,41 +277,42 @@ public class DataManager : MonoBehaviour
         _saveData = new Save_Data();
         _saveData.round = 1;
 
-        _saveData.userData = new User_Data();
-        _saveData.userData.data = new Creature_Data();
-        _saveData.userData.data.itemIndexs = new List<short>() { 501 };
-        _saveData.userData.data.skillIndexs = new List<short>() { 301 };
+        _saveData.userData = new UserData();
+        _saveData.userData.data = new CreatureData();
+        _saveData.userData.data.stats = new CreatureStats();
+        _saveData.userData.data.stats.coin = new CreatureStat(0, 1, 0, 0);
+        _saveData.userData.data.stats.hp = new CreatureStat(10, 1, 0, 0);
+        _saveData.userData.data.stats.mp = new CreatureStat(10, 1, 0, 0);
+        _saveData.userData.data.stats.ap = new CreatureStat(3, 1, 0, 0);
+        _saveData.userData.data.stats.exp = new CreatureStat(0, 1, 0, 0);
+        _saveData.userData.data.stats.attack = new CreatureStat(5, 1, 0, 0);
+        _saveData.userData.data.stats.defence = new CreatureStat(0, 1, 0, 0);
+        _saveData.userData.data.stats.vision = new CreatureStat(1, 1, 0, 0);
+        _saveData.userData.data.stats.attackRange = new CreatureStat(1, 1, 0, 0);
+        _saveData.userData.data.skillIndexs = new List<short>();
+        _saveData.userData.data.itemIndexs = new List<short>();
 
-        _saveData.userData.data.Skill_Duration = new List<Duration>();
+        _saveData.userData.data.skill_Duration = new List<Duration>();
         _saveData.userData.data.item_Duration = new List<Duration>();
         _saveData.userData.data.coolDownSkill = new List<Skill_CoolDown>();
         _saveData.userData.data.abnormalStatuses = new List<AbnormalStatus>();
 
-        _saveData.userData.data.hp = 1;
-        _saveData.userData.data.mp = 1;
-        _saveData.userData.data.ap = 1;
-        _saveData.userData.data.attack = 0;
-        _saveData.userData.data.defence = 0;
-        _saveData.userData.data.vision = 1;
-        _saveData.userData.data.attackRange = 1;
-        _saveData.userData.data.coin = 0;
-
         _saveData.mapData = new Map_Data();
         _saveData.mapData.mapSize = _mapSize;
         _saveData.mapData.nodeDatas = new List<Node_Data>();
-        _saveData.mapData.monsterDatas = new List<Creature_Data>();
+        _saveData.mapData.monsterDatas = new List<CreatureData>();
         _saveData.mapData.itemDatas = new List<ItemData>();
         _saveData.mapData.npcDatas = new List<Npc_Data>();
 
         _saveData.encyclopediaData = new Encyclopedia_Data();
-        _saveData.encyclopediaData.creatureDatas = new List<Creature_Data>();
+        _saveData.encyclopediaData.creatureDatas = new List<CreatureData>();
         _saveData.encyclopediaData.itemDatas = new List<ItemData>();
         _saveData.encyclopediaData._achievementsDatas = new List<Achievements_Data>();
 
 
 
         _encyclopediaData = new Encyclopedia_Data();
-        _encyclopediaData.creatureDatas = new List<Creature_Data>();
+        _encyclopediaData.creatureDatas = new List<CreatureData>();
         _encyclopediaData.itemDatas = new List<ItemData>();
         _encyclopediaData._achievementsDatas = new List<Achievements_Data>();
 
@@ -424,7 +334,7 @@ public class DataManager : MonoBehaviour
         if (_encyclopediaData == null)
         {
             _encyclopediaData = new Encyclopedia_Data();
-            _encyclopediaData.creatureDatas = new List<Creature_Data>();
+            _encyclopediaData.creatureDatas = new List<CreatureData>();
             _encyclopediaData.itemDatas = new List<ItemData>();
             _encyclopediaData._achievementsDatas = new List<Achievements_Data>();
         }
@@ -654,7 +564,7 @@ public class DataManager : MonoBehaviour
         if (_encyclopediaData == null)
         {
             _encyclopediaData = new Encyclopedia_Data();
-            _encyclopediaData.creatureDatas = new List<Creature_Data>();
+            _encyclopediaData.creatureDatas = new List<CreatureData>();
             _encyclopediaData.itemDatas = new List<ItemData>();
         }
 
@@ -685,7 +595,7 @@ public class DataManager : MonoBehaviour
         if (_encyclopediaData == null)
         {
             _encyclopediaData = new Encyclopedia_Data();
-            _encyclopediaData.creatureDatas = new List<Creature_Data>();
+            _encyclopediaData.creatureDatas = new List<CreatureData>();
             _encyclopediaData.itemDatas = new List<ItemData>();
         }
 
@@ -715,7 +625,7 @@ public class DataManager : MonoBehaviour
         if(_encyclopediaData == null)
         {
             _encyclopediaData = new Encyclopedia_Data();
-            _encyclopediaData.creatureDatas = new List<Creature_Data>();
+            _encyclopediaData.creatureDatas = new List<CreatureData>();
             _encyclopediaData.itemDatas = new List<ItemData>();
         }
 
@@ -762,13 +672,7 @@ public class DataManager : MonoBehaviour
 
     public void ResetPlayerData()
     {
-        _saveData.userData.data.currentHP = _saveData.userData.maximumHP;
-        _saveData.userData.data.currentMP = _saveData.userData.maximumMP;
-        _saveData.userData.data.currentAP = _saveData.userData.maximumAP;
-        _saveData.userData.data.currentATTACK = _saveData.userData.maximumATTACK;
-        _saveData.userData.data.currentDEFENCE = _saveData.userData.maximumDEFENCE;
-        _saveData.userData.data.currentVISION = _saveData.userData.maximumVISION;
-        _saveData.userData.data.currentATTACKRANGE = _saveData.userData.maximumATTACKRANGE;
+        _saveData.userData.stats.Maximum();
     }
 
     #endregion
@@ -782,7 +686,7 @@ public class DataManager : MonoBehaviour
             _creatureDatas.Clear();
         }
 
-        _creatureDatas = new List<Creature_Data>();
+        _creatureDatas = new List<CreatureData>();
 
         string json = Resources.Load<TextAsset>(_creatureDataPath).text;
 
@@ -793,10 +697,56 @@ public class DataManager : MonoBehaviour
 
         var result = JsonConvert.DeserializeAnonymousType(json, respons);
 
-        _creatureDatas = result.datas;
+        List<Creature_Data> datas = new List<Creature_Data>();
+        datas = result.datas;
+
+        for (int i = 0; i < datas.Count; i++)
+        {
+            Creature_Data data = datas[i];
+
+            CreatureData temp = new CreatureData();
+            temp.id = data.id;
+            temp.name = data.name; 
+            temp.description = data.description;
+            temp.spriteIndex = data.spriteIndex;
+
+            temp.stats = new CreatureStats();
+            temp.stats.coin = new CreatureStat(data.coin, 1, 0, 0);
+            temp.stats.hp = new CreatureStat(data.hp, 1, 0, 0);
+            temp.stats.mp = new CreatureStat(data.mp, 1, 0, 0);
+            temp.stats.ap = new CreatureStat(data.ap, 1, 0, 0);
+            temp.stats.exp = new CreatureStat(data.exp, 1, 0, 0);
+            temp.stats.attack = new CreatureStat(data.attack, 1, 0, 0);
+            temp.stats.defence = new CreatureStat(data.defence, 1, 0, 0);
+            temp.stats.vision = new CreatureStat(data.vision, 1, 0, 0);
+            temp.stats.attackRange = new CreatureStat(data.attackRange, 1, 0, 0);
+
+            temp.defultStatus = data.defultStatus;
+
+            temp.useSkill = data.useSkill;
+
+            temp.skillIndexs = new List<short>();
+            if(data.skillIndexs != null)
+            {
+                temp.skillIndexs.AddRange(data.skillIndexs);
+            }
+
+            temp.itemIndexs = new List<short>();
+            if(data.itemIndexs != null)
+            {
+                temp.itemIndexs.AddRange(data.itemIndexs);
+            }
+
+            temp.skill_Duration = new List<Duration>();
+            temp.item_Duration = new List<Duration>();
+            temp.coolDownSkill = new List<Skill_CoolDown>();
+            temp.abnormalStatuses = new List<AbnormalStatus>();
+
+            _creatureDatas.Add(temp);
+        }
     }
 
-    public Creature_Data GetCreatureData(int index)
+    public CreatureData GetCreatureData(int index)
     {
         if (index >= _creatureDatas.Count)
         {

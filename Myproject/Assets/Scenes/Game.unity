@@ -2691,7 +2691,7 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 4
+  m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
@@ -2722,7 +2722,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 219.7544, w: 0}
+  m_margin: {x: 0, y: 0, z: 117.537415, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -11200,7 +11200,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &789466080
 RectTransform:
   m_ObjectHideFlags: 0
@@ -11744,28 +11744,35 @@ MonoBehaviour:
       name: 
       description: 
       price: 0
-      duration: 0
-      useMp: 0
-      hp: 0
-      hpPercentIncreased: 0
-      mp: 0
-      mpPercentIncreased: 0
-      ap: 0
-      apPercentIncreased: 0
-      exp: 0
-      expPercentIncreased: 0
-      coin: 0
-      coinPercentIncreased: 0
-      attack: 0
-      attackPercentIncreased: 0
-      defence: 0
-      defencePercentIncreased: 0
-      dir: -1
-      needStatus: -1
-      grantStatus: -1
-      range: 0
-      value: 0
-      revealMap: 0
+      tool:
+        duration: 0
+        hp:
+          value: 0
+          percent: 0
+        mp:
+          value: 0
+          percent: 0
+        ap:
+          value: 0
+          percent: 0
+        exp:
+          value: 0
+          percent: 0
+        coin:
+          value: 0
+          percent: 0
+        attack:
+          value: 0
+          percent: 0
+        defence:
+          value: 0
+          percent: 0
+        dir: -1
+        needStatus: -1
+        grantStatus: -1
+        range: 0
+        value: 0
+        revealMap: 0
       currentNodeIndex: 0
     index: 0
     isBuy: 0
@@ -11777,28 +11784,35 @@ MonoBehaviour:
       name: 
       description: 
       price: 0
-      duration: 0
-      useMp: 0
-      hp: 0
-      hpPercentIncreased: 0
-      mp: 0
-      mpPercentIncreased: 0
-      ap: 0
-      apPercentIncreased: 0
-      exp: 0
-      expPercentIncreased: 0
-      coin: 0
-      coinPercentIncreased: 0
-      attack: 0
-      attackPercentIncreased: 0
-      defence: 0
-      defencePercentIncreased: 0
-      dir: -1
-      needStatus: -1
-      grantStatus: -1
-      range: 0
-      value: 0
-      revealMap: 0
+      tool:
+        duration: 0
+        hp:
+          value: 0
+          percent: 0
+        mp:
+          value: 0
+          percent: 0
+        ap:
+          value: 0
+          percent: 0
+        exp:
+          value: 0
+          percent: 0
+        coin:
+          value: 0
+          percent: 0
+        attack:
+          value: 0
+          percent: 0
+        defence:
+          value: 0
+          percent: 0
+        dir: -1
+        needStatus: -1
+        grantStatus: -1
+        range: 0
+        value: 0
+        revealMap: 0
       currentNodeIndex: 0
     index: 0
     isBuy: 0
@@ -11810,28 +11824,35 @@ MonoBehaviour:
       name: 
       description: 
       price: 0
-      duration: 0
-      useMp: 0
-      hp: 0
-      hpPercentIncreased: 0
-      mp: 0
-      mpPercentIncreased: 0
-      ap: 0
-      apPercentIncreased: 0
-      exp: 0
-      expPercentIncreased: 0
-      coin: 0
-      coinPercentIncreased: 0
-      attack: 0
-      attackPercentIncreased: 0
-      defence: 0
-      defencePercentIncreased: 0
-      dir: -1
-      needStatus: -1
-      grantStatus: -1
-      range: 0
-      value: 0
-      revealMap: 0
+      tool:
+        duration: 0
+        hp:
+          value: 0
+          percent: 0
+        mp:
+          value: 0
+          percent: 0
+        ap:
+          value: 0
+          percent: 0
+        exp:
+          value: 0
+          percent: 0
+        coin:
+          value: 0
+          percent: 0
+        attack:
+          value: 0
+          percent: 0
+        defence:
+          value: 0
+          percent: 0
+        dir: -1
+        needStatus: -1
+        grantStatus: -1
+        range: 0
+        value: 0
+        revealMap: 0
       currentNodeIndex: 0
     index: 0
     isBuy: 0
@@ -20890,7 +20911,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 00000
+  m_text: 00
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 61861d33c37fa674f9641e2a91e5504b, type: 2}
   m_sharedMaterial: {fileID: -8925474514680077256, guid: 61861d33c37fa674f9641e2a91e5504b, type: 2}
@@ -20955,7 +20976,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 233.97803, y: 0, z: 0, w: 0}
+  m_margin: {x: 312.90506, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -21120,7 +21141,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1611151197
 RectTransform:
   m_ObjectHideFlags: 0
@@ -21834,28 +21855,36 @@ MonoBehaviour:
       name: 
       description: 
       coolDown: 0
-      duration: 0
       useMp: 0
-      hp: 0
-      hpPercentIncreased: 0
-      mp: 0
-      mpPercentIncreased: 0
-      ap: 0
-      apPercentIncreased: 0
-      exp: 0
-      expPercentIncreased: 0
-      coin: 0
-      coinPercentIncreased: 0
-      attack: 0
-      attackPercentIncreased: 0
-      defence: 0
-      defencePercentIncreased: 0
-      dir: -1
-      needStatus: -1
-      status: -1
-      range: 0
-      value: 0
-      revealMap: 0
+      tool:
+        duration: 0
+        hp:
+          value: 0
+          percent: 0
+        mp:
+          value: 0
+          percent: 0
+        ap:
+          value: 0
+          percent: 0
+        exp:
+          value: 0
+          percent: 0
+        coin:
+          value: 0
+          percent: 0
+        attack:
+          value: 0
+          percent: 0
+        defence:
+          value: 0
+          percent: 0
+        dir: -1
+        needStatus: -1
+        grantStatus: -1
+        range: 0
+        value: 0
+        revealMap: 0
     index: 0
     isBuy: 0
   - button: {fileID: 1402512653}
@@ -21866,28 +21895,36 @@ MonoBehaviour:
       name: 
       description: 
       coolDown: 0
-      duration: 0
       useMp: 0
-      hp: 0
-      hpPercentIncreased: 0
-      mp: 0
-      mpPercentIncreased: 0
-      ap: 0
-      apPercentIncreased: 0
-      exp: 0
-      expPercentIncreased: 0
-      coin: 0
-      coinPercentIncreased: 0
-      attack: 0
-      attackPercentIncreased: 0
-      defence: 0
-      defencePercentIncreased: 0
-      dir: -1
-      needStatus: -1
-      status: -1
-      range: 0
-      value: 0
-      revealMap: 0
+      tool:
+        duration: 0
+        hp:
+          value: 0
+          percent: 0
+        mp:
+          value: 0
+          percent: 0
+        ap:
+          value: 0
+          percent: 0
+        exp:
+          value: 0
+          percent: 0
+        coin:
+          value: 0
+          percent: 0
+        attack:
+          value: 0
+          percent: 0
+        defence:
+          value: 0
+          percent: 0
+        dir: -1
+        needStatus: -1
+        grantStatus: -1
+        range: 0
+        value: 0
+        revealMap: 0
     index: 0
     isBuy: 0
   - button: {fileID: 2060424586}
@@ -21898,28 +21935,36 @@ MonoBehaviour:
       name: 
       description: 
       coolDown: 0
-      duration: 0
       useMp: 0
-      hp: 0
-      hpPercentIncreased: 0
-      mp: 0
-      mpPercentIncreased: 0
-      ap: 0
-      apPercentIncreased: 0
-      exp: 0
-      expPercentIncreased: 0
-      coin: 0
-      coinPercentIncreased: 0
-      attack: 0
-      attackPercentIncreased: 0
-      defence: 0
-      defencePercentIncreased: 0
-      dir: -1
-      needStatus: -1
-      status: -1
-      range: 0
-      value: 0
-      revealMap: 0
+      tool:
+        duration: 0
+        hp:
+          value: 0
+          percent: 0
+        mp:
+          value: 0
+          percent: 0
+        ap:
+          value: 0
+          percent: 0
+        exp:
+          value: 0
+          percent: 0
+        coin:
+          value: 0
+          percent: 0
+        attack:
+          value: 0
+          percent: 0
+        defence:
+          value: 0
+          percent: 0
+        dir: -1
+        needStatus: -1
+        grantStatus: -1
+        range: 0
+        value: 0
+        revealMap: 0
     index: 0
     isBuy: 0
 --- !u!1 &1687314651
@@ -23658,7 +23703,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -948.6}
+  m_AnchoredPosition: {x: 0, y: -1248.5995}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &1820622972

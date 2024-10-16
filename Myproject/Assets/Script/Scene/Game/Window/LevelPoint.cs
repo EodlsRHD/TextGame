@@ -18,10 +18,10 @@ public class LevelPoint : MonoBehaviour
     [SerializeField] private Transform _trTemplateParant = null;
 
     private Action _onCloseCallback = null;
-    private Action<DataManager.User_Data> _onResultCallback = null;
+    private Action<UserData> _onResultCallback = null;
 
     private List<LevelPointTemplate> _templates = new List<LevelPointTemplate>();
-    private DataManager.User_Data _userData = null;
+    private UserData _userData = null;
 
     private int _maxPoint = 0;
     private int _point = 0;
@@ -57,7 +57,7 @@ public class LevelPoint : MonoBehaviour
         this.gameObject.SetActive(false);
     }
 
-    public void Open(int maxPoint, DataManager.User_Data userData, Action<DataManager.User_Data> onResultCallback)
+    public void Open(int maxPoint, UserData userData, Action<UserData> onResultCallback)
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.MenuOpen);
 
@@ -66,12 +66,12 @@ public class LevelPoint : MonoBehaviour
             _onResultCallback = onResultCallback;
         }
 
-        _templates[0].SetPoint(userData.data.hp);
-        _templates[1].SetPoint(userData.data.mp);
-        _templates[2].SetPoint(userData.data.ap);
-        _templates[3].SetPoint(userData.data.attack);
-        _templates[4].SetPoint(userData.data.defence);
-        _templates[5].SetPoint(userData.data.vision);
+        _templates[0].SetPoint(userData.stats.hp.point);
+        _templates[1].SetPoint(userData.stats.mp.point);
+        _templates[2].SetPoint(userData.stats.ap.point);
+        _templates[3].SetPoint(userData.stats.attack.point);
+        _templates[4].SetPoint(userData.stats.defence.point);
+        _templates[5].SetPoint(userData.stats.vision.currnet);
 
         _textMaxPoint.text = maxPoint.ToString();
 
@@ -172,31 +172,31 @@ public class LevelPoint : MonoBehaviour
         switch(type)
         {
             case eStats.HP:
-                _userData.data.hp = (short)point;
+                _userData.stats.hp.point = (short)point;
                 break;
 
             case eStats.MP:
-                _userData.data.mp = (short)point;
+                _userData.stats.mp.point = (short)point;
                 break;
 
             case eStats.AP:
-                _userData.data.ap = (short)point;
+                _userData.stats.ap.point = (short)point;
                 break;
 
             case eStats.Attack:
-                _userData.data.attack = (short)point;
+                _userData.stats.attack.point = (short)point;
                 break;
 
             case eStats.Defence:
-                _userData.data.defence = (short)point;
+                _userData.stats.defence.point = (short)point;
                 break;
 
             case eStats.Vision:
-                _userData.data.vision = (short)point;
+                _userData.stats.vision.currnet = (short)point;
                 break;
 
             case eStats.AttackRange:
-                _userData.data.attackRange = (short)point;
+                _userData.stats.attackRange.point = (short)point;
                 break;
         }
     }

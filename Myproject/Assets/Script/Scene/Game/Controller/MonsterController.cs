@@ -23,7 +23,7 @@ public class MonsterController : MonoBehaviour
     {
         if (_isAllMonsterDead == true)
         {
-            IngameManager.instance.UpdateText("--- 살아있는 몬스터가 없습니다. 순서를 건너뜁니다.");
+            IngameManager.instance.UpdateText("--- 몬스터의 순서를 건너뜁니다.");
             IngameManager.instance.PlayerTurn();
 
             yield break;
@@ -74,7 +74,7 @@ public class MonsterController : MonoBehaviour
         List<int> dx = new List<int>();
         List<int> dy = new List<int>();
 
-        int range = IngameManager.instance.saveData.mapData.monsterDatas[m].attackRange;
+        int range = IngameManager.instance.saveData.mapData.monsterDatas[m].stats.attackRange.currnet;
         for (int i = -range; i <= range; i++)
         {
             dx.Add(i);
@@ -106,7 +106,7 @@ public class MonsterController : MonoBehaviour
     {
 
         bool isFindPlayer = false;
-        List<int> NearbyIndexs = IngameManager.instance.Vision(IngameManager.instance.saveData.mapData.monsterDatas[m].vision, IngameManager.instance.saveData.mapData.monsterDatas[m].currentNodeIndex);
+        List<int> NearbyIndexs = IngameManager.instance.Vision(IngameManager.instance.saveData.mapData.monsterDatas[m].stats.vision.currnet, IngameManager.instance.saveData.mapData.monsterDatas[m].currentNodeIndex);
 
         for (int i = 0; i < NearbyIndexs.Count; i++)
         {
@@ -147,13 +147,6 @@ public class MonsterController : MonoBehaviour
         }
 
         MonsterSelectMoveBlock(m, ap, ref nearbyBlocks);
-    }
-
-    public void MonsterDead(DataManager.Creature_Data monster)
-    {
-        IngameManager.instance.saveData.mapData.nodeDatas[monster.currentNodeIndex].isMonster = false;
-        IngameManager.instance.saveData.mapData.monsterDatas.Remove(IngameManager.instance.saveData.mapData.monsterDatas.Find(x => x.id == monster.id));
-        IngameManager.instance.UpdateData();
     }
 
     private void MonsterSelectMoveBlock(int m, int ap, ref List<int> nearbyBlocks)
@@ -197,11 +190,11 @@ public class MonsterController : MonoBehaviour
 
     private void MonsterTargetPlayer(int m)
     {
-        DataManager.Creature_Data player = IngameManager.instance.saveData.userData.data;
+        CreatureData player = IngameManager.instance.saveData.userData.data;
         int result = IngameManager.instance.PathFinding(ref IngameManager.instance.saveData.mapData, IngameManager.instance.saveData.mapData.monsterDatas[m].currentNodeIndex, player.currentNodeIndex);
+
         IngameManager.instance.saveData.mapData.nodeDatas[IngameManager.instance.saveData.mapData.monsterDatas[m].currentNodeIndex].isMonster = false;
         IngameManager.instance.saveData.mapData.nodeDatas[result].isMonster = true;
-
         IngameManager.instance.saveData.mapData.monsterDatas[m].currentNodeIndex = result;
     }
 }

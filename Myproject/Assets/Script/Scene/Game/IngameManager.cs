@@ -2,7 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
+using Unity.VisualScripting;
 using UnityEngine;
+using static UnityEngine.Rendering.DebugUI;
 using Random = UnityEngine.Random;
 
 public class IngameManager : MonoBehaviour
@@ -240,7 +242,7 @@ public class IngameManager : MonoBehaviour
         {
             UpdatePopup("가방이 비어있지 않습니다.");
 
-            List<int> list = Vision(_saveData.userData.data.currentVISION, _saveData.userData.data.currentNodeIndex);
+            List<int> list = Vision(_saveData.userData.stats.vision.currnet, _saveData.userData.data.currentNodeIndex);
             int ranIndex = Random.Range(0, list.Count);
             ItemData item = GameManager.instance.dataManager.GetItemData(id);
             item.currentNodeIndex = list[ranIndex];
@@ -272,48 +274,42 @@ public class IngameManager : MonoBehaviour
         GameManager.instance.dataManager.AddEncyclopedia_Item(id);
     }
 
-    public void GetGold(short value)
-    {
-        _saveData.userData.data.coin += (short)(value + (value * 0.1f * _saveData.userData.data.Coin_Effect_Per));
-    }
-
     public void GetExp(short value)
     {
-        _saveData.userData.data.currentEXP += (short)(value + (value * 0.1f * _saveData.userData.data.EXP_Effect_Per));
+        _saveData.userData.PlusExp(value, (result) => 
+        { 
+            if(result == false)
+            {
+                return;
+            }
 
-        if (_saveData.userData.maximumEXP <= _saveData.userData.data.currentEXP)
-        {
             UpdateText("레벨이 증가했습니다 !");
-
-            _saveData.userData.level += 1;
-            _saveData.userData.data.currentEXP = (short)Mathf.Abs(_saveData.userData.maximumEXP - _saveData.userData.data.currentEXP);
 
             UpdatePlayerInfo(eStats.EXP);
             UpdatePlayerInfo(eStats.Level);
 
             OpneLevelPoint();
-        }
+        });
     }
 
-    public void CheckExp()
+    public bool CheckAbnormalStatusEffect(eStrengtheningTool type, CreatureData creature)
     {
-        if (_saveData.userData.maximumEXP <= _saveData.userData.data.currentEXP)
-        {
-            UpdateText("레벨이 증가했습니다 !");
+        var temp = creature.abnormalStatuses.Find(x => x.currentStatus == type);
 
-            _saveData.userData.level += 1;
-            _saveData.userData.data.currentEXP = (short)Mathf.Abs(_saveData.userData.maximumEXP - _saveData.userData.data.currentEXP);
-
-            UpdatePlayerInfo(eStats.EXP);
-            UpdatePlayerInfo(eStats.Level);
-
-            OpneLevelPoint();
-        }
+        return (temp != null);
     }
 
-    public void CheckOverValue()
+    public short GetValueAbnormalStatusEffect(eStrengtheningTool type, CreatureData creature)
     {
+        return (short)creature.abnormalStatuses.Find(x => x.currentStatus == type).value;
+    }
 
+    public void PlayerDefence(Duration duration)
+    {
+        _skillitemCountroller.PlayerDefence(ref _saveData.userData.data, duration); 
+
+        _saveData.userData.stats.ap.currnet = 0;
+        UpdatePlayerInfo(eStats.AP);
     }
 
     #region ActionController
@@ -325,10 +321,10 @@ public class IngameManager : MonoBehaviour
 
     public void ShopOpen(DataManager.Npc_Data npc)
     {
-        _shop.Open(npc, _saveData.userData.data.coin);
+        _shop.Open(npc, _saveData.userData.stats.coin.currnet);
     }
 
-    public void CallAttacker(DataManager.Creature_Data monster, Action onLastCallback, Action<eWinorLose, int> onResultCallback)
+    public void CallAttacker(CreatureData monster, Action onLastCallback, Action<eWinorLose, int> onResultCallback)
     {
         _ingameUI.CallAttacker(_saveData.userData, monster, onLastCallback, onResultCallback);
     }
@@ -337,18 +333,15 @@ public class IngameManager : MonoBehaviour
     {
         _ingameUI.OpneLevelPoint(_saveData.userData, (newData) =>
         {
-            _saveData.userData.data.hp = newData.data.hp;
-            _saveData.userData.data.mp = newData.data.mp;
-            _saveData.userData.data.ap = newData.data.ap;
-            _saveData.userData.data.attack = newData.data.attack;
-            _saveData.userData.data.defence = newData.data.defence;
-            _saveData.userData.data.vision = newData.data.vision;
-            _saveData.userData.data.attackRange = newData.data.attackRange;
+            _saveData.userData.stats.hp.point = newData.stats.hp.point;
+            _saveData.userData.stats.mp.point = newData.stats.mp.point;
+            _saveData.userData.stats.ap.point = newData.stats.ap.point;
+            _saveData.userData.stats.attack.point = newData.stats.attack.point;
+            _saveData.userData.stats.defence.point = newData.stats.defence.point;
+            _saveData.userData.stats.vision.currnet = newData.stats.vision.currnet;
+            _saveData.userData.stats.attackRange.point = newData.stats.attackRange.point;
 
-            _saveData.userData.data.currentHP = _saveData.userData.maximumHP;
-            _saveData.userData.data.currentMP = _saveData.userData.maximumMP;
-            _saveData.userData.data.currentAP = _saveData.userData.maximumAP;
-            _saveData.userData.data.currentVISION = _saveData.userData.maximumVISION;
+            _saveData.userData.stats.Maximum();
 
             UpdateData();
         });
@@ -382,10 +375,17 @@ public class IngameManager : MonoBehaviour
     {
         _isPlayerTurn = true;
 
-        _saveData.userData.data.currentAP = _saveData.userData.maximumAP;
+        short maxAp = _saveData.userData.stats.ap.maximum;
+
+        if(CheckAbnormalStatusEffect(eStrengtheningTool.Slowdown, _saveData.userData.data) == true)
+        {
+            maxAp -= GetValueAbnormalStatusEffect(eStrengtheningTool.Slowdown, _saveData.userData.data);
+        }
+
+        _saveData.userData.stats.ap.currnet = maxAp;
         UpdatePlayerInfo(eStats.AP);
 
-        UpdateText("행동력이 " + saveData.userData.data.currentAP + "만큼 남았습니다.");
+        UpdateText("행동력이 " + saveData.userData.stats.ap.currnet + "만큼 남았습니다.");
 
         _playerController.PlayerSearchNearby();
         UpdateMap();
@@ -405,9 +405,19 @@ public class IngameManager : MonoBehaviour
         StartCoroutine(_monsterController.MonsterTurn());
     }
 
-    public void MonsterDead(DataManager.Creature_Data monster)
+    public void MonsterDead(CreatureData monster)
     {
-        _monsterController.MonsterDead(monster);
+        _saveData.mapData.nodeDatas[monster.currentNodeIndex].isMonster = false;
+        _saveData.mapData.monsterDatas.Remove(_saveData.mapData.monsterDatas.Find(x => x.id == monster.id));
+        UpdateData();
+
+        if (_saveData.mapData.monsterDatas.Count == 0)
+        {
+            UpdateText("--- 잠겨있던 계단이 열렸습니다.");
+            GameManager.instance.soundManager.PlaySfx(eSfx.ExitOpen);
+
+            isAllMonsterDead = true;
+        }
     }
 
     public void MonsterTurnOut()
@@ -469,26 +479,31 @@ public class IngameManager : MonoBehaviour
             _mapController.Close(false, () =>
             {
                 _ingameUI.HideMapButton();
-                _mapController.UpdateMapData(_saveData, Vision(_saveData.userData.data.currentVISION, _saveData.userData.data.currentNodeIndex));
+                _mapController.UpdateMapData(_saveData, Vision(_saveData.userData.stats.vision.currnet, _saveData.userData.data.currentNodeIndex));
             });
 
             return;
         }
 
         _ingameUI.HideMapButton();
-        _mapController.UpdateMapData(_saveData, Vision(_saveData.userData.data.currentVISION, _saveData.userData.data.currentNodeIndex));
+        _mapController.UpdateMapData(_saveData, Vision(_saveData.userData.stats.vision.currnet, _saveData.userData.data.currentNodeIndex));
     }
 
     public void UpdateData(string contnet = null)
     {
         _ingameUI.UpdatePlayerInfo(_saveData.userData);
 
-        if (_saveData.userData.data.currentHP == 0)
+        if (_saveData.userData.stats.hp.currnet == 0)
         {
             _ingameUI.OpenNextRoundWindow(eRoundClear.Fail, contnet);
         }
 
-        _mapController.UpdateMapData(_saveData, Vision(_saveData.userData.data.currentVISION, _saveData.userData.data.currentNodeIndex));
+        _mapController.UpdateMapData(_saveData, Vision(_saveData.userData.stats.vision.currnet, _saveData.userData.data.currentNodeIndex));
+    }
+
+    public void UpdatePlayerData()
+    {
+        _ingameUI.UpdatePlayerInfo(_saveData.userData);
     }
 
     #endregion
@@ -937,7 +952,7 @@ public class MapGenerator
         CreatureGenerator _creatureGenerator = new CreatureGenerator(GenerateCreature, _saveData);
     }
 
-    private void GenerateCreature(DataManager.Creature_Data playerData, List<DataManager.Creature_Data> monsterData)
+    private void GenerateCreature(CreatureData playerData, List<CreatureData> monsterData)
     {
         _saveData.userData.data = playerData;
         _saveData.mapData.monsterDatas = monsterData;
@@ -1149,10 +1164,10 @@ public class MapGenerator
 
 public class CreatureGenerator
 {
-    private System.Action<DataManager.Creature_Data, List<DataManager.Creature_Data>> _onResultCallback = null;
+    private System.Action<CreatureData, List<CreatureData>> _onResultCallback = null;
     private DataManager.Save_Data _saveData = null;
 
-    public CreatureGenerator(System.Action<DataManager.Creature_Data, List<DataManager.Creature_Data>> onResultCallback, DataManager.Save_Data saveData)
+    public CreatureGenerator(System.Action<CreatureData, List<CreatureData>> onResultCallback, DataManager.Save_Data saveData)
     {
         if(onResultCallback != null)
         {
@@ -1166,7 +1181,7 @@ public class CreatureGenerator
 
     private void Start()
     {
-        _saveData.mapData.monsterDatas = new List<DataManager.Creature_Data>();
+        _saveData.mapData.monsterDatas = new List<CreatureData>();
 
         GeneratePlayer();
 
@@ -1255,7 +1270,7 @@ public class CreatureGenerator
 
     private void GenerateMonster()
     {
-        _saveData.mapData.monsterDatas = new List<DataManager.Creature_Data>();
+        _saveData.mapData.monsterDatas = new List<CreatureData>();
 
         int openNodeCount = 0;
 
@@ -1285,7 +1300,7 @@ public class CreatureGenerator
             SpawnMonsterNodeSelect(Random.Range(0, _saveData.mapData.nodeDatas.Count), ref node);
 
             int id = Random.Range(0, GameManager.instance.dataManager.GetCreaturDataCount());
-            DataManager.Creature_Data creature = GameManager.instance.dataManager.GetCreatureData(id);
+            CreatureData creature = GameManager.instance.dataManager.GetCreatureData(id);
             
             if (creature != null)
             {
@@ -1300,15 +1315,15 @@ public class CreatureGenerator
         }
     }
 
-    private void MonsterStats(ref DataManager.Creature_Data creature)
+    private void MonsterStats(ref CreatureData creature)
     {
         float increasePoint = ((_saveData.round - 1) * 0.1f);
 
-        creature.coin += (short)(creature.coin * increasePoint);
-        creature.hp += (short)(creature.hp * increasePoint);
-        creature.exp += (short)(creature.exp * increasePoint);
-        creature.attack += (short)(creature.attack * increasePoint);
-        creature.defence += (short)(creature.defence * (increasePoint * 0.5f));
+        creature.stats.coin.currnet += (short)(creature.stats.coin.currnet * increasePoint);
+        creature.stats.hp.currnet += (short)(creature.stats.hp.currnet * increasePoint);
+        creature.stats.exp.currnet += (short)(creature.stats.exp.currnet * increasePoint);
+        creature.stats.attack.currnet += (short)(creature.stats.attack.currnet * increasePoint);
+        creature.stats.defence.currnet += (short)(creature.stats.defence.currnet * (increasePoint * 0.4f));
     }
 
     private void Done()

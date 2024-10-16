@@ -59,8 +59,13 @@ public class Targeting : MonoBehaviour
         if(type == eControl.Bag)
         {
             var item = GameManager.instance.dataManager.GetItemData(id);
-            
-            if(item.tool.dir != eDir.DesignateDirection || item.tool.dir != eDir.DesignateCoordination)
+
+            if (item == null)
+            {
+                return;
+            }
+
+            if (item.tool.dir != eDir.DesignateDirection || item.tool.dir != eDir.DesignateCoordination)
             {
                 _onResultCallback?.Invoke(-1, eDir.Non);
 
@@ -79,6 +84,11 @@ public class Targeting : MonoBehaviour
         else if(type == eControl.Skill)
         {
             var skill = GameManager.instance.dataManager.GetskillData(id);
+
+            if (skill == null)
+            {
+                return;
+            }
 
             if (skill.tool.dir != eDir.DesignateDirection || skill.tool.dir != eDir.DesignateCoordination)
             {

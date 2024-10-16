@@ -10,7 +10,7 @@ public class BagPad : MonoBehaviour
 
     [SerializeField] private GameObject _objEmptyLabel = null;
 
-    private DataManager.User_Data _data = null;
+    private UserData _data = null;
 
     private Action<string, string> _onOpenInformationCallback = null;
 
@@ -29,7 +29,7 @@ public class BagPad : MonoBehaviour
         this.gameObject.SetActive(false);
     }
 
-    public void Open(DataManager.User_Data data)
+    public void Open(UserData data)
     {
         _data = data;
 

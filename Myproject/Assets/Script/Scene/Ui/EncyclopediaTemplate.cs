@@ -15,7 +15,7 @@ public class EncyclopediaTemplate : MonoBehaviour
 
     private Action<string, string> _onSetInformationCallback = null;
 
-    private DataManager.Creature_Data _creature = null;
+    private CreatureData _creature = null;
     private ItemData _item = null;
     private DataManager.Achievements_Data _acievement = null;
 
@@ -32,7 +32,7 @@ public class EncyclopediaTemplate : MonoBehaviour
         this.gameObject.SetActive(false);
     }
 
-    public void Set(DataManager.Creature_Data data)
+    public void Set(CreatureData data)
     {
         _creature = data;
 

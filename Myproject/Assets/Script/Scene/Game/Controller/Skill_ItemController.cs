@@ -11,12 +11,13 @@ public class Skill_ItemController : MonoBehaviour
         this.gameObject.SetActive(true);
     }
 
-    public void UserDuration(ref DataManager.Creature_Data userData)
+    public void UserDuration(ref CreatureData userData)
     {
         SkillRemindDuration(ref userData);
         ItemRemindDuration(ref userData);
+        AbnormalStatusesDuration(ref userData);
 
-        IngameManager.instance.CheckOverValue();
+        IngameManager.instance.UpdateData();
 
         MonsterDuration(ref IngameManager.instance.saveData.mapData);
     }
@@ -37,7 +38,7 @@ public class Skill_ItemController : MonoBehaviour
 
     #region Skill
 
-    public void UseSkill(int id, ref DataManager.Creature_Data creature)
+    public void UseSkill(int id, ref CreatureData creature)
     {
         if (SkillCheckCoolDown(id, ref creature) == false)
         {
@@ -45,6 +46,7 @@ public class Skill_ItemController : MonoBehaviour
         }
 
         SkillData data = GameManager.instance.dataManager.GetskillData(id);
+        StrengtheningTool(ref creature, data.tool);
 
         Skill_CoolDown cooldown = new Skill_CoolDown();
         cooldown.id = data.id;
@@ -52,9 +54,7 @@ public class Skill_ItemController : MonoBehaviour
         cooldown.coolDown = data.coolDown + 1;
         IngameManager.instance.saveData.userData.data.coolDownSkill.Add(cooldown);
 
-        int useMP = data.useMp;
-        int reMP = creature.currentMP - useMP;
-        creature.currentMP = (short)(reMP < 0 ? 0 : reMP);
+        creature.stats.mp.MinusCurrnet(data.useMp);
 
         SkillConsumptionCheck(ref creature, data, eStats.HP, data.tool.hp.value);
         SkillConsumptionCheck(ref creature, data, eStats.HP, data.tool.hp.percent, true);
@@ -84,7 +84,7 @@ public class Skill_ItemController : MonoBehaviour
         _nodeIndex = -1;
     }
 
-    private bool SkillCheckCoolDown(int id, ref DataManager.Creature_Data creature)
+    private bool SkillCheckCoolDown(int id, ref CreatureData creature)
     {
         if(creature.coolDownSkill.Find(x => x.id == id) == null)
         {
@@ -94,47 +94,47 @@ public class Skill_ItemController : MonoBehaviour
         return true;
     }
 
-    private void SkillConsumptionCheck(ref DataManager.Creature_Data creature, SkillData data, eStats type, int useValue, bool isPercent = false)
+    private void SkillConsumptionCheck(ref CreatureData creature, SkillData data, eStats type, int useValue, bool isPercent = false)
     {
         if (useValue == 0)
         {
             return;
         }
 
-        Duration temp = new Duration();
-        temp.ID = data.id;
-        temp.name = data.name;
-        temp.stats = type;
-        temp.isPercent = isPercent;
-        temp.value = (short)useValue;
-        temp.remaindCooldown = data.coolDown + 1;
-        temp.remaindDuration = data.tool.duration + 1;
+        Duration duration = new Duration();
+        duration.id = data.id;
+        duration.name = data.name;
+        duration.stats = type;
+        duration.isPercent = isPercent;
+        duration.value = (short)useValue;
+        duration.remaindCooldown = data.coolDown + 1;
+        duration.remaindDuration = data.tool.duration + 1;
 
         if (data.tool.duration == 0)
         {
-            ApplyEffect(ref creature, temp);
+            ApplyEffect(ref creature, duration);
 
             return;
         }
 
-        creature.Skill_Duration.Add(temp);
+        creature.skill_Duration.Add(duration);
     }
 
-    public void SkillRemindDuration(ref DataManager.Creature_Data data)
+    public void SkillRemindDuration(ref CreatureData data)
     {
-        for (int i = data.Skill_Duration.Count - 1; i >= 0; i--)
+        for (int i = data.skill_Duration.Count - 1; i >= 0; i--)
         {
-            if (data.Skill_Duration[i].remaindDuration == 0)
+            if (data.skill_Duration[i].remaindDuration == 0)
             {
-                RemoveEffect(ref data, data.Skill_Duration[i]);
+                RemoveEffect(ref data, data.skill_Duration[i]);
 
-                data.Skill_Duration.Remove(data.Skill_Duration[i]);
+                data.skill_Duration.Remove(data.skill_Duration[i]);
 
                 continue;
             }
 
-            ApplyEffect(ref data, data.Skill_Duration[i]);
-            data.Skill_Duration[i].remaindDuration -= 1;
+            ApplyEffect(ref data, data.skill_Duration[i]);
+            data.skill_Duration[i].remaindDuration -= 1;
         }
 
         for (int i = data.coolDownSkill.Count - 1; i >= 0; i--)
@@ -148,19 +148,25 @@ public class Skill_ItemController : MonoBehaviour
 
             data.coolDownSkill[i].coolDown -= 1;
         }
-
-        IngameManager.instance.UpdateData();
     }
 
     #endregion
 
     #region Consumption Item
 
-    public void UseConsumptionItem(int id, ref DataManager.Creature_Data creature)
+    public void PlayerDefence(ref CreatureData creature, Duration duration)
+    {
+        ApplyEffect(ref creature, duration);
+
+        IngameManager.instance.UpdatePlayerData();
+    }
+
+    public void UseConsumptionItem(int id, ref CreatureData creature)
     {
         creature.itemIndexs.Remove(creature.itemIndexs.Find(x => x == id));
 
         ItemData data = GameManager.instance.dataManager.GetItemData(id);
+        StrengtheningTool(ref creature, data.tool);
 
         ItemConsumptionCheck(ref creature, data, eStats.HP, data.tool.hp.value);
         ItemConsumptionCheck(ref creature, data, eStats.HP, data.tool.hp.percent, true);
@@ -192,31 +198,31 @@ public class Skill_ItemController : MonoBehaviour
         IngameManager.instance.UpdateText("아이템 " + data.name + " (을)를 사용했습니다.");
     }
 
-    private void ItemConsumptionCheck(ref DataManager.Creature_Data creature, ItemData data, eStats type, int useValue, bool isPercent = false)
+    private void ItemConsumptionCheck(ref CreatureData creature, ItemData data, eStats type, int useValue, bool isPercent = false)
     {
         if (useValue == 0)
         {
             return;
         }
-        Duration temp = new Duration();
-        temp.ID = data.id;
-        temp.name = data.name;
-        temp.stats = type;
-        temp.isPercent = isPercent;
-        temp.value = (short)useValue;
-        temp.remaindDuration = data.tool.duration + 1;
+        Duration duration = new Duration();
+        duration.id = data.id;
+        duration.name = data.name;
+        duration.stats = type;
+        duration.isPercent = isPercent;
+        duration.value = (short)useValue;
+        duration.remaindDuration = data.tool.duration + 1;
 
         if (data.tool.duration == 0)
         {
-            ApplyEffect(ref creature, temp);
+            ApplyEffect(ref creature, duration);
 
             return;
         }
 
-        IngameManager.instance.saveData.userData.data.item_Duration.Add(temp);
+        IngameManager.instance.saveData.userData.data.item_Duration.Add(duration);
     }
 
-    public void ItemRemindDuration(ref DataManager.Creature_Data data)
+    public void ItemRemindDuration(ref CreatureData data)
     {
         for (int i = data.item_Duration.Count - 1; i >= 0; i--)
         {
@@ -232,58 +238,51 @@ public class Skill_ItemController : MonoBehaviour
             ApplyEffect(ref data, data.item_Duration[i]);
             data.item_Duration[i].remaindDuration -= 1;
         }
-
-        IngameManager.instance.UpdateData();
     }
 
     #endregion
 
-    private void RemoveEffect(ref DataManager.Creature_Data data, Duration duration)
+    private void RemoveEffect(ref CreatureData data, Duration duration)
     {
         switch (duration.stats)
         {
             case eStats.HP:
-                Remove(duration, ref data.currentHP, ref data.HP_Effect_Per);
+                Remove(duration, ref data.stats.hp.currnet, ref data.stats.hp.percent);
                 break;
 
             case eStats.MP:
-                Remove(duration, ref data.currentMP, ref data.MP_Effect_Per);
+                Remove(duration, ref data.stats.mp.currnet, ref data.stats.mp.percent);
                 break;
 
             case eStats.AP:
-                Remove(duration, ref data.currentAP, ref data.AP_Effect_Per);
+                Remove(duration, ref data.stats.ap.currnet, ref data.stats.ap.percent);
                 break;
 
             case eStats.EXP:
-                Remove(duration, ref data.currentEXP, ref data.EXP_Effect_Per);
-                IngameManager.instance.CheckExp();
+                Remove(duration, ref data.stats.exp.currnet, ref data.stats.exp.percent);
+                IngameManager.instance.GetExp(0);
                 break;
 
             case eStats.Coin:
-                Remove(duration, ref data.coin, ref data.Coin_Effect_Per);
+                Remove(duration, ref data.stats.coin.currnet, ref data.stats.coin.percent);
                 break;
 
             case eStats.Attack:
-                Remove(duration, ref data.Attack_Effect, ref data.Attack_Effect_Per);
+                Remove(duration, ref data.stats.attack.plus, ref data.stats.attack.percent);
                 break;
 
             case eStats.Defence:
-                Remove(duration, ref data.Defence_Effect, ref data.Defence_Effect_Per);
+                Remove(duration, ref data.stats.defence.plus, ref data.stats.defence.percent);
                 break;
         }
+
+        IngameManager.instance.UpdatePlayerData();
     }
 
     private void Remove(Duration duration, ref short value, ref short percent)
     {
         if (duration.isPercent == true)
         {
-            if (percent - duration.value < 0)
-            {
-                percent = 0;
-
-                return;
-            }
-
             percent -= duration.value;
             
             return;
@@ -299,39 +298,41 @@ public class Skill_ItemController : MonoBehaviour
         value -= duration.value;
     }
 
-    private void ApplyEffect(ref DataManager.Creature_Data data, Duration duration)
+    private void ApplyEffect(ref CreatureData data, Duration duration)
     {
         switch (duration.stats)
         {
             case eStats.HP:
-                Apply(duration, ref data.currentHP, ref data.HP_Effect_Per);
+                Apply(duration, ref data.stats.hp.currnet, ref data.stats.hp.percent);
                 break;
 
             case eStats.MP:
-                Apply(duration, ref data.currentMP, ref data.MP_Effect_Per);
+                Apply(duration, ref data.stats.mp.currnet, ref data.stats.mp.percent);
                 break;
 
             case eStats.AP:
-                Apply(duration, ref data.currentAP, ref data.AP_Effect_Per);
+                Apply(duration, ref data.stats.ap.currnet, ref data.stats.ap.percent);
                 break;
 
             case eStats.EXP:
-                Apply(duration, ref data.currentEXP, ref data.EXP_Effect_Per);
-                IngameManager.instance.CheckExp();
+                Apply(duration, ref data.stats.exp.currnet, ref data.stats.exp.percent);
+                IngameManager.instance.GetExp(0);
                 break;
 
             case eStats.Coin:
-                Apply(duration, ref data.coin, ref data.Coin_Effect_Per);
+                Apply(duration, ref data.stats.coin.currnet, ref data.stats.coin.percent);
                 break;
 
             case eStats.Attack:
-                Apply(duration, ref data.Attack_Effect, ref data.Attack_Effect_Per);
+                Apply(duration, ref data.stats.attack.plus, ref data.stats.attack.percent);
                 break;
 
             case eStats.Defence:
-                Apply(duration, ref data.Defence_Effect, ref data.Defence_Effect_Per);
+                Apply(duration, ref data.stats.defence.plus, ref data.stats.defence.percent);
                 break;
         }
+
+        IngameManager.instance.UpdatePlayerData();
     }
 
     private void Apply(Duration duration, ref short value, ref short percent)
@@ -343,6 +344,54 @@ public class Skill_ItemController : MonoBehaviour
             return;
         }
 
-        value += value;
+        value += duration.value;
+    }
+
+    private void StrengtheningTool(ref CreatureData data, StrengtheningTool tool)
+    {
+        if(tool.grantStatus == eStrengtheningTool.Non)
+        {
+            return;
+        }
+
+        if(tool.needStatus != eStrengtheningTool.Non)
+        { 
+            if(tool.needStatus != data.defultStatus)
+            {
+                return;
+            }
+        }
+
+        for (int i = 0; i < data.abnormalStatuses.Count; i++)
+        {
+            if (data.abnormalStatuses[i].currentStatus == tool.grantStatus)
+            {
+                data.abnormalStatuses[i].statusCount = tool.duration;
+
+                return;
+            }
+        }
+
+        AbnormalStatus newData = new AbnormalStatus();
+        newData.currentStatus = tool.grantStatus;
+        newData.statusCount = tool.duration;
+        newData.value = tool.value;
+
+        data.abnormalStatuses.Add(newData);
+    }
+
+    private void AbnormalStatusesDuration(ref CreatureData data)
+    {
+        for (int i = data.abnormalStatuses.Count - 1; i >= 0; i--)
+        {
+            if (data.abnormalStatuses[i].statusCount == 0)
+            {
+                data.abnormalStatuses.Remove(data.abnormalStatuses[i]);
+
+                continue;
+            }
+
+            data.abnormalStatuses[i].statusCount -= 1;
+        }
     }
 }
