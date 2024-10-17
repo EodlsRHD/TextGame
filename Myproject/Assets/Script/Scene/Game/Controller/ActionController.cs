@@ -1,3 +1,4 @@
+using GoogleMobileAds.Api;
 using System.Threading;
 using UnityEngine;
 
@@ -234,16 +235,54 @@ public class ActionController : MonoBehaviour
 
             Damage = Mathf.Abs(Damage);
 
-            IngameManager.instance.UpdateText("방어도를 제외한 " + damage + " 의 데미지를 가했습니다.");
+            IngameManager.instance.UpdateText("방어도를 제외한 " + Damage + " 의 데미지를 가했습니다.");
             IngameManager.instance.MonsterHit(nodeMonsterIndex, Damage);
+
+            bool isBloodSucking = false;
+            int bloodSuckingValue = 0;
 
             if (IngameManager.instance.CheckAbnormalStatusEffect(eStrengtheningTool.BloodSucking, IngameManager.instance.saveData.userData.data) == true)
             {
+                isBloodSucking = true;
+
                 short value = IngameManager.instance.GetValueAbnormalStatusEffect(eStrengtheningTool.BloodSucking, IngameManager.instance.saveData.userData.data);
-                short BloodSuckingValue = (short)(damage * (0.01f * value));
+                short BloodSuckingValue = (short)(damage * value);
+                bloodSuckingValue = value;
 
                 IngameManager.instance.saveData.userData.stats.hp.PlusCurrent(BloodSuckingValue);
                 IngameManager.instance.UpdateText("흡혈로 인해 " + BloodSuckingValue + "만큼 회복했습니다.");
+            }
+
+            if (IngameManager.instance.CheckAbnormalStatusEffect(eStrengtheningTool.QuickAttack, IngameManager.instance.saveData.userData.data) == true)
+            {
+                short plusValue = IngameManager.instance.GetValueAbnormalStatusEffect(eStrengtheningTool.QuickAttack, IngameManager.instance.saveData.userData.data);
+                short plusDamage = (short)(damage * plusValue);
+
+                IngameManager.instance.saveData.userData.stats.hp.PlusCurrent(plusDamage);
+                IngameManager.instance.UpdateText("연속타격으로 인해 " + plusDamage + "만큼 한번더 공격합니다.");
+
+                int addDamage = GetMonsterDefence(monster) - plusDamage;
+
+                if (addDamage >= 0)
+                {
+                    IngameManager.instance.UpdateText("--- " + IngameManager.instance.saveData.userData.data.name + " 의 공격이 방어도에 막혔습니다.");
+                    GameManager.instance.soundManager.PlaySfx(eSfx.Blocked);
+
+                    return;
+                }
+
+                Damage = Mathf.Abs(addDamage);
+
+                IngameManager.instance.UpdateText("방어도를 제외한 " + Damage + " 의 데미지를 가했습니다.");
+                IngameManager.instance.MonsterHit(nodeMonsterIndex, Damage);
+
+                if(isBloodSucking == true)
+                {
+                    short BloodSuckingValue = (short)(Damage * bloodSuckingValue);
+
+                    IngameManager.instance.saveData.userData.stats.hp.PlusCurrent(BloodSuckingValue);
+                    IngameManager.instance.UpdateText("흡혈로 인해 " + BloodSuckingValue + "만큼 회복했습니다.");
+                }
             }
 
             #endregion
@@ -268,5 +307,124 @@ public class ActionController : MonoBehaviour
 
         IngameManager.instance.UpdateText("행동력을 모드 소진하였습니다.");
         IngameManager.instance.UpdateText("방어도가 " + ap + "만큼 증가했습니다.");
+    }
+
+    private void AttackLogic(CreatureData attacker, CreatureData defencer, int damage, bool attackerIsMonster, int monsterNodeIndex)
+    {
+        IngameManager.instance.UpdateText("--- " + attacker.name + " (이)가 승리했습니다.");
+
+        int attackerDamage = attacker.stats.attack.maximum;
+        int defencerDefence = defencer.stats.defence.maximum;
+
+        IngameManager.instance.UpdateText("--- " + attacker.name + " (이)가 " + attackerDamage + " 의 공격력으로 공격합니다.");
+
+        if (IngameManager.instance.CheckAbnormalStatusEffect(eStrengtheningTool.Hardness, attacker) == true)
+        {
+            short value = IngameManager.instance.GetValueAbnormalStatusEffect(eStrengtheningTool.Hardness, attacker);
+            short hardnessValue = (short)(attackerDamage * (0.01f * value));
+            attackerDamage += hardnessValue;
+
+            IngameManager.instance.UpdateText("강성으로 인해 " + hardnessValue + "만큼 피해가 추가로 더해졌습니다.");
+        }
+
+        if (IngameManager.instance.CheckAbnormalStatusEffect(eStrengtheningTool.ReductionHalf, defencer) == true)
+        {
+            short reductionHalfValue = (short)(attackerDamage * 0.5f);
+            attackerDamage = reductionHalfValue;
+
+            IngameManager.instance.UpdateText("반감으로 인해 피해가 반감되었습니다.");
+        }
+
+        int Damage = defencerDefence - attackerDamage;
+
+        if (Damage >= 0)
+        {
+            IngameManager.instance.UpdateText("--- " + attacker.name + " 의 공격이 방어도에 막혔습니다.");
+            GameManager.instance.soundManager.PlaySfx(eSfx.Blocked);
+
+            return;
+        }
+
+        Damage = Mathf.Abs(Damage);
+
+        IngameManager.instance.UpdateText("방어도를 제외한 " + Damage + " 의 데미지를 가했습니다.");
+        if(attackerIsMonster == true)
+        {
+            IngameManager.instance.PlayerHit(Damage);
+        }
+        else
+        {
+            IngameManager.instance.MonsterHit(monsterNodeIndex, Damage);
+        }
+
+        bool isBloodSucking = false;
+        int bloodSuckingValue = 0;
+
+        if (IngameManager.instance.CheckAbnormalStatusEffect(eStrengtheningTool.BloodSucking, attacker) == true)
+        {
+            isBloodSucking = true;
+
+            short value = IngameManager.instance.GetValueAbnormalStatusEffect(eStrengtheningTool.BloodSucking, attacker);
+            short BloodSuckingValue = (short)(damage * value);
+            bloodSuckingValue = value;
+
+            if(attackerIsMonster == true)
+            {
+                IngameManager.instance.saveData.mapData.monsterDatas.Find(x => x.currentNodeIndex == monsterNodeIndex).stats.hp.PlusCurrent((short)bloodSuckingValue);
+            }
+            else
+            {
+                IngameManager.instance.saveData.userData.stats.hp.PlusCurrent(BloodSuckingValue);
+            }
+
+            IngameManager.instance.UpdateText("흡혈로 인해 " + BloodSuckingValue + "만큼 회복했습니다.");
+        }
+
+        if (IngameManager.instance.CheckAbnormalStatusEffect(eStrengtheningTool.QuickAttack, attacker) == true)
+        {
+            short plusValue = IngameManager.instance.GetValueAbnormalStatusEffect(eStrengtheningTool.QuickAttack, attacker);
+            short plusDamage = (short)(damage * plusValue);
+
+            IngameManager.instance.UpdateText("연속타격으로 인해 " + plusDamage + "만큼 한번더 공격합니다.");
+
+            int addDamage = defencerDefence - plusDamage;
+
+            if (addDamage >= 0)
+            {
+                IngameManager.instance.UpdateText("--- " + attacker.name + " 의 공격이 방어도에 막혔습니다.");
+                GameManager.instance.soundManager.PlaySfx(eSfx.Blocked);
+
+                return;
+            }
+
+            Damage = Mathf.Abs(addDamage);
+
+            IngameManager.instance.UpdateText("방어도를 제외한 " + Damage + " 의 데미지를 가했습니다.");
+
+            if(attackerIsMonster == true)
+            {
+                IngameManager.instance.PlayerHit(Damage);
+            }
+            else
+            {
+                IngameManager.instance.MonsterHit(monsterNodeIndex, Damage);
+            }
+
+            if (isBloodSucking == true)
+            {
+                short BloodSuckingValue = (short)(Damage * bloodSuckingValue);
+
+                if (attackerIsMonster == true)
+                {
+                    IngameManager.instance.saveData.mapData.monsterDatas.Find(x => x.currentNodeIndex == monsterNodeIndex).stats.hp.PlusCurrent((short)bloodSuckingValue);
+                }
+                else
+                {
+                    IngameManager.instance.saveData.userData.stats.hp.PlusCurrent(BloodSuckingValue);
+                }
+
+                IngameManager.instance.UpdateText("흡혈로 인해 " + BloodSuckingValue + "만큼 회복했습니다.");
+            }
+        }
     }
 }
