@@ -19,7 +19,7 @@ public class PlayerCntroller : MonoBehaviour
             return;
         }
 
-        if (IngameManager.instance.saveData.userData.stats.hp.currnet == 0)
+        if (IngameManager.instance.saveData.userData.stats.ap.currnet == 0)
         {
             IngameManager.instance.UpdatePopup("행동력이 부족합니다");
 
@@ -46,8 +46,8 @@ public class PlayerCntroller : MonoBehaviour
         IngameManager.instance.saveData.mapData.nodeDatas[nearbyBlockIndex].isUser = true;
 
         IngameManager.instance.saveData.userData.data.currentNodeIndex = nearbyBlockIndex;
-        IngameManager.instance.saveData.userData.stats.ap.MinusCurrnet(1);
 
+        IngameManager.instance.saveData.userData.stats.ap.MinusCurrnet(1);
         IngameManager.instance.UpdatePlayerInfo(eStats.AP);
 
         IngameManager.instance.UpdateData();
@@ -81,7 +81,7 @@ public class PlayerCntroller : MonoBehaviour
                 break;
         }
 
-        int result = IngameManager.instance.GetNearbyBlocks(x, y, currentIndex);
+        int result = IngameManager.instance.GetNearbyNodes(x, y, currentIndex);
 
         if (result == -1)
         {
@@ -178,6 +178,13 @@ public class PlayerCntroller : MonoBehaviour
         {
             case eControl.Defence:
                 {
+                    if (IngameManager.instance.saveData.userData.stats.ap.currnet == 0)
+                    {
+                        IngameManager.instance.UpdateText("--- 남아있는 행동력이 없습니다.");
+
+                        break;
+                    }
+
                     UiManager.instance.OpenPopup(string.Empty, "방어력을 높히시겠습니까? 남은 행동력을 모두 소진합니다.", "확인", "취소", () =>
                     {
                         IngameManager.instance.Defence();
@@ -264,21 +271,21 @@ public class PlayerCntroller : MonoBehaviour
 
             if (IngameManager.instance.saveData.mapData.nodeDatas[index].isBonfire == true)
             {
+                if (IngameManager.instance.saveData.mapData.npcDatas.Find(x => x.currentNodeIndex == index).isUseBonfire == true)
+                {
+                    actions.Add(() =>
+                    {
+                        IngameManager.instance.UpdateText(eMapObject.UseBonfire, index);
+                    });
+
+                    Non = true;
+
+                    continue;
+                }
+
                 actions.Add(() =>
                 {
                     IngameManager.instance.UpdateText(eMapObject.Bonfire, index);
-                });
-
-                Non = true;
-
-                continue;
-            }
-
-            if (IngameManager.instance.saveData.mapData.nodeDatas[index].isUseBonfire == true)
-            {
-                actions.Add(() =>
-                {
-                    IngameManager.instance.UpdateText(eMapObject.UseBonfire, index);
                 });
 
                 Non = true;

@@ -1,10 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Threading;
-using Unity.VisualScripting;
 using UnityEngine;
-using static UnityEngine.Rendering.DebugUI;
 using Random = UnityEngine.Random;
 
 public class IngameManager : MonoBehaviour
@@ -37,7 +34,7 @@ public class IngameManager : MonoBehaviour
     [Header("Shop"), SerializeField] private Shop _shop = null;
     [Header("Bonfire"), SerializeField] private Bonfire _bonfire = null;
 
-    private DataManager.Save_Data _saveData = null;
+    private DataManager.SaveData _saveData = null;
     private MapGenerator _mapGenerator = null;
 
     private bool _isPlayerTurn = false;
@@ -45,7 +42,7 @@ public class IngameManager : MonoBehaviour
 
     #region
 
-    public DataManager.Save_Data saveData
+    public DataManager.SaveData saveData
     {
         get { return _saveData; }
     }
@@ -173,7 +170,7 @@ public class IngameManager : MonoBehaviour
         }); 
     }
 
-    private void GenerateMap(DataManager.Map_Data mapData)
+    private void GenerateMap(DataManager.MapData mapData)
     {
         _saveData.mapData = mapData;
 
@@ -208,12 +205,12 @@ public class IngameManager : MonoBehaviour
 
     public void ControlPad_Skill()
     {
-        _controlPad.Skill(_saveData.userData, UseTool);
+        _controlPad.Skill(_saveData.userData, PlayerItem_Skill);
     }
 
     public void ControlPad_Bag()
     {
-        _controlPad.Bag(_saveData.userData, UseTool);
+        _controlPad.Bag(_saveData.userData, PlayerItem_Skill);
     }
 
     public void SetMap()
@@ -306,10 +303,95 @@ public class IngameManager : MonoBehaviour
 
     public void PlayerDefence(Duration duration)
     {
-        _skillitemCountroller.PlayerDefence(ref _saveData.userData.data, duration); 
+        _skillitemCountroller.PlayerDefence(ref _saveData.userData.data, duration);
 
         _saveData.userData.stats.ap.currnet = 0;
         UpdatePlayerInfo(eStats.AP);
+    }
+
+    public bool PlayerHit(float damage)
+    {
+        if ((_saveData.userData.stats.hp.maximum / 3) < (short)Mathf.Abs(damage))
+        {
+            GameManager.instance.soundManager.PlaySfx(eSfx.Hit_hard);
+        }
+        else
+        {
+            GameManager.instance.soundManager.PlaySfx(eSfx.Hit_light);
+        }
+
+        _saveData.userData.stats.hp.MinusCurrnet((short)damage);
+
+        if(_saveData.userData.stats.hp.currnet == 0)
+        {
+            UpdateData(damage + " 의 피해를 입었습니다.");
+
+            return true;
+        }
+
+        UpdatePlayerInfo(eStats.HP);
+        return false;
+    }
+
+    public void MonsterHit(int nodeMonsterNodeIndex, float damage)
+    {
+        CreatureData monster = _saveData.mapData.monsterDatas.Find(x => x.currentNodeIndex == nodeMonsterNodeIndex);
+
+        GameManager.instance.soundManager.PlaySfx(eSfx.Attack);
+
+        monster.stats.hp.MinusCurrnet((short)damage);
+
+        if (monster.stats.hp.currnet == 0)
+        {
+            UpdateText(monster.name + " (을)를 처치하였습니다");
+            UpdateText("--- 경험치 " + monster.stats.exp.currnet + " , 코인 " + monster.stats.coin.currnet + "을 획득했습니다");
+
+            if (monster.itemIndexs != null)
+            {
+                for (int i = 0; i < monster.itemIndexs.Count; i++)
+                {
+                    GetMonsterItem(monster.itemIndexs[i]);
+                }
+            }
+
+            _saveData.userData.stats.PlusCoin(monster.stats.coin.currnet);
+            GetExp(monster.stats.exp.currnet);
+
+            MonsterDead(monster);
+        }
+        else
+        {
+            UpdateText(monster.name + "의 체력이 " + monster.stats.hp.currnet + " 만큼 남았습니다.");
+            _saveData.mapData.monsterDatas.Find(x => x.currentNodeIndex == nodeMonsterNodeIndex).stats.hp.currnet = monster.stats.hp.currnet;
+        }
+    }
+
+    private void PlayerItem_Skill(eTool type, int id)
+    {
+        switch (type)
+        {
+            case eTool.Skill:
+                GameManager.instance.soundManager.PlaySfx(eSfx.UseSkill);
+
+                _skillitemCountroller.UseSkill(false, id, ref _saveData.userData.data);
+
+                break;
+
+            case eTool.Item:
+                GameManager.instance.soundManager.PlaySfx(eSfx.UseItem);
+
+                _skillitemCountroller.UseConsumptionItem(id, ref _saveData.userData.data);
+
+                break;
+        }
+    }
+
+    public void MonsterSkill(int monsterIdnex, int skill_Index)
+    {
+        CreatureData data = _saveData.mapData.monsterDatas[monsterIdnex];
+        UpdateText(data.name + " (이)가 " + GameManager.instance.dataManager.GetskillData(skill_Index).name + " (을)를 시전했습니다.");
+
+        _skillitemCountroller.UseSkill(true, skill_Index, ref data);
     }
 
     #region ActionController
@@ -510,12 +592,12 @@ public class IngameManager : MonoBehaviour
 
     #region Function
 
-    public int PathFinding(ref DataManager.Map_Data mapData, int startNodeIndex, int endNodeIndex)
+    public int PathFinding(ref DataManager.MapData mapData, int startNodeIndex, int endNodeIndex)
     {
         return _mapGenerator.PathFinding(ref mapData, startNodeIndex, endNodeIndex);
     }
 
-    public void CheckNode(int x, int y, Action<int, bool> onRasultCallback)
+    public void CheckWalkableNode(int x, int y, Action<int, bool> onRasultCallback)
     {
         int index = (x + 1) + (_saveData.mapData.mapSize * y);
 
@@ -563,13 +645,6 @@ public class IngameManager : MonoBehaviour
             return;
         }
 
-        if (node.isUseBonfire == false)
-        {
-            onRasultCallback?.Invoke(index, false);
-
-            return;
-        }
-
         if (node.isShop == false)
         {
             onRasultCallback?.Invoke(index, false);
@@ -580,7 +655,62 @@ public class IngameManager : MonoBehaviour
         onRasultCallback?.Invoke(index, true);
     }
 
-    public int GetNearbyBlocks(int x, int y, int index)
+    public List<int> GetRangeNodes(int currentNodeIndex, eDir dir, int range)
+    {
+        List<int> dx = new List<int>();
+        List<int> dy = new List<int>();
+
+        switch (dir)
+        {
+            case eDir.Up:
+                {
+                    dx.Add(0);
+
+                    for (int i = 1; i <= range; i++)
+                    {
+                        dy.Add(i);
+                    }
+                }
+                break;
+
+            case eDir.Left:
+                {
+                    dy.Add(0);
+
+                    for (int i = -1; i >= -range; i++)
+                    {
+                        dx.Add(i);
+                    }
+                }
+                break;
+
+            case eDir.Right:
+                {
+                    dy.Add(0);
+
+                    for (int i = 1; i <= range; i++)
+                    {
+                        dx.Add(i);
+                    }
+                }
+                break;
+
+            case eDir.Down:
+                {
+                    dx.Add(0);
+
+                    for (int i = -1; i >= -range; i--)
+                    {
+                        dy.Add(i);
+                    }
+                }
+                break;
+        }
+
+        return GetRangeNodes_NonDiagonal(dx, dy, currentNodeIndex);
+    }
+
+    public int GetNearbyNodes(int x, int y, int index)
     {
         int result = 0;
 
@@ -618,7 +748,7 @@ public class IngameManager : MonoBehaviour
 
     int[] dx = new int[] { -1, 0, 1 };
     int[] dy = new int[] { -1, 0, 1 };
-    public List<int> GetNearbyBlocks(int index)
+    public List<int> GetNearbyNodes_NonDiagonal(int index)
     {
         List<int> result = new List<int>();
 
@@ -665,7 +795,46 @@ public class IngameManager : MonoBehaviour
         return result;
     }
 
-    public List<int> GetNearbyBlocks_Diagonal(List<int> dx, List<int> dy, int index)
+    public List<int> GetRangeNodes_NonDiagonal(List<int> dx, List<int> dy, int index)
+    {
+        List<int> result = new List<int>();
+
+        for (int y = 0; y < dy.Count; y++)
+        {
+            for (int x = 0; x < dx.Count; x++)
+            {
+                int nearbyX = (index % _saveData.mapData.mapSize) + dx[x];
+
+                if (nearbyX < 0 || _saveData.mapData.mapSize <= nearbyX)
+                {
+                    continue;
+                }
+
+                int nearbyY = (index / _saveData.mapData.mapSize) + dy[y];
+
+                if (nearbyY < 0 || _saveData.mapData.mapSize <= nearbyY)
+                {
+                    continue;
+                }
+
+                int resultIndex = nearbyX + (nearbyY * _saveData.mapData.mapSize);
+
+                if (index == resultIndex)
+                {
+                    continue;
+                }
+
+                if (0 <= resultIndex && resultIndex < (_saveData.mapData.mapSize * _saveData.mapData.mapSize))
+                {
+                    result.Add(resultIndex);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    public List<int> GetRangeNodes_Diagonal(List<int> dx, List<int> dy, int index)
     {
         List<int> result = new List<int>();
 
@@ -719,26 +888,10 @@ public class IngameManager : MonoBehaviour
             dy.Add(i);
         }
 
-        return GetNearbyBlocks_Diagonal(dx, dy, currentIndex);
+        return GetRangeNodes_Diagonal(dx, dy, currentIndex);
     }
 
     #endregion
-
-    private void UseTool(eTool type, int id)
-    {
-        switch(type)
-        {
-            case eTool.Skill:
-                _skillitemCountroller.UseSkill(id, ref _saveData.userData.data);
-
-                break;
-
-            case eTool.Item:
-                _skillitemCountroller.UseConsumptionItem(id, ref _saveData.userData.data);
-
-                break;
-        }
-    }
 }
 
 #region Generator
@@ -778,14 +931,14 @@ public class MapGenerator
         }
     }
 
-    private System.Action<DataManager.Map_Data> _onResultCallback = null;
-    private DataManager.Save_Data _saveData = null;
+    private System.Action<DataManager.MapData> _onResultCallback = null;
+    private DataManager.SaveData _saveData = null;
 
     private List<Node> _nodes = null;
 
     private int _mapSize = 0;
 
-    public MapGenerator(System.Action<DataManager.Map_Data> onResultCallback, DataManager.Save_Data saveData)
+    public MapGenerator(System.Action<DataManager.MapData> onResultCallback, DataManager.SaveData saveData)
     {
         if(onResultCallback != null)
         {
@@ -924,13 +1077,13 @@ public class MapGenerator
 
     private void Done()
     {
-        _saveData.mapData = new DataManager.Map_Data();
+        _saveData.mapData = new DataManager.MapData();
         _saveData.mapData.mapSize = _mapSize;
-        _saveData.mapData.nodeDatas = new List<DataManager.Node_Data>();
+        _saveData.mapData.nodeDatas = new List<DataManager.NodeData>();
 
         for (int n = 0; n < _nodes.Count; n++)
         {
-            DataManager.Node_Data node = new DataManager.Node_Data();
+            DataManager.NodeData node = new DataManager.NodeData();
             node.index = _nodes[n]._index;
             node.x = (ushort)_nodes[n]._x;
             node.y = (ushort)_nodes[n]._y;
@@ -944,6 +1097,7 @@ public class MapGenerator
             if (_nodes[n].isExit == true)
             {
                 _saveData.mapData.exitNodeIndex = n;
+                node.isExit = true;
             }
 
             _saveData.mapData.nodeDatas.Add(node);
@@ -1109,7 +1263,7 @@ public class MapGenerator
         return result;
     }
 
-    public int PathFinding(ref DataManager.Map_Data mapData, int startNodeIndex, int endNodeIndex)
+    public int PathFinding(ref DataManager.MapData mapData, int startNodeIndex, int endNodeIndex)
     {
         int result = startNodeIndex;
 
@@ -1165,9 +1319,9 @@ public class MapGenerator
 public class CreatureGenerator
 {
     private System.Action<CreatureData, List<CreatureData>> _onResultCallback = null;
-    private DataManager.Save_Data _saveData = null;
+    private DataManager.SaveData _saveData = null;
 
-    public CreatureGenerator(System.Action<CreatureData, List<CreatureData>> onResultCallback, DataManager.Save_Data saveData)
+    public CreatureGenerator(System.Action<CreatureData, List<CreatureData>> onResultCallback, DataManager.SaveData saveData)
     {
         if(onResultCallback != null)
         {
@@ -1296,7 +1450,7 @@ public class CreatureGenerator
 
         for (int i = 0; i < monsterSpawnCount; i++)
         {
-            DataManager.Node_Data node = new DataManager.Node_Data();
+            DataManager.NodeData node = new DataManager.NodeData();
             SpawnMonsterNodeSelect(Random.Range(0, _saveData.mapData.nodeDatas.Count), ref node);
 
             int id = Random.Range(0, GameManager.instance.dataManager.GetCreaturDataCount());
@@ -1331,11 +1485,12 @@ public class CreatureGenerator
         _onResultCallback?.Invoke(_saveData.userData.data, _saveData.mapData.monsterDatas);
     }
 
-    private void SpawnMonsterNodeSelect(int index, ref DataManager.Node_Data node)
+    private void SpawnMonsterNodeSelect(int index, ref DataManager.NodeData node)
     {
         if (_saveData.mapData.nodeDatas[index].isWalkable == true 
             && _saveData.mapData.nodeDatas[index].isMonster == false 
-            && _saveData.mapData.nodeDatas[index].isUser == false)
+            && _saveData.mapData.nodeDatas[index].isUser == false
+            && _saveData.mapData.nodeDatas[index].isExit == false)
         {
             node = _saveData.mapData.nodeDatas[index];
 

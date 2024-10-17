@@ -143,21 +143,21 @@ public class DataManager : MonoBehaviour
     #region Map
 
     [Serializable]
-    public class Map_Data
+    public class MapData
     {
         public int mapSize = 0;
 
         public int enterNodeIndex = 0;
         public int exitNodeIndex = 0;
 
-        public List<Node_Data> nodeDatas = null;
+        public List<NodeData> nodeDatas = null;
         public List<CreatureData> monsterDatas = null;
         public List<ItemData> itemDatas = null;
         public List<Npc_Data> npcDatas = null;
     }
 
     [Serializable]
-    public class Node_Data
+    public class NodeData
     {
         public int index = 0;
         public ushort x = 0;
@@ -170,14 +170,13 @@ public class DataManager : MonoBehaviour
         public bool isBonfire = false;
         public bool isItem = false;
         public bool isGuide = false;
-
-        public bool isUseBonfire = false;
+        public bool isExit = false;
     }
 
     #endregion
 
     [Serializable]
-    public class Encyclopedia_Data
+    public class EncyclopediaData
     {
         public string maxRoundDate = string.Empty;
         public int maxRound = 0;
@@ -187,21 +186,21 @@ public class DataManager : MonoBehaviour
 
         public List<CreatureData> creatureDatas = null;
         public List<ItemData> itemDatas = null;
-        public List<Achievements_Data> _achievementsDatas = null;
+        public List<AchievementsData> _achievementsDatas = null;
     }
 
     [Serializable]
-    public class Save_Data
+    public class SaveData
     {
         public short round = 0;
 
         public UserData userData = null;
-        public Map_Data mapData = null;
-        public Encyclopedia_Data encyclopediaData = null;
+        public MapData mapData = null;
+        public EncyclopediaData encyclopediaData = null;
     }
 
     [Serializable]
-    public class Achievements_Data
+    public class AchievementsData
     {
         public bool isSuccess = false;
         public string name = string.Empty;
@@ -209,7 +208,7 @@ public class DataManager : MonoBehaviour
     }
 
     [Serializable]
-    public class Tutorial_Data
+    public class TutorialData
     {
         public int id = 0;
 
@@ -231,8 +230,8 @@ public class DataManager : MonoBehaviour
     [Header("Map Size"), Tooltip("3의 배수이되 홀수여야함"), SerializeField] private int _mapSize = 9;
     [Header("Creature Sprite Template"), SerializeField] private List<BlockImageTemplate> _creatureSpriteTemplate = null;
 
-    private Save_Data _saveData = null;
-    private Encyclopedia_Data _encyclopediaData = null;
+    private SaveData _saveData = null;
+    private EncyclopediaData _encyclopediaData = null;
 
     private List<CreatureData> _creatureDatas = null;
     private List<Npc_Data> _npcDatas = null;
@@ -274,7 +273,7 @@ public class DataManager : MonoBehaviour
     {
         UnityEngine.Debug.LogError("TEST Stat Set");
 
-        _saveData = new Save_Data();
+        _saveData = new SaveData();
         _saveData.round = 1;
 
         _saveData.userData = new UserData();
@@ -283,13 +282,13 @@ public class DataManager : MonoBehaviour
         _saveData.userData.data.stats.coin = new CreatureStat(0, 1, 0, 0);
         _saveData.userData.data.stats.hp = new CreatureStat(10, 1, 0, 0);
         _saveData.userData.data.stats.mp = new CreatureStat(10, 1, 0, 0);
-        _saveData.userData.data.stats.ap = new CreatureStat(3, 1, 0, 0);
+        _saveData.userData.data.stats.ap = new CreatureStat(3, 100, 0, 0);
         _saveData.userData.data.stats.exp = new CreatureStat(0, 1, 0, 0);
         _saveData.userData.data.stats.attack = new CreatureStat(5, 1, 0, 0);
         _saveData.userData.data.stats.defence = new CreatureStat(0, 1, 0, 0);
         _saveData.userData.data.stats.vision = new CreatureStat(1, 1, 0, 0);
         _saveData.userData.data.stats.attackRange = new CreatureStat(1, 1, 0, 0);
-        _saveData.userData.data.skillIndexs = new List<short>();
+        _saveData.userData.data.skillIndexs = new List<short>() { 303 };
         _saveData.userData.data.itemIndexs = new List<short>();
 
         _saveData.userData.data.skill_Duration = new List<Duration>();
@@ -297,24 +296,24 @@ public class DataManager : MonoBehaviour
         _saveData.userData.data.coolDownSkill = new List<Skill_CoolDown>();
         _saveData.userData.data.abnormalStatuses = new List<AbnormalStatus>();
 
-        _saveData.mapData = new Map_Data();
+        _saveData.mapData = new MapData();
         _saveData.mapData.mapSize = _mapSize;
-        _saveData.mapData.nodeDatas = new List<Node_Data>();
+        _saveData.mapData.nodeDatas = new List<NodeData>();
         _saveData.mapData.monsterDatas = new List<CreatureData>();
         _saveData.mapData.itemDatas = new List<ItemData>();
         _saveData.mapData.npcDatas = new List<Npc_Data>();
 
-        _saveData.encyclopediaData = new Encyclopedia_Data();
+        _saveData.encyclopediaData = new EncyclopediaData();
         _saveData.encyclopediaData.creatureDatas = new List<CreatureData>();
         _saveData.encyclopediaData.itemDatas = new List<ItemData>();
-        _saveData.encyclopediaData._achievementsDatas = new List<Achievements_Data>();
+        _saveData.encyclopediaData._achievementsDatas = new List<AchievementsData>();
 
 
 
-        _encyclopediaData = new Encyclopedia_Data();
+        _encyclopediaData = new EncyclopediaData();
         _encyclopediaData.creatureDatas = new List<CreatureData>();
         _encyclopediaData.itemDatas = new List<ItemData>();
-        _encyclopediaData._achievementsDatas = new List<Achievements_Data>();
+        _encyclopediaData._achievementsDatas = new List<AchievementsData>();
 
         ResetPlayerData();
 
@@ -324,25 +323,25 @@ public class DataManager : MonoBehaviour
         });
     }
 
-    public Save_Data CopySaveData()
+    public SaveData CopySaveData()
     {
         return _saveData;
     }
 
-    public Encyclopedia_Data CopyEncyclopediaData()
+    public EncyclopediaData CopyEncyclopediaData()
     {
         if (_encyclopediaData == null)
         {
-            _encyclopediaData = new Encyclopedia_Data();
+            _encyclopediaData = new EncyclopediaData();
             _encyclopediaData.creatureDatas = new List<CreatureData>();
             _encyclopediaData.itemDatas = new List<ItemData>();
-            _encyclopediaData._achievementsDatas = new List<Achievements_Data>();
+            _encyclopediaData._achievementsDatas = new List<AchievementsData>();
         }
 
         return _encyclopediaData;
     }
 
-    public void SaveDataToCloud(Save_Data saveData = null, Action<bool> onSaveOrLoadCallback = null)
+    public void SaveDataToCloud(SaveData saveData = null, Action<bool> onSaveOrLoadCallback = null)
     {
         GameManager.instance.StartLoad();
 
@@ -379,7 +378,7 @@ public class DataManager : MonoBehaviour
         });
     }
 
-    public void SaveEncyclopediaToCloud(Encyclopedia_Data data, Action<bool> onSaveOrLoadCallback = null)
+    public void SaveEncyclopediaToCloud(EncyclopediaData data, Action<bool> onSaveOrLoadCallback = null)
     {
         GameManager.instance.StartLoad();
 
@@ -409,7 +408,7 @@ public class DataManager : MonoBehaviour
         });
     }
 
-    public void LoadDataToCloud(Action<bool, Save_Data> onSaveOrLoadCallback = null)
+    public void LoadDataToCloud(Action<bool, SaveData> onSaveOrLoadCallback = null)
     {
         GameManager.instance.StartLoad();
 
@@ -418,7 +417,7 @@ public class DataManager : MonoBehaviour
 
         var prespons = new
         {
-            data = new Save_Data()
+            data = new SaveData()
         };
 
         var presult = JsonConvert.DeserializeAnonymousType(sapjson, prespons);
@@ -454,7 +453,7 @@ public class DataManager : MonoBehaviour
 
             var respons = new
             {
-                data = new Save_Data()
+                data = new SaveData()
             };
 
             var data = JsonConvert.DeserializeAnonymousType(json, respons);
@@ -482,7 +481,7 @@ public class DataManager : MonoBehaviour
 
         var prespons = new
         {
-            data = new Encyclopedia_Data()
+            data = new EncyclopediaData()
         };
 
         var presult = JsonConvert.DeserializeAnonymousType(enpjson, prespons);
@@ -508,7 +507,7 @@ public class DataManager : MonoBehaviour
 
             var respons = new
             {
-                data = new Encyclopedia_Data()
+                data = new EncyclopediaData()
             };
 
             var data = JsonConvert.DeserializeAnonymousType(json, respons);
@@ -539,7 +538,7 @@ public class DataManager : MonoBehaviour
         });
     }
 
-    public void FailGame(Save_Data saveData = null)
+    public void FailGame(SaveData saveData = null)
     {
         if (saveData != null)
         {
@@ -554,7 +553,7 @@ public class DataManager : MonoBehaviour
         _saveData.userData.data.name = name;
     }
 
-    public void UpdatePlayerData(Save_Data newData)
+    public void UpdatePlayerData(SaveData newData)
     {
         _saveData = newData;
     }
@@ -563,7 +562,7 @@ public class DataManager : MonoBehaviour
     {
         if (_encyclopediaData == null)
         {
-            _encyclopediaData = new Encyclopedia_Data();
+            _encyclopediaData = new EncyclopediaData();
             _encyclopediaData.creatureDatas = new List<CreatureData>();
             _encyclopediaData.itemDatas = new List<ItemData>();
         }
@@ -594,7 +593,7 @@ public class DataManager : MonoBehaviour
     {
         if (_encyclopediaData == null)
         {
-            _encyclopediaData = new Encyclopedia_Data();
+            _encyclopediaData = new EncyclopediaData();
             _encyclopediaData.creatureDatas = new List<CreatureData>();
             _encyclopediaData.itemDatas = new List<ItemData>();
         }
@@ -614,7 +613,7 @@ public class DataManager : MonoBehaviour
         SaveEncyclopediaToCloud(_encyclopediaData);
     }
 
-    private void OrganizeEncyclopedia(Save_Data lastData)
+    private void OrganizeEncyclopedia(SaveData lastData)
     {
         if(lastData == null)
         {
@@ -624,7 +623,7 @@ public class DataManager : MonoBehaviour
 
         if(_encyclopediaData == null)
         {
-            _encyclopediaData = new Encyclopedia_Data();
+            _encyclopediaData = new EncyclopediaData();
             _encyclopediaData.creatureDatas = new List<CreatureData>();
             _encyclopediaData.itemDatas = new List<ItemData>();
         }
@@ -941,7 +940,7 @@ public class DataManager : MonoBehaviour
         return _soTutorial.GetSprite(id);
     }
 
-    public Tutorial_Data GetTutorialData(int id)
+    public TutorialData GetTutorialData(int id)
     {
         return _soTutorial.GetData(id);
     }
@@ -951,8 +950,6 @@ public class DataManager : MonoBehaviour
     public Sprite GetCreatureSprite(eMapObject type)
     {
         BlockImageTemplate blockImageTemplate = _creatureSpriteTemplate.Find(x => x.type == type);
-
-        Debug.Log(type);
 
         if(blockImageTemplate.sprites == null)
         {

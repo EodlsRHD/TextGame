@@ -25,7 +25,7 @@ public class TextView : MonoBehaviour
     /// <summary>
     ///  Player Position
     /// </summary>
-    public void UpdateText(DataManager.Node_Data node)
+    public void UpdateText(DataManager.NodeData node)
     {
         string content = "플레이어 좌표 : " + node.x + " , " + node.y; 
 
@@ -35,7 +35,7 @@ public class TextView : MonoBehaviour
     /// <summary>
     ///  Find Monster
     /// </summary>
-    public void UpdateText(eMapObject type, DataManager.Node_Data monsterNode, DataManager.Node_Data playerNode)
+    public void UpdateText(eMapObject type, DataManager.NodeData monsterNode, DataManager.NodeData playerNode)
     {
         string dirStr = string.Empty;
         string findType = string.Empty;

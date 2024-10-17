@@ -9,7 +9,7 @@ public class SO_TutorialData : ScriptableObject
     [SerializeField] private string _dataPath = string.Empty;
     [SerializeField] private List<Sprite> _images = new List<Sprite>(); 
 
-    private List<DataManager.Tutorial_Data> _list = new List<DataManager.Tutorial_Data>();
+    private List<DataManager.TutorialData> _list = new List<DataManager.TutorialData>();
 
     public void Initialize()
     {
@@ -23,13 +23,13 @@ public class SO_TutorialData : ScriptableObject
             _list.Clear();
         }
 
-        _list = new List<DataManager.Tutorial_Data>();
+        _list = new List<DataManager.TutorialData>();
 
         string json = Resources.Load<TextAsset>(_dataPath).text;
 
         var respons = new
         {
-            datas = new List<DataManager.Tutorial_Data>()
+            datas = new List<DataManager.TutorialData>()
         };
 
         var result = JsonConvert.DeserializeAnonymousType(json, respons);
@@ -47,7 +47,7 @@ public class SO_TutorialData : ScriptableObject
         return _images[id];
     }
 
-    public DataManager.Tutorial_Data GetData(int id)
+    public DataManager.TutorialData GetData(int id)
     {
         return _list.Find(x => x.id == id);
     }
