@@ -66,7 +66,7 @@ public class MapController : MonoBehaviour
         this.gameObject.SetActive(false);
     }
 
-    public void SetMap(DataManager.Save_Data saveData)
+    public void SetMap(DataManager.SaveData saveData)
     {
         _trBack.gameObject.SetActive(GameManager.instance.isMapBackgroundUpdate);
 
@@ -96,7 +96,7 @@ public class MapController : MonoBehaviour
         }
     }
 
-    public void UpdateMapData(DataManager.Save_Data saveData, List<int> nearbyIndexs)
+    public void UpdateMapData(DataManager.SaveData saveData, List<int> nearbyIndexs)
     {
         if(GameManager.instance.isMapBackgroundUpdate == true)
         {

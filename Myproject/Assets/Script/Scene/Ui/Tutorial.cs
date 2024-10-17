@@ -103,7 +103,7 @@ public class Tutorial : MonoBehaviour
                 return;
             }
 
-            DataManager.Tutorial_Data data = GameManager.instance.dataManager.GetTutorialData(_speechIndex);
+            DataManager.TutorialData data = GameManager.instance.dataManager.GetTutorialData(_speechIndex);
 
             if (_start == true)
             {
@@ -219,7 +219,7 @@ public class Tutorial : MonoBehaviour
         {
             case eTutorialQuest.Non:
                 {
-                    DataManager.Tutorial_Data data = GameManager.instance.dataManager.GetTutorialData(next);
+                    DataManager.TutorialData data = GameManager.instance.dataManager.GetTutorialData(next);
                     ContentOutput(data.content);
                     InstantiateAnswer(data.answers, (eTutorialQuest)data.isQuest);
                 }

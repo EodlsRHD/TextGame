@@ -17,7 +17,7 @@ public class BlockTemplate : MonoBehaviour
         this.gameObject.SetActive(false);
     }
 
-    public void SetFog(bool isNearby, DataManager.Node_Data blockData)
+    public void SetFog(bool isNearby, DataManager.NodeData blockData)
     {
         if (isNearby == true)
         {
@@ -58,7 +58,7 @@ public class BlockTemplate : MonoBehaviour
         this.gameObject.SetActive(true);
     }
 
-    public void SetObject(bool isExit, DataManager.Node_Data blockData)
+    public void SetObject(bool isExit, DataManager.NodeData blockData)
     {
         Color color = new Color();
 
@@ -98,7 +98,7 @@ public class BlockTemplate : MonoBehaviour
         {
             _imageBlock.enabled = true;
 
-            if (blockData.isUseBonfire == true)
+            if (IngameManager.instance.saveData.mapData.npcDatas.Find(x => x.currentNodeIndex == blockData.index).isUseBonfire == true)
             {
                 _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eMapObject.UseBonfire);
             }
@@ -131,7 +131,7 @@ public class BlockTemplate : MonoBehaviour
         this.gameObject.SetActive(true);
     }
 
-    public void SetTile(DataManager.Node_Data blockData)
+    public void SetTile(DataManager.NodeData blockData)
     {
         Color color = new Color();
 

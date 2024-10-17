@@ -42,7 +42,7 @@ public class Encyclopedia : MonoBehaviour
 
     private Action _onCloseCallback = null;
 
-    private DataManager.Encyclopedia_Data _data = null;
+    private DataManager.EncyclopediaData _data = null;
 
     private Dictionary<int, List<EncyclopediaTemplate>> _templates = null;
 
