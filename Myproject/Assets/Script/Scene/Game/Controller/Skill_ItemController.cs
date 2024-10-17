@@ -407,6 +407,7 @@ public class Skill_ItemController : MonoBehaviour
 
         AbnormalStatus newData = new AbnormalStatus();
         newData.currentStatus = tool.grantStatus;
+        newData.maintain = tool.maintain;
         newData.duration = tool.duration;
         newData.value = tool.value;
 

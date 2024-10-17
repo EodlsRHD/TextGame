@@ -291,6 +291,7 @@ public class AbnormalStatus
     public int id = 0;
 
     public eStrengtheningTool currentStatus = eStrengtheningTool.Non;
+    public eMaintain maintain = eMaintain.Non;
     public int duration = 0;
 
     public float value = 0;

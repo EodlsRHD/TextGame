@@ -293,29 +293,16 @@ public class IngameManager : MonoBehaviour
     {
         AbnormalStatus status = creature.abnormalStatuses.Find(x => x.currentStatus == type);
 
-        if (type == eStrengtheningTool.AttackBlocking)
-        {
-            Debug.LogError(status != null);
-            Debug.LogError(_saveData.userData.data.abnormalStatuses.Find(x => x.currentStatus == type).value);
-        }
-
         if (status != null)
         {
-            Debug.LogError(type);
-
-            if (type == eStrengtheningTool.AttackBlocking || type == eStrengtheningTool.SkillBlocking ||
-                type == eStrengtheningTool.SkillBlocking || type == eStrengtheningTool.SkillBlocking || type == eStrengtheningTool.SkillBlocking)
+            if(status.maintain == eMaintain.Temporary)
             {
-                Debug.LogError(status.value);
-
-                if (status.value <= 0)
+                if(status.value <= 0)
                 {
                     return false;
                 }
 
                 status.value -= 1;
-
-                Debug.LogError(_saveData.userData.data.abnormalStatuses.Find(x => x.currentStatus == type).value);
 
                 return true;
             }
@@ -333,8 +320,7 @@ public class IngameManager : MonoBehaviour
     {
         AbnormalStatus status = creature.abnormalStatuses.Find(x => x.currentStatus == type);
 
-        if (type == eStrengtheningTool.AttackBlocking || type == eStrengtheningTool.SkillBlocking ||
-            type == eStrengtheningTool.SkillBlocking || type == eStrengtheningTool.SkillBlocking || type == eStrengtheningTool.SkillBlocking)
+        if(status.maintain == eMaintain.Temporary)
         {
             creature.abnormalStatuses.Remove(status);
         }

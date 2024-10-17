@@ -96,6 +96,7 @@ public class DataManager : MonoBehaviour
         public float value = 0;
 
         public bool revealMap = false;
+        public eMaintain maintain = eMaintain.Non;
     }
 
     [Serializable]
@@ -134,6 +135,7 @@ public class DataManager : MonoBehaviour
         public float value = 0;
 
         public bool revealMap = false;
+        public eMaintain maintain = eMaintain.Non;
 
         public int currentNodeIndex = 0;
     }
@@ -771,6 +773,7 @@ public class DataManager : MonoBehaviour
             newData.tool.range = data.range;
             newData.tool.value = data.value;
             newData.tool.revealMap = data.revealMap;
+            newData.tool.maintain = data.maintain;
 
             _itemDatas.Add(newData);
         }
@@ -837,6 +840,7 @@ public class DataManager : MonoBehaviour
             newData.tool.range = data.range;
             newData.tool.value = data.value;
             newData.tool.revealMap = data.revealMap;
+            newData.tool.maintain = data.maintain;
 
             _skillDatas.Add(newData);
         }

@@ -27,7 +27,8 @@
       "grantStatus": -1,
       "range": 1,
       "value": 25,
-      "revealMap": "FALSE"
+      "revealMap": "FALSE",
+      "maintain": 0
     },
     {
       "id": 302,
@@ -55,7 +56,8 @@
       "grantStatus": -1,
       "range": 0,
       "value": 0,
-      "revealMap": "FALSE"
+      "revealMap": "FALSE",
+      "maintain": 0
     },
     {
       "id": 303,
@@ -83,7 +85,8 @@
       "grantStatus": -1,
       "range": 4,
       "value": 30,
-      "revealMap": "FALSE"
+      "revealMap": "FALSE",
+      "maintain": 0
     },
     {
       "id": 304,
@@ -111,7 +114,8 @@
       "grantStatus": 15,
       "range": 3,
       "value": 0,
-      "revealMap": "FALSE"
+      "revealMap": "FALSE",
+      "maintain": 0
     }
   ]
 }
