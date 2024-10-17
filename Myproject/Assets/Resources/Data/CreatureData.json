@@ -264,7 +264,7 @@
     {
       "id": 114,
       "name": "드레이크",
-      "description": "작은 용족으로 화염을 내뿜는 중형 몬스터.",
+      "description": "용족으로 화염을 내뿜는 중형 몬스터.",
       "spriteIndex": 114,
       "coin": 1,
       "hp": 13,
@@ -383,7 +383,7 @@
     },
     {
       "id": 120,
-      "name": "전갈",
+      "name": "지네",
       "description": "독을 이용한 꼬리 공격으로 적을 마비시키는 몬스터.",
       "spriteIndex": 120,
       "coin": 1,
@@ -423,7 +423,7 @@
     },
     {
       "id": 122,
-      "name": "식인 식물",
+      "name": "이상한 버섯",
       "description": "땅속에서 숨어 있다가 덫처럼 공격하는 몬스터.",
       "spriteIndex": 122,
       "coin": 1,
@@ -463,8 +463,8 @@
     },
     {
       "id": 124,
-      "name": "사이클롭스",
-      "description": "한쪽 눈으로 강력한 공격을 하는 몬스터.",
+      "name": "구면",
+      "description": "얼굴대신 거대한 입이 있는 몬스터.",
       "spriteIndex": 124,
       "coin": 1,
       "hp": 8,
@@ -523,7 +523,7 @@
     },
     {
       "id": 127,
-      "name": "파충류 전사",
+      "name": "카카돈",
       "description": "날렵한 움직임으로 공격을 피하면서 공격하는 몬스터.",
       "spriteIndex": 127,
       "coin": 1,

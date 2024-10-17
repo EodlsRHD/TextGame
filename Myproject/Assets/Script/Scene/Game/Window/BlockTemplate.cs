@@ -67,7 +67,7 @@ public class BlockTemplate : MonoBehaviour
         if (blockData.isMonster == true)
         {
             _imageBlock.enabled = true;
-            _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eMapObject.Monster);
+            _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eMapObject.Monster, IngameManager.instance.saveData.mapData.monsterDatas.Find(x => x.currentNodeIndex == blockData.index).spriteIndex);
             color = Color.white;
             color.a = 1f;
         }

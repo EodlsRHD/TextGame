@@ -13,7 +13,7 @@ public class DataManager : MonoBehaviour
     #region Creatures
 
     [Serializable]
-    private class Creature_Data
+    public class Creature_Data
     {
         public short id = 0;
 
@@ -219,13 +219,13 @@ public class DataManager : MonoBehaviour
     }
 
     [Header("Data Path")]
-    [SerializeField] private string _creatureDataPath = string.Empty;
     [SerializeField] private string _npcDataPath = string.Empty;
     [SerializeField] private string _itemDataPath = string.Empty;
     [SerializeField] private string _skillDataPath = string.Empty;
 
     [Header("Scriptable Object")]
     [SerializeField] private SO_TutorialData _soTutorial = null;
+    [SerializeField] private SO_CreatureDataSprite _soCreature = null;
 
     [Header("Map Size"), Tooltip("3의 배수이되 홀수여야함"), SerializeField] private int _mapSize = 9;
     [Header("Creature Sprite Template"), SerializeField] private List<BlockImageTemplate> _creatureSpriteTemplate = null;
@@ -233,7 +233,6 @@ public class DataManager : MonoBehaviour
     private SaveData _saveData = null;
     private EncyclopediaData _encyclopediaData = null;
 
-    private List<CreatureData> _creatureDatas = null;
     private List<Npc_Data> _npcDatas = null;
     private List<ItemData> _itemDatas = null;
     private List<SkillData> _skillDatas = null;
@@ -252,12 +251,12 @@ public class DataManager : MonoBehaviour
 
     public void ReadGameData()
     {
-        ReadCreaturesData();
         ReadNpcData();
         ReadItemsData();
         ReadSkillsData();
 
         _soTutorial.Initialize();
+        _soCreature.Initialize();
     }
 
     public void saveAllData()
@@ -678,86 +677,14 @@ public class DataManager : MonoBehaviour
 
     #region Creature
 
-    private void ReadCreaturesData()
-    {
-        if(_creatureDatas != null)
-        {
-            _creatureDatas.Clear();
-        }
-
-        _creatureDatas = new List<CreatureData>();
-
-        string json = Resources.Load<TextAsset>(_creatureDataPath).text;
-
-        var respons = new
-        {
-            datas = new List<Creature_Data>()
-        };
-
-        var result = JsonConvert.DeserializeAnonymousType(json, respons);
-
-        List<Creature_Data> datas = new List<Creature_Data>();
-        datas = result.datas;
-
-        for (int i = 0; i < datas.Count; i++)
-        {
-            Creature_Data data = datas[i];
-
-            CreatureData temp = new CreatureData();
-            temp.id = data.id;
-            temp.name = data.name; 
-            temp.description = data.description;
-            temp.spriteIndex = data.spriteIndex;
-
-            temp.stats = new CreatureStats();
-            temp.stats.coin = new CreatureStat(data.coin, 1, 0, 0);
-            temp.stats.hp = new CreatureStat(data.hp, 1, 0, 0);
-            temp.stats.mp = new CreatureStat(data.mp, 1, 0, 0);
-            temp.stats.ap = new CreatureStat(data.ap, 1, 0, 0);
-            temp.stats.exp = new CreatureStat(data.exp, 1, 0, 0);
-            temp.stats.attack = new CreatureStat(data.attack, 1, 0, 0);
-            temp.stats.defence = new CreatureStat(data.defence, 1, 0, 0);
-            temp.stats.vision = new CreatureStat(data.vision, 1, 0, 0);
-            temp.stats.attackRange = new CreatureStat(data.attackRange, 1, 0, 0);
-
-            temp.defultStatus = data.defultStatus;
-
-            temp.useSkill = data.useSkill;
-
-            temp.skillIndexs = new List<short>();
-            if(data.skillIndexs != null)
-            {
-                temp.skillIndexs.AddRange(data.skillIndexs);
-            }
-
-            temp.itemIndexs = new List<short>();
-            if(data.itemIndexs != null)
-            {
-                temp.itemIndexs.AddRange(data.itemIndexs);
-            }
-
-            temp.skill_Duration = new List<Duration>();
-            temp.item_Duration = new List<Duration>();
-            temp.coolDownSkill = new List<Skill_CoolDown>();
-            temp.abnormalStatuses = new List<AbnormalStatus>();
-
-            _creatureDatas.Add(temp);
-        }
-    }
-
     public CreatureData GetCreatureData(int index)
     {
-        if (index >= _creatureDatas.Count)
-        {
-            index %= _creatureDatas.Count;
-        }
-
-        return _creatureDatas.Find(x => x.id == (index + 101)).DeepCopy();
+        return _soCreature.GetData(index);
     }
 
     public int GetCreaturDataCount()
     {
-        return _creatureDatas.Count;
+        return _soCreature.GetDataCount();
     }
 
     #endregion
@@ -948,8 +875,13 @@ public class DataManager : MonoBehaviour
 
     #endregion
 
-    public Sprite GetCreatureSprite(eMapObject type)
+    public Sprite GetCreatureSprite(eMapObject type, int spriteId = -1)
     {
+        if(type == eMapObject.Monster)
+        {
+            return _soCreature.GetSprite(spriteId);
+        }
+
         BlockImageTemplate blockImageTemplate = _creatureSpriteTemplate.Find(x => x.type == type);
 
         if(blockImageTemplate.sprites == null)

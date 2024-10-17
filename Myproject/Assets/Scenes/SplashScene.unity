@@ -1252,11 +1252,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d43009387ff460a428a2eaecf9b375b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _creatureDataPath: Data/CreatureData
   _npcDataPath: Data/NpcData
   _itemDataPath: Data/ItemData
   _skillDataPath: Data/SkillData
   _soTutorial: {fileID: 11400000, guid: 0f764c14003476c46bf9b886915026c9, type: 2}
+  _soCreature: {fileID: 11400000, guid: e17d752b7fce6a9498e1c06024d6d918, type: 2}
   _mapSize: 9
   _creatureSpriteTemplate:
   - type: 0
