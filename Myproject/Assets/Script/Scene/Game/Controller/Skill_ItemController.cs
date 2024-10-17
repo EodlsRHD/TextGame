@@ -42,6 +42,16 @@ public class Skill_ItemController : MonoBehaviour
 
     public void UseSkill(bool isMonster, int id, ref CreatureData creature)
     {
+        if(id == -1)
+        {
+            if(isMonster == false)
+            {
+                IngameManager.instance.UpdatePopup("선택된 스킬이 없습니다.");
+            }
+
+            return;
+        }
+
         if (SkillCheckCoolDown(id, ref creature) == true)
         {
             return;
@@ -50,15 +60,20 @@ public class Skill_ItemController : MonoBehaviour
         SkillData skill = GameManager.instance.dataManager.GetskillData(id);
         StrengtheningTool(ref creature, skill.tool);
 
+        creature.stats.mp.MinusCurrnet(skill.useMp);
+
+        if (isMonster == false)
+        {
+            IngameManager.instance.UpdatePlayerInfo(eStats.MP);
+        }
+
         Skill_CoolDown cooldown = new Skill_CoolDown();
         cooldown.id = skill.id;
         cooldown.name = skill.name;
         cooldown.coolDown = skill.coolDown + 1;
         IngameManager.instance.saveData.userData.data.coolDownSkill.Add(cooldown);
 
-        creature.stats.mp.MinusCurrnet(skill.useMp);
-
-        if((_dir == eDir.Non && _nodeIndex == -1) == false)
+        if ((_dir == eDir.Non && _nodeIndex == -1) == false)
         {
             UseGround(isMonster, ref skill, creature.currentNodeIndex, _dir, _nodeIndex);
         }
@@ -114,8 +129,8 @@ public class Skill_ItemController : MonoBehaviour
         duration.stats = type;
         duration.isPercent = isPercent;
         duration.value = (short)useValue;
-        duration.remaindCooldown = data.coolDown + 1;
-        duration.remaindDuration = data.tool.duration + 1;
+        duration.remaindCooldown = data.coolDown;
+        duration.remaindDuration = data.tool.duration;
 
         if (data.tool.duration == 0)
         {
@@ -131,7 +146,7 @@ public class Skill_ItemController : MonoBehaviour
     {
         for (int i = data.skill_Duration.Count - 1; i >= 0; i--)
         {
-            if (data.skill_Duration[i].remaindDuration == 0)
+            if (data.skill_Duration[i].remaindDuration == 1)
             {
                 RemoveEffect(ref data, data.skill_Duration[i]);
 
@@ -146,7 +161,7 @@ public class Skill_ItemController : MonoBehaviour
 
         for (int i = data.coolDownSkill.Count - 1; i >= 0; i--)
         {
-            if (data.coolDownSkill[i].coolDown == 0)
+            if (data.coolDownSkill[i].coolDown == 1)
             {
                 data.coolDownSkill.Remove(data.coolDownSkill[i]);
 
@@ -170,6 +185,13 @@ public class Skill_ItemController : MonoBehaviour
 
     public void UseConsumptionItem(int id, ref CreatureData creature)
     {
+        if (id == -1)
+        {
+            IngameManager.instance.UpdatePopup("선택된 아이템이 없습니다.");
+
+            return;
+        }
+
         creature.itemIndexs.Remove(creature.itemIndexs.Find(x => x == id));
 
         ItemData data = GameManager.instance.dataManager.GetItemData(id);
@@ -217,7 +239,7 @@ public class Skill_ItemController : MonoBehaviour
         duration.stats = type;
         duration.isPercent = isPercent;
         duration.value = (short)useValue;
-        duration.remaindDuration = data.tool.duration + 1;
+        duration.remaindDuration = data.tool.duration;
 
         if (data.tool.duration == 0)
         {
@@ -233,7 +255,7 @@ public class Skill_ItemController : MonoBehaviour
     {
         for (int i = data.item_Duration.Count - 1; i >= 0; i--)
         {
-            if (data.item_Duration[i].remaindDuration == 0)
+            if (data.item_Duration[i].remaindDuration == 1)
             {
                 RemoveEffect(ref data, data.item_Duration[i]);
 
@@ -418,9 +440,16 @@ public class Skill_ItemController : MonoBehaviour
 
             for (int i = 0; i < nodeIndexs.Count; i++)
             {
+                if (isWalkable == false)
+                {
+                    blockBeforeNode = i - 1;
+
+                    break;
+                }
+
                 var node = IngameManager.instance.saveData.mapData.nodeDatas[nodeIndexs[i]];
 
-                if(i == (nodeIndexs.Count - 1))
+                if (i == (nodeIndexs.Count - 1))
                 {
                     if (node.isGuide == true)
                     {
@@ -438,6 +467,11 @@ public class Skill_ItemController : MonoBehaviour
                     }
 
                     if (node.isWalkable == false)
+                    {
+                        isWalkable = false;
+                    }
+
+                    if (node.isExit == false)
                     {
                         isWalkable = false;
                     }
@@ -461,14 +495,7 @@ public class Skill_ItemController : MonoBehaviour
                     }
                 }
 
-                if (isWalkable == false)
-                {
-                    blockBeforeNode = i - 1;
-
-                    break;
-                }
-
-                blockBeforeNode = nodeIndexs[i];
+                blockBeforeNode = i;
             }
 
             if(blockBeforeNode == -1)
@@ -485,11 +512,11 @@ public class Skill_ItemController : MonoBehaviour
                         break;
 
                     case eStrengtheningTool.Teleportation:
-
+                        RangeMove(isMonster, skill, nodeIndexs, currentNodeIndex);
                         break;
 
                     case eStrengtheningTool.Non_Teleportation:
-
+                        RangeMove(isMonster, skill, nodeIndexs, currentNodeIndex, blockBeforeNode);
                         break;
                 }
             }
@@ -544,8 +571,25 @@ public class Skill_ItemController : MonoBehaviour
         }
     }
 
-    private void RangeMone(eStrengtheningTool type)
+    private void RangeMove(bool isMonster, SkillData skill, List<int> indexs, int currentNodeIndex, int blockBeforeNodeIndex = -1)
     {
+        int destinationIndex = indexs[blockBeforeNodeIndex == -1 ? indexs.Count - 1 : blockBeforeNodeIndex];
 
+        if(isMonster == false)
+        {
+            int before = IngameManager.instance.saveData.userData.data.currentNodeIndex;
+            IngameManager.instance.saveData.mapData.nodeDatas[before].isUser = false;
+
+            IngameManager.instance.saveData.userData.data.currentNodeIndex = destinationIndex;
+            IngameManager.instance.saveData.mapData.nodeDatas[destinationIndex].isUser = true;
+        }
+        else if(isMonster == true)
+        {
+            IngameManager.instance.saveData.mapData.nodeDatas[currentNodeIndex].isMonster = false;
+            IngameManager.instance.saveData.mapData.nodeDatas[destinationIndex].isMonster = true;
+            IngameManager.instance.saveData.mapData.monsterDatas.Find(x => x.currentNodeIndex == currentNodeIndex).currentNodeIndex = destinationIndex;
+        }
+
+        IngameManager.instance.UpdateData();
     }
 }

@@ -30,6 +30,8 @@ public class BlockTemplate : MonoBehaviour
         {
             if (blockData.isUser == true)
             {
+                _isRresrarch = true;
+
                 _imageBlock.enabled = false;
                 color.a = 0f;
             }

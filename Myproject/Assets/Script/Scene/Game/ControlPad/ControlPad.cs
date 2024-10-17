@@ -169,6 +169,11 @@ public class ControlPad : MonoBehaviour
 
         int value = -1;
 
+        if(_eOpenPad == eControl.Non)
+        {
+            return;
+        }
+
         switch (_eOpenPad)
         {
             case eControl.Skill:
@@ -180,7 +185,6 @@ public class ControlPad : MonoBehaviour
                         if (coordResult == -1 && dirResult == eDir.Non)
                         {
                             _onResultCallback?.Invoke(eTool.Skill, value);
-                            _onResultCallback = null;
 
                             return;
                         }
@@ -188,7 +192,6 @@ public class ControlPad : MonoBehaviour
                         IngameManager.instance.SetDirCoord(coordResult, dirResult);
 
                         _onResultCallback?.Invoke(eTool.Skill, value);
-                        _onResultCallback = null;
                     });
                 }
                 break;
@@ -202,7 +205,6 @@ public class ControlPad : MonoBehaviour
                         if (coordResult == -1 && dirResult == eDir.Non)
                         {
                             _onResultCallback?.Invoke(eTool.Item, value);
-                            _onResultCallback = null;
 
                             return;
                         }
@@ -210,7 +212,6 @@ public class ControlPad : MonoBehaviour
                         IngameManager.instance.SetDirCoord(coordResult, dirResult);
 
                         _onResultCallback?.Invoke(eTool.Item, value);
-                        _onResultCallback = null;
                     });
                 }
                 break;

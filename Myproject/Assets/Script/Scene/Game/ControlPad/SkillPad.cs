@@ -45,6 +45,7 @@ public class SkillPad : MonoBehaviour
 
     public void Close()
     {
+        _id = -1;
         this.gameObject.SetActive(false);
 
         DeleteTemplate();

@@ -677,7 +677,7 @@ public class IngameManager : MonoBehaviour
                 {
                     dy.Add(0);
 
-                    for (int i = -1; i >= -range; i++)
+                    for (int i = -1; i >= -range; i--)
                     {
                         dx.Add(i);
                     }
@@ -695,7 +695,7 @@ public class IngameManager : MonoBehaviour
                 }
                 break;
 
-            case eDir.Down:
+            case eDir.Down: 
                 {
                     dx.Add(0);
 
