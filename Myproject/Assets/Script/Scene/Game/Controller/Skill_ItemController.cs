@@ -399,7 +399,7 @@ public class Skill_ItemController : MonoBehaviour
         {
             if (data.abnormalStatuses[i].currentStatus == tool.grantStatus)
             {
-                data.abnormalStatuses[i].statusCount = tool.duration;
+                data.abnormalStatuses[i].duration = tool.duration;
 
                 return;
             }
@@ -407,7 +407,7 @@ public class Skill_ItemController : MonoBehaviour
 
         AbnormalStatus newData = new AbnormalStatus();
         newData.currentStatus = tool.grantStatus;
-        newData.statusCount = tool.duration;
+        newData.duration = tool.duration;
         newData.value = tool.value;
 
         data.abnormalStatuses.Add(newData);
@@ -417,14 +417,14 @@ public class Skill_ItemController : MonoBehaviour
     {
         for (int i = data.abnormalStatuses.Count - 1; i >= 0; i--)
         {
-            if (data.abnormalStatuses[i].statusCount == 0)
+            if (data.abnormalStatuses[i].duration <= 0)
             {
                 data.abnormalStatuses.Remove(data.abnormalStatuses[i]);
 
                 continue;
             }
 
-            data.abnormalStatuses[i].statusCount -= 1;
+            data.abnormalStatuses[i].duration -= 1;
         }
     }
 
@@ -546,7 +546,7 @@ public class Skill_ItemController : MonoBehaviour
         AbnormalStatus abnormalStatus = new AbnormalStatus();
         abnormalStatus.id = skill.id;
         abnormalStatus.currentStatus = skill.tool.grantStatus;
-        abnormalStatus.statusCount = skill.tool.duration;
+        abnormalStatus.duration = skill.tool.duration;
         abnormalStatus.value = skill.tool.value;
 
         for (int i = 0; i < indexs.Count; i++)
