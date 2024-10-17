@@ -524,7 +524,20 @@ public class Skill_ItemController : MonoBehaviour
 
         if(nodeIndex != -1)
         {
+            switch (skill.tool.grantStatus)
+            {
+                case eStrengtheningTool.Non:
 
+                    break;
+
+                case eStrengtheningTool.Teleportation:
+
+                    break;
+
+                case eStrengtheningTool.Non_Teleportation:
+
+                    break;
+            }
         }
     }
 
@@ -591,5 +604,15 @@ public class Skill_ItemController : MonoBehaviour
         }
 
         IngameManager.instance.UpdateData();
+    }
+
+    private void NodeAttack()
+    {
+
+    }
+
+    private void NodeMove()
+    {
+
     }
 }

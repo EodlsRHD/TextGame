@@ -278,3 +278,10 @@ public enum eTool
     Skill,
     Item
 }
+
+public enum eMaintain
+{
+    Non = -1,
+    Temporary,
+    Continuous
+}

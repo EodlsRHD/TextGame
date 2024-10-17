@@ -78,6 +78,8 @@ public class StrengtheningTool
     public float value = 0;
 
     public bool revealMap = false;
+
+    public eMaintain maintain = eMaintain.Non;
 }
 
 [Serializable]
