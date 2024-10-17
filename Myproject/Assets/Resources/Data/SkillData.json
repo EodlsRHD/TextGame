@@ -84,6 +84,34 @@
       "range": 4,
       "value": 30,
       "revealMap": "FALSE"
+    },
+    {
+      "id": 304,
+      "name": "대시",
+      "description": "지정한 방향으로 3칸 이동합니다. 몬스터를 지나치지 못합니다.",
+      "coolDown": 0,
+      "duration": 0,
+      "useMp": 5,
+      "hp": 0,
+      "hpPercentIncreased": 0,
+      "mp": 0,
+      "mpPercentIncreased": 0,
+      "ap": 0,
+      "apPercentIncreased": 0,
+      "exp": 0,
+      "expPercentIncreased": 0,
+      "coin": 0,
+      "coinPercentIncreased": 0,
+      "attack": 0,
+      "attackPercentIncreased": 0,
+      "defence": 0,
+      "defencePercentIncreased": 0,
+      "dir": 5,
+      "needStatus": -1,
+      "grantStatus": 15,
+      "range": 3,
+      "value": 0,
+      "revealMap": "FALSE"
     }
   ]
 }
