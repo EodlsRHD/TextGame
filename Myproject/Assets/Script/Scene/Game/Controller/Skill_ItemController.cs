@@ -1,4 +1,6 @@
+using JetBrains.Annotations;
 using System.Collections.Generic;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine; 
 
 public class Skill_ItemController : MonoBehaviour
@@ -22,7 +24,7 @@ public class Skill_ItemController : MonoBehaviour
         MonsterDuration(ref IngameManager.instance.saveData.mapData);
     }
 
-    private void MonsterDuration(ref DataManager.Map_Data mapData)
+    private void MonsterDuration(ref DataManager.MapData mapData)
     {
         //for (int i = 0; i < mapData.; i++)
         //{
@@ -38,44 +40,49 @@ public class Skill_ItemController : MonoBehaviour
 
     #region Skill
 
-    public void UseSkill(int id, ref CreatureData creature)
+    public void UseSkill(bool isMonster, int id, ref CreatureData creature)
     {
-        if (SkillCheckCoolDown(id, ref creature) == false)
+        if (SkillCheckCoolDown(id, ref creature) == true)
         {
             return;
         }
 
-        SkillData data = GameManager.instance.dataManager.GetskillData(id);
-        StrengtheningTool(ref creature, data.tool);
+        SkillData skill = GameManager.instance.dataManager.GetskillData(id);
+        StrengtheningTool(ref creature, skill.tool);
 
         Skill_CoolDown cooldown = new Skill_CoolDown();
-        cooldown.id = data.id;
-        cooldown.name = data.name;
-        cooldown.coolDown = data.coolDown + 1;
+        cooldown.id = skill.id;
+        cooldown.name = skill.name;
+        cooldown.coolDown = skill.coolDown + 1;
         IngameManager.instance.saveData.userData.data.coolDownSkill.Add(cooldown);
 
-        creature.stats.mp.MinusCurrnet(data.useMp);
+        creature.stats.mp.MinusCurrnet(skill.useMp);
 
-        SkillConsumptionCheck(ref creature, data, eStats.HP, data.tool.hp.value);
-        SkillConsumptionCheck(ref creature, data, eStats.HP, data.tool.hp.percent, true);
+        if((_dir == eDir.Non && _nodeIndex == -1) == false)
+        {
+            UseGround(isMonster, ref skill, creature.currentNodeIndex, _dir, _nodeIndex);
+        }
 
-        SkillConsumptionCheck(ref creature, data, eStats.MP, data.tool.mp.value);
-        SkillConsumptionCheck(ref creature, data, eStats.MP, data.tool.mp.percent, true);
+        SkillConsumptionCheck(ref creature, skill, eStats.HP, skill.tool.hp.value);
+        SkillConsumptionCheck(ref creature, skill, eStats.HP, skill.tool.hp.percent, true);
 
-        SkillConsumptionCheck(ref creature, data, eStats.AP, data.tool.ap.value);
-        SkillConsumptionCheck(ref creature, data, eStats.AP, data.tool.ap.percent, true);
+        SkillConsumptionCheck(ref creature, skill, eStats.MP, skill.tool.mp.value);
+        SkillConsumptionCheck(ref creature, skill, eStats.MP, skill.tool.mp.percent, true);
 
-        SkillConsumptionCheck(ref creature, data, eStats.EXP, data.tool.exp.value);
-        SkillConsumptionCheck(ref creature, data, eStats.EXP, data.tool.exp.percent, true);
+        SkillConsumptionCheck(ref creature, skill, eStats.AP, skill.tool.ap.value);
+        SkillConsumptionCheck(ref creature, skill, eStats.AP, skill.tool.ap.percent, true);
 
-        SkillConsumptionCheck(ref creature, data, eStats.Coin, data.tool.coin.value);
-        SkillConsumptionCheck(ref creature, data, eStats.Coin, data.tool.coin.percent, true);
+        SkillConsumptionCheck(ref creature, skill, eStats.EXP, skill.tool.exp.value);
+        SkillConsumptionCheck(ref creature, skill, eStats.EXP, skill.tool.exp.percent, true);
 
-        SkillConsumptionCheck(ref creature, data, eStats.Attack, data.tool.attack.value);
-        SkillConsumptionCheck(ref creature, data, eStats.Attack, data.tool.attack.percent, true);
+        SkillConsumptionCheck(ref creature, skill, eStats.Coin, skill.tool.coin.value);
+        SkillConsumptionCheck(ref creature, skill, eStats.Coin, skill.tool.coin.percent, true);
 
-        SkillConsumptionCheck(ref creature, data, eStats.Defence, data.tool.defence.value);
-        SkillConsumptionCheck(ref creature, data, eStats.Defence, data.tool.defence.percent, true);
+        SkillConsumptionCheck(ref creature, skill, eStats.Attack, skill.tool.attack.value);
+        SkillConsumptionCheck(ref creature, skill, eStats.Attack, skill.tool.attack.percent, true);
+
+        SkillConsumptionCheck(ref creature, skill, eStats.Defence, skill.tool.defence.value);
+        SkillConsumptionCheck(ref creature, skill, eStats.Defence, skill.tool.defence.percent, true);
 
         IngameManager.instance.ControlPadUpdateData();
         IngameManager.instance.UpdateData();
@@ -86,12 +93,12 @@ public class Skill_ItemController : MonoBehaviour
 
     private bool SkillCheckCoolDown(int id, ref CreatureData creature)
     {
-        if(creature.coolDownSkill.Find(x => x.id == id) == null)
+        if(creature.coolDownSkill.Find(x => x.id == id) != null)
         {
-            return false;
+            return true;
         }
 
-        return true;
+        return false;
     }
 
     private void SkillConsumptionCheck(ref CreatureData creature, SkillData data, eStats type, int useValue, bool isPercent = false)
@@ -242,6 +249,8 @@ public class Skill_ItemController : MonoBehaviour
 
     #endregion
 
+    #region Effect
+
     private void RemoveEffect(ref CreatureData data, Duration duration)
     {
         switch (duration.stats)
@@ -347,6 +356,8 @@ public class Skill_ItemController : MonoBehaviour
         value += duration.value;
     }
 
+    #endregion
+
     private void StrengtheningTool(ref CreatureData data, StrengtheningTool tool)
     {
         if(tool.grantStatus == eStrengtheningTool.Non)
@@ -393,5 +404,148 @@ public class Skill_ItemController : MonoBehaviour
 
             data.abnormalStatuses[i].statusCount -= 1;
         }
+    }
+
+    private void UseGround(bool isMonster, ref SkillData skill, int currentNodeIndex, eDir dir, int nodeIndex)
+    {
+        if(dir != eDir.Non)
+        {
+            int range = skill.tool.range;
+
+            bool isWalkable = true;
+            int blockBeforeNode = 0;
+            List<int> nodeIndexs = IngameManager.instance.GetRangeNodes(currentNodeIndex, dir, range);
+
+            for (int i = 0; i < nodeIndexs.Count; i++)
+            {
+                var node = IngameManager.instance.saveData.mapData.nodeDatas[nodeIndexs[i]];
+
+                if(i == (nodeIndexs.Count - 1))
+                {
+                    if (node.isGuide == true)
+                    {
+                        isWalkable = false;
+                    }
+
+                    if (node.isBonfire == true)
+                    {
+                        isWalkable = false;
+                    }
+
+                    if (node.isShop == true)
+                    {
+                        isWalkable = false;
+                    }
+
+                    if (node.isWalkable == false)
+                    {
+                        isWalkable = false;
+                    }
+                }
+
+                if (skill.tool.grantStatus == eStrengtheningTool.Non_Teleportation)
+                {
+                    if(isMonster  == false)
+                    {
+                        if (node.isMonster == true)
+                        {
+                            isWalkable = false;
+                        }
+                    }
+                    else if(isMonster == true)
+                    {
+                        if(node.isUser == true)
+                        {
+                            isWalkable = false;
+                        }
+                    }
+                }
+
+                if (isWalkable == false)
+                {
+                    blockBeforeNode = i - 1;
+
+                    break;
+                }
+
+                blockBeforeNode = nodeIndexs[i];
+            }
+
+            if(blockBeforeNode == -1)
+            {
+                return;
+            }
+
+            if(range > 0)
+            {
+                switch(skill.tool.grantStatus)
+                {
+                    case eStrengtheningTool.Non:
+                        RangeAttack(isMonster, skill, nodeIndexs);
+                        break;
+
+                    case eStrengtheningTool.Teleportation:
+
+                        break;
+
+                    case eStrengtheningTool.Non_Teleportation:
+
+                        break;
+                }
+            }
+        }
+
+        if(nodeIndex != -1)
+        {
+
+        }
+    }
+
+    private void RangeAttack(bool isMonster, SkillData skill, List<int> indexs)
+    {
+        AbnormalStatus abnormalStatus = new AbnormalStatus();
+        abnormalStatus.id = skill.id;
+        abnormalStatus.currentStatus = skill.tool.grantStatus;
+        abnormalStatus.statusCount = skill.tool.duration;
+        abnormalStatus.value = skill.tool.value;
+
+        for (int i = 0; i < indexs.Count; i++)
+        {
+            int index = indexs[i];
+
+            if(isMonster == false)
+            {
+                if (IngameManager.instance.saveData.mapData.nodeDatas[index].isMonster == true)
+                {
+                    if(skill.tool.duration == 0)
+                    {
+                        IngameManager.instance.MonsterHit(index, skill.tool.value);
+                    }
+                    else
+                    {
+                        IngameManager.instance.saveData.mapData.monsterDatas.Find(x => x.currentNodeIndex == index).abnormalStatuses.Add(abnormalStatus);
+                    }
+                }
+            }
+            else if(isMonster == true)
+            {
+                if (IngameManager.instance.saveData.mapData.nodeDatas[index].isUser == true)
+                {
+                    if (skill.tool.duration == 0)
+                    {
+                        IngameManager.instance.PlayerHit(skill.tool.value);
+                    }
+                    else
+                    {
+                        IngameManager.instance.saveData.userData.data.abnormalStatuses.Add(abnormalStatus);
+                    }
+                }
+            }
+        }
+    }
+
+    private void RangeMone(eStrengtheningTool type)
+    {
+
     }
 }

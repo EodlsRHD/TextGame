@@ -66,7 +66,6 @@ public class ActionController : MonoBehaviour
     public void SelectSkill(int currentIndex, int getIndex, int removeIndex)
     {
         IngameManager.instance.saveData.mapData.npcDatas.Find(x => x.currentNodeIndex == currentIndex).isUseBonfire = true;
-        IngameManager.instance.saveData.mapData.nodeDatas[currentIndex].isUseBonfire = true;
         IngameManager.instance.UpdateData();
 
         IngameManager.instance.UpdateText("모닥불의 불꽃이 사그라들고 있다.");
@@ -122,18 +121,6 @@ public class ActionController : MonoBehaviour
         return data.stats.defence.currnet;
     }
     
-    private void HitSfx(int damage, int value)
-    {
-        if (value < (short)Mathf.Abs(damage))
-        {
-            GameManager.instance.soundManager.PlaySfx(eSfx.Hit_hard);
-        }
-        else
-        {
-            GameManager.instance.soundManager.PlaySfx(eSfx.Hit_light);
-        }
-    }
-
     public void Attack(int nodeMonsterIndex, System.Action onLastCallback = null)
     {
         CreatureData monster = IngameManager.instance.saveData.mapData.monsterDatas.Find(x => x.currentNodeIndex == nodeMonsterIndex);
@@ -179,9 +166,12 @@ public class ActionController : MonoBehaviour
                     return;
                 }
 
-                IngameManager.instance.saveData.userData.stats.hp.MinusCurrnet((short)Mathf.Abs(resultDamage));
+                resultDamage = Mathf.Abs(resultDamage);
 
-                HitSfx(resultDamage, IngameManager.instance.saveData.userData.stats.hp.currnet / 3);
+                if(IngameManager.instance.PlayerHit(resultDamage) == true)
+                {
+                    return;
+                }
 
                 if (IngameManager.instance.CheckAbnormalStatusEffect(eStrengtheningTool.BloodSucking, monster) == true)
                 {
@@ -192,18 +182,7 @@ public class ActionController : MonoBehaviour
                     IngameManager.instance.UpdateText("흡혈로 인해 " + BloodSuckingValue + "만큼 회복했습니다.");
                 }
 
-                IngameManager.instance.UpdateText("--- " + Mathf.Abs(resultDamage) + " 의 피해를 입었습니다.");
-
-                if (IngameManager.instance.saveData.userData.stats.hp.currnet <= 0)
-                {
-                    IngameManager.instance.saveData.userData.stats.hp.currnet = 0;
-
-                    GameManager.instance.soundManager.PlaySfx(eSfx.RoundFail);
-                    IngameManager.instance.UpdateData(Mathf.Abs(resultDamage) + " 의 피해를 입어 패배하였습니다.");
-
-                    return;
-                }
-
+                IngameManager.instance.UpdateText("--- " + resultDamage + " 의 피해를 입었습니다.");
                 IngameManager.instance.UpdateData();
 
                 return;
@@ -255,42 +234,16 @@ public class ActionController : MonoBehaviour
 
             Damage = Mathf.Abs(Damage);
 
-            GameManager.instance.soundManager.PlaySfx(eSfx.Attack);
-            IngameManager.instance.UpdateText("방어도를 제외한 " + Damage + " 의 데미지를 가했습니다.");
+            IngameManager.instance.UpdateText("방어도를 제외한 " + damage + " 의 데미지를 가했습니다.");
+            IngameManager.instance.MonsterHit(nodeMonsterIndex, Damage);
 
             if (IngameManager.instance.CheckAbnormalStatusEffect(eStrengtheningTool.BloodSucking, IngameManager.instance.saveData.userData.data) == true)
             {
                 short value = IngameManager.instance.GetValueAbnormalStatusEffect(eStrengtheningTool.BloodSucking, IngameManager.instance.saveData.userData.data);
-                short BloodSuckingValue = (short)(Damage * (0.01f * value));
+                short BloodSuckingValue = (short)(damage * (0.01f * value));
 
                 IngameManager.instance.saveData.userData.stats.hp.PlusCurrent(BloodSuckingValue);
                 IngameManager.instance.UpdateText("흡혈로 인해 " + BloodSuckingValue + "만큼 회복했습니다.");
-            }
-
-            monster.stats.hp.MinusCurrnet((short)Damage);
-
-            if (monster.stats.hp.currnet == 0)
-            {
-                IngameManager.instance.UpdateText(monster.name + " (을)를 처치하였습니다");
-                IngameManager.instance.UpdateText("--- 경험치 " + monster.stats.exp.currnet + " , 코인 " + monster.stats.coin.currnet + "을 획득했습니다");
-
-                if (monster.itemIndexs != null)
-                {
-                    for (int i = 0; i < monster.itemIndexs.Count; i++)
-                    {
-                        IngameManager.instance.GetMonsterItem(monster.itemIndexs[i]);
-                    }
-                }
-
-                IngameManager.instance.saveData.userData.stats.PlusCoin(monster.stats.coin.currnet);
-                IngameManager.instance.GetExp(monster.stats.exp.currnet);
-
-                IngameManager.instance.MonsterDead(monster);
-            }
-            else
-            {
-                IngameManager.instance.UpdateText(monster.name + "의 체력이 " + monster.stats.hp.currnet + " 만큼 남았습니다.");
-                IngameManager.instance.saveData.mapData.monsterDatas.Find(x => x.currentNodeIndex == nodeMonsterIndex).stats.hp.currnet = monster.stats.hp.currnet;
             }
 
             #endregion
@@ -301,13 +254,6 @@ public class ActionController : MonoBehaviour
 
     public void Defence()
     {
-        if (IngameManager.instance.saveData.userData.stats.ap.currnet == 0)
-        {
-            IngameManager.instance.UpdateText("--- 남아있는 행동력이 없습니다.");
-
-            return;
-        }
-
         short ap = IngameManager.instance.saveData.userData.stats.ap.currnet;
 
         Duration duration = new Duration();

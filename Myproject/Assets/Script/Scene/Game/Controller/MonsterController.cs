@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 
 public class MonsterController : MonoBehaviour
@@ -33,6 +34,7 @@ public class MonsterController : MonoBehaviour
 
         int attackMonsterIndex = 0;
         bool isAttack = false;
+        bool isSkill = false;
 
         for (int m = 0; m < IngameManager.instance.saveData.mapData.monsterDatas.Count; m++)
         {
@@ -82,12 +84,17 @@ public class MonsterController : MonoBehaviour
         }
 
         bool isAttack = false;
-        List<int> NearbyIndexs = IngameManager.instance.GetNearbyBlocks(IngameManager.instance.saveData.mapData.monsterDatas[m].currentNodeIndex);
+        List<int> NearbyIndexs = IngameManager.instance.GetNearbyNodes_NonDiagonal(IngameManager.instance.saveData.mapData.monsterDatas[m].currentNodeIndex);
 
         for (int i = 0; i < NearbyIndexs.Count; i++)
         {
             if (IngameManager.instance.saveData.userData.data.currentNodeIndex == NearbyIndexs[i])
             {
+                if(IngameManager.instance.CheckAbnormalStatusEffect(eStrengtheningTool.AttackBlocking, IngameManager.instance.saveData.userData.data) == true)
+                {
+                    break;
+                }
+
                 isAttack = true;
 
                 break;
@@ -104,49 +111,60 @@ public class MonsterController : MonoBehaviour
 
     private void MonsterMove(int m, int ap)
     {
+        List<int> visionIndexs = IngameManager.instance.Vision(IngameManager.instance.saveData.mapData.monsterDatas[m].stats.vision.currnet, IngameManager.instance.saveData.mapData.monsterDatas[m].currentNodeIndex);
 
-        bool isFindPlayer = false;
-        List<int> NearbyIndexs = IngameManager.instance.Vision(IngameManager.instance.saveData.mapData.monsterDatas[m].stats.vision.currnet, IngameManager.instance.saveData.mapData.monsterDatas[m].currentNodeIndex);
-
-        for (int i = 0; i < NearbyIndexs.Count; i++)
+        FindPlayer(m, (result) =>
         {
-            if (IngameManager.instance.saveData.mapData.nodeDatas[NearbyIndexs[i]].isWalkable == false)
+            if(result == true)
             {
-                continue;
+                MonsterSkill(m);
+
+                return;
             }
 
-            if (IngameManager.instance.saveData.mapData.nodeDatas[NearbyIndexs[i]].isMonster == true)
+            List<int> nearbyIndexs = IngameManager.instance.GetNearbyNodes_NonDiagonal(IngameManager.instance.saveData.mapData.monsterDatas[m].currentNodeIndex);
+
+            if (nearbyIndexs.Count == 0)
             {
-                continue;
+                return;
             }
 
-            if (IngameManager.instance.saveData.mapData.nodeDatas[NearbyIndexs[i]].isShop == true)
-            {
-                continue;
-            }
+            MonsterSelectMoveBlock(m, ap, ref nearbyIndexs);
+        });
+    }
 
-            if (IngameManager.instance.saveData.userData.data.currentNodeIndex == NearbyIndexs[i])
-            {
-                isFindPlayer = true;
+    private void MonsterSkill(int m)
+    {
+        CreatureData monster = IngameManager.instance.saveData.mapData.monsterDatas[m];
 
-                break;
-            }
-        }
+        Debug.LogError("TEST");
+        return;
 
-        if (isFindPlayer == true)
+        if (monster.useSkill == false)
         {
             MonsterTargetPlayer(m);
+
             return;
         }
 
-        List<int> nearbyBlocks = IngameManager.instance.GetNearbyBlocks(IngameManager.instance.saveData.mapData.monsterDatas[m].currentNodeIndex);
-
-        if (nearbyBlocks.Count == 0)
+        FindPlayer(m, (result) =>
         {
-            return;
-        }
+            if(result == false)
+            {
+                MonsterTargetPlayer(m);
 
-        MonsterSelectMoveBlock(m, ap, ref nearbyBlocks);
+                return;
+            }
+
+            SkillData skill = GameManager.instance.dataManager.GetskillData(m);
+
+            if(monster.coolDownSkill.Find(x => x.id == skill.id) != null)
+            {
+                return;
+            }
+
+            IngameManager.instance.MonsterSkill(m, skill.id);
+        });
     }
 
     private void MonsterSelectMoveBlock(int m, int ap, ref List<int> nearbyBlocks)
@@ -196,5 +214,45 @@ public class MonsterController : MonoBehaviour
         IngameManager.instance.saveData.mapData.nodeDatas[IngameManager.instance.saveData.mapData.monsterDatas[m].currentNodeIndex].isMonster = false;
         IngameManager.instance.saveData.mapData.nodeDatas[result].isMonster = true;
         IngameManager.instance.saveData.mapData.monsterDatas[m].currentNodeIndex = result;
+    }
+
+    private void FindPlayer(int m,Action<bool> onFindPlayerActionCallback)
+    {
+        CreatureData monster = IngameManager.instance.saveData.mapData.monsterDatas[m];
+
+        bool isFindPlayer = false;
+        List<int> visionIndexs = IngameManager.instance.Vision(monster.stats.vision.currnet, monster.currentNodeIndex);
+
+        for (int i = 0; i < visionIndexs.Count; i++)
+        {
+            if (IngameManager.instance.saveData.mapData.nodeDatas[visionIndexs[i]].isWalkable == false)
+            {
+                continue;
+            }
+
+            if (IngameManager.instance.saveData.mapData.nodeDatas[visionIndexs[i]].isMonster == true)
+            {
+                continue;
+            }
+
+            if (IngameManager.instance.saveData.mapData.nodeDatas[visionIndexs[i]].isShop == true)
+            {
+                continue;
+            }
+
+            if (IngameManager.instance.saveData.mapData.nodeDatas[visionIndexs[i]].isBonfire == true)
+            {
+                continue;
+            }
+
+            if (IngameManager.instance.saveData.userData.data.currentNodeIndex == visionIndexs[i])
+            {
+                isFindPlayer = true;
+
+                break;
+            }
+        }
+
+        onFindPlayerActionCallback?.Invoke(isFindPlayer);
     }
 }

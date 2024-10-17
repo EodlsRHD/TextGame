@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using System;
 using TMPro;
 using static UnityEditor.Progress;
+using UnityEditor.Experimental.GraphView;
 
 public class Targeting : MonoBehaviour
 {
@@ -51,7 +52,7 @@ public class Targeting : MonoBehaviour
 
     public void Open(eControl type, int id, Action<int, eDir> onResultCallback)
     {
-        if(onResultCallback != null)
+        if (onResultCallback != null)
         {
             _onResultCallback = onResultCallback;
         }
@@ -62,6 +63,8 @@ public class Targeting : MonoBehaviour
 
             if (item == null)
             {
+                _onResultCallback?.Invoke(-1, eDir.Non);
+
                 return;
             }
 
@@ -87,10 +90,12 @@ public class Targeting : MonoBehaviour
 
             if (skill == null)
             {
+                _onResultCallback?.Invoke(-1, eDir.Non);
+
                 return;
             }
 
-            if (skill.tool.dir != eDir.DesignateDirection || skill.tool.dir != eDir.DesignateCoordination)
+            if ((skill.tool.dir == eDir.DesignateDirection || skill.tool.dir == eDir.DesignateCoordination) == false)
             {
                 _onResultCallback?.Invoke(-1, eDir.Non);
 
@@ -107,12 +112,16 @@ public class Targeting : MonoBehaviour
             }
         }
 
+        GameManager.instance.soundManager.PlaySfx(eSfx.MenuOpen);
+
         this.gameObject.SetActive(true);
         GameManager.instance.tools.Move_Anchor_XY(eUiDir.Y, this.GetComponent<RectTransform>(), 350f, 0.5f, 0, Ease.OutBack, null);
     }
 
     private void OnClose()
     {
+        GameManager.instance.soundManager.PlaySfx(eSfx.MenuClose);
+
         GameManager.instance.tools.Move_Anchor_XY(eUiDir.Y, this.GetComponent<RectTransform>(), -360f, 0.5f, 0, Ease.InBack, () =>
         {
             this.gameObject.SetActive(false);
@@ -122,14 +131,18 @@ public class Targeting : MonoBehaviour
 
             _nodeIndex = -1;
             _dir = eDir.Non;
+            SetText(string.Empty);
         });
     }
 
     private void OnSelect()
     {
+        GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+
         if (_dir != eDir.Non)
         {
             _onResultCallback?.Invoke(_nodeIndex, _dir);
+            OnClose();
 
             return;
         }
@@ -137,7 +150,7 @@ public class Targeting : MonoBehaviour
         int X = int.Parse(_inputXcoord.text);
         int Y = int.Parse(_inputYcoord.text);
 
-        IngameManager.instance.CheckNode(X, Y, (coord, result) =>
+        IngameManager.instance.CheckWalkableNode(X, Y, (coord, result) =>
         {
             if (result == false)
             {
@@ -147,6 +160,7 @@ public class Targeting : MonoBehaviour
             }
 
             _onResultCallback?.Invoke(coord, _dir);
+            OnClose();
         });
     }
 
@@ -167,6 +181,8 @@ public class Targeting : MonoBehaviour
 
     private void OnUp()
     {
+        GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+
         _dir = eDir.Up;
 
         SetText("À§");
@@ -174,6 +190,8 @@ public class Targeting : MonoBehaviour
 
     private void OnLeft()
     {
+        GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+
         _dir = eDir.Left;
 
         SetText("¿Þ");
@@ -181,6 +199,8 @@ public class Targeting : MonoBehaviour
 
     private void OnRight()
     {
+        GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+
         _dir = eDir.Right;
 
         SetText("¿ì");
@@ -188,6 +208,8 @@ public class Targeting : MonoBehaviour
 
     private void OnDown()
     {
+        GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
+
         _dir = eDir.Down;
 
         SetText("¾Æ·¡");

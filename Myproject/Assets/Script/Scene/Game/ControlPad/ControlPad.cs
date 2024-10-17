@@ -177,22 +177,15 @@ public class ControlPad : MonoBehaviour
 
                     _targeting.Open(_eOpenPad, value, (coordResult, dirResult) =>
                     {
-                        if (coordResult != -1)
+                        if (coordResult == -1 && dirResult == eDir.Non)
                         {
-                            IngameManager.instance.UpdateText("사용할 수 없습니다.");
-
-                            return;
-                        }
-
-                        if (dirResult != eDir.Non)
-                        {
-
-
                             _onResultCallback?.Invoke(eTool.Skill, value);
                             _onResultCallback = null;
 
                             return;
                         }
+
+                        IngameManager.instance.SetDirCoord(coordResult, dirResult);
 
                         _onResultCallback?.Invoke(eTool.Skill, value);
                         _onResultCallback = null;
@@ -206,22 +199,15 @@ public class ControlPad : MonoBehaviour
 
                     _targeting.Open(_eOpenPad, value, (coordResult, dirResult) =>
                     {
-                        if (coordResult != -1)
+                        if (coordResult == -1 && dirResult == eDir.Non)
                         {
-                            IngameManager.instance.UpdateText("선택된 아이템이 없습니다.");
-
-                            return;
-                        }
-
-                        if (dirResult != eDir.Non)
-                        {
-
-
                             _onResultCallback?.Invoke(eTool.Item, value);
                             _onResultCallback = null;
 
                             return;
                         }
+
+                        IngameManager.instance.SetDirCoord(coordResult, dirResult);
 
                         _onResultCallback?.Invoke(eTool.Item, value);
                         _onResultCallback = null;
