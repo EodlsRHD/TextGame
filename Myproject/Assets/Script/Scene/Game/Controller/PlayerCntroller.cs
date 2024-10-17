@@ -115,7 +115,7 @@ public class PlayerCntroller : MonoBehaviour
             IngameManager.instance.saveData.userData.stats.ap.MinusCurrnet(2);
             IngameManager.instance.UpdatePlayerInfo(eStats.AP);
 
-            IngameManager.instance.Attack(result);
+            IngameManager.instance.Attack(false, result);
 
             return -1;
         }

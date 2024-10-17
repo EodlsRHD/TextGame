@@ -291,14 +291,55 @@ public class IngameManager : MonoBehaviour
 
     public bool CheckAbnormalStatusEffect(eStrengtheningTool type, CreatureData creature)
     {
-        var temp = creature.abnormalStatuses.Find(x => x.currentStatus == type);
+        AbnormalStatus status = creature.abnormalStatuses.Find(x => x.currentStatus == type);
 
-        return (temp != null);
+        if (type == eStrengtheningTool.AttackBlocking)
+        {
+            Debug.LogError(status != null);
+            Debug.LogError(_saveData.userData.data.abnormalStatuses.Find(x => x.currentStatus == type).value);
+        }
+
+        if (status != null)
+        {
+            Debug.LogError(type);
+
+            if (type == eStrengtheningTool.AttackBlocking || type == eStrengtheningTool.SkillBlocking ||
+                type == eStrengtheningTool.SkillBlocking || type == eStrengtheningTool.SkillBlocking || type == eStrengtheningTool.SkillBlocking)
+            {
+                Debug.LogError(status.value);
+
+                if (status.value <= 0)
+                {
+                    return false;
+                }
+
+                status.value -= 1;
+
+                Debug.LogError(_saveData.userData.data.abnormalStatuses.Find(x => x.currentStatus == type).value);
+
+                return true;
+            }
+        }
+
+        return (status != null);
     }
 
     public short GetValueAbnormalStatusEffect(eStrengtheningTool type, CreatureData creature)
     {
         return (short)creature.abnormalStatuses.Find(x => x.currentStatus == type).value;
+    }
+
+    public void RemoveAbnormalStatusEffect(eStrengtheningTool type, ref CreatureData creature)
+    {
+        AbnormalStatus status = creature.abnormalStatuses.Find(x => x.currentStatus == type);
+
+        if (type == eStrengtheningTool.AttackBlocking || type == eStrengtheningTool.SkillBlocking ||
+            type == eStrengtheningTool.SkillBlocking || type == eStrengtheningTool.SkillBlocking || type == eStrengtheningTool.SkillBlocking)
+        {
+            creature.abnormalStatuses.Remove(status);
+        }
+
+        UpdateData();
     }
 
     public void PlayerDefence(Duration duration)
@@ -434,9 +475,9 @@ public class IngameManager : MonoBehaviour
         _controlPad.UpdateData(_saveData.userData);
     }
 
-    public void Attack(int index, Action onLastCallback = null)
+    public void Attack(bool isInitiateMonster, int index, Action onLastCallback = null)
     {
-        _actionController.Attack(index, onLastCallback);
+        _actionController.Attack(isInitiateMonster, index, onLastCallback);
     }
 
     public void Defence()
@@ -1490,7 +1531,8 @@ public class CreatureGenerator
         if (_saveData.mapData.nodeDatas[index].isWalkable == true 
             && _saveData.mapData.nodeDatas[index].isMonster == false 
             && _saveData.mapData.nodeDatas[index].isUser == false
-            && _saveData.mapData.nodeDatas[index].isExit == false)
+            && _saveData.mapData.nodeDatas[index].isExit == false
+            && _saveData.mapData.nodeDatas[index].isGuide == false)
         {
             node = _saveData.mapData.nodeDatas[index];
 

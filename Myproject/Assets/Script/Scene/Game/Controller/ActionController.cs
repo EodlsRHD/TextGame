@@ -1,5 +1,3 @@
-using GoogleMobileAds.Api;
-using System.Threading;
 using UnityEngine;
 
 public class ActionController : MonoBehaviour
@@ -102,10 +100,31 @@ public class ActionController : MonoBehaviour
         }
     }
     
-    public void Attack(int nodeMonsterIndex, System.Action onLastCallback = null)
+    public void Attack(bool isInitiateMonster, int nodeMonsterIndex, System.Action onLastCallback = null)
     {
         CreatureData monster = IngameManager.instance.saveData.mapData.monsterDatas.Find(x => x.currentNodeIndex == nodeMonsterIndex);
         GameManager.instance.dataManager.AddEncyclopedia_Creature(monster.id);
+
+        if(isInitiateMonster == true)
+        {
+            if (IngameManager.instance.CheckAbnormalStatusEffect(eStrengtheningTool.AttackBlocking, IngameManager.instance.saveData.userData.data) == true)
+            {
+                IngameManager.instance.RemoveAbnormalStatusEffect(eStrengtheningTool.AttackBlocking, ref IngameManager.instance.saveData.userData.data);
+                IngameManager.instance.UpdateText("상대의 공격 시도를 막았습니다.");
+
+                return;
+            }
+        }
+        else if(isInitiateMonster == false)
+        {
+            if (IngameManager.instance.CheckAbnormalStatusEffect(eStrengtheningTool.AttackBlocking, monster) == true)
+            {
+                IngameManager.instance.RemoveAbnormalStatusEffect(eStrengtheningTool.AttackBlocking, ref monster);
+                IngameManager.instance.UpdateText(monster.name + " 의 효과에 공격 시도가 막혔습니다.");
+
+                return;
+            }
+        }
 
         IngameManager.instance.isHuntMonster = true;
 

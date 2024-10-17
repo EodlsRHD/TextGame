@@ -55,7 +55,7 @@ public class MonsterController : MonoBehaviour
 
         if (isAttack == true)
         {
-            IngameManager.instance.Attack(IngameManager.instance.saveData.mapData.monsterDatas[attackMonsterIndex].currentNodeIndex, () =>
+            IngameManager.instance.Attack(true, IngameManager.instance.saveData.mapData.monsterDatas[attackMonsterIndex].currentNodeIndex, () =>
             {
                 MonsterTurnOut();
             });
@@ -90,11 +90,6 @@ public class MonsterController : MonoBehaviour
         {
             if (IngameManager.instance.saveData.userData.data.currentNodeIndex == NearbyIndexs[i])
             {
-                if(IngameManager.instance.CheckAbnormalStatusEffect(eStrengtheningTool.AttackBlocking, IngameManager.instance.saveData.userData.data) == true)
-                {
-                    break;
-                }
-
                 isAttack = true;
 
                 break;
