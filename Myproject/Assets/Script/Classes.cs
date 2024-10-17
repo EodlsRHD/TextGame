@@ -291,7 +291,7 @@ public class AbnormalStatus
     public int id = 0;
 
     public eStrengtheningTool currentStatus = eStrengtheningTool.Non;
-    public int statusCount = 0;
+    public int duration = 0;
 
     public float value = 0;
 }
