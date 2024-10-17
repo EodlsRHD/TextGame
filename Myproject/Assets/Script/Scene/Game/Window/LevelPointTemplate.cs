@@ -73,7 +73,7 @@ public class LevelPointTemplate : MonoBehaviour
 
         if (_type == eStats.Vision)
         {
-            if(_point == 5 || _oriPoint == 5)
+            if(_point == 4 || _oriPoint == 4)
             {
                 UiManager.instance.OpenPopup(string.Empty, "최대치입니다.", string.Empty, null);
 

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 public class IngameUI : MonoBehaviour
 {
-    [SerializeField] private int _maxLevelPoint = 5;
+    [SerializeField] private int _maxLevelPoint = 3;
     [SerializeField] private GameObject _objBlocker = null;
 
     [Header("Top")]

@@ -307,8 +307,6 @@ public class DataManager : MonoBehaviour
         _saveData.encyclopediaData.itemDatas = new List<ItemData>();
         _saveData.encyclopediaData._achievementsDatas = new List<AchievementsData>();
 
-
-
         _encyclopediaData = new EncyclopediaData();
         _encyclopediaData.creatureDatas = new List<CreatureData>();
         _encyclopediaData.itemDatas = new List<ItemData>();
