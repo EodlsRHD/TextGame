@@ -1278,7 +1278,7 @@ MonoBehaviour:
     sprite: {fileID: -4187769825804618121, guid: 08f004b97cd87d0419574a56796b2906, type: 3}
     sprites: []
   - type: 6
-    sprite: {fileID: -22973045, guid: 06ad8a00384fb7b498997e4f54cf1c28, type: 3}
+    sprite: {fileID: -4672163745296329812, guid: ab6b213d85b87cd43a67af4c6a593b2c, type: 3}
     sprites: []
   - type: 7
     sprite: {fileID: 21300000, guid: 58004cff2687ab845ad577e611305a3a, type: 3}
