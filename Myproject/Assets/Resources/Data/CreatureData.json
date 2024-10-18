@@ -1,5 +1,5 @@
 {
-  "datas":
+  "datas" :
   [
     {
       "id": 101,
@@ -78,7 +78,7 @@
       "evasion": 0,
       "defultStatus": -1,
       "useSkill": "TRUE",
-      "skillIndexs": "",
+      "skillIndexs": [401],
       "itemIndexs": ""
     },
     {
@@ -198,7 +198,7 @@
       "evasion": 0,
       "defultStatus": 1,
       "useSkill": "TRUE",
-      "skillIndexs": "",
+      "skillIndexs": [401],
       "itemIndexs": ""
     },
     {
@@ -218,7 +218,7 @@
       "evasion": 0,
       "defultStatus": -1,
       "useSkill": "TRUE",
-      "skillIndexs": "",
+      "skillIndexs": [401],
       "itemIndexs": ""
     },
     {
@@ -318,7 +318,7 @@
       "evasion": 0,
       "defultStatus": -1,
       "useSkill": "TRUE",
-      "skillIndexs": "",
+      "skillIndexs": [404,405],
       "itemIndexs": ""
     },
     {
@@ -338,7 +338,7 @@
       "evasion": 0,
       "defultStatus": 11,
       "useSkill": "TRUE",
-      "skillIndexs": "",
+      "skillIndexs": [401],
       "itemIndexs": ""
     },
     {
@@ -358,7 +358,7 @@
       "evasion": 0,
       "defultStatus": 5,
       "useSkill": "TRUE",
-      "skillIndexs": "",
+      "skillIndexs": [401],
       "itemIndexs": ""
     },
     {
@@ -498,7 +498,7 @@
       "evasion": 0,
       "defultStatus": 1,
       "useSkill": "TRUE",
-      "skillIndexs": "",
+      "skillIndexs": [404,405],
       "itemIndexs": ""
     },
     {
@@ -558,7 +558,7 @@
       "evasion": 0,
       "defultStatus": 2,
       "useSkill": "TRUE",
-      "skillIndexs": "",
+      "skillIndexs": [402],
       "itemIndexs": ""
     },
     {
@@ -578,6 +578,26 @@
       "evasion": 0,
       "defultStatus": -1,
       "useSkill": "TRUE",
+      "skillIndexs": [403],
+      "itemIndexs": ""
+    },
+    {
+      "id": 130,
+      "name": "광전사",
+      "description": "체력이 낮아질수록 더욱 강해지는 근접형 몬스터.",
+      "spriteIndex": 130,
+      "coin": 1,
+      "hp": 13,
+      "mp": 30,
+      "ap": 1,
+      "exp": 12,
+      "attack": 3,
+      "defence": 1,
+      "vision": 2,
+      "attackRange": 1,
+      "evasion": 0,
+      "defultStatus": 8,
+      "useSkill": "FALSE",
       "skillIndexs": "",
       "itemIndexs": ""
     }

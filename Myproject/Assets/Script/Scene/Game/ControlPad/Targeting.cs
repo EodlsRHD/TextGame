@@ -2,8 +2,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using System;
 using TMPro;
-using static UnityEditor.Progress;
-using UnityEditor.Experimental.GraphView;
 
 public class Targeting : MonoBehaviour
 {

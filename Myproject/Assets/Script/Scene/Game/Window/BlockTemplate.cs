@@ -45,10 +45,18 @@ public class BlockTemplate : MonoBehaviour
         }
         else if (isNearby == false && _isRresrarch == true)
         {
-            _imageBlock.enabled = true;
-            _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eMapObject.Fog);
-            color = Color.black;
-            color.a = 0.4f;
+            if(blockData.isUser == true)
+            {
+                _imageBlock.enabled = false;
+                color.a = 0f;
+            }
+            else
+            {
+                _imageBlock.enabled = true;
+                _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eMapObject.Fog);
+                color = Color.black;
+                color.a = 0.4f;
+            }
         }
         else if(isNearby == true)
         {

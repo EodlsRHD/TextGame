@@ -283,13 +283,13 @@ public class DataManager : MonoBehaviour
         _saveData.userData.data.stats.coin = new CreatureStat(0, 1, 0, 0);
         _saveData.userData.data.stats.hp = new CreatureStat(10, 1, 0, 0);
         _saveData.userData.data.stats.mp = new CreatureStat(10, 1, 0, 0);
-        _saveData.userData.data.stats.ap = new CreatureStat(3, 100, 0, 0);
+        _saveData.userData.data.stats.ap = new CreatureStat(3, 1, 0, 0);
         _saveData.userData.data.stats.exp = new CreatureStat(10, 1, 0, 0);
         _saveData.userData.data.stats.attack = new CreatureStat(5, 1, 0, 0);
         _saveData.userData.data.stats.defence = new CreatureStat(0, 1, 0, 0);
         _saveData.userData.data.stats.vision = new CreatureStat(1, 1, 0, 0);
         _saveData.userData.data.stats.attackRange = new CreatureStat(1, 1, 0, 0);
-        _saveData.userData.data.skillIndexs = new List<short>() { 303, 304, 305 };
+        _saveData.userData.data.skillIndexs = new List<short>() {  };
         _saveData.userData.data.itemIndexs = new List<short>();
 
         _saveData.userData.data.skill_Duration = new List<Duration>();
