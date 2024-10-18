@@ -172,11 +172,11 @@ public class CreatureStats
 
     public bool PlusExp(short value, short maximumExp)
     {
-        exp.currnet += (short)(value + (value * 0.1f * exp.percent));
+        exp.current += (short)(value + (value * 0.1f * exp.percent));
 
-        if(exp.currnet > maximumExp)
+        if(exp.current > maximumExp)
         {
-            exp.currnet -= maximumExp;
+            exp.current -= maximumExp;
 
             return true;
         }
@@ -186,28 +186,28 @@ public class CreatureStats
 
     public bool MinusExp(short value)
     {
-        if (exp.currnet - value < 0)
+        if (exp.current - value < 0)
         {
             return false;
         }
 
-        exp.currnet -= value;
+        exp.current -= value;
         return true;
     }
 
     public void PlusCoin(short value)
     {
-        coin.currnet += (short)(value + (value * 0.1f * coin.percent));
+        coin.current += (short)(value + (value * 0.1f * coin.percent));
     }
 
     public bool MinusCoin(short value)
     {
-        if (coin.currnet - value < 0)
+        if (coin.current - value < 0)
         {
             return false;
         }
 
-        coin.currnet -= value;
+        coin.current -= value;
         return true;
     }
 }
@@ -219,7 +219,7 @@ public class CreatureStat
     public short point = 1;
     public short plus = 0;
     public short percent = 0;
-    public short currnet = 0;
+    public short current = 0;
 
     public short maximum
     {
@@ -233,32 +233,45 @@ public class CreatureStat
         this.plus = plus;
         this.percent = percent;
         this.plus = plus;
-        currnet = (short)(this.defult * this.point);
+        current = (short)(this.defult * this.point);
     }
 
     public void Maximum()
     {
-        currnet = maximum;
+        current = maximum;
     }
 
     public void PlusCurrent(short value)
     {
-        currnet += value;
+        current += value;
 
-        if(currnet > maximum)
+        if(current > maximum)
         {
-            currnet = maximum;
+            current = maximum;
         }
     }
 
     public void MinusCurrnet(short value)
     {
-        currnet -= value;
+        current -= value;
 
-        if (currnet < 0)
+        if (current < 0)
         {
-            currnet = 0;
+            current = 0;
         }
+    }
+
+    public bool isUse(short value)
+    {
+        short Current = this.current;
+        Current -= value;
+
+        if(Current < 0)
+        {
+            return false;
+        }
+
+        return true;
     }
 }
 

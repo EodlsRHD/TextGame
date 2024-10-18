@@ -19,7 +19,7 @@ public class PlayerCntroller : MonoBehaviour
             return;
         }
 
-        if (IngameManager.instance.saveData.userData.stats.ap.currnet == 0)
+        if (IngameManager.instance.saveData.userData.stats.ap.current == 0)
         {
             IngameManager.instance.UpdatePopup("행동력이 부족합니다");
 
@@ -106,7 +106,7 @@ public class PlayerCntroller : MonoBehaviour
 
         if (IngameManager.instance.saveData.mapData.nodeDatas[result].isMonster == true)
         {
-            if(IngameManager.instance.saveData.userData.stats.ap.currnet < 2)
+            if(IngameManager.instance.saveData.userData.stats.ap.current < 2)
             {
                 IngameManager.instance.UpdatePopup("행동력이 부족합니다");
                 return -1;
@@ -122,7 +122,7 @@ public class PlayerCntroller : MonoBehaviour
 
         if (IngameManager.instance.saveData.mapData.nodeDatas[result].isShop == true || IngameManager.instance.saveData.mapData.nodeDatas[result].isBonfire == true)
         {
-            if (IngameManager.instance.saveData.userData.stats.ap.currnet < 1)
+            if (IngameManager.instance.saveData.userData.stats.ap.current < 1)
             {
                 IngameManager.instance.UpdatePopup("행동력이 부족합니다");
 
@@ -178,7 +178,7 @@ public class PlayerCntroller : MonoBehaviour
         {
             case eControl.Defence:
                 {
-                    if (IngameManager.instance.saveData.userData.stats.ap.currnet == 0)
+                    if (IngameManager.instance.saveData.userData.stats.ap.current == 0)
                     {
                         IngameManager.instance.UpdateText("--- 남아있는 행동력이 없습니다.");
 
@@ -225,7 +225,7 @@ public class PlayerCntroller : MonoBehaviour
     public List<int> PlayerSearchNearby()
     {
         List<Action> actions = new List<Action>();
-        List<int> NearbyIndexs = IngameManager.instance.Vision(IngameManager.instance.saveData.userData.stats.vision.currnet, IngameManager.instance.saveData.userData.data.currentNodeIndex);
+        List<int> NearbyIndexs = IngameManager.instance.Vision(IngameManager.instance.saveData.userData.stats.vision.current, IngameManager.instance.saveData.userData.data.currentNodeIndex);
 
         bool Non = false;
 

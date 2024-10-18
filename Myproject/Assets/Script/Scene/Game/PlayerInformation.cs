@@ -34,10 +34,10 @@ public class PlayerInformation : MonoBehaviour
         _userData = userData;
 
         _textLevel.text = userData.level.ToString();
-        _textHP.text = userData.stats.hp.currnet + " / " + userData.stats.hp.maximum;
-        _textMP.text = userData.stats.mp.currnet + " / " + userData.stats.mp.maximum;
-        _textAP.text = userData.stats.ap.currnet + " / " + userData.stats.ap.maximum;
-        _textEXP.text = userData.stats.exp.currnet + " / " + userData.maximumEXP;
+        _textHP.text = userData.stats.hp.current + " / " + userData.stats.hp.maximum;
+        _textMP.text = userData.stats.mp.current + " / " + userData.stats.mp.maximum;
+        _textAP.text = userData.stats.ap.current + " / " + userData.stats.ap.maximum;
+        _textEXP.text = userData.stats.exp.current + " / " + userData.maximumEXP;
     }
 
     public void UpdatePlayerInfo(eStats type, UserData userData)
@@ -51,30 +51,30 @@ public class PlayerInformation : MonoBehaviour
                 break;
 
             case eStats.HP:
-                _textHP.text = userData.stats.hp.currnet + " / " + userData.stats.hp.maximum;
+                _textHP.text = userData.stats.hp.current + " / " + userData.stats.hp.maximum;
                 break;
 
             case eStats.MP:
-                _textMP.text = userData.stats.mp.currnet + " / " + userData.stats.mp.maximum;
+                _textMP.text = userData.stats.mp.current + " / " + userData.stats.mp.maximum;
                 break;
 
             case eStats.AP:
-                _textAP.text = userData.stats.ap.currnet + " / " + userData.stats.ap.maximum;
+                _textAP.text = userData.stats.ap.current + " / " + userData.stats.ap.maximum;
                 break;
 
             case eStats.EXP:
-                _textEXP.text = userData.stats.exp.currnet + " / " + userData.maximumEXP;
+                _textEXP.text = userData.stats.exp.current + " / " + userData.maximumEXP;
                 break;
         }
     }
 
     public void Open()
     {
-        _textCoin.text = _userData.stats.coin.currnet.ToString();
-        _textAttack.text = (_userData.stats.attack.currnet + _userData.stats.attack.plus).ToString();
-        _textDefence.text = (_userData.stats.defence.currnet + _userData.stats.defence.plus).ToString();
-        _textVision.text = (_userData.stats.vision.currnet + _userData.stats.vision.plus).ToString();
-        _textAttackRange.text = (_userData.stats.attackRange.currnet + _userData.stats.attackRange.plus).ToString();
+        _textCoin.text = _userData.stats.coin.current.ToString();
+        _textAttack.text = (_userData.stats.attack.current + _userData.stats.attack.plus).ToString();
+        _textDefence.text = (_userData.stats.defence.current + _userData.stats.defence.plus).ToString();
+        _textVision.text = (_userData.stats.vision.current + _userData.stats.vision.plus).ToString();
+        _textAttackRange.text = (_userData.stats.attackRange.current + _userData.stats.attackRange.plus).ToString();
 
         _objInformation.SetActive(true);
 

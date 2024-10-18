@@ -88,6 +88,13 @@ public class Targeting : MonoBehaviour
         {
             var skill = GameManager.instance.dataManager.GetskillData(id);
 
+            if(IngameManager.instance.saveData.userData.stats.mp.current < skill.useMp)
+            {
+                IngameManager.instance.UpdatePopup("마나가 부족합니다.");
+
+                return;
+            }
+
             if (skill == null)
             {
                 _onResultCallback?.Invoke(-1, eDir.Non);
@@ -129,6 +136,9 @@ public class Targeting : MonoBehaviour
             _objCoordination.SetActive(false);
             _objDirection.SetActive(false);
 
+            _inputXcoord.text = string.Empty;
+            _inputYcoord.text = string.Empty;
+
             _nodeIndex = -1;
             _dir = eDir.Non;
             SetText(string.Empty);
@@ -150,18 +160,10 @@ public class Targeting : MonoBehaviour
         int X = int.Parse(_inputXcoord.text);
         int Y = int.Parse(_inputYcoord.text);
 
-        IngameManager.instance.CheckWalkableNode(X, Y, (coord, result) =>
-        {
-            if (result == false)
-            {
-                IngameManager.instance.UpdatePopup("이동할 수 없는 좌표입니다.");
+        int index = (X + 1) + (IngameManager.instance.saveData.mapData.mapSize * Y);
+        _onResultCallback?.Invoke(index, _dir);
 
-                return;
-            }
-
-            _onResultCallback?.Invoke(coord, _dir);
-            OnClose();
-        });
+        OnClose();
     }
 
     private void OnCheckCoord(string coord, ref TMP_InputField input)

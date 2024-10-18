@@ -76,7 +76,7 @@ public class MonsterController : MonoBehaviour
         List<int> dx = new List<int>();
         List<int> dy = new List<int>();
 
-        int range = IngameManager.instance.saveData.mapData.monsterDatas[m].stats.attackRange.currnet;
+        int range = IngameManager.instance.saveData.mapData.monsterDatas[m].stats.attackRange.current;
         for (int i = -range; i <= range; i++)
         {
             dx.Add(i);
@@ -106,7 +106,7 @@ public class MonsterController : MonoBehaviour
 
     private void MonsterMove(int m, int ap)
     {
-        List<int> visionIndexs = IngameManager.instance.Vision(IngameManager.instance.saveData.mapData.monsterDatas[m].stats.vision.currnet, IngameManager.instance.saveData.mapData.monsterDatas[m].currentNodeIndex);
+        List<int> visionIndexs = IngameManager.instance.Vision(IngameManager.instance.saveData.mapData.monsterDatas[m].stats.vision.current, IngameManager.instance.saveData.mapData.monsterDatas[m].currentNodeIndex);
 
         FindPlayer(m, (result) =>
         {
@@ -192,6 +192,14 @@ public class MonsterController : MonoBehaviour
 
             return;
         }
+
+        if(IngameManager.instance.saveData.mapData.nodeDatas[nearbyBlocks[randomIndex]].isExit == true)
+        {
+            MonsterSelectMoveBlock(m, ap, ref nearbyBlocks);
+
+            return;
+        }
+
         IngameManager.instance.saveData.mapData.nodeDatas[IngameManager.instance.saveData.mapData.monsterDatas[m].currentNodeIndex].isMonster = false;
         IngameManager.instance.saveData.mapData.nodeDatas[nearbyBlocks[randomIndex]].isMonster = true;
 
@@ -216,7 +224,7 @@ public class MonsterController : MonoBehaviour
         CreatureData monster = IngameManager.instance.saveData.mapData.monsterDatas[m];
 
         bool isFindPlayer = false;
-        List<int> visionIndexs = IngameManager.instance.Vision(monster.stats.vision.currnet, monster.currentNodeIndex);
+        List<int> visionIndexs = IngameManager.instance.Vision(monster.stats.vision.current, monster.currentNodeIndex);
 
         for (int i = 0; i < visionIndexs.Count; i++)
         {

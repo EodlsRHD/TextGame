@@ -48,7 +48,7 @@ public class BlockTemplate : MonoBehaviour
             _imageBlock.enabled = true;
             _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eMapObject.Fog);
             color = Color.black;
-            color.a = 0.2f;
+            color.a = 0.4f;
         }
         else if(isNearby == true)
         {
@@ -166,11 +166,6 @@ public class BlockTemplate : MonoBehaviour
 
     private void SetColor(Color color)
     {
-        if(GameManager.instance.isMapBackgroundUpdate == true)
-        {
-            color.a *= 0.8f;
-        }
-
         _imageBlock.color = color;
     }
 }

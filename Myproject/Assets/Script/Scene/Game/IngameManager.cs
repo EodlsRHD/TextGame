@@ -239,7 +239,7 @@ public class IngameManager : MonoBehaviour
         {
             UpdatePopup("가방이 비어있지 않습니다.");
 
-            List<int> list = Vision(_saveData.userData.stats.vision.currnet, _saveData.userData.data.currentNodeIndex);
+            List<int> list = Vision(_saveData.userData.stats.vision.current, _saveData.userData.data.currentNodeIndex);
             int ranIndex = Random.Range(0, list.Count);
             ItemData item = GameManager.instance.dataManager.GetItemData(id);
             item.currentNodeIndex = list[ranIndex];
@@ -332,7 +332,7 @@ public class IngameManager : MonoBehaviour
     {
         _skillitemCountroller.PlayerDefence(ref _saveData.userData.data, duration);
 
-        _saveData.userData.stats.ap.currnet = 0;
+        _saveData.userData.stats.ap.current = 0;
         UpdatePlayerInfo(eStats.AP);
     }
 
@@ -349,7 +349,7 @@ public class IngameManager : MonoBehaviour
 
         _saveData.userData.stats.hp.MinusCurrnet((short)damage);
 
-        if(_saveData.userData.stats.hp.currnet == 0)
+        if(_saveData.userData.stats.hp.current == 0)
         {
             UpdateData(damage + " 의 피해를 입었습니다.");
 
@@ -368,10 +368,10 @@ public class IngameManager : MonoBehaviour
 
         monster.stats.hp.MinusCurrnet((short)damage);
 
-        if (monster.stats.hp.currnet == 0)
+        if (monster.stats.hp.current == 0)
         {
             UpdateText(monster.name + " (을)를 처치하였습니다");
-            UpdateText("--- 경험치 " + monster.stats.exp.currnet + " , 코인 " + monster.stats.coin.currnet + "을 획득했습니다");
+            UpdateText("--- 경험치 " + monster.stats.exp.current + " , 코인 " + monster.stats.coin.current + "을 획득했습니다");
 
             if (monster.itemIndexs != null)
             {
@@ -381,15 +381,15 @@ public class IngameManager : MonoBehaviour
                 }
             }
 
-            _saveData.userData.stats.PlusCoin(monster.stats.coin.currnet);
-            GetExp(monster.stats.exp.currnet);
+            _saveData.userData.stats.PlusCoin(monster.stats.coin.current);
+            GetExp(monster.stats.exp.current);
 
             MonsterDead(monster);
         }
         else
         {
-            UpdateText(monster.name + "의 체력이 " + monster.stats.hp.currnet + " 만큼 남았습니다.");
-            _saveData.mapData.monsterDatas.Find(x => x.currentNodeIndex == nodeMonsterNodeIndex).stats.hp.currnet = monster.stats.hp.currnet;
+            UpdateText(monster.name + "의 체력이 " + monster.stats.hp.current + " 만큼 남았습니다.");
+            _saveData.mapData.monsterDatas.Find(x => x.currentNodeIndex == nodeMonsterNodeIndex).stats.hp.current = monster.stats.hp.current;
         }
     }
 
@@ -416,7 +416,23 @@ public class IngameManager : MonoBehaviour
     public void MonsterSkill(int monsterIdnex, int skill_Index)
     {
         CreatureData data = _saveData.mapData.monsterDatas[monsterIdnex];
+        SkillData skill = GameManager.instance.dataManager.GetskillData(skill_Index);
+
         UpdateText(data.name + " (이)가 " + GameManager.instance.dataManager.GetskillData(skill_Index).name + " (을)를 시전했습니다.");
+
+        int playerIndex = -1;
+        eDir playerDir = eDir.Non;
+
+        if(skill.tool.dir == eDir.DesignateDirection)
+        {
+            playerIndex = _saveData.userData.data.currentNodeIndex;
+        }
+        else if(skill.tool.dir == eDir.DesignateCoordination)
+        {
+            playerDir = GetTargetDirection(monsterIdnex, playerIndex);
+        }
+
+        SetDirCoord(playerIndex, playerDir);
 
         _skillitemCountroller.UseSkill(true, skill_Index, ref data);
     }
@@ -430,7 +446,7 @@ public class IngameManager : MonoBehaviour
 
     public void ShopOpen(DataManager.Npc_Data npc)
     {
-        _shop.Open(npc, _saveData.userData.stats.coin.currnet);
+        _shop.Open(npc, _saveData.userData.stats.coin.current);
     }
 
     public void CallAttacker(CreatureData monster, Action onLastCallback, Action<eWinorLose, int> onResultCallback)
@@ -447,7 +463,7 @@ public class IngameManager : MonoBehaviour
             _saveData.userData.stats.ap.point = newData.stats.ap.point;
             _saveData.userData.stats.attack.point = newData.stats.attack.point;
             _saveData.userData.stats.defence.point = newData.stats.defence.point;
-            _saveData.userData.stats.vision.currnet = newData.stats.vision.currnet;
+            _saveData.userData.stats.vision.current = newData.stats.vision.current;
             _saveData.userData.stats.attackRange.point = newData.stats.attackRange.point;
 
             _saveData.userData.stats.Maximum();
@@ -491,10 +507,10 @@ public class IngameManager : MonoBehaviour
             maxAp -= GetValueAbnormalStatusEffect(eStrengtheningTool.Slowdown, _saveData.userData.data);
         }
 
-        _saveData.userData.stats.ap.currnet = maxAp;
+        _saveData.userData.stats.ap.current = maxAp;
         UpdatePlayerInfo(eStats.AP);
 
-        UpdateText("행동력이 " + saveData.userData.stats.ap.currnet + "만큼 남았습니다.");
+        UpdateText("행동력이 " + saveData.userData.stats.ap.current + "만큼 남았습니다.");
 
         _playerController.PlayerSearchNearby();
         UpdateMap();
@@ -588,26 +604,28 @@ public class IngameManager : MonoBehaviour
             _mapController.Close(false, () =>
             {
                 _ingameUI.HideMapButton();
-                _mapController.UpdateMapData(_saveData, Vision(_saveData.userData.stats.vision.currnet, _saveData.userData.data.currentNodeIndex));
+                _mapController.UpdateMapData(_saveData, Vision(_saveData.userData.stats.vision.current, _saveData.userData.data.currentNodeIndex));
+                _textView.UpdateTextViewHeight();
             });
 
             return;
         }
 
         _ingameUI.HideMapButton();
-        _mapController.UpdateMapData(_saveData, Vision(_saveData.userData.stats.vision.currnet, _saveData.userData.data.currentNodeIndex));
+        _mapController.UpdateMapData(_saveData, Vision(_saveData.userData.stats.vision.current, _saveData.userData.data.currentNodeIndex));
+        _textView.UpdateTextViewHeight();
     }
 
     public void UpdateData(string contnet = null)
     {
         _ingameUI.UpdatePlayerInfo(_saveData.userData);
 
-        if (_saveData.userData.stats.hp.currnet == 0)
+        if (_saveData.userData.stats.hp.current == 0)
         {
             _ingameUI.OpenNextRoundWindow(eRoundClear.Fail, contnet);
         }
 
-        _mapController.UpdateMapData(_saveData, Vision(_saveData.userData.stats.vision.currnet, _saveData.userData.data.currentNodeIndex));
+        _mapController.UpdateMapData(_saveData, Vision(_saveData.userData.stats.vision.current, _saveData.userData.data.currentNodeIndex));
     }
 
     public void UpdatePlayerData()
@@ -682,7 +700,54 @@ public class IngameManager : MonoBehaviour
         onRasultCallback?.Invoke(index, true);
     }
 
-    public List<int> GetRangeNodes(int currentNodeIndex, eDir dir, int range)
+    public bool CheckWalkableNode(int index)
+    {
+        if(index < 0 || index > _saveData.mapData.nodeDatas.Count)
+        {
+            return false;
+        }
+
+        var node = _saveData.mapData.nodeDatas[index];
+
+        if(node.isGuide == false)
+        {
+            return false;
+        }
+
+        if(node.isUser == false)
+        {
+            return false;
+        }
+
+        if(node.isWalkable == false)
+        {
+            return false;
+        }
+
+        if(node.isMonster == false)
+        {
+            return false;
+        }
+
+        if(node.isBonfire == false)
+        {
+            return false;
+        }
+
+        if(node.isShop == false)
+        {
+            return false;
+        }
+
+        if(node.isExit == false)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    public List<int> GetDirectionRangeNodes(int currentNodeIndex, eDir dir, int range)
     {
         List<int> dx = new List<int>();
         List<int> dy = new List<int>();
@@ -806,12 +871,49 @@ public class IngameManager : MonoBehaviour
                         continue;
                     }
 
-                    if (resultIndex == _saveData.mapData.exitNodeIndex)
+                    if (0 <= resultIndex && resultIndex < (_saveData.mapData.mapSize * _saveData.mapData.mapSize))
+                    {
+                        result.Add(resultIndex);
+                    }
+                }
+            }
+        }
+
+        return result;
+    }
+
+    public List<int> GetNearbyNodes_NonDiagonal(List<int> dx, List<int> dy, int index)
+    {
+        List<int> result = new List<int>();
+
+        for(int y = 0; y < dy.Count; y++)
+        {
+            for(int x = 0; x < dx.Count; x++)
+            {
+                if(Mathf.Abs(dx[x]) + Mathf.Abs(dy[y]) <= Mathf.Abs(dx[dx.Count - 1]))
+                {
+                    int nearbyX = (index % _saveData.mapData.mapSize) + dx[x];
+
+                    if(nearbyX < 0 || _saveData.mapData.mapSize <= nearbyX)
                     {
                         continue;
                     }
 
-                    if (0 <= resultIndex && resultIndex < (_saveData.mapData.mapSize * _saveData.mapData.mapSize))
+                    int nearbyY = (index / _saveData.mapData.mapSize) + dy[y];
+
+                    if(nearbyY < 0 || _saveData.mapData.mapSize <= nearbyY)
+                    {
+                        continue;
+                    }
+
+                    int resultIndex = nearbyX + (nearbyY * _saveData.mapData.mapSize);
+
+                    if(index == resultIndex)
+                    {
+                        continue;
+                    }
+
+                    if(0 <= resultIndex && resultIndex < (_saveData.mapData.mapSize * _saveData.mapData.mapSize))
                     {
                         result.Add(resultIndex);
                     }
@@ -902,6 +1004,34 @@ public class IngameManager : MonoBehaviour
         }
 
         return result;
+    }
+
+    public eDir GetTargetDirection(int currentNodeIndex, int targetNodeIndex)
+    {
+        int value = targetNodeIndex - currentNodeIndex;
+
+        if((value % _saveData.mapData.mapSize) == 0)
+        {
+            if(value > 0)
+            {
+                return eDir.Up;
+            }
+            else if(value < 0)
+            {
+                return eDir.Down;
+            }
+        }
+
+        if(value > 0)
+        {
+            return eDir.Right;
+        }
+        else if(value < 0)
+        {
+            return eDir.Left;
+        }
+
+        return eDir.Non;
     }
 
     public List<int> Vision(int vision, int currentIndex)
@@ -1500,11 +1630,11 @@ public class CreatureGenerator
     {
         float increasePoint = ((_saveData.round - 1) * 0.1f);
 
-        creature.stats.coin.currnet += (short)(creature.stats.coin.currnet * increasePoint);
-        creature.stats.hp.currnet += (short)(creature.stats.hp.currnet * increasePoint);
-        creature.stats.exp.currnet += (short)(creature.stats.exp.currnet * increasePoint);
-        creature.stats.attack.currnet += (short)(creature.stats.attack.currnet * increasePoint);
-        creature.stats.defence.currnet += (short)(creature.stats.defence.currnet * (increasePoint * 0.4f));
+        creature.stats.coin.current += (short)(creature.stats.coin.current * increasePoint);
+        creature.stats.hp.current += (short)(creature.stats.hp.current * increasePoint);
+        creature.stats.exp.current += (short)(creature.stats.exp.current * increasePoint);
+        creature.stats.attack.current += (short)(creature.stats.attack.current * increasePoint);
+        creature.stats.defence.current += (short)(creature.stats.defence.current * (increasePoint * 0.4f));
     }
 
     private void Done()

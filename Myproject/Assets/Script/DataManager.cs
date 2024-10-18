@@ -289,7 +289,7 @@ public class DataManager : MonoBehaviour
         _saveData.userData.data.stats.defence = new CreatureStat(0, 1, 0, 0);
         _saveData.userData.data.stats.vision = new CreatureStat(1, 1, 0, 0);
         _saveData.userData.data.stats.attackRange = new CreatureStat(1, 1, 0, 0);
-        _saveData.userData.data.skillIndexs = new List<short>() { 303, 304 };
+        _saveData.userData.data.skillIndexs = new List<short>() { 303, 304, 305 };
         _saveData.userData.data.itemIndexs = new List<short>();
 
         _saveData.userData.data.skill_Duration = new List<Duration>();

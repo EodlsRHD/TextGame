@@ -151,7 +151,7 @@ public class ActionController : MonoBehaviour
 
     public void Defence()
     {
-        short ap = IngameManager.instance.saveData.userData.stats.ap.currnet;
+        short ap = IngameManager.instance.saveData.userData.stats.ap.current;
 
         Duration duration = new Duration();
         duration.id = 0;
@@ -160,7 +160,7 @@ public class ActionController : MonoBehaviour
         duration.stats = eStats.Defence;
         duration.value = ap;
 
-        IngameManager.instance.saveData.userData.stats.ap.currnet = 0;
+        IngameManager.instance.saveData.userData.stats.ap.current = 0;
         IngameManager.instance.PlayerDefence(duration);
 
         IngameManager.instance.UpdateText("행동력을 모드 소진하였습니다.");

@@ -116,6 +116,35 @@
       "value": 0,
       "revealMap": "FALSE",
       "maintain": 0
+    },
+    {
+      "id": 305,
+      "name": "폭발 공격",
+      "description": "지정된 좌표 주변 2칸이내에 광역 피해를 줍니다.",
+      "coolDown": 0,
+      "duration": 0,
+      "useMp": 5,
+      "hp": 0,
+      "hpPercentIncreased": 0,
+      "mp": 0,
+      "mpPercentIncreased": 0,
+      "ap": 0,
+      "apPercentIncreased": 0,
+      "exp": 0,
+      "expPercentIncreased": 0,
+      "coin": 0,
+      "coinPercentIncreased": 0,
+      "attack": 0,
+      "attackPercentIncreased": 0,
+      "defence": 0,
+      "defencePercentIncreased": 0,
+      "dir": 6,
+      "needStatus": -1,
+      "grantStatus": -1,
+      "range": 2,
+      "value": 40,
+      "revealMap": "FALSE",
+      "maintain": 0
     }
   ]
 }

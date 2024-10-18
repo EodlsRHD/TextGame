@@ -9,9 +9,13 @@ public class TextView : MonoBehaviour
     [Header("Template"), SerializeField] private TextViewTemplate _template = null;
     [Header("Template Parant"), SerializeField] private Transform _trTemplateParant = null;
 
+    private RectTransform _rectTransform;
+
     public void Initialize()
     {
         _template.Initialize();
+
+        _rectTransform = GetComponent<RectTransform>();
     }
 
     /// <summary>
@@ -30,6 +34,26 @@ public class TextView : MonoBehaviour
         string content = "플레이어 좌표 : " + node.x + " , " + node.y; 
 
         InstantiateTemplate(content);
+    }
+
+    public void UpdateTextViewHeight()
+    {
+        this.gameObject.SetActive(false);
+
+        var offset = _rectTransform.offsetMax;
+
+        if(GameManager.instance.isMapBackgroundUpdate == true)
+        {
+            offset = new Vector2(offset.x, -1020f);
+        }
+        else
+        {
+            offset = new Vector2(offset.x, -180f);
+        }
+
+        _rectTransform.offsetMax = offset;
+
+        this.gameObject.SetActive(true);
     }
 
     /// <summary>

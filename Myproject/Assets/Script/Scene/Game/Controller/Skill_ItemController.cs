@@ -1,4 +1,5 @@
 using JetBrains.Annotations;
+using System;
 using System.Collections.Generic;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine; 
@@ -76,6 +77,13 @@ public class Skill_ItemController : MonoBehaviour
         if ((_dir == eDir.Non && _nodeIndex == -1) == false)
         {
             UseGround(isMonster, ref skill, creature.currentNodeIndex, _dir, _nodeIndex);
+        }
+        else
+        {
+            if(isMonster == false)
+            {
+                IngameManager.instance.UpdatePlayerInfo(eStats.MP);
+            }
         }
 
         SkillConsumptionCheck(ref creature, skill, eStats.HP, skill.tool.hp.value);
@@ -278,24 +286,24 @@ public class Skill_ItemController : MonoBehaviour
         switch (duration.stats)
         {
             case eStats.HP:
-                Remove(duration, ref data.stats.hp.currnet, ref data.stats.hp.percent);
+                Remove(duration, ref data.stats.hp.current, ref data.stats.hp.percent);
                 break;
 
             case eStats.MP:
-                Remove(duration, ref data.stats.mp.currnet, ref data.stats.mp.percent);
+                Remove(duration, ref data.stats.mp.current, ref data.stats.mp.percent);
                 break;
 
             case eStats.AP:
-                Remove(duration, ref data.stats.ap.currnet, ref data.stats.ap.percent);
+                Remove(duration, ref data.stats.ap.current, ref data.stats.ap.percent);
                 break;
 
             case eStats.EXP:
-                Remove(duration, ref data.stats.exp.currnet, ref data.stats.exp.percent);
+                Remove(duration, ref data.stats.exp.current, ref data.stats.exp.percent);
                 IngameManager.instance.GetExp(0);
                 break;
 
             case eStats.Coin:
-                Remove(duration, ref data.stats.coin.currnet, ref data.stats.coin.percent);
+                Remove(duration, ref data.stats.coin.current, ref data.stats.coin.percent);
                 break;
 
             case eStats.Attack:
@@ -334,24 +342,24 @@ public class Skill_ItemController : MonoBehaviour
         switch (duration.stats)
         {
             case eStats.HP:
-                Apply(duration, ref data.stats.hp.currnet, ref data.stats.hp.percent);
+                Apply(duration, ref data.stats.hp.current, ref data.stats.hp.percent);
                 break;
 
             case eStats.MP:
-                Apply(duration, ref data.stats.mp.currnet, ref data.stats.mp.percent);
+                Apply(duration, ref data.stats.mp.current, ref data.stats.mp.percent);
                 break;
 
             case eStats.AP:
-                Apply(duration, ref data.stats.ap.currnet, ref data.stats.ap.percent);
+                Apply(duration, ref data.stats.ap.current, ref data.stats.ap.percent);
                 break;
 
             case eStats.EXP:
-                Apply(duration, ref data.stats.exp.currnet, ref data.stats.exp.percent);
+                Apply(duration, ref data.stats.exp.current, ref data.stats.exp.percent);
                 IngameManager.instance.GetExp(0);
                 break;
 
             case eStats.Coin:
-                Apply(duration, ref data.stats.coin.currnet, ref data.stats.coin.percent);
+                Apply(duration, ref data.stats.coin.current, ref data.stats.coin.percent);
                 break;
 
             case eStats.Attack:
@@ -431,13 +439,15 @@ public class Skill_ItemController : MonoBehaviour
 
     private void UseGround(bool isMonster, ref SkillData skill, int currentNodeIndex, eDir dir, int nodeIndex)
     {
+        IngameManager.instance.UpdateText(skill.name + " (을)를 사용했습니다.");
+
         if(dir != eDir.Non)
         {
             int range = skill.tool.range;
 
             bool isWalkable = true;
             int blockBeforeNode = 0;
-            List<int> nodeIndexs = IngameManager.instance.GetRangeNodes(currentNodeIndex, dir, range);
+            List<int> nodeIndexs = IngameManager.instance.GetDirectionRangeNodes(currentNodeIndex, dir, range);
 
             for (int i = 0; i < nodeIndexs.Count; i++)
             {
@@ -499,27 +509,19 @@ public class Skill_ItemController : MonoBehaviour
                 blockBeforeNode = i;
             }
 
-            if(blockBeforeNode == -1)
+            switch(skill.tool.grantStatus)
             {
-                return;
-            }
+                case eStrengtheningTool.Non:
+                    RangeAttack(isMonster, skill, nodeIndexs);
+                    break;
 
-            if(range > 0)
-            {
-                switch(skill.tool.grantStatus)
-                {
-                    case eStrengtheningTool.Non:
-                        RangeAttack(isMonster, skill, nodeIndexs);
-                        break;
+                case eStrengtheningTool.Teleportation:
+                    RangeMove(isMonster, skill, nodeIndexs, currentNodeIndex);
+                    break;
 
-                    case eStrengtheningTool.Teleportation:
-                        RangeMove(isMonster, skill, nodeIndexs, currentNodeIndex);
-                        break;
-
-                    case eStrengtheningTool.Non_Teleportation:
-                        RangeMove(isMonster, skill, nodeIndexs, currentNodeIndex, blockBeforeNode);
-                        break;
-                }
+                case eStrengtheningTool.Non_Teleportation:
+                    RangeMove(isMonster, skill, nodeIndexs, currentNodeIndex, blockBeforeNode);
+                    break;
             }
         }
 
@@ -528,18 +530,16 @@ public class Skill_ItemController : MonoBehaviour
             switch (skill.tool.grantStatus)
             {
                 case eStrengtheningTool.Non:
-
+                    NodeAttack(isMonster, skill, nodeIndex);
                     break;
 
                 case eStrengtheningTool.Teleportation:
-
-                    break;
-
-                case eStrengtheningTool.Non_Teleportation:
-
+                    NodeMove(isMonster, skill, nodeIndex, currentNodeIndex);
                     break;
             }
         }
+
+        IngameManager.instance.UpdateData();
     }
 
     private void RangeAttack(bool isMonster, SkillData skill, List<int> indexs)
@@ -589,8 +589,21 @@ public class Skill_ItemController : MonoBehaviour
     {
         int destinationIndex = indexs[blockBeforeNodeIndex == -1 ? indexs.Count - 1 : blockBeforeNodeIndex];
 
+        AbnormalStatus abnormalStatus = new AbnormalStatus();
+        abnormalStatus.id = skill.id;
+        abnormalStatus.currentStatus = skill.tool.grantStatus;
+        abnormalStatus.duration = skill.tool.duration;
+        abnormalStatus.value = skill.tool.value;
+
         if(isMonster == false)
         {
+            IngameManager.instance.saveData.userData.stats.mp.MinusCurrnet(skill.useMp);
+
+            if(skill.tool.duration > 0)
+            {
+                IngameManager.instance.saveData.mapData.monsterDatas.Find(x => x.currentNodeIndex == currentNodeIndex).abnormalStatuses.Add(abnormalStatus);
+            }
+
             int before = IngameManager.instance.saveData.userData.data.currentNodeIndex;
             IngameManager.instance.saveData.mapData.nodeDatas[before].isUser = false;
 
@@ -599,21 +612,144 @@ public class Skill_ItemController : MonoBehaviour
         }
         else if(isMonster == true)
         {
+            if(skill.tool.duration > 0)
+            {
+                IngameManager.instance.saveData.userData.data.abnormalStatuses.Add(abnormalStatus);
+            }
+
             IngameManager.instance.saveData.mapData.nodeDatas[currentNodeIndex].isMonster = false;
             IngameManager.instance.saveData.mapData.nodeDatas[destinationIndex].isMonster = true;
             IngameManager.instance.saveData.mapData.monsterDatas.Find(x => x.currentNodeIndex == currentNodeIndex).currentNodeIndex = destinationIndex;
         }
-
-        IngameManager.instance.UpdateData();
     }
 
-    private void NodeAttack()
+    private void NodeAttack(bool isMonster, SkillData skill, int index)
     {
+        AbnormalStatus abnormalStatus = new AbnormalStatus();
+        abnormalStatus.id = skill.id;
+        abnormalStatus.currentStatus = skill.tool.grantStatus;
+        abnormalStatus.duration = skill.tool.duration;
+        abnormalStatus.value = skill.tool.value;
 
+        if(skill.tool.range > 0)
+        {
+            List<int> dx = new List<int>();
+            List<int> dy = new List<int>();
+
+            for(int i = -skill.tool.range; i <= skill.tool.range; i++)
+            {
+                dx.Add(i);
+                dy.Add(i);
+            }
+
+            List<int> nearbyIndexs = IngameManager.instance.GetRangeNodes_Diagonal(dx, dy, index);
+
+            for(int i = 0; i < nearbyIndexs.Count; i++)
+            {
+                int node = nearbyIndexs[i];
+
+                if(isMonster == false)
+                {
+                    IngameManager.instance.saveData.userData.stats.mp.MinusCurrnet(skill.useMp);
+
+                    if(IngameManager.instance.saveData.mapData.nodeDatas[node].isMonster == true)
+                    {
+                        if(skill.tool.duration == 0)
+                        {
+                            IngameManager.instance.MonsterHit(node, skill.tool.value);
+                        }
+                        else
+                        {
+                            IngameManager.instance.saveData.mapData.monsterDatas.Find(x => x.currentNodeIndex == node).abnormalStatuses.Add(abnormalStatus);
+                        }
+                    }
+                }
+                else if (isMonster == false)
+                {
+                    if(IngameManager.instance.saveData.mapData.nodeDatas[node].isUser == true)
+                    {
+                        if(skill.tool.duration == 0)
+                        {
+                            IngameManager.instance.PlayerHit(skill.tool.value);
+                        }
+                        else
+                        {
+                            IngameManager.instance.saveData.userData.data.abnormalStatuses.Add(abnormalStatus);
+                        }
+                    }
+                }
+            }
+
+            return;
+        }
+
+        if(isMonster == false)
+        {
+            IngameManager.instance.saveData.userData.stats.mp.MinusCurrnet(skill.useMp);
+
+            if(IngameManager.instance.saveData.mapData.nodeDatas[index].isMonster == true)
+            {
+                if(skill.tool.duration == 0)
+                {
+                    IngameManager.instance.MonsterHit(index, skill.tool.value);
+                }
+                else
+                {
+                    IngameManager.instance.saveData.mapData.monsterDatas.Find(x => x.currentNodeIndex == index).abnormalStatuses.Add(abnormalStatus);
+                }
+            }
+        }
+        else if(isMonster == true)
+        {
+            if(IngameManager.instance.saveData.mapData.nodeDatas[index].isUser == true)
+            {
+                if(skill.tool.duration == 0)
+                {
+                    IngameManager.instance.PlayerHit(skill.tool.value);
+                }
+                else
+                {
+                    IngameManager.instance.saveData.userData.data.abnormalStatuses.Add(abnormalStatus);
+                }
+            }
+        }
     }
 
-    private void NodeMove()
+    private void NodeMove(bool isMonster, SkillData skill, int destinationIndex, int currentNodeIndex)
     {
+        AbnormalStatus abnormalStatus = new AbnormalStatus();
+        abnormalStatus.id = skill.id;
+        abnormalStatus.currentStatus = skill.tool.grantStatus;
+        abnormalStatus.duration = skill.tool.duration;
+        abnormalStatus.value = skill.tool.value;
 
+        if(isMonster == false)
+        {
+            if(IngameManager.instance.CheckWalkableNode(destinationIndex) == false)
+            {
+                IngameManager.instance.UpdatePopup("이동이 불가능 합니다.");
+
+                return;
+            }
+
+            int before = IngameManager.instance.saveData.userData.data.currentNodeIndex;
+            IngameManager.instance.saveData.mapData.nodeDatas[before].isUser = false;
+
+            IngameManager.instance.saveData.userData.data.currentNodeIndex = destinationIndex;
+            IngameManager.instance.saveData.mapData.nodeDatas[destinationIndex].isUser = true;
+
+            IngameManager.instance.saveData.userData.stats.mp.MinusCurrnet(skill.useMp);
+        }
+        else if(isMonster == true)
+        {
+            if(IngameManager.instance.CheckWalkableNode(destinationIndex) == false)
+            {
+                return;
+            }
+
+            IngameManager.instance.saveData.mapData.nodeDatas[currentNodeIndex].isMonster = false;
+            IngameManager.instance.saveData.mapData.nodeDatas[destinationIndex].isMonster = true;
+            IngameManager.instance.saveData.mapData.monsterDatas.Find(x => x.currentNodeIndex == currentNodeIndex).currentNodeIndex = destinationIndex;
+        }
     }
 }

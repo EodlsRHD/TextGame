@@ -17,14 +17,14 @@ MonoBehaviour:
   _tempalte:
   - id: 101
     sprite: {fileID: 2520108084128459728, guid: 3d521ae897b89844fb54b11d02fec449, type: 3}
-  - id: 0
-    sprite: {fileID: 0}
-  - id: 0
-    sprite: {fileID: 0}
-  - id: 0
-    sprite: {fileID: 0}
-  - id: 0
-    sprite: {fileID: 0}
+  - id: 102
+    sprite: {fileID: -3398425601533472082, guid: 3d521ae897b89844fb54b11d02fec449, type: 3}
+  - id: 103
+    sprite: {fileID: 3671900364904746485, guid: 3d521ae897b89844fb54b11d02fec449, type: 3}
+  - id: 104
+    sprite: {fileID: -3247113975369345124, guid: 3d521ae897b89844fb54b11d02fec449, type: 3}
+  - id: 105
+    sprite: {fileID: -6546070771089995561, guid: 3d521ae897b89844fb54b11d02fec449, type: 3}
   - id: 106
     sprite: {fileID: 8179219320991236185, guid: 3d521ae897b89844fb54b11d02fec449, type: 3}
   - id: 107

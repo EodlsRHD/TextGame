@@ -51,7 +51,7 @@ public class LevelPoint : MonoBehaviour
         _templates[4].Initialize(eStats.Defence, Plus, Minus, Result);
         _templates[5].Initialize(eStats.Vision, Plus, Minus, Result);
 
-        _buttonReset.gameObject.SetActive(false);
+        _buttonReset.gameObject.SetActive(true);
         _template.gameObject.SetActive(false);
 
         this.gameObject.SetActive(false);
@@ -71,7 +71,7 @@ public class LevelPoint : MonoBehaviour
         _templates[2].SetPoint(userData.stats.ap.point);
         _templates[3].SetPoint(userData.stats.attack.point);
         _templates[4].SetPoint(userData.stats.defence.point);
-        _templates[5].SetPoint(userData.stats.vision.currnet);
+        _templates[5].SetPoint(userData.stats.vision.current);
 
         _textMaxPoint.text = maxPoint.ToString();
 
@@ -141,25 +141,25 @@ public class LevelPoint : MonoBehaviour
             return;
         }
 
-        _buttonReset.gameObject.SetActive(true);
-
         _point -= 1;
         _textMaxPoint.text = _point.ToString();
 
         onResultCallback?.Invoke(true);
     }
 
-    private void Minus(Action<bool> onResultCallback)
+    private void Minus(bool isOri, Action<bool> onResultCallback)
     {
         if (_point == _maxPoint)
         {
-            _buttonReset.gameObject.SetActive(false);
             onResultCallback?.Invoke(false);
 
             return;
         }
 
-        _buttonReset.gameObject.SetActive(true);
+        if(isOri == true)
+        {
+            return;
+        }
 
         _point += 1;
         _textMaxPoint.text = _point.ToString();
@@ -192,7 +192,7 @@ public class LevelPoint : MonoBehaviour
                 break;
 
             case eStats.Vision:
-                _userData.stats.vision.currnet = (short)point;
+                _userData.stats.vision.current = (short)point;
                 break;
 
             case eStats.AttackRange:

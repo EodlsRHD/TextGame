@@ -15,13 +15,13 @@ public class LevelPointTemplate : MonoBehaviour
 
     private Action<eStats, int> _onResultCallback = null;
     private Action<Action<bool>> _onPlusCallback = null;
-    private Action<Action<bool>> _onMinusCallback = null;
+    private Action<bool, Action<bool>> _onMinusCallback = null;
 
     private eStats _type = eStats.Non;
     private int _oriPoint = 0;
     private int _point = 0;
 
-    public void Initialize(eStats type, Action<Action<bool>> onPlusCallback, Action<Action<bool>> onMinusCallback, Action<eStats, int> onResultCallback)
+    public void Initialize(eStats type, Action<Action<bool>> onPlusCallback, Action<bool, Action<bool>> onMinusCallback, Action<eStats, int> onResultCallback)
     {
         if(onResultCallback != null)
         {
@@ -97,7 +97,7 @@ public class LevelPointTemplate : MonoBehaviour
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
 
-        _onMinusCallback?.Invoke((result) =>
+        _onMinusCallback?.Invoke((_point == _oriPoint), (result) =>
         {
             if (result == false)
             {

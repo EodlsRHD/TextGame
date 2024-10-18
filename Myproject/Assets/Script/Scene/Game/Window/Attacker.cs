@@ -100,8 +100,8 @@ public class Attacker : MonoBehaviour
         _userData = userData;
         _monster = monster;
 
-        _playerCoinCount = userData.stats.hp.currnet;
-        _monsterCoinCount = monster.stats.hp.currnet;
+        _playerCoinCount = userData.stats.hp.current;
+        _monsterCoinCount = monster.stats.hp.current;
 
         _batCount = userData.level;
         _totalCount += _batCount * 2;
