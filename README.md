@@ -15,18 +15,12 @@ use font
 
 Preferences
 
-1. gradle-8.7
-    설치 방법  
-    1. 압축 파일을 풀어 lib 파일만 아래 경로에 바꿔서 넣는다.
-        C:\Program Files\Unity\Hub\Editor\(Editor version)\Editor\Data\PlaybackEngines\AndroidPlayer\Tools\gradle\~
-    2.maingradleTemplate.property에 있는 두 버전을 8.6.0으로 변경한다.
-
-2. android-31
+1. android-31
     설치 방법  
     1. 압축 파일을 풀어  아래 경로에 바꿔서 넣는다.
         C:\Program Files\Unity\Hub\Editor\2022.3.50f1\Editor\Data\PlaybackEngines\AndroidPlayer\SDK\build-tools\~
 
-3. Build-tool 30.0.2
+2. Build-tool 30.0.2
     설치 방법  
     1. 압축 파일을 풀어 아래 경로에 바꿔서 넣는다.
         C:\Program Files\Unity\Hub\Editor\2022.3.50f1\Editor\Data\PlaybackEngines\AndroidPlayer\SDK\platforms\~
