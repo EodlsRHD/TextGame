@@ -132,6 +132,8 @@ public class Tutorial : MonoBehaviour
 
         _isMenu = false;
 
+        _textSpeechBubble.text = string.Empty;
+
         this.gameObject.SetActive(false);
         _objGuide.SetActive(false);
         _objMenu.SetActive(false);
