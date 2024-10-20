@@ -465,6 +465,13 @@ public class Skill_ItemController : MonoBehaviour
     {
         IngameManager.instance.UpdateText(skill.name + " (을)를 사용했습니다.");
 
+        if(skill.tool.revealMap == true)
+        {
+            RevealMap(dir, nodeIndex, skill.tool.range);
+
+            return;
+        }
+
         if(dir != eDir.Non)
         {
             int range = skill.tool.range;
@@ -564,6 +571,24 @@ public class Skill_ItemController : MonoBehaviour
         }
 
         IngameManager.instance.UpdateData();
+    }
+
+    private void RevealMap(eDir dir, int nodeIndex, int range)
+    {
+        List<int> dx = new List<int>();
+        List<int> dy = new List<int>();
+
+        if(dir != eDir.All)
+        {
+            for(int i = -range; i <= range; i++)
+            {
+                dx.Add(i);
+                dy.Add(i);
+            }
+        }
+
+        List<int> list = IngameManager.instance.GetRangeNodes_Diagonal(dx, dy, nodeIndex);
+        IngameManager.instance.RevealMap(dir, list);
     }
 
     private void RangeAttack(bool isMonster, SkillData skill, List<int> indexs)

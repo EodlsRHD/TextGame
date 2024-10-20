@@ -40,6 +40,8 @@ public class IngameManager : MonoBehaviour
     private bool _isPlayerTurn = false;
     private bool _isHuntMonster = false;
 
+    private int _turnCount = 1;
+    
     #region
 
     public DataManager.SaveData saveData
@@ -173,6 +175,7 @@ public class IngameManager : MonoBehaviour
     private void GenerateMap(DataManager.MapData mapData)
     {
         _saveData.mapData = mapData;
+        _turnCount = 1;
 
         RoundSet();
     }
@@ -197,11 +200,14 @@ public class IngameManager : MonoBehaviour
     {
         GameManager.instance.dataManager.UpdatePlayerData(_saveData);
 
+        _mapController.NextTurn();
         _mapController.Close();
         _saveData.round++;
 
         OpenNextRoundWindow(eRoundClear.Success);
     }
+
+    #region connection Method
 
     public void ControlPad_Skill()
     {
@@ -437,6 +443,8 @@ public class IngameManager : MonoBehaviour
         _skillitemCountroller.UseSkill(true, skill_Index, ref data);
     }
 
+    #endregion
+
     #region ActionController
 
     public void BonfireOpen(DataManager.Npc_Data npc)
@@ -492,6 +500,37 @@ public class IngameManager : MonoBehaviour
         _actionController.Npc(index);
     }
 
+    public void RevealMap(eDir dir, List<int> indexs)
+    {
+        _mapController.RevealMap(dir, indexs);
+
+        UpdateData();
+    }
+
+    private void EnforceMonster()
+    {
+        _turnCount++;
+
+        UpdateRoundText();
+
+        if(_saveData.round == 1)
+        {
+            return;
+        }
+
+        if((_turnCount % 5) > 0)
+        {
+            return;
+        }
+
+        UpdateText("--- 몬스터가 강화되었습니다.");
+
+        for(int i = 0; i < _saveData.mapData.monsterDatas.Count; i++)
+        {
+            _saveData.mapData.monsterDatas[i].stats.Enforce();
+        }
+    }
+
     #endregion
 
     #region Creature
@@ -533,6 +572,7 @@ public class IngameManager : MonoBehaviour
     public void MonsterDead(CreatureData monster)
     {
         _saveData.mapData.nodeDatas[monster.currentNodeIndex].isMonster = false;
+        _saveData.mapData.monsterDatas.Find(x => x.id == monster.id).stats.Reset();
         _saveData.mapData.monsterDatas.Remove(_saveData.mapData.monsterDatas.Find(x => x.id == monster.id));
         UpdateData();
 
@@ -548,6 +588,8 @@ public class IngameManager : MonoBehaviour
     public void MonsterTurnOut()
     {
         UpdateText("--- 몬스터의 순서가 종료되었습니다.");
+
+        EnforceMonster();
 
         UpdateData();
         PlayerTurn();
@@ -589,7 +631,7 @@ public class IngameManager : MonoBehaviour
 
     public void UpdateRoundText()
     {
-        _ingameUI.SetRoundText(_saveData.round);
+        _ingameUI.SetRoundText(_saveData.round, _turnCount);
     }
 
     public void OpenNextRoundWindow(eRoundClear type)
@@ -1628,6 +1670,8 @@ public class CreatureGenerator
 
     private void MonsterStats(ref CreatureData creature)
     {
+        creature.stats.Reset();
+
         float increasePoint = ((_saveData.round - 1) * 0.1f);
 
         creature.stats.coin.current += (short)(creature.stats.coin.current * increasePoint);

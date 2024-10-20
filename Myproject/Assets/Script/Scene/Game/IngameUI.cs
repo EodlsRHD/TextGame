@@ -140,9 +140,9 @@ public class IngameUI : MonoBehaviour
         });
     }
 
-    public void SetRoundText(int round)
+    public void SetRoundText(int round, int turnCount)
     {
-        _textRound.text = round.ToString();
+        _textRound.text = round + " - " + turnCount;
     }
 
     public void OpenNextRoundWindow(eRoundClear type, string content = null)

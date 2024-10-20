@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System;
 using Unity.VisualScripting;
+using TMPro;
 
 public class MapController : MonoBehaviour
 {
@@ -26,6 +27,9 @@ public class MapController : MonoBehaviour
     private Action _onCloseCallback = null;
 
     private bool _isOpen = false;
+
+    private eDir _revealMapDir = eDir.Non;
+    private List<int> _revealMapIndexs = new List<int>();
 
     public void Initialize(int mapSize)
     {
@@ -68,6 +72,8 @@ public class MapController : MonoBehaviour
 
     public void SetMap(DataManager.SaveData saveData)
     {
+        NextTurn();
+
         _trBack.gameObject.SetActive(GameManager.instance.isMapBackgroundUpdate);
 
         var blockData = saveData.mapData.nodeDatas;
@@ -98,6 +104,8 @@ public class MapController : MonoBehaviour
 
     public void UpdateMapData(DataManager.SaveData saveData, List<int> nearbyIndexs)
     {
+        _trBack.gameObject.SetActive(GameManager.instance.isMapBackgroundUpdate);
+
         if(GameManager.instance.isMapBackgroundUpdate == true)
         {
             _map.transform.SetParent(_trBack);
@@ -108,8 +116,6 @@ public class MapController : MonoBehaviour
             _map.transform.SetParent(this.transform);
             _map.GetComponent<RectTransform>().localPosition = new Vector2(0, 0);
         }
-
-        _trBack.gameObject.SetActive(GameManager.instance.isMapBackgroundUpdate);
 
         var blockData = saveData.mapData.nodeDatas;
 
@@ -136,11 +142,44 @@ public class MapController : MonoBehaviour
                 }
             }
 
+            if(_revealMapDir == eDir.All)
+            {
+                isNearby = true;
+            }
+            else if(_revealMapDir == eDir.Non && _revealMapDir != eDir.All)
+            {
+                for(int j = 0; j < _revealMapIndexs.Count; j++)
+                {
+                    if(i == _revealMapIndexs[j])
+                    {
+                        isNearby = true;
+
+                        break;
+                    }
+                }
+            }
+
             templateFog.gameObject.transform.SetParent(_trTemplateParant_Fog);
             templateFog.SetFog(isNearby, blockData[i]);
 
             templateCreature.gameObject.transform.SetParent(_trTemplateParant_Creauture);
             templateCreature.SetObject(isExit, blockData[i]);
+        }
+    }
+
+    public void RevealMap(eDir dir, List<int> indexs)
+    {
+        _revealMapDir = dir;
+        _revealMapIndexs = indexs;
+    }
+
+    public void NextTurn()
+    {
+        _revealMapDir = eDir.Non;
+
+        if(_revealMapIndexs.Count != 0)
+        {
+            _revealMapIndexs.Clear();
         }
     }
 
