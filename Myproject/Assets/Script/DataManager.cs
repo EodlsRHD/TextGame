@@ -68,9 +68,8 @@ public class DataManager : MonoBehaviour
         public string description = string.Empty;
 
         public short coolDown = 0;
-        public short useMp = 0;
-
         public short duration = 0;
+        public short useMp = 0;
 
         public short hp = 0;
         public short hpPercentIncreased = 0;
