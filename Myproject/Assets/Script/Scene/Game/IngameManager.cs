@@ -564,12 +564,12 @@ public class IngameManager : MonoBehaviour
         _saveData.userData.stats.ap.PlusCurrent(maxAp);
         _saveData.userData.stats.mp.PlusCurrent(recoveryMp);
         _saveData.userData.stats.hp.PlusCurrent(recoveryHp);
-        UpdatePlayerInfo(eStats.AP);
 
         UpdateText("행동력이 " + saveData.userData.stats.ap.current + "만큼 남았습니다.");
 
         _playerController.PlayerSearchNearby();
         UpdateMap();
+        UpdateData();
     }
 
     public void PlayerTurnOut()
