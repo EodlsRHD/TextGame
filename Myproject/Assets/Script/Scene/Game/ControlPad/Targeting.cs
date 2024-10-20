@@ -86,16 +86,16 @@ public class Targeting : MonoBehaviour
         {
             var skill = GameManager.instance.dataManager.GetskillData(id);
 
-            if(IngameManager.instance.saveData.userData.stats.mp.current < skill.useMp)
+            if(skill == null)
             {
-                IngameManager.instance.UpdatePopup("마나가 부족합니다.");
+                _onResultCallback?.Invoke(-1, eDir.Non);
 
                 return;
             }
 
-            if (skill == null)
+            if(IngameManager.instance.saveData.userData.stats.mp.current < skill.useMp)
             {
-                _onResultCallback?.Invoke(-1, eDir.Non);
+                IngameManager.instance.UpdateText("--- 마나가 부족합니다.");
 
                 return;
             }

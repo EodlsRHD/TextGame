@@ -30,7 +30,7 @@ public class Skill_ItemController : MonoBehaviour
             {
                 creatrue.skill_Duration[i].remaindDuration -= 1;
 
-                if(creatrue.skill_Duration[j].remaindDuration <= 1)
+                if(creatrue.skill_Duration[j].remaindDuration <= 0)
                 {
                     RemoveEffect(ref creatrue, creatrue.skill_Duration[j]);
 
@@ -46,7 +46,7 @@ public class Skill_ItemController : MonoBehaviour
             {
                 creatrue.coolDownSkill[j].coolDown -= 1;
 
-                if(creatrue.coolDownSkill[j].coolDown <= 1)
+                if(creatrue.coolDownSkill[j].coolDown <= 0)
                 {
                     creatrue.coolDownSkill.Remove(creatrue.coolDownSkill[j]);
 
@@ -181,7 +181,7 @@ public class Skill_ItemController : MonoBehaviour
         {
             data.skill_Duration[i].remaindDuration -= 1;
 
-            if (data.skill_Duration[i].remaindDuration <= 1)
+            if (data.skill_Duration[i].remaindDuration <= 0)
             {
                 RemoveEffect(ref data, data.skill_Duration[i]);
 
@@ -197,7 +197,7 @@ public class Skill_ItemController : MonoBehaviour
         {
             data.coolDownSkill[i].coolDown -= 1;
 
-            if (data.coolDownSkill[i].coolDown <= 1)
+            if (data.coolDownSkill[i].coolDown <= 0)
             {
                 data.coolDownSkill.Remove(data.coolDownSkill[i]);
 
@@ -291,7 +291,7 @@ public class Skill_ItemController : MonoBehaviour
         {
             data.item_Duration[i].remaindDuration -= 1;
 
-            if (data.item_Duration[i].remaindDuration <= 1)
+            if (data.item_Duration[i].remaindDuration <= 0)
             {
                 RemoveEffect(ref data, data.item_Duration[i]);
 

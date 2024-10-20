@@ -147,9 +147,15 @@ public class MonsterController : MonoBehaviour
                 return;
             }
 
-            SkillData skill = GameManager.instance.dataManager.GetskillData(m);
+            SkillData skill = GameManager.instance.dataManager.GetskillData(monster.skillIndexs[0]);
 
-            if(monster.coolDownSkill.Find(x => x.id == skill.id) != null)
+            if (skill == null)
+            {
+                Debug.LogError("Monster Skill Error   " + monster.name);
+                return;
+            }
+
+            if (monster.coolDownSkill.Find(x => x.id == skill.id) != null)
             {
                 return;
             }
