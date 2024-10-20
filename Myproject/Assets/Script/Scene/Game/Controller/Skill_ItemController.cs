@@ -18,11 +18,9 @@ public class Skill_ItemController : MonoBehaviour
         AbnormalStatusesDuration(ref userData);
 
         IngameManager.instance.UpdateData();
-
-        MonsterDuration(ref IngameManager.instance.saveData.mapData);
     }
 
-    private void MonsterDuration(ref DataManager.MapData mapData)
+    public void MonsterDuration(ref DataManager.MapData mapData)
     {
         for(int i = 0; i < mapData.monsterDatas.Count; i++)
         {
@@ -30,7 +28,9 @@ public class Skill_ItemController : MonoBehaviour
 
             for(int j = creatrue.skill_Duration.Count - 1; j >= 0; j--)
             {
-                if(creatrue.skill_Duration[j].remaindDuration == 1)
+                creatrue.skill_Duration[i].remaindDuration -= 1;
+
+                if(creatrue.skill_Duration[j].remaindDuration <= 1)
                 {
                     RemoveEffect(ref creatrue, creatrue.skill_Duration[j]);
 
@@ -40,21 +40,22 @@ public class Skill_ItemController : MonoBehaviour
                 }
 
                 ApplyEffect(ref creatrue, creatrue.skill_Duration[i]);
-                creatrue.skill_Duration[i].remaindDuration -= 1;
             }
 
             for(int j = creatrue.coolDownSkill.Count - 1; j >= 0; j--)
             {
-                if(creatrue.coolDownSkill[j].coolDown == 1)
+                creatrue.coolDownSkill[j].coolDown -= 1;
+
+                if(creatrue.coolDownSkill[j].coolDown <= 1)
                 {
                     creatrue.coolDownSkill.Remove(creatrue.coolDownSkill[j]);
 
                     continue;
                 }
-
-                creatrue.coolDownSkill[j].coolDown -= 1;
             }
         }
+
+        IngameManager.instance.UpdateData();
     }
 
     public void SetDirCoord(int nodeIndex, eDir type)
@@ -178,7 +179,9 @@ public class Skill_ItemController : MonoBehaviour
     {
         for (int i = data.skill_Duration.Count - 1; i >= 0; i--)
         {
-            if (data.skill_Duration[i].remaindDuration == 1)
+            data.skill_Duration[i].remaindDuration -= 1;
+
+            if (data.skill_Duration[i].remaindDuration <= 1)
             {
                 RemoveEffect(ref data, data.skill_Duration[i]);
 
@@ -188,19 +191,18 @@ public class Skill_ItemController : MonoBehaviour
             }
 
             ApplyEffect(ref data, data.skill_Duration[i]);
-            data.skill_Duration[i].remaindDuration -= 1;
         }
 
         for (int i = data.coolDownSkill.Count - 1; i >= 0; i--)
         {
-            if (data.coolDownSkill[i].coolDown == 1)
+            data.coolDownSkill[i].coolDown -= 1;
+
+            if (data.coolDownSkill[i].coolDown <= 1)
             {
                 data.coolDownSkill.Remove(data.coolDownSkill[i]);
 
                 continue;
             }
-
-            data.coolDownSkill[i].coolDown -= 1;
         }
     }
 
@@ -287,7 +289,9 @@ public class Skill_ItemController : MonoBehaviour
     {
         for (int i = data.item_Duration.Count - 1; i >= 0; i--)
         {
-            if (data.item_Duration[i].remaindDuration == 1)
+            data.item_Duration[i].remaindDuration -= 1;
+
+            if (data.item_Duration[i].remaindDuration <= 1)
             {
                 RemoveEffect(ref data, data.item_Duration[i]);
 
@@ -297,7 +301,6 @@ public class Skill_ItemController : MonoBehaviour
             }
 
             ApplyEffect(ref data, data.item_Duration[i]);
-            data.item_Duration[i].remaindDuration -= 1;
         }
     }
 
@@ -450,14 +453,14 @@ public class Skill_ItemController : MonoBehaviour
     {
         for (int i = data.abnormalStatuses.Count - 1; i >= 0; i--)
         {
+            data.abnormalStatuses[i].duration -= 1;
+
             if (data.abnormalStatuses[i].duration <= 0)
             {
                 data.abnormalStatuses.Remove(data.abnormalStatuses[i]);
 
                 continue;
             }
-
-            data.abnormalStatuses[i].duration -= 1;
         }
     }
 

@@ -22,8 +22,6 @@ public class PlayerInformation : MonoBehaviour
     [SerializeField] private TMP_Text _textVision = null;
     [SerializeField] private TMP_Text _textAttackRange = null;
 
-    private UserData _userData = null;
-
     public void Initialize()
     {
         _objInformation.SetActive(false);
@@ -31,19 +29,21 @@ public class PlayerInformation : MonoBehaviour
 
     public void UpdatePlayerInfo(UserData userData)
     {
-        _userData = userData;
-
         _textLevel.text = userData.level.ToString();
         _textHP.text = userData.stats.hp.current + " / " + userData.stats.hp.maximum;
         _textMP.text = userData.stats.mp.current + " / " + userData.stats.mp.maximum;
         _textAP.text = userData.stats.ap.current + " / " + userData.stats.ap.maximum;
         _textEXP.text = userData.stats.exp.current + " / " + userData.maximumEXP;
+
+        _textCoin.text = userData.stats.coin.current.ToString();
+        _textAttack.text = (userData.stats.attack.current + userData.stats.attack.plus).ToString();
+        _textDefence.text = (userData.stats.defence.current + userData.stats.defence.plus).ToString();
+        _textVision.text = (userData.stats.vision.current + userData.stats.vision.plus).ToString();
+        _textAttackRange.text = (userData.stats.attackRange.current + userData.stats.attackRange.plus).ToString();
     }
 
     public void UpdatePlayerInfo(eStats type, UserData userData)
     {
-        _userData = userData;
-
         switch (type)
         {
             case eStats.Level:
@@ -66,16 +66,16 @@ public class PlayerInformation : MonoBehaviour
                 _textEXP.text = userData.stats.exp.current + " / " + userData.maximumEXP;
                 break;
         }
+
+        _textCoin.text = userData.stats.coin.current.ToString();
+        _textAttack.text = (userData.stats.attack.current + userData.stats.attack.plus).ToString();
+        _textDefence.text = (userData.stats.defence.current + userData.stats.defence.plus).ToString();
+        _textVision.text = (userData.stats.vision.current + userData.stats.vision.plus).ToString();
+        _textAttackRange.text = (userData.stats.attackRange.current + userData.stats.attackRange.plus).ToString();
     }
 
     public void Open()
     {
-        _textCoin.text = _userData.stats.coin.current.ToString();
-        _textAttack.text = (_userData.stats.attack.current + _userData.stats.attack.plus).ToString();
-        _textDefence.text = (_userData.stats.defence.current + _userData.stats.defence.plus).ToString();
-        _textVision.text = (_userData.stats.vision.current + _userData.stats.vision.plus).ToString();
-        _textAttackRange.text = (_userData.stats.attackRange.current + _userData.stats.attackRange.plus).ToString();
-
         _objInformation.SetActive(true);
 
         GameManager.instance.tools.Move_Anchor_XY(eUiDir.X, _objInformation.GetComponent<RectTransform>(), 0f, 0.5f, 0, Ease.OutBack, null);

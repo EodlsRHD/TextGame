@@ -337,6 +337,7 @@ public class IngameManager : MonoBehaviour
     public void PlayerDefence(Duration duration)
     {
         _skillitemCountroller.PlayerDefence(ref _saveData.userData.data, duration);
+        _saveData.userData.data.item_Duration.Add(duration);
 
         _saveData.userData.stats.ap.current = 0;
         UpdatePlayerInfo(eStats.AP);
@@ -507,7 +508,7 @@ public class IngameManager : MonoBehaviour
         UpdateData();
     }
 
-    private void EnforceMonster()
+    private void DoneTurn()
     {
         _turnCount++;
 
@@ -559,7 +560,7 @@ public class IngameManager : MonoBehaviour
     {
         _isPlayerTurn = false;
 
-        _skillitemCountroller.UserDuration(ref _saveData.userData.data);
+        _skillitemCountroller.MonsterDuration(ref _saveData.mapData);
 
         UpdateText("--- " + _saveData.userData.data.name + "의 순서가 종료됩니다.");
     }
@@ -589,7 +590,9 @@ public class IngameManager : MonoBehaviour
     {
         UpdateText("--- 몬스터의 순서가 종료되었습니다.");
 
-        EnforceMonster();
+        _skillitemCountroller.UserDuration(ref _saveData.userData.data);
+
+        DoneTurn();
 
         UpdateData();
         PlayerTurn();
