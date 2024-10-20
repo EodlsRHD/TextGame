@@ -11,6 +11,11 @@ Assets/TextMesh Pro/
 
 Plugins.meta
 TextMesh Pro.meta
+Myproject/Assets/UniversalRenderPipelineGlobalSettings.asset
+Myproject/Assets/Resources/PerformanceTestRunInfo.json
+Myproject/Assets/Resources/PerformanceTestRunInfo.json.meta
+Myproject/Assets/Resources/PerformanceTestRunSettings.json
+Myproject/Assets/Resources/PerformanceTestRunSettings.json.meta
 
 *.cache
 *.csproj
