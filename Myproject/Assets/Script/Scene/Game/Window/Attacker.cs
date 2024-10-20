@@ -122,6 +122,24 @@ public class Attacker : MonoBehaviour
         this.gameObject.SetActive(true);
 
         GameManager.instance.tools.Move_Anchor_XY(eUiDir.Y, this.GetComponent<RectTransform>(), 350f, 0.5f, 0, Ease.OutBack, null);
+
+        if(IngameManager.instance.CheckAbnormalStatusEffect(eStrengtheningTool.UnableAct, monster) == true)
+        {
+            IngameManager.instance.RemoveAbnormalStatusEffect(eStrengtheningTool.UnableAct, ref monster);
+            IngameManager.instance.UpdateText("상대가 행동불능 상태로 인해 전투를 포기했습니다.");
+
+            OnFold(false, ref _playerCoinCount, ref _batCount);
+
+            return;
+        }
+
+        if(IngameManager.instance.CheckAbnormalStatusEffect(eStrengtheningTool.UnableAct, IngameManager.instance.saveData.userData.data) == true)
+        {
+            IngameManager.instance.RemoveAbnormalStatusEffect(eStrengtheningTool.UnableAct, ref IngameManager.instance.saveData.userData.data);
+            IngameManager.instance.UpdateText("행동불능 상태로 인해 전투를 포기합니다.");
+
+            OnFold(true, ref _playerCoinCount, ref _batCount);
+        }
     }
 
     public void Close()
