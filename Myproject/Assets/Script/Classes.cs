@@ -181,12 +181,12 @@ public class UserData
 
     public short maximumEXP
     {
-        get { return (short)(stats.exp.maximum * 0.7f * level); }
+        get { return (short)(stats.exp.maximum  * level * 0.6f); }
     }
 
     public CreatureData data = null;
 
-    public short level = 1; // 1레벨 (경험치 * 0.4) * 레벨수
+    public short level = 1;
 
     public void PlusExp(short value, Action<bool> onResultCallback)
     {
@@ -229,6 +229,8 @@ public class CreatureData
 [Serializable]
 public class CreatureStats
 {
+    public short creatureLevel = 1;
+
     public CreatureStat coin = null;
     public CreatureStat hp = null;
     public CreatureStat mp = null;
@@ -260,17 +262,6 @@ public class CreatureStats
         return false;
     }
 
-    public bool MinusExp(short value)
-    {
-        if (exp.current - value < 0)
-        {
-            return false;
-        }
-
-        exp.current -= value;
-        return true;
-    }
-
     public void PlusCoin(short value)
     {
         coin.current += (short)(value + (value * 0.1f * coin.percent));
@@ -285,6 +276,28 @@ public class CreatureStats
 
         coin.current -= value;
         return true;
+    }
+
+    public void Enforce()
+    {
+        coin.point += 1;
+        hp.point += 1;
+        mp.point += 1;
+        ap.point += 1;
+        exp.point += 1;
+        attack.point += 1;
+        defence.point += 1;
+    }
+
+    public void Reset()
+    {
+        coin.point = 1;
+        hp.point = 1;
+        mp.point = 1;
+        ap.point = 1;
+        exp.point = 1;
+        attack.point = 1;
+        defence.point = 1;
     }
 }
 
