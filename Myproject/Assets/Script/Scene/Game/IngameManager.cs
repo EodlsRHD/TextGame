@@ -547,7 +547,23 @@ public class IngameManager : MonoBehaviour
             maxAp -= GetValueAbnormalStatusEffect(eStrengtheningTool.Slowdown, _saveData.userData.data);
         }
 
-        _saveData.userData.stats.ap.current = maxAp;
+        short recoveryMp = (short)(_saveData.userData.stats.mp.maximum * 0.05f);
+
+        if(recoveryMp < 1)
+        {
+            recoveryMp = 1;
+        }
+
+        short recoveryHp = (short)(_saveData.userData.stats.hp.maximum * 0.05f);
+
+        if(recoveryHp < 1)
+        {
+            recoveryHp = 1;
+        }
+
+        _saveData.userData.stats.ap.PlusCurrent(maxAp);
+        _saveData.userData.stats.mp.PlusCurrent(recoveryMp);
+        _saveData.userData.stats.hp.PlusCurrent(recoveryHp);
         UpdatePlayerInfo(eStats.AP);
 
         UpdateText("행동력이 " + saveData.userData.stats.ap.current + "만큼 남았습니다.");
