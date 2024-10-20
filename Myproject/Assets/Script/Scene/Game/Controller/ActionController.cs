@@ -69,12 +69,12 @@ public class ActionController : MonoBehaviour
 
         IngameManager.instance.UpdateText("모닥불의 불꽃이 사그라들고 있다.");
 
-        if (getIndex == 0 && removeIndex == 0)
+        if(getIndex == 0 && removeIndex == 0)
         {
             IngameManager.instance.UpdateText("체력과 마나가 회복되었습니다.");
 
-            short hp = (short)(IngameManager.instance.saveData.userData.stats.hp.maximum * 0.35f);
-            short mp = (short)(IngameManager.instance.saveData.userData.stats.mp.maximum * 0.35f);
+            short hp = (short)(IngameManager.instance.saveData.userData.stats.hp.maximum * 0.5f);
+            short mp = (short)(IngameManager.instance.saveData.userData.stats.mp.maximum * 0.5f);
 
             IngameManager.instance.saveData.userData.stats.hp.PlusCurrent(hp);
             IngameManager.instance.saveData.userData.stats.mp.PlusCurrent(hp);
@@ -83,12 +83,11 @@ public class ActionController : MonoBehaviour
 
             return;
         }
-
-        if (removeIndex != 0)
+        else if(removeIndex > 0)
         {
-            for (int i = 0; i < IngameManager.instance.saveData.userData.data.skillIndexs.Count; i++)
+            for(int i = 0; i < IngameManager.instance.saveData.userData.data.skillIndexs.Count; i++)
             {
-                if (IngameManager.instance.saveData.userData.data.skillIndexs[i] != removeIndex)
+                if(IngameManager.instance.saveData.userData.data.skillIndexs[i] != removeIndex)
                 {
                     continue;
                 }
@@ -97,6 +96,10 @@ public class ActionController : MonoBehaviour
 
                 break;
             }
+        }
+        else if(removeIndex == -1)
+        {
+            IngameManager.instance.UpdateText("스킬이 강화되었습니다.");
         }
     }
     

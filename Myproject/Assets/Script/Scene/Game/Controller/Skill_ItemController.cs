@@ -24,10 +24,37 @@ public class Skill_ItemController : MonoBehaviour
 
     private void MonsterDuration(ref DataManager.MapData mapData)
     {
-        //for (int i = 0; i < mapData.; i++)
-        //{
+        for(int i = 0; i < mapData.monsterDatas.Count; i++)
+        {
+            CreatureData creatrue = mapData.monsterDatas[i];
 
-        //}
+            for(int j = creatrue.skill_Duration.Count - 1; j >= 0; j--)
+            {
+                if(creatrue.skill_Duration[j].remaindDuration == 1)
+                {
+                    RemoveEffect(ref creatrue, creatrue.skill_Duration[j]);
+
+                    creatrue.skill_Duration.Remove(creatrue.skill_Duration[j]);
+
+                    continue;
+                }
+
+                ApplyEffect(ref creatrue, creatrue.skill_Duration[i]);
+                creatrue.skill_Duration[i].remaindDuration -= 1;
+            }
+
+            for(int j = creatrue.coolDownSkill.Count - 1; j >= 0; j--)
+            {
+                if(creatrue.coolDownSkill[j].coolDown == 1)
+                {
+                    creatrue.coolDownSkill.Remove(creatrue.coolDownSkill[j]);
+
+                    continue;
+                }
+
+                creatrue.coolDownSkill[j].coolDown -= 1;
+            }
+        }
     }
 
     public void SetDirCoord(int nodeIndex, eDir type)
@@ -83,26 +110,26 @@ public class Skill_ItemController : MonoBehaviour
             }
         }
 
-        SkillConsumptionCheck(ref creature, skill, eStats.HP, skill.tool.hp.value);
-        SkillConsumptionCheck(ref creature, skill, eStats.HP, skill.tool.hp.percent, true);
+        SkillConsumptionCheck(ref creature, skill, eStats.HP, skill.GetStat_Value(eStats.HP));
+        SkillConsumptionCheck(ref creature, skill, eStats.HP, skill.GetStat_Percent(eStats.HP), true);
 
-        SkillConsumptionCheck(ref creature, skill, eStats.MP, skill.tool.mp.value);
-        SkillConsumptionCheck(ref creature, skill, eStats.MP, skill.tool.mp.percent, true);
+        SkillConsumptionCheck(ref creature, skill, eStats.MP, skill.GetStat_Value(eStats.MP));
+        SkillConsumptionCheck(ref creature, skill, eStats.MP, skill.GetStat_Percent(eStats.MP), true);
 
-        SkillConsumptionCheck(ref creature, skill, eStats.AP, skill.tool.ap.value);
-        SkillConsumptionCheck(ref creature, skill, eStats.AP, skill.tool.ap.percent, true);
+        SkillConsumptionCheck(ref creature, skill, eStats.AP, skill.GetStat_Value(eStats.AP));
+        SkillConsumptionCheck(ref creature, skill, eStats.AP, skill.GetStat_Percent(eStats.AP), true);
 
-        SkillConsumptionCheck(ref creature, skill, eStats.EXP, skill.tool.exp.value);
-        SkillConsumptionCheck(ref creature, skill, eStats.EXP, skill.tool.exp.percent, true);
+        SkillConsumptionCheck(ref creature, skill, eStats.EXP, skill.GetStat_Value(eStats.EXP));
+        SkillConsumptionCheck(ref creature, skill, eStats.EXP, skill.GetStat_Percent(eStats.EXP), true);
 
-        SkillConsumptionCheck(ref creature, skill, eStats.Coin, skill.tool.coin.value);
-        SkillConsumptionCheck(ref creature, skill, eStats.Coin, skill.tool.coin.percent, true);
+        SkillConsumptionCheck(ref creature, skill, eStats.Coin, skill.GetStat_Value(eStats.Coin));
+        SkillConsumptionCheck(ref creature, skill, eStats.Coin, skill.GetStat_Percent(eStats.Coin), true);
 
-        SkillConsumptionCheck(ref creature, skill, eStats.Attack, skill.tool.attack.value);
-        SkillConsumptionCheck(ref creature, skill, eStats.Attack, skill.tool.attack.percent, true);
+        SkillConsumptionCheck(ref creature, skill, eStats.Attack, skill.GetStat_Value(eStats.Attack));
+        SkillConsumptionCheck(ref creature, skill, eStats.Attack, skill.GetStat_Percent(eStats.Attack), true);
 
-        SkillConsumptionCheck(ref creature, skill, eStats.Defence, skill.tool.defence.value);
-        SkillConsumptionCheck(ref creature, skill, eStats.Defence, skill.tool.defence.percent, true);
+        SkillConsumptionCheck(ref creature, skill, eStats.Defence, skill.GetStat_Value(eStats.Defence));
+        SkillConsumptionCheck(ref creature, skill, eStats.Defence, skill.GetStat_Percent(eStats.Defence), true);
 
         IngameManager.instance.ControlPadUpdateData();
         IngameManager.instance.UpdateData();
@@ -545,7 +572,7 @@ public class Skill_ItemController : MonoBehaviour
         abnormalStatus.id = skill.id;
         abnormalStatus.currentStatus = skill.tool.grantStatus;
         abnormalStatus.duration = skill.tool.duration;
-        abnormalStatus.value = skill.tool.value;
+        abnormalStatus.value = skill.Get_Value();
 
         for (int i = 0; i < indexs.Count; i++)
         {
@@ -557,7 +584,7 @@ public class Skill_ItemController : MonoBehaviour
                 {
                     if(skill.tool.duration == 0)
                     {
-                        IngameManager.instance.MonsterHit(index, skill.tool.value);
+                        IngameManager.instance.MonsterHit(index, skill.Get_Value());
                     }
                     else
                     {
@@ -571,7 +598,7 @@ public class Skill_ItemController : MonoBehaviour
                 {
                     if (skill.tool.duration == 0)
                     {
-                        IngameManager.instance.PlayerHit(skill.tool.value);
+                        IngameManager.instance.PlayerHit(skill.Get_Value());
                     }
                     else
                     {
@@ -626,7 +653,7 @@ public class Skill_ItemController : MonoBehaviour
         abnormalStatus.id = skill.id;
         abnormalStatus.currentStatus = skill.tool.grantStatus;
         abnormalStatus.duration = skill.tool.duration;
-        abnormalStatus.value = skill.tool.value;
+        abnormalStatus.value = skill.Get_Value();
 
         if(skill.tool.range > 0)
         {
@@ -653,7 +680,7 @@ public class Skill_ItemController : MonoBehaviour
                     {
                         if(skill.tool.duration == 0)
                         {
-                            IngameManager.instance.MonsterHit(node, skill.tool.value);
+                            IngameManager.instance.MonsterHit(node, skill.Get_Value());
                         }
                         else
                         {
@@ -667,7 +694,7 @@ public class Skill_ItemController : MonoBehaviour
                     {
                         if(skill.tool.duration == 0)
                         {
-                            IngameManager.instance.PlayerHit(skill.tool.value);
+                            IngameManager.instance.PlayerHit(skill.Get_Value());
                         }
                         else
                         {
@@ -688,7 +715,7 @@ public class Skill_ItemController : MonoBehaviour
             {
                 if(skill.tool.duration == 0)
                 {
-                    IngameManager.instance.MonsterHit(index, skill.tool.value);
+                    IngameManager.instance.MonsterHit(index, skill.Get_Value());
                 }
                 else
                 {
@@ -702,7 +729,7 @@ public class Skill_ItemController : MonoBehaviour
             {
                 if(skill.tool.duration == 0)
                 {
-                    IngameManager.instance.PlayerHit(skill.tool.value);
+                    IngameManager.instance.PlayerHit(skill.Get_Value());
                 }
                 else
                 {

@@ -32,6 +32,8 @@ public class SkillData
 {
     public short id = 0;
 
+    public short level = 0;
+
     public string name = string.Empty;
     public string description = string.Empty;
 
@@ -39,6 +41,80 @@ public class SkillData
     public short useMp = 0;
 
     public StrengtheningTool tool = null;
+
+
+    #region Get
+
+    public short GetStat_Value(eStats type)
+    {
+        int Level = level == 0 ? 1 : (int)(level * 0.33f);
+
+        switch(type)
+        {
+            case eStats.HP:
+                return (short)((Level) * tool.hp.value);
+
+            case eStats.MP:
+                return (short)((Level) * tool.mp.value);
+
+            case eStats.AP:
+                return (short)((Level) * tool.ap.value);
+
+            case eStats.EXP:
+                return (short)((Level) * tool.exp.value);
+
+            case eStats.Coin:
+                return (short)((Level) * tool.coin.value);
+
+            case eStats.Attack:
+                return (short)((Level) * tool.attack.value);
+
+            case eStats.Defence:
+                return (short)((Level) * tool.defence.value);
+        }
+
+        return 0;
+    }
+
+    public short GetStat_Percent(eStats type)
+    {
+        int Level = level == 0 ? 1 : (int)(level * 0.33f);
+
+        switch(type)
+        {
+            case eStats.HP:
+                return (short)((Level) * tool.hp.percent);
+
+            case eStats.MP:
+                return (short)((Level) * tool.mp.percent);
+
+            case eStats.AP:
+                return (short)((Level) * tool.ap.percent);
+
+            case eStats.EXP:
+                return (short)((Level) * tool.exp.percent);
+
+            case eStats.Coin:
+                return (short)((Level) * tool.coin.percent);
+
+            case eStats.Attack:
+                return (short)((Level) * tool.attack.percent);
+
+            case eStats.Defence:
+                return (short)((Level) * tool.defence.percent);
+        }
+
+        return 0;
+    }
+
+    public short Get_Value()
+    {
+        int Level = level == 0 ? 1 : (int)(level * 0.33f);
+
+        return (short)(level * tool.value);
+    }
+
+    #endregion
 }
 
 [Serializable]

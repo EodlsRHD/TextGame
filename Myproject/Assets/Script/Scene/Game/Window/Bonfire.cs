@@ -75,7 +75,7 @@ public class Bonfire : MonoBehaviour
     private UserData _user = null;
 
     private int _selectTemplateIndex = 0;
-    private int removeId = 0;
+    private int _removeId = 0;
     private bool _isSelect = false;
 
     public void Initialize(Action<int, int, int> onResultCallback, Action<UserData, Action<eTool, int>> onOpenUserSkillCallback)
@@ -175,7 +175,7 @@ public class Bonfire : MonoBehaviour
             _objSelectSkill.gameObject.SetActive(false);
 
             _selectTemplateIndex = -1;
-            removeId = 0;
+            _removeId = 0;
 
             for (int i = 0; i < _template.Count; i++)
             {
@@ -190,44 +190,68 @@ public class Bonfire : MonoBehaviour
 
         CloseInformation();
 
+        var template = _template[_selectTemplateIndex];
+
+        int value = -1;
+        for(int i = 0; i < _user.data.skillIndexs.Count; i++)
+        {
+            if(_user.data.skillIndexs[i] == _template[_selectTemplateIndex].skill.id)
+            {
+                value = _user.data.skillIndexs[i];
+
+                break;
+            }
+        }
+
+        if(value == -1)
+        {
+            if(GameManager.instance.dataManager.GetskillData(template.skill.id).level >= 3)
+            {
+                IngameManager.instance.UpdatePopup("최대치입니다.");
+
+                return;
+            }
+
+            GameManager.instance.dataManager.GetskillData(template.skill.id).level += 1;
+
+            Done(template.skill.id, -1);
+
+            return;
+        }
+
         if (_user.data.skillIndexs.Count == 3)
         {
             IngameManager.instance.UpdatePopup("남은 공간이 없습니다.");
             OpenUserSkill(() => 
             {
-                var template = _template[_selectTemplateIndex];
-
                 if (_isSelect == true)
                 {
                     return;
                 }
 
-                _isSelect = true;
-
-                _template[_selectTemplateIndex].Buy();
-
-                OnClose();
-
-                _onResultCallback?.Invoke(_npc.currentNodeIndex, template.skill.id, removeId);
+                Done(template.skill.id, _removeId);
             });
+
+            return;
         }
-        else
+
+        if(_isSelect == true)
         {
-            var template = _template[_selectTemplateIndex];
-
-            if (_isSelect == true)
-            {
-                return;
-            }
-
-            _isSelect = true;
-
-            _template[_selectTemplateIndex].Buy();
-
-            OnClose();
-
-            _onResultCallback?.Invoke(_npc.currentNodeIndex, template.skill.id, removeId);
+            return;
         }
+
+        Done(template.skill.id, _removeId);
+    }
+
+    private void Done(int id, int removeID)
+    {
+        _isSelect = true;
+
+        _template[_selectTemplateIndex].Buy();
+
+        OnClose();
+
+        _onResultCallback?.Invoke(_npc.currentNodeIndex, id, removeID);
     }
 
     private void OpenInformation()
@@ -258,7 +282,7 @@ public class Bonfire : MonoBehaviour
     {
         _onOpenUserSkillCallback?.Invoke(_user, (type, result) => 
         {
-            removeId = result;
+            _removeId = result;
 
             onResultCallback?.Invoke();
         });

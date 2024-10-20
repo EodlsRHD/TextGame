@@ -44,7 +44,7 @@ public class PadTemplate : MonoBehaviour
         _isItem = false;
         _skillData = skillData;
 
-        _textButtonLabel.text = skillData.name;
+        _textButtonLabel.text = skillData.name + " +" + skillData.level;
 
         this.gameObject.SetActive(true);
     }
@@ -72,7 +72,7 @@ public class PadTemplate : MonoBehaviour
             return;
         }
 
-        _onViewInfoCallback?.Invoke(_skillData.id, _skillData.name, _skillData.description, !_buttonSelect.interactable);
+        _onViewInfoCallback?.Invoke(_skillData.id, _skillData.name + " +" + _skillData.level, _skillData.description, !_buttonSelect.interactable);
 
     }
 }

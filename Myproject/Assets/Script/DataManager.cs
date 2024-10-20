@@ -544,6 +544,11 @@ public class DataManager : MonoBehaviour
             OrganizeEncyclopedia(saveData);
         }
 
+        for(int i = 0; i < _skillDatas.Count; i++)
+        {
+            _skillDatas[i].level = 0;
+        }
+
         DeleteData();
     }
 
