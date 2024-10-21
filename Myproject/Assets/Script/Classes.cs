@@ -111,7 +111,7 @@ public class SkillData
     {
         int Level = level == 0 ? 1 : (int)(level * 0.33f);
 
-        return (short)(level * tool.value);
+        return (short)(Level * tool.value);
     }
 
     #endregion
@@ -374,6 +374,7 @@ public class Duration
     public int remaindCooldown = 0;
 
     public eStats stats = eStats.Non;
+    public eMaintain maintain = eMaintain.Non;
     public bool isPercent = false;
     public short value;
 }
