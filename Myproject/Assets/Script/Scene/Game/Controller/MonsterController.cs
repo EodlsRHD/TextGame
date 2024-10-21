@@ -306,6 +306,8 @@ public class MonsterController : MonoBehaviour
 
             IngameManager.instance.saveData.mapData.nodeDatas[newCreature.currentNodeIndex].isMonster = true;
             IngameManager.instance.saveData.mapData.monsterDatas.Add(newCreature);
+
+            IngameManager.instance.UpdateText(newCreature + "(이)가 분열했습니다.");
         }
 
         IngameManager.instance.UpdateData();

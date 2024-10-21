@@ -135,10 +135,6 @@ public class ActionController : MonoBehaviour
         {
             IngameManager.instance.PlayBgm(eBgm.Ingame);
 
-            Debug.LogError("TEST");
-            result = eWinorLose.Win;
-            damage = 10;
-
             if (result == eWinorLose.Lose)
             {
                 AttackLogic(monster, IngameManager.instance.saveData.userData.data, damage, true, nodeMonsterIndex);
