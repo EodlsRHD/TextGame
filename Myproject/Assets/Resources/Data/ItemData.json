@@ -26,7 +26,7 @@
       "dir": -1,
       "range": 0,
       "value": 0,
-      "revealMap": "FALSE",
+      "revealMap": false,
       "maintain": 0
     },
     {
@@ -54,7 +54,7 @@
       "dir": -1,
       "range": 0,
       "value": 0,
-      "revealMap": "FALSE",
+      "revealMap": false,
       "maintain": 0
     },
     {
@@ -82,7 +82,7 @@
       "dir": 6,
       "range": 3,
       "value": 10,
-      "revealMap": "FALSE",
+      "revealMap": false,
       "maintain": 0
     },
     {
@@ -110,7 +110,7 @@
       "dir": -1,
       "range": 0,
       "value": 10,
-      "revealMap": "FALSE",
+      "revealMap": false,
       "maintain": 0
     },
     {
@@ -138,7 +138,7 @@
       "dir": -1,
       "range": 0,
       "value": 0,
-      "revealMap": "FALSE",
+      "revealMap": false,
       "maintain": 0
     },
     {
@@ -166,7 +166,7 @@
       "dir": -1,
       "range": 0,
       "value": 0,
-      "revealMap": "FALSE",
+      "revealMap": false,
       "maintain": 0
     },
     {
@@ -194,7 +194,7 @@
       "dir": -1,
       "range": 0,
       "value": 15,
-      "revealMap": "FALSE",
+      "revealMap": false,
       "maintain": 0
     },
     {
@@ -222,7 +222,7 @@
       "dir": 5,
       "range": 4,
       "value": 20,
-      "revealMap": "FALSE",
+      "revealMap": false,
       "maintain": 0
     },
     {
@@ -250,7 +250,7 @@
       "dir": -1,
       "range": 0,
       "value": 1,
-      "revealMap": "FALSE",
+      "revealMap": false,
       "maintain": 0
     },
     {
@@ -278,7 +278,7 @@
       "dir": 6,
       "range": 0,
       "value": 10,
-      "revealMap": "FALSE",
+      "revealMap": false,
       "maintain": 0
     },
     {
@@ -306,7 +306,7 @@
       "dir": -1,
       "range": 0,
       "value": 0,
-      "revealMap": "FALSE",
+      "revealMap": false,
       "maintain": 0
     },
     {
@@ -334,7 +334,7 @@
       "dir": -1,
       "range": 0,
       "value": 1,
-      "revealMap": "FALSE",
+      "revealMap": false,
       "maintain": 0
     },
     {
@@ -362,7 +362,7 @@
       "dir": -1,
       "range": 0,
       "value": 0,
-      "revealMap": "FALSE",
+      "revealMap": false,
       "maintain": 0
     },
     {
@@ -390,7 +390,7 @@
       "dir": -1,
       "range": 0,
       "value": 0,
-      "revealMap": "FALSE",
+      "revealMap": false,
       "maintain": 0
     },
     {
@@ -418,7 +418,7 @@
       "dir": -1,
       "range": 0,
       "value": 0,
-      "revealMap": "FALSE",
+      "revealMap": false,
       "maintain": 0
     },
     {
@@ -446,7 +446,7 @@
       "dir": -1,
       "range": 0,
       "value": 0,
-      "revealMap": "FALSE",
+      "revealMap": false,
       "maintain": 0
     },
     {
@@ -474,7 +474,7 @@
       "dir": -1,
       "range": 0,
       "value": 0,
-      "revealMap": "FALSE",
+      "revealMap": false,
       "maintain": 0
     },
     {
@@ -502,7 +502,7 @@
       "dir": -1,
       "range": 0,
       "value": 0,
-      "revealMap": "FALSE",
+      "revealMap": false,
       "maintain": 0
     },
     {
@@ -530,7 +530,7 @@
       "dir": -1,
       "range": 0,
       "value": 0,
-      "revealMap": "FALSE",
+      "revealMap": false,
       "maintain": 0
     },
     {
@@ -558,7 +558,7 @@
       "dir": -1,
       "range": 0,
       "value": 0,
-      "revealMap": "FALSE",
+      "revealMap": false,
       "maintain": 0
     },
     {
@@ -586,7 +586,7 @@
       "dir": -1,
       "range": 0,
       "value": 0,
-      "revealMap": "FALSE",
+      "revealMap": false,
       "maintain": 0
     },
     {
@@ -614,7 +614,7 @@
       "dir": -1,
       "range": 0,
       "value": 0,
-      "revealMap": "FALSE",
+      "revealMap": false,
       "maintain": 0
     },
     {
@@ -642,7 +642,7 @@
       "dir": -1,
       "range": 0,
       "value": 0,
-      "revealMap": "FALSE",
+      "revealMap": false,
       "maintain": 0
     },
     {
@@ -670,7 +670,7 @@
       "dir": -1,
       "range": 0,
       "value": 0,
-      "revealMap": "FALSE",
+      "revealMap": false,
       "maintain": 0
     },
     {
@@ -698,7 +698,7 @@
       "dir": -1,
       "range": 0,
       "value": 0,
-      "revealMap": "FALSE",
+      "revealMap": false,
       "maintain": 0
     },
     {
@@ -726,7 +726,7 @@
       "dir": -1,
       "range": 0,
       "value": 0,
-      "revealMap": "FALSE",
+      "revealMap": false,
       "maintain": 0
     },
     {
@@ -754,7 +754,7 @@
       "dir": 4,
       "range": 3,
       "value": 0,
-      "revealMap": "FALSE",
+      "revealMap": false,
       "maintain": 0
     },
     {
@@ -782,7 +782,7 @@
       "dir": 6,
       "range": 0,
       "value": 0,
-      "revealMap": "FALSE",
+      "revealMap": false,
       "maintain": 0
     },
     {
@@ -810,7 +810,7 @@
       "dir": 6,
       "range": 0,
       "value": 10,
-      "revealMap": "FALSE",
+      "revealMap": false,
       "maintain": 0
     },
     {
@@ -838,7 +838,7 @@
       "dir": -1,
       "range": 0,
       "value": 0,
-      "revealMap": "FALSE",
+      "revealMap": false,
       "maintain": 0
     },
     {
@@ -866,7 +866,7 @@
       "dir": 6,
       "range": 2,
       "value": 0,
-      "revealMap": "TRUE",
+      "revealMap": true,
       "maintain": 0
     },
     {
@@ -894,7 +894,7 @@
       "dir": 4,
       "range": 0,
       "value": 0,
-      "revealMap": "TRUE",
+      "revealMap": true,
       "maintain": 0
     },
     {
@@ -922,7 +922,7 @@
       "dir": 6,
       "range": 0,
       "value": 0,
-      "revealMap": "FALSE",
+      "revealMap": false,
       "maintain": 0
     },
     {
@@ -950,7 +950,7 @@
       "dir": 22,
       "range": 0,
       "value": 0,
-      "revealMap": "FALSE",
+      "revealMap": false,
       "maintain": 0
     }
   ]

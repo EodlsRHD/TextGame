@@ -66,9 +66,9 @@ public class Targeting : MonoBehaviour
                 return;
             }
 
-            if (item.tool.dir != eDir.DesignateDirection || item.tool.dir != eDir.DesignateCoordination)
+            if(item.tool.dir == eDir.All)
             {
-                _onResultCallback?.Invoke(-1, eDir.Non);
+                _onResultCallback?.Invoke(-1, eDir.All);
 
                 return;
             }
@@ -80,6 +80,12 @@ public class Targeting : MonoBehaviour
             else if (item.tool.dir == eDir.DesignateCoordination)
             {
                 _objCoordination.SetActive(true);
+            }
+            else
+            {
+                _onResultCallback?.Invoke(-1, eDir.Non);
+
+                return;
             }
         }
         else if(type == eControl.Skill)
@@ -100,13 +106,6 @@ public class Targeting : MonoBehaviour
                 return;
             }
 
-            if ((skill.tool.dir == eDir.DesignateDirection || skill.tool.dir == eDir.DesignateCoordination) == false)
-            {
-                _onResultCallback?.Invoke(-1, eDir.Non);
-
-                return;
-            }
-
             if (skill.tool.dir == eDir.DesignateDirection)
             {
                 _objDirection.SetActive(true);
@@ -114,6 +113,12 @@ public class Targeting : MonoBehaviour
             else if (skill.tool.dir == eDir.DesignateCoordination)
             {
                 _objCoordination.SetActive(true);
+            }
+            else
+            {
+                _onResultCallback?.Invoke(-1, eDir.Non);
+
+                return;
             }
         }
 
@@ -158,7 +163,7 @@ public class Targeting : MonoBehaviour
         int X = int.Parse(_inputXcoord.text);
         int Y = int.Parse(_inputYcoord.text);
 
-        int index = (X + 1) + (IngameManager.instance.saveData.mapData.mapSize * Y);
+        int index = X + (IngameManager.instance.saveData.mapData.mapSize * Y);
         _onResultCallback?.Invoke(index, _dir);
 
         OnClose();

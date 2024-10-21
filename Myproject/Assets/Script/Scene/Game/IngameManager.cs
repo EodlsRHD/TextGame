@@ -513,6 +513,7 @@ public class IngameManager : MonoBehaviour
         _turnCount++;
 
         UpdateRoundText();
+        _mapController.NextTurn();
 
         if(_saveData.round == 1)
         {

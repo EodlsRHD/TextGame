@@ -95,7 +95,7 @@ public class MapController : MonoBehaviour
             templateFog.SetFog(false, blockData[i]);
 
             templateCreature.gameObject.transform.SetParent(_trTemplateParant_Creauture);
-            templateCreature.SetObject(isExit, blockData[i]);
+            templateCreature.SetObject(false, isExit, blockData[i]);
 
             templateTile.gameObject.transform.SetParent(_trTemplateParant_Tile);
             templateTile.SetTile(blockData[i]);
@@ -163,7 +163,7 @@ public class MapController : MonoBehaviour
             templateFog.SetFog(isNearby, blockData[i]);
 
             templateCreature.gameObject.transform.SetParent(_trTemplateParant_Creauture);
-            templateCreature.SetObject(isExit, blockData[i]);
+            templateCreature.SetObject(isNearby, isExit, blockData[i]);
         }
     }
 
