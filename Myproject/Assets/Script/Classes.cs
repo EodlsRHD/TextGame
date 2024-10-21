@@ -42,7 +42,6 @@ public class SkillData
 
     public StrengtheningTool tool = null;
 
-
     #region Get
 
     public short GetStat_Value(eStats type)

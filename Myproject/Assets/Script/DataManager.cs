@@ -269,7 +269,7 @@ public class DataManager : MonoBehaviour
 
     public void CreateNewSaveData(Action<bool> onResultCallback)
     {
-        UnityEngine.Debug.LogError("TEST Stat Set");
+        Debug.LogError("TEST Stat Set");
 
         _saveData = new SaveData();
         _saveData.round = 1;
@@ -288,7 +288,7 @@ public class DataManager : MonoBehaviour
         _saveData.userData.data.stats.vision = new CreatureStat(1, 1, 0, 0);
         _saveData.userData.data.stats.attackRange = new CreatureStat(1, 1, 0, 0);
         _saveData.userData.data.skillIndexs = new List<short>() { 301 };
-        _saveData.userData.data.itemIndexs = new List<short>() { 501, 502 };
+        _saveData.userData.data.itemIndexs = new List<short>() { 522, 522, 502 };
 
         _saveData.userData.data.skill_Duration = new List<Duration>();
         _saveData.userData.data.item_Duration = new List<Duration>();
