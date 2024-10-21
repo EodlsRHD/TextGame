@@ -763,13 +763,13 @@ public class DataManager : MonoBehaviour
 
             newData.tool = new StrengtheningTool();
             newData.tool.duration = data.duration;
-            newData.tool.hp = new Stat_In_De(data.hp, data.hpPercentIncreased);
-            newData.tool.mp = new Stat_In_De(data.mp, data.mpPercentIncreased);
-            newData.tool.ap = new Stat_In_De(data.ap, data.apPercentIncreased);
-            newData.tool.exp = new Stat_In_De(data.exp, data.expPercentIncreased);
-            newData.tool.coin = new Stat_In_De(data.coin, data.coinPercentIncreased);
-            newData.tool.attack = new Stat_In_De(data.attack, data.attackPercentIncreased);
-            newData.tool.defence = new Stat_In_De(data.defence, data.defencePercentIncreased);
+            newData.tool.hp = new StrengtheningToolStat(data.hp, data.hpPercentIncreased);
+            newData.tool.mp = new StrengtheningToolStat(data.mp, data.mpPercentIncreased);
+            newData.tool.ap = new StrengtheningToolStat(data.ap, data.apPercentIncreased);
+            newData.tool.exp = new StrengtheningToolStat(data.exp, data.expPercentIncreased);
+            newData.tool.coin = new StrengtheningToolStat(data.coin, data.coinPercentIncreased);
+            newData.tool.attack = new StrengtheningToolStat(data.attack, data.attackPercentIncreased);
+            newData.tool.defence = new StrengtheningToolStat(data.defence, data.defencePercentIncreased);
             newData.tool.dir = data.dir;
             newData.tool.needStatus = data.needStatus;
             newData.tool.grantStatus = data.grantStatus;
@@ -830,13 +830,13 @@ public class DataManager : MonoBehaviour
 
             newData.tool = new StrengtheningTool();
             newData.tool.duration = data.duration;
-            newData.tool.hp = new Stat_In_De(data.hp, data.hpPercentIncreased);
-            newData.tool.mp = new Stat_In_De(data.mp, data.mpPercentIncreased);
-            newData.tool.ap = new Stat_In_De(data.ap, data.apPercentIncreased);
-            newData.tool.exp = new Stat_In_De(data.exp, data.expPercentIncreased);
-            newData.tool.coin = new Stat_In_De(data.coin, data.coinPercentIncreased);
-            newData.tool.attack = new Stat_In_De(data.attack, data.attackPercentIncreased);
-            newData.tool.defence = new Stat_In_De(data.defence, data.defencePercentIncreased);
+            newData.tool.hp = new StrengtheningToolStat(data.hp, data.hpPercentIncreased);
+            newData.tool.mp = new StrengtheningToolStat(data.mp, data.mpPercentIncreased);
+            newData.tool.ap = new StrengtheningToolStat(data.ap, data.apPercentIncreased);
+            newData.tool.exp = new StrengtheningToolStat(data.exp, data.expPercentIncreased);
+            newData.tool.coin = new StrengtheningToolStat(data.coin, data.coinPercentIncreased);
+            newData.tool.attack = new StrengtheningToolStat(data.attack, data.attackPercentIncreased);
+            newData.tool.defence = new StrengtheningToolStat(data.defence, data.defencePercentIncreased);
             newData.tool.dir = data.dir;
             newData.tool.needStatus = data.needStatus;
             newData.tool.grantStatus = data.grantStatus;

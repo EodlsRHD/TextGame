@@ -136,13 +136,13 @@ public class StrengtheningTool
 {
     public short duration = 0;
 
-    public Stat_In_De hp = null;
-    public Stat_In_De mp = null;
-    public Stat_In_De ap = null;
-    public Stat_In_De exp = null;
-    public Stat_In_De coin = null;
-    public Stat_In_De attack = null;
-    public Stat_In_De defence = null;
+    public StrengtheningToolStat hp = null;
+    public StrengtheningToolStat mp = null;
+    public StrengtheningToolStat ap = null;
+    public StrengtheningToolStat exp = null;
+    public StrengtheningToolStat coin = null;
+    public StrengtheningToolStat attack = null;
+    public StrengtheningToolStat defence = null;
 
     public eDir dir = eDir.Non;
 
@@ -158,12 +158,12 @@ public class StrengtheningTool
 }
 
 [Serializable]
-public class Stat_In_De
+public class StrengtheningToolStat
 {
     public short value = 0;
     public short percent = 0;
 
-    public Stat_In_De(short v, short p)
+    public StrengtheningToolStat(short v, short p)
     {
         value = v;
         percent = p;
@@ -213,7 +213,7 @@ public class CreatureData
     public bool recovery = false;
     public byte recoveryCount = 0;
 
-    public bool useSkill = false;
+    public bool haveSkill = false;
     public List<short> skillIndexs = null;
     public List<short> itemIndexs = null;
 
@@ -239,6 +239,7 @@ public class CreatureStats
     public CreatureStat defence = null;
     public CreatureStat vision = null;
     public CreatureStat attackRange = null;
+    public CreatureStat evesion = null;
 
     public void Maximum()
     {

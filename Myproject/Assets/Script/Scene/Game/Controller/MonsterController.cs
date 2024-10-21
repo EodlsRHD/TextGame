@@ -135,7 +135,7 @@ public class MonsterController : MonoBehaviour
     {
         CreatureData monster = IngameManager.instance.saveData.mapData.monsterDatas[m];
 
-        if (monster.useSkill == false)
+        if (monster.haveSkill == false)
         {
             MonsterTargetPlayer(m);
 

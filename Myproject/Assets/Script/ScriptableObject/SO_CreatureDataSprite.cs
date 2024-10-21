@@ -69,10 +69,11 @@ public class SO_CreatureDataSprite : ScriptableObject
             temp.stats.defence = new CreatureStat(data.defence, 1, 0, 0);
             temp.stats.vision = new CreatureStat(data.vision, 1, 0, 0);
             temp.stats.attackRange = new CreatureStat(data.attackRange, 1, 0, 0);
+            temp.stats.evesion = new CreatureStat(data.evasion, 1, 0, 0);
 
             temp.defultStatus = data.defultStatus;
 
-            temp.useSkill = data.useSkill;
+            temp.haveSkill = data.useSkill;
 
             temp.skillIndexs = new List<short>();
             if (data.skillIndexs != null)
