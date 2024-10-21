@@ -1678,8 +1678,7 @@ public class CreatureGenerator
             DataManager.NodeData node = new DataManager.NodeData();
             SpawnMonsterNodeSelect(Random.Range(0, _saveData.mapData.nodeDatas.Count), ref node);
 
-            //int id = Random.Range(0, GameManager.instance.dataManager.GetCreaturDataCount());
-            int id = 8;
+            int id = Random.Range(0, GameManager.instance.dataManager.GetCreaturDataCount());
             CreatureData creature = GameManager.instance.dataManager.GetCreatureData(id);
 
             if (creature != null)
