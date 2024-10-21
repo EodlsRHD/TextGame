@@ -135,6 +135,10 @@ public class ActionController : MonoBehaviour
         {
             IngameManager.instance.PlayBgm(eBgm.Ingame);
 
+            Debug.LogError("TEST");
+            result = eWinorLose.Win;
+            damage = 10;
+
             if (result == eWinorLose.Lose)
             {
                 AttackLogic(monster, IngameManager.instance.saveData.userData.data, damage, true, nodeMonsterIndex);
@@ -148,6 +152,15 @@ public class ActionController : MonoBehaviour
                 AttackLogic(IngameManager.instance.saveData.userData.data, monster, damage, false, nodeMonsterIndex);
             }
 
+            if(monster.defultStatus == eStrengtheningTool.Incubation 
+            || monster.defultStatus == eStrengtheningTool.Camouflage 
+            || monster.defultStatus == eStrengtheningTool.Stealth)
+            {
+                monster.defultStatus = eStrengtheningTool.Non;
+            }
+
+            IngameManager.instance.SplitMonster();
+
             IngameManager.instance.UpdateData();
         });
     }
@@ -159,7 +172,7 @@ public class ActionController : MonoBehaviour
         Duration duration = new Duration();
         duration.id = 0;
         duration.name = "일시적 방어도 상승";
-        duration.remaindDuration = 0;
+        duration.remaindDuration = 1;
         duration.stats = eStats.Defence;
         duration.value = ap;
 

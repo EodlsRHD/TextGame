@@ -33,7 +33,6 @@ public class MonsterController : MonoBehaviour
 
         int attackMonsterIndex = 0;
         bool isAttack = false;
-        bool isSkill = false;
 
         for (int m = 0; m < IngameManager.instance.saveData.mapData.monsterDatas.Count; m++)
         {
@@ -47,6 +46,11 @@ public class MonsterController : MonoBehaviour
 
                     isAttack = true;
                 }
+            }
+
+            if(attackMonsterIndex == m)
+            {
+                continue;
             }
 
             MonsterMove(m, 1);
@@ -95,17 +99,17 @@ public class MonsterController : MonoBehaviour
             }
         }
 
-        if (isAttack == true)
-        {
-            return isAttack;
-        }
-
         return isAttack;
     }
 
     private void MonsterMove(int m, int ap)
     {
         List<int> visionIndexs = IngameManager.instance.Vision(IngameManager.instance.saveData.mapData.monsterDatas[m].stats.vision.current, IngameManager.instance.saveData.mapData.monsterDatas[m].currentNodeIndex);
+
+        if(IngameManager.instance.saveData.mapData.monsterDatas[m].defultStatus == eStrengtheningTool.Incubation)
+        {
+            return;
+        }
 
         FindPlayer(m, (result) =>
         {
@@ -259,5 +263,51 @@ public class MonsterController : MonoBehaviour
         }
 
         onFindPlayerActionCallback?.Invoke(isFindPlayer);
+    }
+
+    public void SplitMonster()
+    {
+        for(int i = IngameManager.instance.saveData.mapData.monsterDatas.Count - 1; i >= 0; i--)
+        {
+            if(IngameManager.instance.saveData.mapData.monsterDatas[i].defultStatus != eStrengtheningTool.split)
+            {
+                continue;
+            }
+
+            if(IngameManager.instance.saveData.mapData.monsterDatas[i].stats.hp.maximum * 0.5f < IngameManager.instance.saveData.mapData.monsterDatas[i].stats.hp.current)
+            {
+                continue;
+            }
+
+            IngameManager.instance.saveData.mapData.monsterDatas[i].defultStatus = eStrengtheningTool.Non;
+
+            CreatureData newCreature = IngameManager.instance.saveData.mapData.monsterDatas[i].DeepCopy();
+            newCreature.id = (short)IngameManager.instance.saveData.mapData.monsterDatas.Count;
+            newCreature.stats = new CreatureStats();
+            newCreature.stats.coin = new CreatureStat((short)(IngameManager.instance.saveData.mapData.monsterDatas[i].stats.coin.defult * 0.5f), 1, 0, 0);
+            newCreature.stats.hp = new CreatureStat((short)(IngameManager.instance.saveData.mapData.monsterDatas[i].stats.hp.current), 1, 0, 0);
+            newCreature.stats.mp = new CreatureStat((short)(IngameManager.instance.saveData.mapData.monsterDatas[i].stats.mp.defult), 1, 0, 0);
+            newCreature.stats.ap = new CreatureStat((short)(IngameManager.instance.saveData.mapData.monsterDatas[i].stats.ap.defult * 0.5f), 1, 0, 0);
+            newCreature.stats.exp = new CreatureStat((short)(IngameManager.instance.saveData.mapData.monsterDatas[i].stats.exp.defult * 0.5f), 1, 0, 0);
+            newCreature.stats.attack = new CreatureStat((short)(IngameManager.instance.saveData.mapData.monsterDatas[i].stats.attack.defult * 0.5f), 1, 0, 0);
+            newCreature.stats.defence = new CreatureStat((short)(IngameManager.instance.saveData.mapData.monsterDatas[i].stats.defence.defult * 0.5f), 1, 0, 0);
+            newCreature.stats.vision = new CreatureStat((short)(IngameManager.instance.saveData.mapData.monsterDatas[i].stats.vision.defult * 0.5f), 1, 0, 0);
+            newCreature.stats.attackRange = new CreatureStat((short)(IngameManager.instance.saveData.mapData.monsterDatas[i].stats.attackRange.defult * 0.5f), 1, 0, 0);
+            List<int> indexs = IngameManager.instance.GetNearbyNodes_NonDiagonal(IngameManager.instance.saveData.mapData.monsterDatas[i].currentNodeIndex);
+
+            for(int j = 0; j < indexs.Count; j++)
+            {
+                if(IngameManager.instance.CheckWalkableNode(indexs[j]) == true)
+                {
+                    newCreature.currentNodeIndex = indexs[j];
+                    break;
+                }
+            }
+
+            IngameManager.instance.saveData.mapData.nodeDatas[newCreature.currentNodeIndex].isMonster = true;
+            IngameManager.instance.saveData.mapData.monsterDatas.Add(newCreature);
+        }
+
+        IngameManager.instance.UpdateData();
     }
 }

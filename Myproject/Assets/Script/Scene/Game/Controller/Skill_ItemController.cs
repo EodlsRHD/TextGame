@@ -555,7 +555,7 @@ public class Skill_ItemController : MonoBehaviour
 
     public void PlayerDefence(ref CreatureData creature, Duration duration)
     {
-        ApplyEffect(ref creature, duration);
+        creature.stats.defence.plus += duration.value;
 
         IngameManager.instance.UpdatePlayerData();
     }
@@ -998,55 +998,62 @@ public class Skill_ItemController : MonoBehaviour
         switch (duration.stats)
         {
             case eStats.HP:
-                Remove(duration, ref data.stats.hp.current, ref data.stats.hp.percent);
+                Remove(duration, ref data.stats.hp);
                 break;
 
             case eStats.MP:
-                Remove(duration, ref data.stats.mp.current, ref data.stats.mp.percent);
+                Remove(duration, ref data.stats.mp);
                 break;
 
             case eStats.AP:
-                Remove(duration, ref data.stats.ap.current, ref data.stats.ap.percent);
+                Remove(duration, ref data.stats.ap);
                 break;
 
             case eStats.EXP:
-                Remove(duration, ref data.stats.exp.current, ref data.stats.exp.percent);
+                Remove(duration, ref data.stats.exp);
                 IngameManager.instance.GetExp(0);
                 break;
 
             case eStats.Coin:
-                Remove(duration, ref data.stats.coin.current, ref data.stats.coin.percent);
+                data.stats.MinusCoin(duration.value);
                 break;
 
             case eStats.Attack:
-                Remove(duration, ref data.stats.attack.plus, ref data.stats.attack.percent);
+                if(duration.isPercent == true)
+                {
+                    data.stats.attack.percent -= duration.value;
+
+                    return;
+                }
+
+                data.stats.attack.plus -= duration.value;
                 break;
 
             case eStats.Defence:
-                Remove(duration, ref data.stats.defence.plus, ref data.stats.defence.percent);
+                if(duration.isPercent == true)
+                {
+                    data.stats.defence.percent -= duration.value;
+
+                    return;
+                }
+
+                data.stats.defence.plus -= duration.value;
                 break;
         }
 
         IngameManager.instance.UpdatePlayerData();
     }
 
-    private void Remove(Duration duration, ref short value, ref short percent)
+    private void Remove(Duration duration, ref CreatureStat stat)
     {
         if (duration.isPercent == true)
         {
-            percent -= duration.value;
+            stat.percent -= duration.value;
             
             return;
         }
 
-        if (value - duration.value < 0)
-        {
-            value = 0;
-
-            return;
-        }
-
-        value -= duration.value;
+        stat.MinusCurrnet(duration.value);
     }
 
     private void ApplyEffect(ref CreatureData data, Duration duration)
@@ -1054,48 +1061,62 @@ public class Skill_ItemController : MonoBehaviour
         switch (duration.stats)
         {
             case eStats.HP:
-                Apply(duration, ref data.stats.hp.current, ref data.stats.hp.percent);
+                Apply(duration, ref data.stats.hp);
                 break;
 
             case eStats.MP:
-                Apply(duration, ref data.stats.mp.current, ref data.stats.mp.percent);
+                Apply(duration, ref data.stats.mp);
                 break;
 
             case eStats.AP:
-                Apply(duration, ref data.stats.ap.current, ref data.stats.ap.percent);
+                Apply(duration, ref data.stats.ap);
                 break;
 
             case eStats.EXP:
-                Apply(duration, ref data.stats.exp.current, ref data.stats.exp.percent);
+                Apply(duration, ref data.stats.exp);
                 IngameManager.instance.GetExp(0);
                 break;
 
             case eStats.Coin:
-                Apply(duration, ref data.stats.coin.current, ref data.stats.coin.percent);
+                data.stats.PlusCoin(duration.value);
                 break;
 
             case eStats.Attack:
-                Apply(duration, ref data.stats.attack.plus, ref data.stats.attack.percent);
+                if(duration.isPercent == true)
+                {
+                    data.stats.attack.percent += duration.value;
+
+                    return;
+                }
+
+                data.stats.attack.plus += duration.value;
                 break;
 
             case eStats.Defence:
-                Apply(duration, ref data.stats.defence.plus, ref data.stats.defence.percent);
+                if(duration.isPercent == true)
+                {
+                    data.stats.defence.percent += duration.value;
+
+                    return;
+                }
+
+                data.stats.defence.plus += duration.value;
                 break;
         }
 
         IngameManager.instance.UpdatePlayerData();
     }
 
-    private void Apply(Duration duration, ref short value, ref short percent)
+    private void Apply(Duration duration, ref CreatureStat stat)
     {
         if (duration.isPercent == true)
         {
-            percent += value;
+            stat.percent += duration.value;
 
             return;
         }
 
-        value += duration.value;
+        stat.PlusCurrent(duration.value);
     }
 
     #endregion

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -34,7 +35,7 @@ public class IngameManager : MonoBehaviour
     [Header("Shop"), SerializeField] private Shop _shop = null;
     [Header("Bonfire"), SerializeField] private Bonfire _bonfire = null;
 
-    private DataManager.SaveData _saveData = null;
+    [SerializeField] private DataManager.SaveData _saveData = null;
     private MapGenerator _mapGenerator = null;
 
     private bool _isPlayerTurn = false;
@@ -486,9 +487,9 @@ public class IngameManager : MonoBehaviour
         _controlPad.UpdateData(_saveData.userData);
     }
 
-    public void Attack(bool isInitiateMonster, int index, Action onLastCallback = null)
+    public void Attack(bool isMonster, int index, Action onLastCallback = null)
     {
-        _actionController.Attack(isInitiateMonster, index, onLastCallback);
+        _actionController.Attack(isMonster, index, onLastCallback);
     }
 
     public void Defence()
@@ -508,12 +509,18 @@ public class IngameManager : MonoBehaviour
         UpdateData();
     }
 
+    public void SplitMonster()
+    {
+        _monsterController.SplitMonster();
+    }
+
     private void DoneTurn()
     {
         _turnCount++;
 
         UpdateRoundText();
         _mapController.NextTurn();
+        _skillitemCountroller.UserDuration(ref _saveData.userData.data);
 
         if(_saveData.round == 1)
         {
@@ -606,8 +613,6 @@ public class IngameManager : MonoBehaviour
     public void MonsterTurnOut()
     {
         UpdateText("--- 몬스터의 순서가 종료되었습니다.");
-
-        _skillitemCountroller.UserDuration(ref _saveData.userData.data);
 
         DoneTurn();
 
@@ -764,19 +769,19 @@ public class IngameManager : MonoBehaviour
 
     public bool CheckWalkableNode(int index)
     {
-        if(index < 0 || index > _saveData.mapData.nodeDatas.Count)
+        if(index < 0 || index >= _saveData.mapData.nodeDatas.Count)
         {
             return false;
         }
 
         var node = _saveData.mapData.nodeDatas[index];
 
-        if(node.isGuide == false)
+        if(node.isGuide == true)
         {
             return false;
         }
 
-        if(node.isUser == false)
+        if(node.isUser == true)
         {
             return false;
         }
@@ -786,22 +791,22 @@ public class IngameManager : MonoBehaviour
             return false;
         }
 
-        if(node.isMonster == false)
+        if(node.isMonster == true)
         {
             return false;
         }
 
-        if(node.isBonfire == false)
+        if(node.isBonfire == true)
         {
             return false;
         }
 
-        if(node.isShop == false)
+        if(node.isShop == true)
         {
             return false;
         }
 
-        if(node.isExit == false)
+        if(node.isExit == true)
         {
             return false;
         }
@@ -1152,6 +1157,7 @@ public class MapGenerator
 
     private System.Action<DataManager.MapData> _onResultCallback = null;
     private DataManager.SaveData _saveData = null;
+    private CreatureGenerator _creatureGenerator = null;
 
     private List<Node> _nodes = null;
 
@@ -1322,7 +1328,7 @@ public class MapGenerator
             _saveData.mapData.nodeDatas.Add(node);
         }
 
-        CreatureGenerator _creatureGenerator = new CreatureGenerator(GenerateCreature, _saveData);
+        _creatureGenerator = new CreatureGenerator(GenerateCreature, _saveData);
     }
 
     private void GenerateCreature(CreatureData playerData, List<CreatureData> monsterData)
@@ -1672,9 +1678,10 @@ public class CreatureGenerator
             DataManager.NodeData node = new DataManager.NodeData();
             SpawnMonsterNodeSelect(Random.Range(0, _saveData.mapData.nodeDatas.Count), ref node);
 
-            int id = Random.Range(0, GameManager.instance.dataManager.GetCreaturDataCount());
+            //int id = Random.Range(0, GameManager.instance.dataManager.GetCreaturDataCount());
+            int id = 8;
             CreatureData creature = GameManager.instance.dataManager.GetCreatureData(id);
-            
+
             if (creature != null)
             {
                 creature.id = (short)i;

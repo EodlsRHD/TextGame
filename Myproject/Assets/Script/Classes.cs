@@ -311,7 +311,7 @@ public class CreatureStat
 
     public short maximum
     {
-        get { return (short)((defult * point) + ((defult * point) * 0.1f * percent)); }
+        get { return (short)((defult * point) + ((defult * point) * 0.1f * percent) + plus); }
     }
 
     public CreatureStat(short defult, short point, short plus, short percent)
@@ -320,7 +320,6 @@ public class CreatureStat
         this.point = point;
         this.plus = plus;
         this.percent = percent;
-        this.plus = plus;
         current = (short)(this.defult * this.point);
     }
 
