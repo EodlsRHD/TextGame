@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine; 
 
@@ -360,7 +361,8 @@ public class Skill_ItemController : MonoBehaviour
                     }
                     else
                     {
-                        IngameManager.instance.saveData.mapData.monsterDatas.Find(x => x.currentNodeIndex == index).abnormalStatuses.Add(abnormalStatus);
+                        var monster = IngameManager.instance.saveData.mapData.monsterDatas.Find(x => x.currentNodeIndex == index);
+                        AddAbnormalStatus(ref monster, abnormalStatus);
                     }
                 }
             }
@@ -374,7 +376,7 @@ public class Skill_ItemController : MonoBehaviour
                     }
                     else
                     {
-                        IngameManager.instance.saveData.userData.data.abnormalStatuses.Add(abnormalStatus);
+                        AddAbnormalStatus(ref IngameManager.instance.saveData.userData.data, abnormalStatus);
                     }
                 }
             }
@@ -405,6 +407,8 @@ public class Skill_ItemController : MonoBehaviour
 
             IngameManager.instance.saveData.userData.data.currentNodeIndex = destinationIndex;
             IngameManager.instance.saveData.mapData.nodeDatas[destinationIndex].isUser = true;
+
+            AddAbnormalStatus(ref IngameManager.instance.saveData.userData.data, abnormalStatus);
         }
         else if(isMonster == true)
         {
@@ -415,7 +419,10 @@ public class Skill_ItemController : MonoBehaviour
 
             IngameManager.instance.saveData.mapData.nodeDatas[currentNodeIndex].isMonster = false;
             IngameManager.instance.saveData.mapData.nodeDatas[destinationIndex].isMonster = true;
-            IngameManager.instance.saveData.mapData.monsterDatas.Find(x => x.currentNodeIndex == currentNodeIndex).currentNodeIndex = destinationIndex;
+            var monster = IngameManager.instance.saveData.mapData.monsterDatas.Find(x => x.currentNodeIndex == currentNodeIndex);
+            monster.currentNodeIndex = destinationIndex;
+
+            AddAbnormalStatus(ref monster, abnormalStatus);
         }
     }
 
@@ -782,7 +789,7 @@ public class Skill_ItemController : MonoBehaviour
 
         List<int> list = IngameManager.instance.GetRangeNodes_Diagonal(dx, dy, nodeIndex);
         list.Add(nodeIndex);
-        
+                
         IngameManager.instance.RevealMap(dir, list);
     }
 
@@ -808,7 +815,8 @@ public class Skill_ItemController : MonoBehaviour
                     }
                     else
                     {
-                        IngameManager.instance.saveData.mapData.monsterDatas.Find(x => x.currentNodeIndex == index).abnormalStatuses.Add(abnormalStatus);
+                        var monster = IngameManager.instance.saveData.mapData.monsterDatas.Find(x => x.currentNodeIndex == index);
+                        AddAbnormalStatus(ref monster, abnormalStatus);
                     }
                 }
             }
@@ -822,7 +830,7 @@ public class Skill_ItemController : MonoBehaviour
                     }
                     else
                     {
-                        IngameManager.instance.saveData.userData.data.abnormalStatuses.Add(abnormalStatus);
+                        AddAbnormalStatus(ref IngameManager.instance.saveData.userData.data, abnormalStatus);
                     }
                 }
             }
@@ -851,6 +859,8 @@ public class Skill_ItemController : MonoBehaviour
 
             IngameManager.instance.saveData.userData.data.currentNodeIndex = destinationIndex;
             IngameManager.instance.saveData.mapData.nodeDatas[destinationIndex].isUser = true;
+
+            AddAbnormalStatus(ref IngameManager.instance.saveData.userData.data, abnormalStatus);
         }
         else if(isMonster == true)
         {
@@ -861,7 +871,10 @@ public class Skill_ItemController : MonoBehaviour
 
             IngameManager.instance.saveData.mapData.nodeDatas[currentNodeIndex].isMonster = false;
             IngameManager.instance.saveData.mapData.nodeDatas[destinationIndex].isMonster = true;
-            IngameManager.instance.saveData.mapData.monsterDatas.Find(x => x.currentNodeIndex == currentNodeIndex).currentNodeIndex = destinationIndex;
+            var monster = IngameManager.instance.saveData.mapData.monsterDatas.Find(x => x.currentNodeIndex == currentNodeIndex);
+            monster.currentNodeIndex = destinationIndex;
+
+            AddAbnormalStatus(ref monster, abnormalStatus);
         }
     }
 
@@ -900,7 +913,8 @@ public class Skill_ItemController : MonoBehaviour
                         }
                         else
                         {
-                            IngameManager.instance.saveData.mapData.monsterDatas.Find(x => x.currentNodeIndex == node).abnormalStatuses.Add(abnormalStatus);
+                            var monster = IngameManager.instance.saveData.mapData.monsterDatas.Find(x => x.currentNodeIndex == index);
+                            AddAbnormalStatus(ref monster, abnormalStatus);
                         }
                     }
                 }
@@ -914,7 +928,7 @@ public class Skill_ItemController : MonoBehaviour
                         }
                         else
                         {
-                            IngameManager.instance.saveData.userData.data.abnormalStatuses.Add(abnormalStatus);
+                            AddAbnormalStatus(ref IngameManager.instance.saveData.userData.data, abnormalStatus);
                         }
                     }
                 }
@@ -933,7 +947,8 @@ public class Skill_ItemController : MonoBehaviour
                 }
                 else
                 {
-                    IngameManager.instance.saveData.mapData.monsterDatas.Find(x => x.currentNodeIndex == index).abnormalStatuses.Add(abnormalStatus);
+                    var monster = IngameManager.instance.saveData.mapData.monsterDatas.Find(x => x.currentNodeIndex == index);
+                    AddAbnormalStatus(ref monster, abnormalStatus);
                 }
             }
         }
@@ -947,7 +962,7 @@ public class Skill_ItemController : MonoBehaviour
                 }
                 else
                 {
-                    IngameManager.instance.saveData.userData.data.abnormalStatuses.Add(abnormalStatus);
+                    AddAbnormalStatus(ref IngameManager.instance.saveData.userData.data, abnormalStatus);
                 }
             }
         }
@@ -975,6 +990,8 @@ public class Skill_ItemController : MonoBehaviour
 
             IngameManager.instance.saveData.userData.data.currentNodeIndex = destinationIndex;
             IngameManager.instance.saveData.mapData.nodeDatas[destinationIndex].isUser = true;
+
+            AddAbnormalStatus(ref IngameManager.instance.saveData.userData.data, abnormalStatus);
         }
         else if(isMonster == true)
         {
@@ -985,7 +1002,10 @@ public class Skill_ItemController : MonoBehaviour
 
             IngameManager.instance.saveData.mapData.nodeDatas[currentNodeIndex].isMonster = false;
             IngameManager.instance.saveData.mapData.nodeDatas[destinationIndex].isMonster = true;
-            IngameManager.instance.saveData.mapData.monsterDatas.Find(x => x.currentNodeIndex == currentNodeIndex).currentNodeIndex = destinationIndex;
+            var monster = IngameManager.instance.saveData.mapData.monsterDatas.Find(x => x.currentNodeIndex == currentNodeIndex);
+            monster.currentNodeIndex = destinationIndex;
+
+            AddAbnormalStatus(ref monster, abnormalStatus);
         }
     }
 
@@ -1121,6 +1141,27 @@ public class Skill_ItemController : MonoBehaviour
 
     #endregion
 
+    private void AddAbnormalStatus(ref CreatureData creature, AbnormalStatus status)
+    {
+        if(status.currentStatus == eStrengtheningTool.Non)
+        {
+            return;
+        }
+
+        for(int i = 0; i < creature.abnormalStatuses.Count; i++)
+        {
+            if(creature.abnormalStatuses[i].currentStatus == status.currentStatus)
+            {
+                creature.abnormalStatuses[i].duration += status.duration;
+                creature.abnormalStatuses[i].value = status.value;
+
+                return;
+            }
+        }
+
+        creature.abnormalStatuses.Add(status);
+    }
+
     private void StrengtheningTool(ref CreatureData data, StrengtheningTool tool)
     {
         if(tool.grantStatus == eStrengtheningTool.Non)
@@ -1152,7 +1193,7 @@ public class Skill_ItemController : MonoBehaviour
         newData.duration = tool.duration;
         newData.value = tool.value;
 
-        data.abnormalStatuses.Add(newData);
+        AddAbnormalStatus(ref data, newData);
     }
 
     private void AbnormalStatusesDuration(ref CreatureData data)

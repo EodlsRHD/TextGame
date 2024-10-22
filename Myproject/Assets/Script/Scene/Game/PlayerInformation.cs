@@ -15,15 +15,15 @@ public class PlayerInformation : MonoBehaviour
     [SerializeField] private TMP_Text _textEXP = null;
 
     [Header("Vertical")]
+    [SerializeField] private GameObject _objMaker = null;
     [SerializeField] private GameObject _objInformation = null;
-    [SerializeField] private TMP_Text _textCoin = null;
-    [SerializeField] private TMP_Text _textAttack = null;
-    [SerializeField] private TMP_Text _textDefence = null;
-    [SerializeField] private TMP_Text _textVision = null;
-    [SerializeField] private TMP_Text _textAttackRange = null;
+    [SerializeField] private TMP_Text _textInformation = null;
+    [SerializeField] private TMP_Text _textAbnormalStatus = null;
 
     public void Initialize()
     {
+        _textAbnormalStatus.text = string.Empty;
+
         _objInformation.SetActive(false);
     }
 
@@ -35,11 +35,8 @@ public class PlayerInformation : MonoBehaviour
         _textAP.text = userData.stats.ap.current + " / " + userData.stats.ap.maximum;
         _textEXP.text = userData.stats.exp.current + " / " + userData.maximumEXP;
 
-        _textCoin.text = userData.stats.coin.current.ToString();
-        _textAttack.text = (userData.stats.attack.current + userData.stats.attack.plus).ToString();
-        _textDefence.text = (userData.stats.defence.current + userData.stats.defence.plus).ToString();
-        _textVision.text = (userData.stats.vision.current + userData.stats.vision.plus).ToString();
-        _textAttackRange.text = (userData.stats.attackRange.current + userData.stats.attackRange.plus).ToString();
+        Information(userData);
+        Abnormalstatus(userData);
     }
 
     public void UpdatePlayerInfo(eStats type, UserData userData)
@@ -67,15 +64,13 @@ public class PlayerInformation : MonoBehaviour
                 break;
         }
 
-        _textCoin.text = userData.stats.coin.current.ToString();
-        _textAttack.text = (userData.stats.attack.current + userData.stats.attack.plus).ToString();
-        _textDefence.text = (userData.stats.defence.current + userData.stats.defence.plus).ToString();
-        _textVision.text = (userData.stats.vision.current + userData.stats.vision.plus).ToString();
-        _textAttackRange.text = (userData.stats.attackRange.current + userData.stats.attackRange.plus).ToString();
+        Information(userData);
+        Abnormalstatus(userData);
     }
 
     public void Open()
     {
+        _objMaker.SetActive(false);
         _objInformation.SetActive(true);
 
         GameManager.instance.tools.Move_Anchor_XY(eUiDir.X, _objInformation.GetComponent<RectTransform>(), 0f, 0.5f, 0, Ease.OutBack, null);
@@ -83,11 +78,76 @@ public class PlayerInformation : MonoBehaviour
 
     public void Close(System.Action onResultCallback = null)
     {
-        GameManager.instance.tools.Move_Anchor_XY(eUiDir.X, _objInformation.GetComponent<RectTransform>(), 447f, 0.5f, 0, Ease.InBack, () => 
+        GameManager.instance.tools.Move_Anchor_XY(eUiDir.X, _objInformation.GetComponent<RectTransform>(), 1000f, 0.5f, 0, Ease.InBack, () => 
         {
+            _objMaker.SetActive(true);
             _objInformation.SetActive(false);
 
-            onResultCallback?.Invoke();
+            _textAbnormalStatus.text = string.Empty;
+
+           onResultCallback?.Invoke();
         });
+    }
+
+    private void Information(UserData userData)
+    {
+        _textInformation.text = "Gold : " + userData.stats.coin.current + "\n";
+        _textInformation.text += "Attack : " + (userData.stats.attack.current + userData.stats.attack.plus) + "\n";
+        _textInformation.text += "Defence : " + (userData.stats.defence.current + userData.stats.defence.plus) + "\n";
+        _textInformation.text += "Vision : " + (userData.stats.vision.current + userData.stats.vision.plus);
+    }
+
+    private void Abnormalstatus(UserData userData)
+    {
+        for(int i = 0; i < userData.data.abnormalStatuses.Count; i++)
+        {
+            switch(userData.data.abnormalStatuses[i].currentStatus)
+            {
+                case eStrengtheningTool.UnableAct:
+                    _textAbnormalStatus.text += "행동 불능 : " + userData.data.abnormalStatuses[i].duration + "턴 남았습니다." + "\n";
+                    break;
+
+                case eStrengtheningTool.ContinuousDamage:
+                    _textAbnormalStatus.text += "지속 피해 : " + userData.data.abnormalStatuses[i].duration + "턴/ " + userData.data.abnormalStatuses[i].value + "\n";
+                    break;
+
+                case eStrengtheningTool.Recovery:
+                    _textAbnormalStatus.text += "회복 : " + userData.data.abnormalStatuses[i].duration + "턴 / " + userData.data.abnormalStatuses[i].value + "\n";
+                    break;
+
+                case eStrengtheningTool.Slowdown:
+                    _textAbnormalStatus.text += "둔화 : " + userData.data.abnormalStatuses[i].duration + "턴 남았습니다." + "\n";
+                    break;
+
+                case eStrengtheningTool.BloodSucking:
+                    _textAbnormalStatus.text += "흡혈 : " + userData.data.abnormalStatuses[i].duration + "턴 남았습니다." + "\n";
+                    break;
+
+                case eStrengtheningTool.Hardness:
+                    _textAbnormalStatus.text += "강성 : " + userData.data.abnormalStatuses[i].duration + "턴 남았습니다." + "\n";
+                    break;
+
+                case eStrengtheningTool.Stealth:
+                    _textAbnormalStatus.text += "은신 : " + userData.data.abnormalStatuses[i].duration + "턴 남았습니다." + "\n";
+                    break;
+
+                case eStrengtheningTool.AttackBlocking:
+                    _textAbnormalStatus.text += "공격 방어 : " + userData.data.abnormalStatuses[i].value + "회 남았습니다." + "\n";
+                    break;
+
+                case eStrengtheningTool.SkillBlocking:
+                    _textAbnormalStatus.text += "스킬 방어 : " + userData.data.abnormalStatuses[i].value + "회 남았습니다." + "\n";
+                    break;
+
+                case eStrengtheningTool.SkillReflect:
+                    _textAbnormalStatus.text += "스킬 반사 : " + userData.data.abnormalStatuses[i].value + "회 남았습니다." + "\n";
+                    break;
+
+                case eStrengtheningTool.Invincibility:
+                    _textAbnormalStatus.text += "무적 : " + userData.data.abnormalStatuses[i].value + "회 남았습니다." + "\n";
+                    break;
+
+            }
+        }
     }
 }

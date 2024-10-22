@@ -40,7 +40,7 @@ public class MonsterController : MonoBehaviour
 
             if (isAttack == false)
             {
-                if (MonsterAttack(m) == true)
+                if (CheckNearbyPlayer(m) == true)
                 {
                     attackMonsterIndex = m;
 
@@ -74,13 +74,13 @@ public class MonsterController : MonoBehaviour
         IngameManager.instance.MonsterTurnOut();
     }
 
-    private bool MonsterAttack(int m)
+    private bool CheckNearbyPlayer(int m)
     {
         List<int> dx = new List<int>();
         List<int> dy = new List<int>();
 
-        int range = IngameManager.instance.saveData.mapData.monsterDatas[m].stats.attackRange.current;
-        for (int i = -range; i <= range; i++)
+        int attackRange = IngameManager.instance.saveData.mapData.monsterDatas[m].stats.attackRange.current;
+        for (int i = -attackRange; i <= attackRange; i++)
         {
             dx.Add(i);
             dy.Add(i);
@@ -225,7 +225,7 @@ public class MonsterController : MonoBehaviour
         IngameManager.instance.saveData.mapData.monsterDatas[m].currentNodeIndex = result;
     }
 
-    private void FindPlayer(int m,Action<bool> onFindPlayerActionCallback)
+    private void FindPlayer(int m, Action<bool> onFindPlayerActionCallback)
     {
         CreatureData monster = IngameManager.instance.saveData.mapData.monsterDatas[m];
 
@@ -254,7 +254,7 @@ public class MonsterController : MonoBehaviour
                 continue;
             }
 
-            if (IngameManager.instance.saveData.userData.data.currentNodeIndex == visionIndexs[i])
+            if(IngameManager.instance.saveData.mapData.nodeDatas[visionIndexs[i]].isUser == true)
             {
                 isFindPlayer = true;
 

@@ -113,6 +113,12 @@ public class SO_CreatureDataSprite : ScriptableObject
     
     public Sprite GetSprite(int id)
     {
+        if (_tempalte.Find(x => x.id == id) == null)
+        {
+            Debug.LogError("_tempalte.Find(x => x.id == id) = null     " + id);
+            return _spriteNull;
+        }
+
         if(_tempalte.Find(x => x.id == id).sprite == null)
         {
             return _spriteNull;
