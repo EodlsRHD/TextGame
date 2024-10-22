@@ -712,8 +712,6 @@ public class Attacker : MonoBehaviour
     {
         List<AttackerTemplate> card = new List<AttackerTemplate>();
 
-        AttackerTemplate temp = new AttackerTemplate();
-
         for (int i = 0; i < indexs.Count; i++)
         {
             card.Add(_cards[indexs[i]]);
@@ -725,7 +723,7 @@ public class Attacker : MonoBehaviour
             {
                 if (card[j].Num < card[j + 1].Num)
                 {
-                    temp = card[j];
+                    AttackerTemplate temp = card[j];
                     card[j] = card[j + 1];
                     card[j + 1] = temp;
                 }
