@@ -31,8 +31,9 @@ public class DataManager : MonoBehaviour
         public short evasion = 0;
 
         public eStrengtheningTool defultStatus = eStrengtheningTool.Non;
+        public short defultStatusValue = 0;
 
-        public bool useSkill = false;
+        public string useSkill = false;
         public List<short> skillIndexs = null;
         public List<short> itemIndexs = null;
     }
@@ -280,7 +281,7 @@ public class DataManager : MonoBehaviour
         _saveData.userData.data.stats.coin = new CreatureStat(0, 1, 0, 0);
         _saveData.userData.data.stats.hp = new CreatureStat(10, 1, 0, 0);
         _saveData.userData.data.stats.mp = new CreatureStat(10, 1, 0, 0);
-        _saveData.userData.data.stats.ap = new CreatureStat(3, 1, 0, 0);
+        _saveData.userData.data.stats.ap = new CreatureStat(100, 1, 0, 0);
         _saveData.userData.data.stats.exp = new CreatureStat(20, 1, 0, 0);
         _saveData.userData.data.stats.exp.current = 0;
         _saveData.userData.data.stats.attack = new CreatureStat(5, 1, 0, 0);

@@ -178,6 +178,9 @@ public class IngameManager : MonoBehaviour
         _saveData.mapData = mapData;
         _turnCount = 1;
 
+        _monsterController.CreateMonster(_saveData.mapData.monsterDatas);
+        _mapController.SetMap(_saveData);
+
         RoundSet();
     }
      
@@ -186,7 +189,6 @@ public class IngameManager : MonoBehaviour
         UpdatePlayerCoord();
         UpdateRoundText();
 
-        SetMap();
         UpdateData();
 
         PlayerTurn();
@@ -218,11 +220,6 @@ public class IngameManager : MonoBehaviour
     public void ControlPad_Bag()
     {
         _controlPad.Bag(_saveData.userData, PlayerItem_Skill);
-    }
-
-    public void SetMap()
-    {
-        _mapController.SetMap(_saveData);
     }
 
     public void PlayBgm(eBgm type)
@@ -426,18 +423,18 @@ public class IngameManager : MonoBehaviour
         CreatureData data = _saveData.mapData.monsterDatas[monsterIdnex];
         SkillData skill = GameManager.instance.dataManager.GetskillData(skill_Index);
 
-        UpdateText(data.name + " (이)가 " + GameManager.instance.dataManager.GetskillData(skill_Index).name + " (을)를 시전했습니다.");
+        UpdateText(data.name + " (이)가 " + skill.name + " (을)를 시전했습니다.");
 
         int playerIndex = -1;
         eDir playerDir = eDir.Non;
 
         if(skill.tool.dir == eDir.DesignateDirection)
         {
-            playerIndex = _saveData.userData.data.currentNodeIndex;
+            playerDir = GetTargetDirection(monsterIdnex, playerIndex);
         }
         else if(skill.tool.dir == eDir.DesignateCoordination)
         {
-            playerDir = GetTargetDirection(monsterIdnex, playerIndex);
+            playerIndex = _saveData.userData.data.currentNodeIndex;
         }
 
         SetDirCoord(playerIndex, playerDir);
@@ -509,9 +506,10 @@ public class IngameManager : MonoBehaviour
         UpdateData();
     }
 
-    public void SplitMonster()
+    public void MonsterEffect()
     {
         _monsterController.SplitMonster();
+        _monsterController.HardnessMonster();
     }
 
     private void DoneTurn()
@@ -576,7 +574,6 @@ public class IngameManager : MonoBehaviour
         UpdateText("행동력이 " + saveData.userData.stats.ap.current + "만큼 남았습니다.");
 
         _playerController.PlayerSearchNearby();
-        UpdateMap();
         UpdateData();
     }
 
@@ -664,7 +661,7 @@ public class IngameManager : MonoBehaviour
         _ingameUI.OpenNextRoundWindow(type);
     }
 
-    public void UpdateMap()
+    public void ViewMap()
     {
         if (GameManager.instance.isMapBackgroundUpdate == true)
         {
@@ -693,6 +690,7 @@ public class IngameManager : MonoBehaviour
         }
 
         _mapController.UpdateMapData(_saveData, Vision(_saveData.userData.stats.vision.current, _saveData.userData.data.currentNodeIndex));
+        _monsterController.UpdateData(_saveData.mapData.monsterDatas);
     }
 
     public void UpdatePlayerData()
@@ -704,9 +702,9 @@ public class IngameManager : MonoBehaviour
 
     #region Function
 
-    public int PathFinding(ref DataManager.MapData mapData, int startNodeIndex, int endNodeIndex)
+    public int PathFinding(int startNodeIndex, int endNodeIndex)
     {
-        return _mapGenerator.PathFinding(ref mapData, startNodeIndex, endNodeIndex);
+        return _mapGenerator.PathFinding(ref _saveData.mapData, startNodeIndex, endNodeIndex);
     }
 
     public void CheckWalkableNode(int x, int y, Action<int, bool> onRasultCallback)

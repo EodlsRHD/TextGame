@@ -216,7 +216,10 @@ public class MapController : MonoBehaviour
 
     public void Close(bool isCloseButton = false, Action onResultCallbacl = null)
     {
-        GameManager.instance.soundManager.PlaySfx(eSfx.Map);
+        if(GameManager.instance.isMapBackgroundUpdate == false)
+        {
+            GameManager.instance.soundManager.PlaySfx(eSfx.Map);
+        }
 
         GameManager.instance.tools.Move_Anchor_XY(eUiDir.Y, this.GetComponent<RectTransform>(), 1800f, 0.5f, 0, Ease.InBack, () =>
         {

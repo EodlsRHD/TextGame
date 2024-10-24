@@ -209,9 +209,7 @@ public class CreatureData
     public CreatureStats stats = null;
 
     public eStrengtheningTool defultStatus = eStrengtheningTool.Non;
-
-    public bool recovery = false;
-    public byte recoveryCount = 0;
+    public short defultStatusValue = 0;
 
     public bool haveSkill = false;
     public List<short> skillIndexs = null;

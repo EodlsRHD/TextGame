@@ -72,8 +72,9 @@ public class SO_CreatureDataSprite : ScriptableObject
             temp.stats.evesion = new CreatureStat(data.evasion, 1, 0, 0);
 
             temp.defultStatus = data.defultStatus;
+            temp.defultStatusValue = data.defultStatusValue;
 
-            temp.haveSkill = data.useSkill;
+            temp.haveSkill = data.useSkill.Equals("TRUE") ? true : false;
 
             temp.skillIndexs = new List<short>();
             if (data.skillIndexs != null)

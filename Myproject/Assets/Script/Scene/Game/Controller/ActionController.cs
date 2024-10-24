@@ -1,3 +1,4 @@
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 public class ActionController : MonoBehaviour
@@ -155,7 +156,7 @@ public class ActionController : MonoBehaviour
                 monster.defultStatus = eStrengtheningTool.Non;
             }
 
-            IngameManager.instance.SplitMonster();
+            IngameManager.instance.MonsterEffect();
 
             IngameManager.instance.UpdateData();
         });
@@ -179,35 +180,21 @@ public class ActionController : MonoBehaviour
         IngameManager.instance.UpdateText("방어도가 " + ap + "만큼 증가했습니다.");
     }
 
-    private void AttackLogic(CreatureData attacker, CreatureData defencer, int damage, bool attackerIsMonster, int monsterNodeIndex)
+    private void AttackLogic(CreatureData attacker, CreatureData defencer, int battleDamage, bool attackerIsMonster, int monsterNodeIndex)
     {
         IngameManager.instance.UpdateText("--- " + attacker.name + " (이)가 승리했습니다.");
 
-        int attackerDamage = attacker.stats.attack.maximum;
+        Hardness(attacker, ref battleDamage);
+        ReductionHalf(defencer, ref battleDamage);
+
+        int attackerDamage = attacker.stats.attack.maximum + battleDamage;
         int defencerDefence = defencer.stats.defence.maximum;
 
         IngameManager.instance.UpdateText("--- " + attacker.name + " (이)가 " + attackerDamage + " 의 공격력으로 공격합니다.");
 
-        if (IngameManager.instance.CheckAbnormalStatusEffect(eStrengtheningTool.Hardness, attacker) == true)
-        {
-            short value = IngameManager.instance.GetValueAbnormalStatusEffect(eStrengtheningTool.Hardness, attacker);
-            short hardnessValue = (short)(attackerDamage * (0.01f * value));
-            attackerDamage += hardnessValue;
+        int resultDamage = defencerDefence - attackerDamage;
 
-            IngameManager.instance.UpdateText("강성으로 인해 " + hardnessValue + "만큼 피해가 추가로 더해졌습니다.");
-        }
-
-        if (IngameManager.instance.CheckAbnormalStatusEffect(eStrengtheningTool.ReductionHalf, defencer) == true)
-        {
-            short reductionHalfValue = (short)(attackerDamage * 0.5f);
-            attackerDamage = reductionHalfValue;
-
-            IngameManager.instance.UpdateText("반감으로 인해 피해가 반감되었습니다.");
-        }
-
-        int Damage = defencerDefence - attackerDamage;
-
-        if (Damage >= 0)
+        if (resultDamage >= 0)
         {
             IngameManager.instance.UpdateText("--- " + attacker.name + " 의 공격이 방어도에 막혔습니다.");
             GameManager.instance.soundManager.PlaySfx(eSfx.Blocked);
@@ -215,16 +202,16 @@ public class ActionController : MonoBehaviour
             return;
         }
 
-        Damage = Mathf.Abs(Damage);
+        resultDamage = Mathf.Abs(resultDamage);
 
-        IngameManager.instance.UpdateText("방어도를 제외한 " + Damage + " 의 데미지를 가했습니다.");
+        IngameManager.instance.UpdateText("방어도를 제외한 " + resultDamage + " 의 데미지를 가했습니다.");
         if(attackerIsMonster == true)
         {
-            IngameManager.instance.PlayerHit(Damage);
+            IngameManager.instance.PlayerHit(resultDamage);
         }
         else
         {
-            IngameManager.instance.MonsterHit(monsterNodeIndex, Damage);
+            IngameManager.instance.MonsterHit(monsterNodeIndex, resultDamage);
         }
 
         bool isBloodSucking = false;
@@ -235,7 +222,7 @@ public class ActionController : MonoBehaviour
             isBloodSucking = true;
 
             short value = IngameManager.instance.GetValueAbnormalStatusEffect(eStrengtheningTool.BloodSucking, attacker);
-            short BloodSuckingValue = (short)(damage * value);
+            short BloodSuckingValue = (short)(resultDamage * value);
             bloodSuckingValue = value;
 
             if(attackerIsMonster == true)
@@ -253,7 +240,7 @@ public class ActionController : MonoBehaviour
         if (IngameManager.instance.CheckAbnormalStatusEffect(eStrengtheningTool.QuickAttack, attacker) == true)
         {
             short plusValue = IngameManager.instance.GetValueAbnormalStatusEffect(eStrengtheningTool.QuickAttack, attacker);
-            short plusDamage = (short)(damage * plusValue);
+            short plusDamage = (short)(resultDamage * plusValue);
 
             IngameManager.instance.UpdateText("연속타격으로 인해 " + plusDamage + "만큼 한번더 공격합니다.");
 
@@ -267,22 +254,22 @@ public class ActionController : MonoBehaviour
                 return;
             }
 
-            Damage = Mathf.Abs(addDamage);
+            resultDamage = Mathf.Abs(addDamage);
 
-            IngameManager.instance.UpdateText("방어도를 제외한 " + Damage + " 의 데미지를 가했습니다.");
+            IngameManager.instance.UpdateText("방어도를 제외한 " + resultDamage + " 의 데미지를 가했습니다.");
 
             if(attackerIsMonster == true)
             {
-                IngameManager.instance.PlayerHit(Damage);
+                IngameManager.instance.PlayerHit(resultDamage);
             }
             else
             {
-                IngameManager.instance.MonsterHit(monsterNodeIndex, Damage);
+                IngameManager.instance.MonsterHit(monsterNodeIndex, resultDamage);
             }
 
             if (isBloodSucking == true)
             {
-                short BloodSuckingValue = (short)(Damage * bloodSuckingValue);
+                short BloodSuckingValue = (short)(resultDamage * bloodSuckingValue);
 
                 if (attackerIsMonster == true)
                 {
@@ -295,6 +282,32 @@ public class ActionController : MonoBehaviour
 
                 IngameManager.instance.UpdateText("흡혈로 인해 " + BloodSuckingValue + "만큼 회복했습니다.");
             }
+        }
+    }
+
+    private void Hardness(CreatureData attacker, ref int damage)
+    {
+        if(IngameManager.instance.CheckAbnormalStatusEffect(eStrengtheningTool.Hardness, attacker) == true)
+        {
+            if(attacker.stats.hp.maximum < attacker.stats.hp.current)
+            {
+                int minusHp = attacker.stats.hp.maximum - attacker.stats.hp.current;
+                short reductionHalfValue = (short)(minusHp * 0.5f);
+                damage += reductionHalfValue;
+
+                IngameManager.instance.UpdateText(attacker.name + "강성으로 인해 피해가 2배 증가되었습니다.");
+            }
+        }
+    }
+
+    private void ReductionHalf(CreatureData defencer, ref int damage)
+    {
+        if(IngameManager.instance.CheckAbnormalStatusEffect(eStrengtheningTool.ReductionHalf, defencer) == true)
+        {
+            short reductionHalfValue = (short)(damage * 0.5f);
+            damage = reductionHalfValue;
+
+            IngameManager.instance.UpdateText(defencer.name + "반감으로 인해 피해가 반감되었습니다.");
         }
     }
 }

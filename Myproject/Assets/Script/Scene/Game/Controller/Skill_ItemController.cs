@@ -134,7 +134,10 @@ public class Skill_ItemController : MonoBehaviour
         SkillConsumptionCheck(ref creature, skill, eStats.Defence, skill.GetStat_Value(eStats.Defence));
         SkillConsumptionCheck(ref creature, skill, eStats.Defence, skill.GetStat_Percent(eStats.Defence), true);
 
-        IngameManager.instance.ControlPadUpdateData();
+        if(isMonster == false)
+        {
+            IngameManager.instance.ControlPadUpdateData();
+        }
         IngameManager.instance.UpdateData();
 
         _dir = eDir.Non;
@@ -170,9 +173,7 @@ public class Skill_ItemController : MonoBehaviour
 
         if (data.tool.duration == 0)
         {
-            ApplyEffect(ref creature, duration);
-
-            return;
+            ApplyEffect(ref creature, duration); 
         }
 
         creature.skill_Duration.Add(duration);

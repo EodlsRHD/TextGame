@@ -163,7 +163,7 @@ public class GameMenu : MonoBehaviour
 
         if (IngameManager.instance != null)
         {
-            IngameManager.instance.UpdateMap();
+            IngameManager.instance.ViewMap();
         }
     }
 
