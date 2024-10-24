@@ -1,11 +1,15 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class MonsterController : MonoBehaviour
 {
+    private List<Monster> _monsters = new List<Monster>();
 
+    private bool _isAttack = false;
     private bool _isAllMonsterDead = false;
 
     public bool isAllMonsterDead
@@ -19,9 +23,29 @@ public class MonsterController : MonoBehaviour
         this.gameObject.SetActive(true);
     }
 
+    public void CreateMonster(List<CreatureData> monsters)
+    {
+        _monsters.Clear();
+
+        if(monsters.Count == 0)
+        {
+            _isAllMonsterDead = true;
+
+            return;
+        }
+
+        for(int i = 0; i < monsters.Count; i++)
+        {
+            Monster monster = new Monster();
+            monster.Initialize(monsters[i], Attack, Move, Skill);
+
+            _monsters.Add(monster);
+        }
+    }
+
     public IEnumerator MonsterTurn()
     {
-        if (_isAllMonsterDead == true)
+        if(_isAllMonsterDead == true)
         {
             IngameManager.instance.UpdateText("--- 몬스터의 순서를 건너뜁니다.");
             IngameManager.instance.PlayerTurn();
@@ -31,42 +55,59 @@ public class MonsterController : MonoBehaviour
 
         IngameManager.instance.UpdateText("--- 몬스터의 순서입니다.");
 
-        int attackMonsterIndex = 0;
-        bool isAttack = false;
-
-        for (int m = 0; m < IngameManager.instance.saveData.mapData.monsterDatas.Count; m++)
+        for(int i = 0; i < _monsters.Count; i++)
         {
             yield return new WaitForSeconds(0.5f);
 
-            if (isAttack == false)
-            {
-                if (CheckNearbyPlayer(m) == true)
-                {
-                    attackMonsterIndex = m;
-
-                    isAttack = true;
-                }
-            }
-
-            if(attackMonsterIndex == m)
-            {
-                continue;
-            }
-
-            MonsterMove(m, 1);
+            _monsters[i].Action();
         }
+    }
 
-        if (isAttack == true)
+    private void Attack(int id)
+    {
+        if(_isAttack == true)
         {
-            IngameManager.instance.Attack(true, IngameManager.instance.saveData.mapData.monsterDatas[attackMonsterIndex].currentNodeIndex, () =>
-            {
-                MonsterTurnOut();
-            });
-
-            yield break;
+            return;
         }
 
-        MonsterTurnOut();
+        _isAttack = true;
+        IngameManager.instance.Attack(true, IngameManager.instance.saveData.mapData.monsterDatas[id].currentNodeIndex, () =>
+        {
+            _isAttack = false;
+            MonsterTurnOut();
+        });
+    }
+
+    private void Move(int id, int nodeIndex)
+    {
+        IngameManager.instance.saveData.mapData.nodeDatas[IngameManager.instance.saveData.mapData.monsterDatas[id].currentNodeIndex].isMonster = false;
+        IngameManager.instance.saveData.mapData.nodeDatas[nodeIndex].isMonster = true;
+        IngameManager.instance.saveData.mapData.monsterDatas[id].currentNodeIndex = nodeIndex;
+
+        if(id == (_monsters.Count - 1))
+        {
+            if(_isAttack == true)
+            {
+                return;
+            }
+
+            MonsterTurnOut();
+        }
+    }
+
+    private void Skill(int id, int skillId)
+    {
+        IngameManager.instance.MonsterSkill(id, skillId);
+
+        if(id == (_monsters.Count - 1))
+        {
+            if(_isAttack == true)
+            {
+                return;
+            }
+
+            MonsterTurnOut();
+        }
     }
 
     private void MonsterTurnOut()
@@ -74,195 +115,41 @@ public class MonsterController : MonoBehaviour
         IngameManager.instance.MonsterTurnOut();
     }
 
-    private bool CheckNearbyPlayer(int m)
+    public void UpdateData(List<CreatureData> monsters)
     {
-        List<int> dx = new List<int>();
-        List<int> dy = new List<int>();
-
-        int attackRange = IngameManager.instance.saveData.mapData.monsterDatas[m].stats.attackRange.current;
-        for (int i = -attackRange; i <= attackRange; i++)
-        {
-            dx.Add(i);
-            dy.Add(i);
-        }
-
-        bool isAttack = false;
-        List<int> NearbyIndexs = IngameManager.instance.GetNearbyNodes_NonDiagonal(IngameManager.instance.saveData.mapData.monsterDatas[m].currentNodeIndex);
-
-        for (int i = 0; i < NearbyIndexs.Count; i++)
-        {
-            if (IngameManager.instance.saveData.userData.data.currentNodeIndex == NearbyIndexs[i])
-            {
-                isAttack = true;
-
-                break;
-            }
-        }
-
-        return isAttack;
-    }
-
-    private void MonsterMove(int m, int ap)
-    {
-        List<int> visionIndexs = IngameManager.instance.Vision(IngameManager.instance.saveData.mapData.monsterDatas[m].stats.vision.current, IngameManager.instance.saveData.mapData.monsterDatas[m].currentNodeIndex);
-
-        if(IngameManager.instance.saveData.mapData.monsterDatas[m].defultStatus == eStrengtheningTool.Incubation)
+        if(_isAllMonsterDead == true)
         {
             return;
         }
 
-        FindPlayer(m, (result) =>
+        if(monsters.Count == 0)
         {
-            if(result == true)
-            {
-                MonsterSkill(m);
-
-                return;
-            }
-
-            List<int> nearbyIndexs = IngameManager.instance.GetNearbyNodes_NonDiagonal(IngameManager.instance.saveData.mapData.monsterDatas[m].currentNodeIndex);
-
-            if (nearbyIndexs.Count == 0)
-            {
-                return;
-            }
-
-            MonsterSelectMoveBlock(m, ap, ref nearbyIndexs);
-        });
-    }
-
-    private void MonsterSkill(int m)
-    {
-        CreatureData monster = IngameManager.instance.saveData.mapData.monsterDatas[m];
-
-        if (monster.haveSkill == false)
-        {
-            MonsterTargetPlayer(m);
-
-            return;
+            _isAllMonsterDead = true;
         }
 
-        FindPlayer(m, (result) =>
+        for(int i = 0; i < _monsters.Count; i++)
         {
-            if(result == false)
-            {
-                MonsterTargetPlayer(m);
+            bool isFind = false;
 
-                return;
+            for(int j = 0; j < monsters.Count; j++)
+            {
+                if(i == j)
+                {
+                    isFind = true;
+
+                    break;
+                }
+
+                if(isFind == false)
+                {
+                    _monsters[i].isDie = true;
+
+                    continue;
+                }
             }
 
-            SkillData skill = GameManager.instance.dataManager.GetskillData(monster.skillIndexs[0]);
-
-            if (skill == null)
-            {
-                Debug.LogError("Monster Skill Error   " + monster.name);
-                return;
-            }
-
-            if (monster.coolDownSkill.Find(x => x.id == skill.id) != null)
-            {
-                return;
-            }
-
-            IngameManager.instance.MonsterSkill(m, skill.id);
-        });
-    }
-
-    private void MonsterSelectMoveBlock(int m, int ap, ref List<int> nearbyBlocks)
-    {
-        if (ap <= 0)
-        {
-            return;
+            _monsters[i].UpdateData(monsters[i]);
         }
-
-        int randomIndex = UnityEngine.Random.Range(0, nearbyBlocks.Count);
-
-        if (IngameManager.instance.saveData.mapData.nodeDatas[nearbyBlocks[randomIndex]].isUser == true)
-        {
-            ap -= 1;
-            MonsterTargetPlayer(m);
-
-            return;
-        }
-
-        if (IngameManager.instance.saveData.mapData.nodeDatas[nearbyBlocks[randomIndex]].isWalkable == false)
-        {
-            MonsterSelectMoveBlock(m, ap, ref nearbyBlocks);
-
-            return;
-        }
-
-        if (IngameManager.instance.saveData.mapData.nodeDatas[nearbyBlocks[randomIndex]].isMonster == true)
-        {
-            MonsterSelectMoveBlock(m, ap, ref nearbyBlocks);
-
-            return;
-        }
-
-        if(IngameManager.instance.saveData.mapData.nodeDatas[nearbyBlocks[randomIndex]].isExit == true)
-        {
-            MonsterSelectMoveBlock(m, ap, ref nearbyBlocks);
-
-            return;
-        }
-
-        IngameManager.instance.saveData.mapData.nodeDatas[IngameManager.instance.saveData.mapData.monsterDatas[m].currentNodeIndex].isMonster = false;
-        IngameManager.instance.saveData.mapData.nodeDatas[nearbyBlocks[randomIndex]].isMonster = true;
-
-        IngameManager.instance.saveData.mapData.monsterDatas[m].currentNodeIndex = nearbyBlocks[randomIndex];
-        ap -= 1;
-
-        MonsterSelectMoveBlock(m, ap, ref nearbyBlocks);
-    }
-
-    private void MonsterTargetPlayer(int m)
-    {
-        CreatureData player = IngameManager.instance.saveData.userData.data;
-        int result = IngameManager.instance.PathFinding(ref IngameManager.instance.saveData.mapData, IngameManager.instance.saveData.mapData.monsterDatas[m].currentNodeIndex, player.currentNodeIndex);
-
-        IngameManager.instance.saveData.mapData.nodeDatas[IngameManager.instance.saveData.mapData.monsterDatas[m].currentNodeIndex].isMonster = false;
-        IngameManager.instance.saveData.mapData.nodeDatas[result].isMonster = true;
-        IngameManager.instance.saveData.mapData.monsterDatas[m].currentNodeIndex = result;
-    }
-
-    private void FindPlayer(int m, Action<bool> onFindPlayerActionCallback)
-    {
-        CreatureData monster = IngameManager.instance.saveData.mapData.monsterDatas[m];
-
-        bool isFindPlayer = false;
-        List<int> visionIndexs = IngameManager.instance.Vision(monster.stats.vision.current, monster.currentNodeIndex);
-
-        for (int i = 0; i < visionIndexs.Count; i++)
-        {
-            if (IngameManager.instance.saveData.mapData.nodeDatas[visionIndexs[i]].isWalkable == false)
-            {
-                continue;
-            }
-
-            if (IngameManager.instance.saveData.mapData.nodeDatas[visionIndexs[i]].isMonster == true)
-            {
-                continue;
-            }
-
-            if (IngameManager.instance.saveData.mapData.nodeDatas[visionIndexs[i]].isShop == true)
-            {
-                continue;
-            }
-
-            if (IngameManager.instance.saveData.mapData.nodeDatas[visionIndexs[i]].isBonfire == true)
-            {
-                continue;
-            }
-
-            if(IngameManager.instance.saveData.mapData.nodeDatas[visionIndexs[i]].isUser == true)
-            {
-                isFindPlayer = true;
-
-                break;
-            }
-        }
-
-        onFindPlayerActionCallback?.Invoke(isFindPlayer);
     }
 
     public void SplitMonster()
@@ -307,9 +194,30 @@ public class MonsterController : MonoBehaviour
             IngameManager.instance.saveData.mapData.nodeDatas[newCreature.currentNodeIndex].isMonster = true;
             IngameManager.instance.saveData.mapData.monsterDatas.Add(newCreature);
 
-            IngameManager.instance.UpdateText(newCreature + "(이)가 분열했습니다.");
+            IngameManager.instance.UpdateText(newCreature.name + "(이)가 분열했습니다.");
         }
 
         IngameManager.instance.UpdateData();
+    }
+
+    public void HardnessMonster()
+    {
+        for(int i = IngameManager.instance.saveData.mapData.monsterDatas.Count - 1; i >= 0; i--)
+        {
+            if(IngameManager.instance.saveData.mapData.monsterDatas[i].defultStatus != eStrengtheningTool.Hardness)
+            {
+                continue;
+            }
+
+            if(IngameManager.instance.saveData.mapData.monsterDatas[i].stats.hp.maximum == IngameManager.instance.saveData.mapData.monsterDatas[i].stats.hp.current)
+            {
+                continue;
+            }
+
+            int minusHp = IngameManager.instance.saveData.mapData.monsterDatas[i].stats.hp.maximum - IngameManager.instance.saveData.mapData.monsterDatas[i].stats.hp.current;
+            IngameManager.instance.saveData.mapData.monsterDatas[i].stats.attack.plus += (short)(minusHp * 0.3f);
+
+            IngameManager.instance.UpdateText(IngameManager.instance.saveData.mapData.monsterDatas[i].name + "(이)가 강성으로 인해 강해졌습니다.");
+        }
     }
 }
