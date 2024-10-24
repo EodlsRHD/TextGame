@@ -673,19 +673,24 @@ public class IngameManager : MonoBehaviour
 
     public void ViewMap()
     {
+        _textView.UpdateTextViewHeight();
+
         if (GameManager.instance.isMapBackgroundUpdate == true)
         {
-            _mapController.Close(false);
-            _ingameUI.HideMapButton();
-            _mapController.UpdateMapData(_saveData, Vision(_saveData.userData.stats.vision.current, _saveData.userData.data.currentNodeIndex));
-            _textView.UpdateTextViewHeight();
+            if(_mapController.isOpen == true)
+            {
+                _mapController.Close(() =>
+                {
+                    _ingameUI.HideMapButton();
+                    _mapController.UpdateMapData(_saveData, Vision(_saveData.userData.stats.vision.current, _saveData.userData.data.currentNodeIndex));
+                });
 
-            return;
+                return;
+            }
         }
 
         _ingameUI.HideMapButton();
         _mapController.UpdateMapData(_saveData, Vision(_saveData.userData.stats.vision.current, _saveData.userData.data.currentNodeIndex));
-        _textView.UpdateTextViewHeight();
     }
 
     public void UpdateData(string contnet = null)

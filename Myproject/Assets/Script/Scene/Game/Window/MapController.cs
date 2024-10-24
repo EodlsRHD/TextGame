@@ -31,9 +31,11 @@ public class MapController : MonoBehaviour
     private eDir _revealMapDir = eDir.Non;
     private List<int> _revealMapIndexs = new List<int>();
 
+    public bool isOpen { get { return _isOpen; } }
+
     public void Initialize(int mapSize)
     {
-        _buttonCloseViewMap?.onClick.AddListener(CloseMap);
+        _buttonCloseViewMap?.onClick.AddListener(OnCloseMap);
 
         _tempalte.Initialize();
 
@@ -200,21 +202,14 @@ public class MapController : MonoBehaviour
         GameManager.instance.tools.Move_Anchor_XY(eUiDir.Y, this.GetComponent<RectTransform>(), 276f, 0.5f, 0, Ease.OutBack, null);
     }
 
-    private void CloseMap()
+    private void OnCloseMap()
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
 
-        if(_isOpen == false)
-        {
-            return;
-        }
-
-        _isOpen = false;
-
-        Close(true);
+        Close();
     }
 
-    public void Close(bool isCloseButton = false, Action onResultCallbacl = null)
+    public void Close(Action onResultCallbacl = null)
     {
         if(GameManager.instance.isMapBackgroundUpdate == false)
         {
@@ -223,11 +218,12 @@ public class MapController : MonoBehaviour
 
         GameManager.instance.tools.Move_Anchor_XY(eUiDir.Y, this.GetComponent<RectTransform>(), 1800f, 0.5f, 0, Ease.InBack, () =>
         {
+            _isOpen = false;
+
             _buttonCloseViewMap.gameObject.SetActive(false);
             this.gameObject.SetActive(false);
 
             onResultCallbacl?.Invoke();
-
             _onCloseCallback?.Invoke();
         });
     }
