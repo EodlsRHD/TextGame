@@ -295,6 +295,11 @@ public class IngameManager : MonoBehaviour
 
     public bool CheckAbnormalStatusEffect(eStrengtheningTool type, CreatureData creature)
     {
+        if(creature.defultStatus == type)
+        {
+            return true;
+        }
+
         AbnormalStatus status = creature.abnormalStatuses.Find(x => x.currentStatus == type);
 
         if (status != null)
@@ -317,6 +322,11 @@ public class IngameManager : MonoBehaviour
 
     public short GetValueAbnormalStatusEffect(eStrengtheningTool type, CreatureData creature)
     {
+        if(creature.defultStatus == type)
+        {
+            return creature.defultStatusValue;
+        }
+
         return (short)creature.abnormalStatuses.Find(x => x.currentStatus == type).value;
     }
 
