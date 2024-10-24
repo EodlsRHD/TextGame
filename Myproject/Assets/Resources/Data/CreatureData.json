@@ -17,9 +17,10 @@
       "attackRange": 1,
       "evasion": 0,
       "defultStatus": -1,
-      "useSkill": false,
-      "skillIndexs": "",
-      "itemIndexs": ""
+      "defultStatusValue": 0,
+      "haveSkill": "FALSE",
+      "skillIndexs": [],
+      "itemIndexs": []
     },
     {
       "id": 102,
@@ -37,9 +38,10 @@
       "attackRange": 1,
       "evasion": 0,
       "defultStatus": -1,
-      "useSkill": false,
-      "skillIndexs": "",
-      "itemIndexs": ""
+      "defultStatusValue": 0,
+      "haveSkill": "FALSE",
+      "skillIndexs": [],
+      "itemIndexs": []
     },
     {
       "id": 103,
@@ -56,10 +58,13 @@
       "vision": 2,
       "attackRange": 1,
       "evasion": 30,
-      "defultStatus": 10,
-      "useSkill": false,
-      "skillIndexs": "",
-      "itemIndexs": ""
+      "defultStatus": -1,
+      "defultStatusValue": 0,
+      "haveSkill": "TRUE",
+      "skillIndexs": [
+        402
+      ],
+      "itemIndexs": []
     },
     {
       "id": 104,
@@ -77,9 +82,12 @@
       "attackRange": 1,
       "evasion": 0,
       "defultStatus": -1,
-      "useSkill": true,
-      "skillIndexs": [401],
-      "itemIndexs": ""
+      "defultStatusValue": 0,
+      "haveSkill": "TRUE",
+      "skillIndexs": [
+        401
+      ],
+      "itemIndexs": []
     },
     {
       "id": 105,
@@ -97,9 +105,10 @@
       "attackRange": 1,
       "evasion": 0,
       "defultStatus": 2,
-      "useSkill": false,
-      "skillIndexs": "",
-      "itemIndexs": ""
+      "defultStatusValue": 40,
+      "haveSkill": "FALSE",
+      "skillIndexs": [],
+      "itemIndexs": []
     },
     {
       "id": 106,
@@ -117,9 +126,10 @@
       "attackRange": 1,
       "evasion": 0,
       "defultStatus": -1,
-      "useSkill": false,
-      "skillIndexs": "",
-      "itemIndexs": ""
+      "defultStatusValue": 0,
+      "haveSkill": "FALSE",
+      "skillIndexs": [],
+      "itemIndexs": []
     },
     {
       "id": 107,
@@ -137,9 +147,10 @@
       "attackRange": 1,
       "evasion": 0,
       "defultStatus": 9,
-      "useSkill": false,
-      "skillIndexs": "",
-      "itemIndexs": ""
+      "defultStatusValue": 0,
+      "haveSkill": "FALSE",
+      "skillIndexs": [],
+      "itemIndexs": []
     },
     {
       "id": 108,
@@ -157,9 +168,10 @@
       "attackRange": 1,
       "evasion": 0,
       "defultStatus": -1,
-      "useSkill": false,
-      "skillIndexs": "",
-      "itemIndexs": ""
+      "defultStatusValue": 0,
+      "haveSkill": "FALSE",
+      "skillIndexs": [],
+      "itemIndexs": []
     },
     {
       "id": 109,
@@ -177,9 +189,10 @@
       "attackRange": 1,
       "evasion": 0,
       "defultStatus": 6,
-      "useSkill": false,
-      "skillIndexs": "",
-      "itemIndexs": ""
+      "defultStatusValue": 0,
+      "haveSkill": "FALSE",
+      "skillIndexs": [],
+      "itemIndexs": []
     },
     {
       "id": 110,
@@ -196,10 +209,13 @@
       "vision": 2,
       "attackRange": 1,
       "evasion": 0,
-      "defultStatus": 1,
-      "useSkill": true,
-      "skillIndexs": [401],
-      "itemIndexs": ""
+      "defultStatus": -1,
+      "defultStatusValue": 0,
+      "haveSkill": "TRUE",
+      "skillIndexs": [
+        401
+      ],
+      "itemIndexs": []
     },
     {
       "id": 111,
@@ -217,9 +233,12 @@
       "attackRange": 1,
       "evasion": 0,
       "defultStatus": -1,
-      "useSkill": true,
-      "skillIndexs": [401],
-      "itemIndexs": ""
+      "defultStatusValue": 0,
+      "haveSkill": "TRUE",
+      "skillIndexs": [
+        401
+      ],
+      "itemIndexs": []
     },
     {
       "id": 112,
@@ -237,9 +256,10 @@
       "attackRange": 1,
       "evasion": 0,
       "defultStatus": 5,
-      "useSkill": false,
-      "skillIndexs": "",
-      "itemIndexs": ""
+      "defultStatusValue": 0,
+      "haveSkill": "FALSE",
+      "skillIndexs": [],
+      "itemIndexs": []
     },
     {
       "id": 113,
@@ -257,9 +277,10 @@
       "attackRange": 1,
       "evasion": 0,
       "defultStatus": -1,
-      "useSkill": false,
-      "skillIndexs": "",
-      "itemIndexs": ""
+      "defultStatusValue": 0,
+      "haveSkill": "FALSE",
+      "skillIndexs": [],
+      "itemIndexs": []
     },
     {
       "id": 114,
@@ -277,9 +298,10 @@
       "attackRange": 1,
       "evasion": 0,
       "defultStatus": -1,
-      "useSkill": false,
-      "skillIndexs": "",
-      "itemIndexs": ""
+      "defultStatusValue": 0,
+      "haveSkill": "FALSE",
+      "skillIndexs": [],
+      "itemIndexs": []
     },
     {
       "id": 115,
@@ -297,9 +319,10 @@
       "attackRange": 1,
       "evasion": 0,
       "defultStatus": -1,
-      "useSkill": false,
-      "skillIndexs": "",
-      "itemIndexs": ""
+      "defultStatusValue": 0,
+      "haveSkill": "FALSE",
+      "skillIndexs": [],
+      "itemIndexs": []
     },
     {
       "id": 116,
@@ -317,9 +340,13 @@
       "attackRange": 1,
       "evasion": 0,
       "defultStatus": -1,
-      "useSkill": true,
-      "skillIndexs": [404,405],
-      "itemIndexs": ""
+      "defultStatusValue": 0,
+      "haveSkill": "TRUE",
+      "skillIndexs": [
+        404,
+        405
+      ],
+      "itemIndexs": []
     },
     {
       "id": 117,
@@ -337,9 +364,12 @@
       "attackRange": 1,
       "evasion": 0,
       "defultStatus": 11,
-      "useSkill": true,
-      "skillIndexs": [401],
-      "itemIndexs": ""
+      "defultStatusValue": 0,
+      "haveSkill": "TRUE",
+      "skillIndexs": [
+        401
+      ],
+      "itemIndexs": []
     },
     {
       "id": 118,
@@ -357,9 +387,12 @@
       "attackRange": 1,
       "evasion": 0,
       "defultStatus": 5,
-      "useSkill": true,
-      "skillIndexs": [401],
-      "itemIndexs": ""
+      "defultStatusValue": 0,
+      "haveSkill": "TRUE",
+      "skillIndexs": [
+        401
+      ],
+      "itemIndexs": []
     },
     {
       "id": 119,
@@ -377,9 +410,10 @@
       "attackRange": 1,
       "evasion": 0,
       "defultStatus": 7,
-      "useSkill": false,
-      "skillIndexs": "",
-      "itemIndexs": ""
+      "defultStatusValue": 33,
+      "haveSkill": "FALSE",
+      "skillIndexs": [],
+      "itemIndexs": []
     },
     {
       "id": 120,
@@ -397,9 +431,10 @@
       "attackRange": 1,
       "evasion": 0,
       "defultStatus": -1,
-      "useSkill": false,
-      "skillIndexs": "",
-      "itemIndexs": ""
+      "defultStatusValue": 0,
+      "haveSkill": "FALSE",
+      "skillIndexs": [],
+      "itemIndexs": []
     },
     {
       "id": 121,
@@ -417,9 +452,10 @@
       "attackRange": 1,
       "evasion": 0,
       "defultStatus": 9,
-      "useSkill": false,
-      "skillIndexs": "",
-      "itemIndexs": ""
+      "defultStatusValue": 0,
+      "haveSkill": "FALSE",
+      "skillIndexs": [],
+      "itemIndexs": []
     },
     {
       "id": 122,
@@ -437,9 +473,10 @@
       "attackRange": 1,
       "evasion": 0,
       "defultStatus": 4,
-      "useSkill": false,
-      "skillIndexs": "",
-      "itemIndexs": ""
+      "defultStatusValue": 0,
+      "haveSkill": "FALSE",
+      "skillIndexs": [],
+      "itemIndexs": []
     },
     {
       "id": 123,
@@ -457,9 +494,10 @@
       "attackRange": 1,
       "evasion": 0,
       "defultStatus": -1,
-      "useSkill": false,
-      "skillIndexs": "",
-      "itemIndexs": ""
+      "defultStatusValue": 0,
+      "haveSkill": "FALSE",
+      "skillIndexs": [],
+      "itemIndexs": []
     },
     {
       "id": 124,
@@ -477,9 +515,10 @@
       "attackRange": 1,
       "evasion": 0,
       "defultStatus": -1,
-      "useSkill": false,
-      "skillIndexs": "",
-      "itemIndexs": ""
+      "defultStatusValue": 0,
+      "haveSkill": "FALSE",
+      "skillIndexs": [],
+      "itemIndexs": []
     },
     {
       "id": 125,
@@ -496,10 +535,14 @@
       "vision": 2,
       "attackRange": 1,
       "evasion": 0,
-      "defultStatus": 1,
-      "useSkill": true,
-      "skillIndexs": [404,405],
-      "itemIndexs": ""
+      "defultStatus": -1,
+      "defultStatusValue": 0,
+      "haveSkill": "TRUE",
+      "skillIndexs": [
+        404,
+        405
+      ],
+      "itemIndexs": []
     },
     {
       "id": 126,
@@ -517,9 +560,10 @@
       "attackRange": 1,
       "evasion": 0,
       "defultStatus": 11,
-      "useSkill": false,
-      "skillIndexs": "",
-      "itemIndexs": ""
+      "defultStatusValue": 0,
+      "haveSkill": "FALSE",
+      "skillIndexs": [],
+      "itemIndexs": []
     },
     {
       "id": 127,
@@ -537,9 +581,10 @@
       "attackRange": 1,
       "evasion": 0,
       "defultStatus": 9,
-      "useSkill": false,
-      "skillIndexs": "",
-      "itemIndexs": ""
+      "defultStatusValue": 0,
+      "haveSkill": "FALSE",
+      "skillIndexs": [],
+      "itemIndexs": []
     },
     {
       "id": 128,
@@ -552,14 +597,17 @@
       "ap": 1,
       "exp": 3,
       "attack": 2,
-      "defence": 0,
+      "defence": 1,
       "vision": 4,
       "attackRange": 1,
       "evasion": 0,
       "defultStatus": 2,
-      "useSkill": true,
-      "skillIndexs": [402],
-      "itemIndexs": ""
+      "defultStatusValue": 40,
+      "haveSkill": "TRUE",
+      "skillIndexs": [
+        402
+      ],
+      "itemIndexs": []
     },
     {
       "id": 129,
@@ -577,9 +625,12 @@
       "attackRange": 1,
       "evasion": 0,
       "defultStatus": -1,
-      "useSkill": true,
-      "skillIndexs": [403],
-      "itemIndexs": ""
+      "defultStatusValue": 0,
+      "haveSkill": "TRUE",
+      "skillIndexs": [
+        403
+      ],
+      "itemIndexs": []
     },
     {
       "id": 130,
@@ -597,9 +648,10 @@
       "attackRange": 1,
       "evasion": 0,
       "defultStatus": 8,
-      "useSkill": false,
-      "skillIndexs": "",
-      "itemIndexs": ""
+      "defultStatusValue": 50,
+      "haveSkill": "FALSE",
+      "skillIndexs": [],
+      "itemIndexs": []
     }
   ]
 }
