@@ -33,7 +33,7 @@ public class DataManager : MonoBehaviour
         public eStrengtheningTool defultStatus = eStrengtheningTool.Non;
         public short defultStatusValue = 0;
 
-        public string useSkill = false;
+        public string useSkill = string.Empty;
         public List<short> skillIndexs = null;
         public List<short> itemIndexs = null;
     }
