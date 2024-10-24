@@ -139,13 +139,13 @@ public class MonsterController : MonoBehaviour
 
                     break;
                 }
+            }
 
-                if(isFind == false)
-                {
-                    _monsters[i].isDie = true;
+            if(isFind == false)
+            {
+                _monsters[i].isDie = true;
 
-                    continue;
-                }
+                continue;
             }
 
             _monsters[i].UpdateData(monsters[i]);

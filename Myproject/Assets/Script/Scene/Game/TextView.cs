@@ -3,18 +3,19 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.UIElements;
 
 public class TextView : MonoBehaviour
 {
     [Header("Template"), SerializeField] private TextViewTemplate _template = null;
     [Header("Template Parant"), SerializeField] private Transform _trTemplateParant = null;
+    [Header("Scroll View"), SerializeField] private ScrollRect _scrollRect = null;
 
     private RectTransform _rectTransform;
 
     public void Initialize()
     {
         _template.Initialize();
-
         _rectTransform = GetComponent<RectTransform>();
     }
 
@@ -45,10 +46,12 @@ public class TextView : MonoBehaviour
         if(GameManager.instance.isMapBackgroundUpdate == true)
         {
             offset = new Vector2(offset.x, -1020f);
+            _scrollRect.content.anchoredPosition = new Vector2(0f, -408f);
         }
         else
         {
             offset = new Vector2(offset.x, -180f);
+            _scrollRect.content.anchoredPosition = new Vector2(0f, -1248f);
         }
 
         _rectTransform.offsetMax = offset;

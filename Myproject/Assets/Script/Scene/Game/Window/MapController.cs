@@ -228,14 +228,6 @@ public class MapController : MonoBehaviour
 
             onResultCallbacl?.Invoke();
 
-            if (GameManager.instance.isMapBackgroundUpdate == false)
-            {
-                if (isCloseButton == false)
-                {
-                    RemoveTemplate();
-                }
-            }
-
             _onCloseCallback?.Invoke();
         });
     }

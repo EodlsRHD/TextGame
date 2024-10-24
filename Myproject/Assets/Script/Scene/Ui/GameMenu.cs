@@ -161,10 +161,7 @@ public class GameMenu : MonoBehaviour
         PlayerPrefs.SetInt("MAP_BACKGROUND", !GameManager.instance.isMapBackgroundUpdate == true ? 1 : 0);
         GameManager.instance.isMapBackgroundUpdate = PlayerPrefs.GetInt("MAP_BACKGROUND") == 1 ? true : false;
 
-        if (IngameManager.instance != null)
-        {
-            IngameManager.instance.ViewMap();
-        }
+        IngameManager.instance.ViewMap();
     }
 
     private void OnCredit()

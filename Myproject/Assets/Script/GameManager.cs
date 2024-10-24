@@ -70,11 +70,11 @@ public class GameManager : MonoBehaviour
         _instance = this;
         DontDestroyOnLoad(this.gameObject);
 
-        _isMapBackgroundUpdate = PlayerPrefs.GetInt("MAP_BACKGROUND", 0) == 1 ? true : false;
-
 #if UNITY_EDITOR
         PlayerPrefs.DeleteAll();
 #endif
+
+        _isMapBackgroundUpdate = PlayerPrefs.GetInt("MAP_BACKGROUND", 0) == 1 ? true : false;
 
         _toolProxy.Initialize(_soundManager.VolumeDown);
         _dataManager.Initialize();

@@ -3157,8 +3157,7 @@ MonoBehaviour:
             percent: 0
             current: 0
         defultStatus: -1
-        recovery: 0
-        recoveryCount: 0
+        defultStatusValue: 0
         haveSkill: 0
         skillIndexs: 
         itemIndexs: 
@@ -14409,7 +14408,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1107931110
 RectTransform:
   m_ObjectHideFlags: 0
@@ -26056,6 +26055,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _template: {fileID: 2123424167}
   _trTemplateParant: {fileID: 1820622971}
+  _scrollRect: {fileID: 516969085}
 --- !u!1 &2035147192
 GameObject:
   m_ObjectHideFlags: 0

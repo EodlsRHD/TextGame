@@ -675,12 +675,10 @@ public class IngameManager : MonoBehaviour
     {
         if (GameManager.instance.isMapBackgroundUpdate == true)
         {
-            _mapController.Close(false, () =>
-            {
-                _ingameUI.HideMapButton();
-                _mapController.UpdateMapData(_saveData, Vision(_saveData.userData.stats.vision.current, _saveData.userData.data.currentNodeIndex));
-                _textView.UpdateTextViewHeight();
-            });
+            _mapController.Close(false);
+            _ingameUI.HideMapButton();
+            _mapController.UpdateMapData(_saveData, Vision(_saveData.userData.stats.vision.current, _saveData.userData.data.currentNodeIndex));
+            _textView.UpdateTextViewHeight();
 
             return;
         }
