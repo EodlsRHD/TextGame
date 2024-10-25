@@ -13,7 +13,7 @@ public class IngameUI : MonoBehaviour
     [Header("Top")]
     [SerializeField] private Button _buttonViewMap = null;
     [SerializeField] private Button _buttonGameMenu = null;
-    [SerializeField] private TMP_Text _textRound = null;s
+    [SerializeField] private TMP_Text _textRound = null;
 
     [Header("Next Round")]
     [SerializeField] private GameObject _objNextRound = null;
