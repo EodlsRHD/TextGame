@@ -125,29 +125,20 @@ public class MonsterController : MonoBehaviour
             _isAllMonsterDead = true;
         }
 
+        bool check = true;
         for(int i = 0; i < _monsters.Count; i++)
         {
-            bool isFind = false;
+            _monsters[i].UpdateData(monsters[i]);
 
-            for(int j = 0; j < monsters.Count; j++)
+            if(check == false)
             {
-                if(i == j)
-                {
-                    isFind = true;
-
-                    break;
-                }
-            }
-
-            if(isFind == false)
-            {
-                _monsters[i].isDie = true;
-
                 continue;
             }
 
-            _monsters[i].UpdateData(monsters[i]);
+            check = monsters[i].isDead;
         }
+
+        _isAllMonsterDead = check;
     }
 
     public void SplitMonster()

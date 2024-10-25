@@ -89,7 +89,7 @@ public class BlockTemplate : MonoBehaviour
                 }
                 else if(monster.defultStatus == eStrengtheningTool.Camouflage)
                 {
-                    _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eMapObject.Monster, -1);
+                    _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eMapObject.Ground);
                     color.a = 1f;
                 }
                 else if(monster.defultStatus == eStrengtheningTool.Stealth)

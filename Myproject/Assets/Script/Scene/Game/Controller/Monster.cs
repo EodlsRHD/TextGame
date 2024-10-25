@@ -11,10 +11,6 @@ public class Monster : MonoBehaviour
     private Action<int, int> _onMoveCallback = null;
     private Action<int, int> _onSkillCallback = null;
 
-    private bool _isDie = false;
-
-    public bool isDie { set { _isDie = value; } }
-
     public void Initialize(CreatureData data, Action<int> onAttackCallback, Action<int, int> onMoveCallback, Action<int, int> onSkillCallback)
     {
         if(onAttackCallback != null)
@@ -38,16 +34,11 @@ public class Monster : MonoBehaviour
     public void UpdateData(CreatureData data)
     {
         _data = data;
-
-        if(data.stats.hp.current == 0)
-        {
-            _isDie = true;
-        }
     }
 
     public void Action()
     {
-        if(_isDie == true)
+        if(_data.isDead == true)
         {
             return;
         }

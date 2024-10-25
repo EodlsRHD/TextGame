@@ -3166,6 +3166,7 @@ MonoBehaviour:
         coolDownSkill: []
         abnormalStatuses: []
         currentNodeIndex: 0
+        isDead: 0
       level: 1
     mapData:
       mapSize: 0
@@ -13693,7 +13694,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa868e61468e9834782a75cc9f732ade, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _maxLevelPoint: 5
+  _maxLevelPoint: 3
   _objBlocker: {fileID: 952114329}
   _buttonViewMap: {fileID: 1229939693}
   _buttonGameMenu: {fileID: 845723230}

@@ -74,7 +74,8 @@ public class MapController : MonoBehaviour
 
     public void SetMap(DataManager.SaveData saveData)
     {
-        NextTurn();
+        ResetReveal();
+        RemoveTemplate();
 
         _trBack.gameObject.SetActive(GameManager.instance.isMapBackgroundUpdate);
 
@@ -175,7 +176,7 @@ public class MapController : MonoBehaviour
         _revealMapIndexs = indexs;
     }
 
-    public void NextTurn()
+    public void ResetReveal()
     {
         _revealMapDir = eDir.Non;
 

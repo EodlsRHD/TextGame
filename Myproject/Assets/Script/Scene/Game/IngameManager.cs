@@ -203,7 +203,7 @@ public class IngameManager : MonoBehaviour
     {
         GameManager.instance.dataManager.UpdatePlayerData(_saveData);
 
-        _mapController.NextTurn();
+        _mapController.ResetReveal();
         _mapController.Close();
         _saveData.round++;
 
@@ -572,9 +572,12 @@ public class IngameManager : MonoBehaviour
 
     public void MonsterDead(CreatureData monster)
     {
+        Debug.LogError(monster.name + "           " + monster.id + "           " + _saveData.mapData.monsterDatas[monster.id].name);
+
         _saveData.mapData.nodeDatas[monster.currentNodeIndex].isMonster = false;
-        _saveData.mapData.monsterDatas.Find(x => x.id == monster.id).stats.Reset();
-        _saveData.mapData.monsterDatas.Remove(_saveData.mapData.monsterDatas.Find(x => x.id == monster.id));
+        _saveData.mapData.monsterDatas[monster.id].stats.Reset();
+        _saveData.mapData.monsterDatas[monster.id].isDead = true;
+
         UpdateData();
 
         if (_saveData.mapData.monsterDatas.Count == 0)
@@ -601,7 +604,7 @@ public class IngameManager : MonoBehaviour
         _turnCount++;
 
         UpdateRoundText();
-        _mapController.NextTurn();
+        _mapController.ResetReveal();
         _skillitemCountroller.UserDuration(ref _saveData.userData.data);
 
         if(_saveData.round == 1)

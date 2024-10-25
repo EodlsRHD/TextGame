@@ -221,6 +221,7 @@ public class CreatureData
     public List<AbnormalStatus> abnormalStatuses = null;
 
     public int currentNodeIndex = 0;
+    public bool isDead = false;
 }
 
 [Serializable]
