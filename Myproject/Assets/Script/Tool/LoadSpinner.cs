@@ -20,16 +20,12 @@ public class LoadSpinner : MonoBehaviour
 
     public void StartLoading()
     {
-        Debug.LogError("StartLoading");
-
         _loadingBar.DOPlay();
         _loadingBarTransform.DOPlay();
     }
 
     public void StopLoading()
     {
-        Debug.LogError("StopLoading");
-
         _loadingBar.DOPause();
         _loadingBarTransform.DOPause();
     }
