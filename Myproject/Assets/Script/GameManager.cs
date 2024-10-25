@@ -96,14 +96,14 @@ public class GameManager : MonoBehaviour
 
     public void StartLoad()
     {
-        _loadSpinner.StartLoading();
         _objLoading.SetActive(true);
+        _loadSpinner.StartLoading();
     }
 
     public void StopLoad()
     {
-        _objLoading.SetActive(false);
         _loadSpinner.StopLoading();
+        _objLoading.SetActive(false);
     }
 
     #endregion
