@@ -8,13 +8,12 @@ using System.Threading.Tasks;
 
 public class IngameUI : MonoBehaviour
 {
-    [SerializeField] private int _maxLevelPoint = 3;
     [SerializeField] private GameObject _objBlocker = null;
 
     [Header("Top")]
     [SerializeField] private Button _buttonViewMap = null;
     [SerializeField] private Button _buttonGameMenu = null;
-    [SerializeField] private TMP_Text _textRound = null;
+    [SerializeField] private TMP_Text _textRound = null;s
 
     [Header("Next Round")]
     [SerializeField] private GameObject _objNextRound = null;
@@ -37,6 +36,7 @@ public class IngameUI : MonoBehaviour
     private eRoundClear _type = eRoundClear.Non;
 
     private int _resurrectionCount = 2;
+    private int _maxLevelPoint = 3;
 
     public void Initialize(Action<Action> onViewMapCallback, Action<eRoundClear> onNextRoundCallback)
     {
