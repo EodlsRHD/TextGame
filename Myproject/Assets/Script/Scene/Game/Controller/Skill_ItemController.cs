@@ -1,6 +1,4 @@
 using System.Collections.Generic;
-using System.Threading;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine; 
 
 public class Skill_ItemController : MonoBehaviour
