@@ -212,16 +212,6 @@ public class IngameManager : MonoBehaviour
 
     #region connection Method
 
-    public void ControlPad_Skill()
-    {
-        _controlPad.Skill(_saveData.userData, PlayerItem_Skill);
-    }
-
-    public void ControlPad_Bag()
-    {
-        _controlPad.Bag(_saveData.userData, PlayerItem_Skill);
-    }
-
     public void PlayBgm(eBgm type)
     {
         GameManager.instance.soundManager.PlayBgm(type);
@@ -236,6 +226,53 @@ public class IngameManager : MonoBehaviour
     {
         _skillitemCountroller.SetDirCoord(nodeIndex, type);
     }
+
+    public void BonfireOpen(DataManager.Npc_Data npc)
+    {
+        _bonfire.Open(npc, _saveData.userData);
+    }
+
+    public void ShopOpen(DataManager.Npc_Data npc)
+    {
+        _shop.Open(npc, _saveData.userData.stats.coin.current);
+    }
+
+    public void CallAttacker(CreatureData monster, Action onLastCallback, Action<eWinorLose, int> onResultCallback)
+    {
+        _ingameUI.CallAttacker(_saveData.userData, monster, onLastCallback, onResultCallback);
+    }
+
+    public void Attack(bool isMonster, int index, Action onLastCallback = null)
+    {
+        _actionController.Attack(isMonster, index, onLastCallback);
+    }
+
+    public void Defence()
+    {
+        _actionController.Defence();
+    }
+
+    public void Npc(int index)
+    {
+        _actionController.Npc(index);
+    }
+
+    public void RevealMap(eDir dir, List<int> indexs)
+    {
+        _mapController.RevealMap(dir, indexs);
+
+        UpdateData();
+    }
+
+    public void MonsterEffect()
+    {
+        _monsterController.SplitMonster();
+        _monsterController.HardnessMonster();
+    }
+
+    #endregion
+
+    #region Action
 
     public void GetMonsterItem(short id)
     {
@@ -260,10 +297,10 @@ public class IngameManager : MonoBehaviour
 
     public void GetFieldItem(int nodeIndex)
     {
-        if (isItemListEmpty() == false)
+        if(isItemListEmpty() == false)
         {
             UpdatePopup("가방이 비어있지 않습니다.");
-            
+
             return;
         }
 
@@ -277,8 +314,8 @@ public class IngameManager : MonoBehaviour
 
     public void GetExp(short value)
     {
-        _saveData.userData.PlusExp(value, (result) => 
-        { 
+        _saveData.userData.PlusExp(value, (result) =>
+        {
             if(result == false)
             {
                 return;
@@ -302,7 +339,7 @@ public class IngameManager : MonoBehaviour
 
         AbnormalStatus status = creature.abnormalStatuses.Find(x => x.currentStatus == type);
 
-        if (status != null)
+        if(status != null)
         {
             if(status.maintain == eMaintain.Temporary)
             {
@@ -342,6 +379,34 @@ public class IngameManager : MonoBehaviour
         UpdateData();
     }
 
+    public void ControlPad_Skill()
+    {
+        _controlPad.Skill(_saveData.userData, PlayerItem_Skill);
+    }
+
+    public void ControlPad_Bag()
+    {
+        _controlPad.Bag(_saveData.userData, PlayerItem_Skill);
+    }
+
+    public void OpneLevelPoint()
+    {
+        _ingameUI.OpneLevelPoint(_saveData.userData, (newData) =>
+        {
+            _saveData.userData.stats.hp.point = newData.stats.hp.point;
+            _saveData.userData.stats.mp.point = newData.stats.mp.point;
+            _saveData.userData.stats.ap.point = newData.stats.ap.point;
+            _saveData.userData.stats.attack.point = newData.stats.attack.point;
+            _saveData.userData.stats.defence.point = newData.stats.defence.point;
+            _saveData.userData.stats.vision.current = newData.stats.vision.current;
+            _saveData.userData.stats.attackRange.point = newData.stats.attackRange.point;
+
+            _saveData.userData.stats.Maximum();
+
+            UpdateData();
+        });
+    }
+
     public void PlayerDefence(Duration duration)
     {
         _skillitemCountroller.PlayerDefence(ref _saveData.userData.data, duration);
@@ -353,7 +418,7 @@ public class IngameManager : MonoBehaviour
 
     public bool PlayerHit(float damage)
     {
-        if ((_saveData.userData.stats.hp.maximum / 3) < (short)Mathf.Abs(damage))
+        if((_saveData.userData.stats.hp.maximum / 3) < (short)Mathf.Abs(damage))
         {
             GameManager.instance.soundManager.PlaySfx(eSfx.Hit_hard);
         }
@@ -383,14 +448,14 @@ public class IngameManager : MonoBehaviour
 
         monster.stats.hp.MinusCurrnet((short)damage);
 
-        if (monster.stats.hp.current == 0)
+        if(monster.stats.hp.current == 0)
         {
             UpdateText(monster.name + " (을)를 처치하였습니다");
             UpdateText("--- 경험치 " + monster.stats.exp.current + " , 코인 " + monster.stats.coin.current + "을 획득했습니다");
 
-            if (monster.itemIndexs != null)
+            if(monster.itemIndexs != null)
             {
-                for (int i = 0; i < monster.itemIndexs.Count; i++)
+                for(int i = 0; i < monster.itemIndexs.Count; i++)
                 {
                     GetMonsterItem(monster.itemIndexs[i]);
                 }
@@ -410,7 +475,7 @@ public class IngameManager : MonoBehaviour
 
     private void PlayerItem_Skill(eTool type, int id)
     {
-        switch (type)
+        switch(type)
         {
             case eTool.Skill:
                 GameManager.instance.soundManager.PlaySfx(eSfx.UseSkill);
@@ -454,103 +519,7 @@ public class IngameManager : MonoBehaviour
 
     #endregion
 
-    #region ActionController
-
-    public void BonfireOpen(DataManager.Npc_Data npc)
-    {
-        _bonfire.Open(npc, _saveData.userData);
-    }
-
-    public void ShopOpen(DataManager.Npc_Data npc)
-    {
-        _shop.Open(npc, _saveData.userData.stats.coin.current);
-    }
-
-    public void CallAttacker(CreatureData monster, Action onLastCallback, Action<eWinorLose, int> onResultCallback)
-    {
-        _ingameUI.CallAttacker(_saveData.userData, monster, onLastCallback, onResultCallback);
-    }
-
-    public void OpneLevelPoint()
-    {
-        _ingameUI.OpneLevelPoint(_saveData.userData, (newData) =>
-        {
-            _saveData.userData.stats.hp.point = newData.stats.hp.point;
-            _saveData.userData.stats.mp.point = newData.stats.mp.point;
-            _saveData.userData.stats.ap.point = newData.stats.ap.point;
-            _saveData.userData.stats.attack.point = newData.stats.attack.point;
-            _saveData.userData.stats.defence.point = newData.stats.defence.point;
-            _saveData.userData.stats.vision.current = newData.stats.vision.current;
-            _saveData.userData.stats.attackRange.point = newData.stats.attackRange.point;
-
-            _saveData.userData.stats.Maximum();
-
-            UpdateData();
-        });
-    }
-
-    public void ControlPadUpdateData()
-    {
-        _controlPad.UpdateData(_saveData.userData);
-    }
-
-    public void Attack(bool isMonster, int index, Action onLastCallback = null)
-    {
-        _actionController.Attack(isMonster, index, onLastCallback);
-    }
-
-    public void Defence()
-    {
-        _actionController.Defence();
-    }
-
-    public void Npc(int index)
-    {
-        _actionController.Npc(index);
-    }
-
-    public void RevealMap(eDir dir, List<int> indexs)
-    {
-        _mapController.RevealMap(dir, indexs);
-
-        UpdateData();
-    }
-
-    public void MonsterEffect()
-    {
-        _monsterController.SplitMonster();
-        _monsterController.HardnessMonster();
-    }
-
-    private void DoneTurn()
-    {
-        _turnCount++;
-
-        UpdateRoundText();
-        _mapController.NextTurn();
-        _skillitemCountroller.UserDuration(ref _saveData.userData.data);
-
-        if(_saveData.round == 1)
-        {
-            return;
-        }
-
-        if((_turnCount % 5) > 0)
-        {
-            return;
-        }
-
-        UpdateText("--- 몬스터가 강화되었습니다.");
-
-        for(int i = 0; i < _saveData.mapData.monsterDatas.Count; i++)
-        {
-            _saveData.mapData.monsterDatas[i].stats.Enforce();
-        }
-    }
-
-    #endregion
-
-    #region Creature
+    #region Turn
 
     public void PlayerTurn()
     {
@@ -627,9 +596,39 @@ public class IngameManager : MonoBehaviour
         PlayerTurn();
     }
 
+    private void DoneTurn()
+    {
+        _turnCount++;
+
+        UpdateRoundText();
+        _mapController.NextTurn();
+        _skillitemCountroller.UserDuration(ref _saveData.userData.data);
+
+        if(_saveData.round == 1)
+        {
+            return;
+        }
+
+        if((_turnCount % 5) > 0)
+        {
+            return;
+        }
+
+        UpdateText("--- 몬스터가 강화되었습니다.");
+
+        for(int i = 0; i < _saveData.mapData.monsterDatas.Count; i++)
+        {
+            _saveData.mapData.monsterDatas[i].stats.Enforce();
+        }
+    }
+
     #endregion
 
     #region Update
+    public void ControlPadUpdateData()
+    {
+        _controlPad.UpdateData(_saveData.userData);
+    }
 
     public void UpdatePlayerCoord()
     {
