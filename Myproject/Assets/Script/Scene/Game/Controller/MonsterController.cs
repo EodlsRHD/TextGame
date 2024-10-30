@@ -45,13 +45,13 @@ public class MonsterController : MonoBehaviour
     {
         if(_isAllMonsterDead == true)
         {
-            IngameManager.instance.UpdateText("--- 몬스터의 순서를 건너뜁니다.");
+            IngameManager.instance.UpdateText("몬스터의 순서를 건너뜁니다.");
             IngameManager.instance.PlayerTurn();
 
             yield break;
         }
 
-        IngameManager.instance.UpdateText("--- 몬스터의 순서입니다.");
+        IngameManager.instance.UpdateText("몬스터의 순서입니다.");
 
         for(int i = 0; i < _monsters.Count; i++)
         {

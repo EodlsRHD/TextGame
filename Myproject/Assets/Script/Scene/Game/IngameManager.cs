@@ -126,7 +126,7 @@ public class IngameManager : MonoBehaviour
     {
         if(type == eRoundClear.Restart)
         {
-            UpdateText("--- 부활하였습니다.");
+            UpdateText("부활하였습니다.");
             
             GameManager.instance.dataManager.ResetPlayerData();
             _ingameUI.UpdatePlayerInfo(_saveData.userData);
@@ -160,7 +160,7 @@ public class IngameManager : MonoBehaviour
 
         if(type == eRoundClear.Success)
         {
-            UpdateText("--- " + _saveData.round + " 라운드 입니다.");
+            UpdateText(_saveData.round + " 라운드 입니다.");
             GameManager.instance.soundManager.PlaySfx(eSfx.TurnPage);
         }
 
@@ -562,7 +562,7 @@ public class IngameManager : MonoBehaviour
 
         _skillitemCountroller.MonsterDuration(ref _saveData.mapData);
 
-        UpdateText("--- " + _saveData.userData.data.name + "의 순서가 종료됩니다.");
+        UpdateText(_saveData.userData.data.name + "의 순서가 종료됩니다.");
     }
 
     public void MonsterTurn()
@@ -572,8 +572,6 @@ public class IngameManager : MonoBehaviour
 
     public void MonsterDead(CreatureData monster)
     {
-        Debug.LogError(monster.name + "           " + monster.id + "           " + _saveData.mapData.monsterDatas[monster.id].name);
-
         _saveData.mapData.nodeDatas[monster.currentNodeIndex].isMonster = false;
         _saveData.mapData.monsterDatas[monster.id].stats.Reset();
         _saveData.mapData.monsterDatas[monster.id].isDead = true;
@@ -582,7 +580,7 @@ public class IngameManager : MonoBehaviour
 
         if (_saveData.mapData.monsterDatas.Count == 0)
         {
-            UpdateText("--- 잠겨있던 계단이 열렸습니다.");
+            UpdateText("잠겨있던 계단이 열렸습니다.");
             GameManager.instance.soundManager.PlaySfx(eSfx.ExitOpen);
 
             isAllMonsterDead = true;
@@ -591,7 +589,7 @@ public class IngameManager : MonoBehaviour
 
     public void MonsterTurnOut()
     {
-        UpdateText("--- 몬스터의 순서가 종료되었습니다.");
+        UpdateText("몬스터의 순서가 종료되었습니다.");
 
         DoneTurn();
 
@@ -617,7 +615,7 @@ public class IngameManager : MonoBehaviour
             return;
         }
 
-        UpdateText("--- 몬스터가 강화되었습니다.");
+        UpdateText("몬스터가 강화되었습니다.");
 
         for(int i = 0; i < _saveData.mapData.monsterDatas.Count; i++)
         {

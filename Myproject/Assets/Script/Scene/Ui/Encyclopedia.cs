@@ -202,7 +202,7 @@ public class Encyclopedia : MonoBehaviour
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
 
-        GameManager.instance.tools.Move_Anchor_XY(eUiDir.X, _objPlayerInformation.GetComponent<RectTransform>(), 2039f, 0.5f, 0, Ease.InBack, () =>
+        GameManager.instance.tools.Move_Anchor_XY(eUiDir.X, _objPlayerInformation.GetComponent<RectTransform>(), 1025f, 0.5f, 0, Ease.InBack, () =>
         {
             _objPlayerInformation.SetActive(false);
 

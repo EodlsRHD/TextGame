@@ -24,7 +24,7 @@ public class TextView : MonoBehaviour
     /// </summary>
     public void UpdateText(string content)
     {
-        InstantiateTemplate(content);
+        InstantiateTemplate("> " + content);
     }
 
     /// <summary>
@@ -32,7 +32,7 @@ public class TextView : MonoBehaviour
     /// </summary>
     public void UpdateText(DataManager.NodeData node)
     {
-        string content = "플레이어 좌표 : " + node.x + " , " + node.y; 
+        string content = "> 플레이어 좌표 : " + node.x + " , " + node.y; 
 
         InstantiateTemplate(content);
     }
@@ -141,7 +141,7 @@ public class TextView : MonoBehaviour
                 break;
         }
 
-        string content = dirStr + " 방향, " + distance + " 거리에 " + findType + "(이)가 있습니다.";
+        string content = "> " + dirStr + " 방향, " + distance + " 거리에 " + findType + "(이)가 있습니다.";
 
         InstantiateTemplate(content);
     }

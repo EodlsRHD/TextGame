@@ -18,7 +18,7 @@ public class ActionController : MonoBehaviour
         {
             if (npc.isUseBonfire == true)
             {
-                IngameManager.instance.UpdateText("--- 모닥불의 불꽃이 사그라들었습니다.");
+                IngameManager.instance.UpdateText("모닥불의 불꽃이 사그라들었습니다.");
             }
             else
             {
@@ -29,13 +29,13 @@ public class ActionController : MonoBehaviour
         {
             if (npc.itemIndexs.Count == 0)
             {
-                IngameManager.instance.UpdateText("@상인 : 물건이 다 떨어졌어요 다음에 들러주세요!");
+                IngameManager.instance.UpdateText("상인 : 물건이 다 떨어졌어요 다음에 들러주세요!");
 
                 return;
             }
             else
             {
-                IngameManager.instance.UpdateText("@상인 : 안녕하세요! 좋은 물건 구경해보세요!");
+                IngameManager.instance.UpdateText("상인 : 안녕하세요! 좋은 물건 구경해보세요!");
 
                 IngameManager.instance.ShopOpen(npc);
             }
@@ -53,7 +53,7 @@ public class ActionController : MonoBehaviour
 
         GameManager.instance.soundManager.PlaySfx(eSfx.Coin);
 
-        IngameManager.instance.UpdateText("@상인 : 구매해주셔서 고마워요");
+        IngameManager.instance.UpdateText("상인 : 구매해주셔서 고마워요");
         IngameManager.instance.UpdateText("가방에 보관되었습니다.");
 
         IngameManager.instance.saveData.userData.stats.coin.MinusCurrnet(price);
@@ -141,7 +141,7 @@ public class ActionController : MonoBehaviour
             }
             else if (result == eWinorLose.Draw)
             {
-                IngameManager.instance.UpdateText("--- 무승부입니다.");
+                IngameManager.instance.UpdateText("무승부입니다.");
             }
             else
             {
@@ -181,7 +181,7 @@ public class ActionController : MonoBehaviour
 
     private void AttackLogic(CreatureData attacker, CreatureData defencer, int battleDamage, bool attackerIsMonster, int monsterNodeIndex)
     {
-        IngameManager.instance.UpdateText("--- " + attacker.name + " (이)가 승리했습니다.");
+        IngameManager.instance.UpdateText(attacker.name + " (이)가 승리했습니다.");
 
         Hardness(attacker, ref battleDamage);
         ReductionHalf(defencer, ref battleDamage);
@@ -189,13 +189,13 @@ public class ActionController : MonoBehaviour
         int attackerDamage = attacker.stats.attack.maximum + battleDamage;
         int defencerDefence = defencer.stats.defence.maximum;
 
-        IngameManager.instance.UpdateText("--- " + attacker.name + " (이)가 " + attackerDamage + " 의 공격력으로 공격합니다.");
+        IngameManager.instance.UpdateText(attacker.name + " (이)가 " + attackerDamage + " 의 공격력으로 공격합니다.");
 
         int resultDamage = defencerDefence - attackerDamage;
 
         if (resultDamage >= 0)
         {
-            IngameManager.instance.UpdateText("--- " + attacker.name + " 의 공격이 방어도에 막혔습니다.");
+            IngameManager.instance.UpdateText(attacker.name + " 의 공격이 방어도에 막혔습니다.");
             GameManager.instance.soundManager.PlaySfx(eSfx.Blocked);
 
             return;
@@ -247,7 +247,7 @@ public class ActionController : MonoBehaviour
 
             if (addDamage >= 0)
             {
-                IngameManager.instance.UpdateText("--- " + attacker.name + " 의 공격이 방어도에 막혔습니다.");
+                IngameManager.instance.UpdateText(attacker.name + " 의 공격이 방어도에 막혔습니다.");
                 GameManager.instance.soundManager.PlaySfx(eSfx.Blocked);
 
                 return;
@@ -294,7 +294,7 @@ public class ActionController : MonoBehaviour
                 short reductionHalfValue = (short)(minusHp * 0.5f);
                 damage += reductionHalfValue;
 
-                IngameManager.instance.UpdateText(attacker.name + "강성으로 인해 피해가 2배 증가되었습니다.");
+                IngameManager.instance.UpdateText(attacker.name + "의 강성으로 인해 피해가 2배 증가되었습니다.");
             }
         }
     }
@@ -306,7 +306,7 @@ public class ActionController : MonoBehaviour
             short reductionHalfValue = (short)(damage * 0.5f);
             damage = reductionHalfValue;
 
-            IngameManager.instance.UpdateText(defencer.name + "반감으로 인해 피해가 반감되었습니다.");
+            IngameManager.instance.UpdateText(defencer.name + "의 반감으로 인해 피해가 반감되었습니다.");
         }
     }
 }

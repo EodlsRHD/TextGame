@@ -114,7 +114,7 @@ public class Attacker : MonoBehaviour
         _textTotal.text = _totalCount.ToString();
 
         IngameManager.instance.UpdateText(_monster.name + " (와)과 전투를 시작합니다!");
-        IngameManager.instance.UpdateText("--- " + (_turnCount + 1) + "번째 턴");
+        IngameManager.instance.UpdateText((_turnCount + 1) + "번째 턴");
 
         CardDistribution();
 
@@ -350,7 +350,7 @@ public class Attacker : MonoBehaviour
 
         if (_turnCount < 4)
         {
-            IngameManager.instance.UpdateText("--- " + (_turnCount + 1) + "번째 턴");
+            IngameManager.instance.UpdateText((_turnCount + 1) + "번째 턴");
         }
 
         CardOpen();
@@ -536,7 +536,7 @@ public class Attacker : MonoBehaviour
     {
         yield return new WaitForSecondsRealtime(1f);
 
-        IngameManager.instance.UpdateText("--- 전투가 종료되었습니다.");
+        IngameManager.instance.UpdateText("전투가 종료되었습니다.");
 
         List<int> nums = new List<int>(6);
 
@@ -558,8 +558,8 @@ public class Attacker : MonoBehaviour
         int monsterHighCardNum = 0;
         eRankings monsterRankings = Rankings(Sort(nums), ref monsterHighCardNum);
 
-        IngameManager.instance.UpdateText("--- " + _userData.data.name + " 의 결과 : " + playerRankings);
-        IngameManager.instance.UpdateText("--- " + _monster.name + " 의 결과 : " + monsterRankings);
+        IngameManager.instance.UpdateText(_userData.data.name + " 의 결과 : " + playerRankings);
+        IngameManager.instance.UpdateText(_monster.name + " 의 결과 : " + monsterRankings);
 
         _resultDamage = _totalCount;
 
@@ -577,8 +577,8 @@ public class Attacker : MonoBehaviour
         {
             _isPlayerWin = eWinorLose.Draw;
 
-            IngameManager.instance.UpdateText("--- " + _userData.data.name + " 의 높은 카드 : " + ChangeCardNum(playerHighCardNum));
-            IngameManager.instance.UpdateText("--- " + _monster.name + " 의 높은 카드 : " + ChangeCardNum(monsterHighCardNum));
+            IngameManager.instance.UpdateText(_userData.data.name + " 의 높은 카드 : " + ChangeCardNum(playerHighCardNum));
+            IngameManager.instance.UpdateText(_monster.name + " 의 높은 카드 : " + ChangeCardNum(monsterHighCardNum));
 
             if(playerHighCardNum == monsterHighCardNum)
             {

@@ -180,7 +180,7 @@ public class PlayerCntroller : MonoBehaviour
                 {
                     if (IngameManager.instance.saveData.userData.stats.ap.current == 0)
                     {
-                        IngameManager.instance.UpdateText("--- 남아있는 행동력이 없습니다.");
+                        IngameManager.instance.UpdateText("남아있는 행동력이 없습니다.");
 
                         break;
                     }
@@ -320,19 +320,19 @@ public class PlayerCntroller : MonoBehaviour
 
         if (Non == false)
         {
-            IngameManager.instance.UpdateText("--- 주변에 발견된게 없습니다.");
+            IngameManager.instance.UpdateText("주변에 발견된게 없습니다.");
 
             return NearbyIndexs;
         }
 
-        IngameManager.instance.UpdateText("--- 주변 검색을 시작합니다.");
+        IngameManager.instance.UpdateText("주변 검색을 시작합니다.");
 
         foreach (var action in actions)
         {
             action?.Invoke();
         }
 
-        IngameManager.instance.UpdateText("--- 주변 검색이 끝났습니다.");
+        IngameManager.instance.UpdateText("주변 검색이 끝났습니다.");
 
         return NearbyIndexs;
     }

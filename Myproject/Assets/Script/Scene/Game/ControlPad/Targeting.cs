@@ -101,7 +101,7 @@ public class Targeting : MonoBehaviour
 
             if(IngameManager.instance.saveData.userData.stats.mp.current < skill.useMp)
             {
-                IngameManager.instance.UpdateText("--- 마나가 부족합니다.");
+                IngameManager.instance.UpdateText("마나가 부족합니다.");
 
                 return;
             }
