@@ -208,12 +208,12 @@ public class DataManager : MonoBehaviour
     }
 
     [Serializable]
-    public class TutorialData
+    public class Tutorial_Data
     {
         public int id = 0;
 
         public string content = string.Empty;
-        public List<Tutorial_answer> answers = null;
+        public List<TutorialAnswer> answers = null;
 
         public int isQuest = -1;
     }

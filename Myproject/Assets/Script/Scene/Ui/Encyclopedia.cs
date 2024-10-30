@@ -119,11 +119,13 @@ public class Encyclopedia : MonoBehaviour
         GameManager.instance.dataManager.LoadEncyclopediaToCloud((result) =>
         {
             _data = GameManager.instance.dataManager.CopyEncyclopediaData();
-            _templates = new Dictionary<int, List<EncyclopediaTemplate>>();
+            _templates = new Dictionary<int, List<EncyclopediaTemplate>>
+            {
+                { 0, new List<EncyclopediaTemplate>() },
+                { 1, new List<EncyclopediaTemplate>() },
+                { 2, new List<EncyclopediaTemplate>() }
+            };
 
-            
-
-            _templates.Add(0, new List<EncyclopediaTemplate>());
             for (int i = 0; i < _data.creatureDatas.Count; i++)
             {
                 var obj = Instantiate(_templateCreature_Item, _trCreature_Item);
@@ -135,7 +137,6 @@ public class Encyclopedia : MonoBehaviour
                 _templates[0].Add(com);
             }
 
-            _templates.Add(1, new List<EncyclopediaTemplate>());
             for (int i = 0; i < _data.itemDatas.Count; i++)
             {
                 var obj = Instantiate(_templateCreature_Item, _trCreature_Item);
@@ -147,7 +148,6 @@ public class Encyclopedia : MonoBehaviour
                 _templates[1].Add(com);
             }
 
-            _templates.Add(2, new List<EncyclopediaTemplate>());
             for (int i = 0; i < _data._achievementsDatas.Count; i++)
             {
                 var obj = Instantiate(_templateAchievements, _trAchievements);

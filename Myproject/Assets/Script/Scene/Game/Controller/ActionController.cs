@@ -103,9 +103,9 @@ public class ActionController : MonoBehaviour
         }
     }
     
-    public void Attack(bool isInitiateMonster, int nodeMonsterIndex, System.Action onLastCallback = null)
+    public void Attack(bool isInitiateMonster, int currentMonsterNodeIndex, System.Action onLastCallback = null)
     {
-        CreatureData monster = IngameManager.instance.saveData.mapData.monsterDatas.Find(x => x.currentNodeIndex == nodeMonsterIndex);
+        CreatureData monster = IngameManager.instance.saveData.mapData.monsterDatas.Find(x => x.currentNodeIndex == currentMonsterNodeIndex);
         GameManager.instance.dataManager.AddEncyclopedia_Creature(monster.id);
 
         if(isInitiateMonster == true)
@@ -137,7 +137,7 @@ public class ActionController : MonoBehaviour
 
             if (result == eWinorLose.Lose)
             {
-                AttackLogic(monster, IngameManager.instance.saveData.userData.data, damage, true, nodeMonsterIndex);
+                AttackLogic(monster, IngameManager.instance.saveData.userData.data, damage, true, currentMonsterNodeIndex);
             }
             else if (result == eWinorLose.Draw)
             {
@@ -145,7 +145,7 @@ public class ActionController : MonoBehaviour
             }
             else
             {
-                AttackLogic(IngameManager.instance.saveData.userData.data, monster, damage, false, nodeMonsterIndex);
+                AttackLogic(IngameManager.instance.saveData.userData.data, monster, damage, false, currentMonsterNodeIndex);
             }
 
             if(monster.defultStatus == eStrengtheningTool.Incubation 

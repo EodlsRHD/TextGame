@@ -242,9 +242,15 @@ public class IngameManager : MonoBehaviour
         _ingameUI.CallAttacker(_saveData.userData, monster, onLastCallback, onResultCallback);
     }
 
-    public void Attack(bool isMonster, int index, Action onLastCallback = null)
+    public void Attack(bool isMonster, int currentMonsterNodeIndex, Action onLastCallback = null)
     {
-        _actionController.Attack(isMonster, index, onLastCallback);
+        if(isMonster == true)
+        {
+            _saveData.mapData.monsterDatas.Find(x => x.currentNodeIndex == currentMonsterNodeIndex).defultStatus = eStrengtheningTool.Non;
+            _monsterController.UpdateData(_saveData.mapData.monsterDatas);
+        }
+
+        _actionController.Attack(isMonster, currentMonsterNodeIndex, onLastCallback);
     }
 
     public void Defence()

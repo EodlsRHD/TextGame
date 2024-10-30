@@ -69,6 +69,7 @@ public class MonsterController : MonoBehaviour
         }
 
         _isAttack = true;
+
         IngameManager.instance.Attack(true, IngameManager.instance.saveData.mapData.monsterDatas[id].currentNodeIndex, () =>
         {
             _isAttack = false;

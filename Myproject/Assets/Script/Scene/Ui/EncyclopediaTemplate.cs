@@ -36,6 +36,7 @@ public class EncyclopediaTemplate : MonoBehaviour
     {
         _creature = data;
 
+        _imageThumbnail.sprite = GameManager.instance.dataManager.GetCreatureSprite(eMapObject.Monster, data.id);
         _textName.text = _creature.name;
         _textDescription.text = _creature.description;
     }
@@ -44,6 +45,7 @@ public class EncyclopediaTemplate : MonoBehaviour
     {
         _item = data;
 
+        _imageThumbnail.sprite = GameManager.instance.dataManager.GetCreatureSprite(eMapObject.Item, data.id);
         _textName.text = _item.name;
         _textDescription.text = _item.description;
     }

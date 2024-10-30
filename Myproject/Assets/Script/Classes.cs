@@ -1,10 +1,31 @@
 using System.Collections.Generic;
 using System;
 using UnityEngine;
-using Unity.VisualScripting.Antlr3.Runtime.Misc;
 
 [Serializable]
-public class Tutorial_answer
+public class TutorialData
+{
+    public int id = 0;
+
+    public string content = string.Empty;
+    public List<TutorialAnswer> answers = null;
+
+    public int isQuest = -1;
+
+    public TutorialData(DataManager.Tutorial_Data data)
+    {
+        id = data.id;
+        content = data.content;
+
+        answers = new List<TutorialAnswer>();
+        answers.AddRange(data.answers);
+
+        isQuest = data.isQuest;
+    }
+}
+
+[Serializable]
+public class TutorialAnswer
 {
     public string answer = string.Empty;
     public int next = 0;
