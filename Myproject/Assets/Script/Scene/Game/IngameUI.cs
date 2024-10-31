@@ -209,6 +209,11 @@ public class IngameUI : MonoBehaviour
         _Attacker.CallAttacker(userData, monster, onLastCallback, onResultCallback);
     }
 
+    public void ViewRanking()
+    {
+        _Attacker.ViewRanking();
+    }
+
     private void CloseAttacker()
     {
         _Attacker.Close();

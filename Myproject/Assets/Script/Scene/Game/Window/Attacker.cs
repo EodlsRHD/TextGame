@@ -1,4 +1,4 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -7,16 +7,64 @@ using TMPro;
 
 public class Attacker : MonoBehaviour
 {
-    [Space(10)]
+    public class Card
+    {
+        public int num = 0;
+        public eCardShape shape = eCardShape.Non;
 
-    [SerializeField]private AttackerTemplate _template = null;
-    [SerializeField] private Transform _trTemplateParant = null;
+        public bool isHide = true;
+        public string name = string.Empty;
 
-    [SerializeField] private Transform _trMyParant = null;
-    [SerializeField] private Transform _trEnemyParant = null;
-    [SerializeField] private Transform _trCommunityParant = null;
+        public void Set(eCardShape cardShape, int cardNum)
+        {
+            num = cardNum;
+            shape = cardShape;
 
-    [Space(10)]
+            if(shape == eCardShape.Clob)
+            {
+                name = "â™£ï¸";
+            }
+            else if(shape == eCardShape.Spade)
+            {
+                name = "â™ ";
+            }
+            else if(shape == eCardShape.Heart)
+            {
+                name = "â™¥";
+            }
+            else if(shape == eCardShape.Diamond)
+            {
+                name = "â™¦ï¸";
+            }
+
+            if(num == 1)
+            {
+                num = 14;
+                name += "A";
+            }
+            else if(num == 11)
+            {
+                name += "J";
+            }
+            else if(num == 12)
+            {
+                name += "Q";
+            }
+            else if(num == 13)
+            {
+                name += "K";
+            }
+            else
+            {
+                name += num;
+            }
+        }
+
+        public void IsHide(bool hide)
+        {
+            isHide = hide;
+        }
+    }
 
     [SerializeField] private TMP_Text _textCoin = null;
     [SerializeField] private TMP_Text _textBat = null;
@@ -34,11 +82,15 @@ public class Attacker : MonoBehaviour
     [SerializeField] private Button _buttonAllin = null;
     [SerializeField] private Button _buttonFold = null;
 
+    [Space(10)]
+    [SerializeField] private GameObject _objViewRanking = null;
+    [SerializeField] private TMP_Text _textViewRanking = null;
+
     private Action _onCloseCallback = null;
     private Action _onLastCallback = null;
     private Action<eWinorLose, int> _onResultCallback = null;
 
-    private List<AttackerTemplate> _cards = null;
+    private List<Card> _cards = null;
     private List<int> _fieldCardIndex = new List<int>();
     private UserData _userData = null;
     private CreatureData _monster = null;
@@ -66,8 +118,6 @@ public class Attacker : MonoBehaviour
             _onCloseCallback = onCloseCallback;
         }
 
-        _template.Initialize();
-
         _textPlayerNameLabel.text = string.Empty;
         _textPlayerCard.text = string.Empty;
         _textCommunityCard.text = string.Empty;
@@ -79,6 +129,7 @@ public class Attacker : MonoBehaviour
 
         MakeCard();
 
+        _objViewRanking.SetActive(false);
         this.gameObject.SetActive(false);
     }
 
@@ -86,6 +137,8 @@ public class Attacker : MonoBehaviour
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.MenuOpen);
         PlayBgm(eBgm.Battle);
+
+        ViewRanking();
 
         if (onLastCallback != null)
         {
@@ -113,8 +166,8 @@ public class Attacker : MonoBehaviour
         _textBat.text = _batCount.ToString();
         _textTotal.text = _totalCount.ToString();
 
-        IngameManager.instance.UpdateText(_monster.name + " (¿Í)°ú ÀüÅõ¸¦ ½ÃÀÛÇÕ´Ï´Ù!");
-        IngameManager.instance.UpdateText((_turnCount + 1) + "¹øÂ° ÅÏ");
+        IngameManager.instance.UpdateText(_monster.name + " (ì™€)ê³¼ ì „íˆ¬ë¥¼ ì‹œì‘í•©ë‹ˆë‹¤!");
+        IngameManager.instance.UpdateText((_turnCount + 1) + "ë²ˆì§¸ í„´");
 
         CardDistribution();
 
@@ -126,7 +179,7 @@ public class Attacker : MonoBehaviour
         if(IngameManager.instance.CheckAbnormalStatusEffect(eStrengtheningTool.UnableAct, monster) == true)
         {
             IngameManager.instance.RemoveAbnormalStatusEffect(eStrengtheningTool.UnableAct, ref monster);
-            IngameManager.instance.UpdateText("»ó´ë°¡ Çàµ¿ºÒ´É »óÅÂ·Î ÀÎÇØ ÀüÅõ¸¦ Æ÷±âÇß½À´Ï´Ù.");
+            IngameManager.instance.UpdateText("ìƒëŒ€ê°€ í–‰ë™ë¶ˆëŠ¥ ìƒíƒœë¡œ ì¸í•´ ì „íˆ¬ë¥¼ í¬ê¸°í–ˆìŠµë‹ˆë‹¤.");
 
             OnFold(false, ref _playerCoinCount, ref _batCount);
 
@@ -136,7 +189,7 @@ public class Attacker : MonoBehaviour
         if(IngameManager.instance.CheckAbnormalStatusEffect(eStrengtheningTool.UnableAct, IngameManager.instance.saveData.userData.data) == true)
         {
             IngameManager.instance.RemoveAbnormalStatusEffect(eStrengtheningTool.UnableAct, ref IngameManager.instance.saveData.userData.data);
-            IngameManager.instance.UpdateText("Çàµ¿ºÒ´É »óÅÂ·Î ÀÎÇØ ÀüÅõ¸¦ Æ÷±âÇÕ´Ï´Ù.");
+            IngameManager.instance.UpdateText("í–‰ë™ë¶ˆëŠ¥ ìƒíƒœë¡œ ì¸í•´ ì „íˆ¬ë¥¼ í¬ê¸°í•©ë‹ˆë‹¤.");
 
             OnFold(true, ref _playerCoinCount, ref _batCount);
         }
@@ -150,6 +203,7 @@ public class Attacker : MonoBehaviour
         _textPlayerCard.text = string.Empty;
         _textCommunityCard.text = string.Empty;
         _textTotal.text = string.Empty;
+        _textViewRanking.text = string.Empty;
 
         _playerBat = 0;
         _turnCount = 0;
@@ -166,15 +220,25 @@ public class Attacker : MonoBehaviour
         _buttonRaise.gameObject.SetActive(true);
         _buttonAllin.gameObject.SetActive(true);
         _buttonFold.gameObject.SetActive(true);
+    }
 
-        ReturnTemplate();
+    public void ViewRanking()
+    {
+        _objViewRanking.SetActive(GameManager.instance.isViewRanking);
+
+        if(GameManager.instance.isViewRanking == false)
+        {
+            return;
+        }
+
+        PredictionViewRanking();
     }
 
     private void OnClose()
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.MenuClose);
 
-        GameManager.instance.tools.Move_Anchor_XY(eUiDir.Y, this.GetComponent<RectTransform>(), -360f, 0.5f, 0, Ease.InBack, () => 
+        GameManager.instance.tools.Move_Anchor_XY(eUiDir.Y, this.GetComponent<RectTransform>(), -600f, 0.5f, 0, Ease.InBack, () => 
         {
             _onCloseCallback?.Invoke();
         });
@@ -188,14 +252,14 @@ public class Attacker : MonoBehaviour
 
             if (coin < bat)
             {
-                IngameManager.instance.UpdatePopup("³²Àº Ã¼·ÂÀÌ ºÎÁ·ÇÕ´Ï´Ù.");
+                IngameManager.instance.UpdatePopup("ë‚¨ì€ ì²´ë ¥ì´ ë¶€ì¡±í•©ë‹ˆë‹¤.");
 
                 return;
             }
         }
 
         string str_name = isPlayer == true ? _userData.data.name : _monster.name;
-        IngameManager.instance.UpdateText(str_name + " (ÀÌ)°¡ " + bat + " ¸¸Å­ Call Çß½À´Ï´Ù.");
+        IngameManager.instance.UpdateText(str_name + " (ì´)ê°€ " + bat + " ë§Œí¼ Call í–ˆìŠµë‹ˆë‹¤.");
 
         coin -= bat;
         _totalCount += bat;
@@ -226,14 +290,14 @@ public class Attacker : MonoBehaviour
 
             if (coin < (bat * 2))
             {
-                IngameManager.instance.UpdatePopup("³²Àº Ã¼·ÂÀÌ ºÎÁ·ÇÕ´Ï´Ù.");
+                IngameManager.instance.UpdatePopup("ë‚¨ì€ ì²´ë ¥ì´ ë¶€ì¡±í•©ë‹ˆë‹¤.");
 
                 return;
             }
         }
 
         string str_name = isPlayer == true ? _userData.data.name : _monster.name;
-        IngameManager.instance.UpdateText(str_name + " (ÀÌ)°¡ Raise¸¦ Çß½À´Ï´Ù.");
+        IngameManager.instance.UpdateText(str_name + " (ì´)ê°€ Raiseë¥¼ í–ˆìŠµë‹ˆë‹¤.");
 
         bat *= 2;
         coin -= bat;
@@ -297,7 +361,7 @@ public class Attacker : MonoBehaviour
         }
 
         string str_name = isPlayer == true ? _userData.data.name : _monster.name;
-        IngameManager.instance.UpdateText(str_name + " (ÀÌ)°¡ Fold Çß½À´Ï´Ù.");
+        IngameManager.instance.UpdateText(str_name + " (ì´)ê°€ Fold í–ˆìŠµë‹ˆë‹¤.");
 
         if (isPlayer == true)
         {
@@ -350,7 +414,7 @@ public class Attacker : MonoBehaviour
 
         if (_turnCount < 4)
         {
-            IngameManager.instance.UpdateText((_turnCount + 1) + "¹øÂ° ÅÏ");
+            IngameManager.instance.UpdateText((_turnCount + 1) + "ë²ˆì§¸ í„´");
         }
 
         CardOpen();
@@ -358,7 +422,7 @@ public class Attacker : MonoBehaviour
 
         if (_turnCount < 4 && _playerCoinCount == 0)
         {
-            IngameManager.instance.UpdateText("³²Àº Hp°¡ ¾ø¾î CallÇÒ ¼ö ¾ø½À´Ï´Ù.");
+            IngameManager.instance.UpdateText("ë‚¨ì€ Hpê°€ ì—†ì–´ Callí•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
 
             StartCoroutine(Co_EnemyTurn());
         }
@@ -372,7 +436,7 @@ public class Attacker : MonoBehaviour
 
         for (int i = 2; i < _fieldCardIndex.Count; i++)
         {
-            if(_cards[_fieldCardIndex[i]].isHide)
+            if(_cards[_fieldCardIndex[i]].isHide == true)
             {
                 continue;
             }
@@ -382,6 +446,13 @@ public class Attacker : MonoBehaviour
 
         int monsterHighCardNum = 0;
         eRankings monsterPedigree = Rankings(Sort(nums), ref monsterHighCardNum);
+
+        if(monsterPedigree == eRankings.Non)
+        {
+            OnBat(false, ref _monsterCoinCount, ref _batCount);
+
+            yield break;
+        }
 
         if ((int)monsterPedigree < 2)
         {
@@ -490,30 +561,38 @@ public class Attacker : MonoBehaviour
 
         if (_turnCount == 1)
         {
-            string s1 = _cards[_fieldCardIndex[2]].Name + " ";
-            s1 += _cards[_fieldCardIndex[3]].Name + " ";
-            s1 += _cards[_fieldCardIndex[4]].Name + " ";
+            _cards[_fieldCardIndex[2]].IsHide(false);
+            _cards[_fieldCardIndex[3]].IsHide(false);
+            _cards[_fieldCardIndex[4]].IsHide(false);
+
+            string s1 = _cards[_fieldCardIndex[2]].name + " ";
+            s1 += _cards[_fieldCardIndex[3]].name + " ";
+            s1 += _cards[_fieldCardIndex[4]].name + " ";
 
             str = s1 + "** **";
         }
 
         if (_turnCount == 2)
         {
-            string s1 = _cards[_fieldCardIndex[2]].Name + " ";
-            s1 += _cards[_fieldCardIndex[3]].Name + " ";
-            s1 += _cards[_fieldCardIndex[4]].Name + " ";
-            s1 += _cards[_fieldCardIndex[5]].Name + " ";
+            _cards[_fieldCardIndex[5]].IsHide(false);
+
+            string s1 = _cards[_fieldCardIndex[2]].name + " ";
+            s1 += _cards[_fieldCardIndex[3]].name + " ";
+            s1 += _cards[_fieldCardIndex[4]].name + " ";
+            s1 += _cards[_fieldCardIndex[5]].name + " ";
 
             str = s1 + "**";
         }
 
         if (_turnCount == 3)
         {
-            string s1 = _cards[_fieldCardIndex[2]].Name + " ";
-            s1 += _cards[_fieldCardIndex[3]].Name + " ";
-            s1 += _cards[_fieldCardIndex[4]].Name + " ";
-            s1 += _cards[_fieldCardIndex[5]].Name + " ";
-            s1 += _cards[_fieldCardIndex[6]].Name;
+            _cards[_fieldCardIndex[6]].IsHide(false);
+
+            string s1 = _cards[_fieldCardIndex[2]].name + " ";
+            s1 += _cards[_fieldCardIndex[3]].name + " ";
+            s1 += _cards[_fieldCardIndex[4]].name + " ";
+            s1 += _cards[_fieldCardIndex[5]].name + " ";
+            s1 += _cards[_fieldCardIndex[6]].name;
 
             str = s1;
         }
@@ -524,6 +603,8 @@ public class Attacker : MonoBehaviour
         {
             SettleUp();
         }
+
+        PredictionViewRanking();
     }
 
     private void SettleUp()
@@ -536,7 +617,7 @@ public class Attacker : MonoBehaviour
     {
         yield return new WaitForSecondsRealtime(1f);
 
-        IngameManager.instance.UpdateText("ÀüÅõ°¡ Á¾·áµÇ¾ú½À´Ï´Ù.");
+        IngameManager.instance.UpdateText("ì „íˆ¬ê°€ ì¢…ë£Œë˜ì—ˆìŠµë‹ˆë‹¤.");
 
         List<int> nums = new List<int>(6);
 
@@ -558,8 +639,8 @@ public class Attacker : MonoBehaviour
         int monsterHighCardNum = 0;
         eRankings monsterRankings = Rankings(Sort(nums), ref monsterHighCardNum);
 
-        IngameManager.instance.UpdateText(_userData.data.name + " ÀÇ °á°ú : " + playerRankings);
-        IngameManager.instance.UpdateText(_monster.name + " ÀÇ °á°ú : " + monsterRankings);
+        IngameManager.instance.UpdateText(_userData.data.name + " ì˜ ê²°ê³¼ : " + playerRankings);
+        IngameManager.instance.UpdateText(_monster.name + " ì˜ ê²°ê³¼ : " + monsterRankings);
 
         _resultDamage = _totalCount;
 
@@ -577,8 +658,8 @@ public class Attacker : MonoBehaviour
         {
             _isPlayerWin = eWinorLose.Draw;
 
-            IngameManager.instance.UpdateText(_userData.data.name + " ÀÇ ³ôÀº Ä«µå : " + ChangeCardNum(playerHighCardNum));
-            IngameManager.instance.UpdateText(_monster.name + " ÀÇ ³ôÀº Ä«µå : " + ChangeCardNum(monsterHighCardNum));
+            IngameManager.instance.UpdateText(_userData.data.name + " ì˜ ë†’ì€ ì¹´ë“œ : " + ChangeCardNum(playerHighCardNum));
+            IngameManager.instance.UpdateText(_monster.name + " ì˜ ë†’ì€ ì¹´ë“œ : " + ChangeCardNum(monsterHighCardNum));
 
             if(playerHighCardNum == monsterHighCardNum)
             {
@@ -611,50 +692,40 @@ public class Attacker : MonoBehaviour
         OnClose();
     }
 
-    public void ReturnTemplate()
-    {
-        foreach (var index in _fieldCardIndex)
-        {
-            _cards[index].ChangePositionAndActive(_trTemplateParant, false);
-        }
-    }
-
     private void MakeCard()
     {
-        _cards = new List<AttackerTemplate>();
+        _cards = new List<Card>();
 
         for (int i = 0; i < 52; i++)
         {
-            var obj = Instantiate(_template, _trTemplateParant);
-            var com = obj.GetComponent<AttackerTemplate>();
+            Card card = new Card();
 
             if(i < 13)
             {
-                com.Set(eCardShape.Spade, "¢¼", (i + 1));
+                card.Set(eCardShape.Spade, (i + 1));
             }
 
             if(13 <= i && i < 26)
             {
-                com.Set(eCardShape.Diamond, "¡ß", (i + 1) - 13);
+                card.Set(eCardShape.Diamond, (i + 1) - 13);
             }
 
             if (26 <= i && i < 39)
             {
-                com.Set(eCardShape.Heart, "¢¾", (i + 1) - 26);
+                card.Set(eCardShape.Heart, (i + 1) - 26);
             }
 
             if (39 <= i)
             {
-                com.Set(eCardShape.Clob, "¢À", (i + 1) - 39);
+                card.Set(eCardShape.Clob, (i + 1) - 39);
             }
 
-            _cards.Add(com);
+            _cards.Add(card);
         }
     }
 
     private void CardDistribution()
     {
-        int voitedCount = 9;
         _fieldCardIndex = new List<int>();
 
         while (_fieldCardIndex.Count < 9)
@@ -678,7 +749,6 @@ public class Attacker : MonoBehaviour
             }
 
             _fieldCardIndex.Add(ranNum);
-            voitedCount--;
         }
 
         for (int i = 0; i < _fieldCardIndex.Count; i++)
@@ -687,32 +757,27 @@ public class Attacker : MonoBehaviour
 
             if(i < 2)
             {
-                //_cards[index].ChangePositionAndActive(_trMyParant, true);
-                _textPlayerCard.text += _cards[index].Name + " ";
+                _cards[index].IsHide(false);
+                _textPlayerCard.text += _cards[index].name + " ";
 
                 continue;
             }
 
             if(6 < i)
             {
-                //_cards[index].ChangePositionAndActive(_trEnemyParant, true);
-                //_cards[index].HideAndSeek(true);
-
+                _cards[index].IsHide(false);
                 continue;
             }
-
-            //_cards[index].ChangePositionAndActive(_trCommunityParant, true);
-            //_cards[index].HideAndSeek(true);
 
             _textCommunityCard.text += "** ";
         }
     }
 
-    private List<AttackerTemplate> Sort(List<int> indexs)
+    private List<Card> Sort(List<int> indexs)
     {
-        List<AttackerTemplate> card = new List<AttackerTemplate>();
+        List<Card> card = new List<Card>();
 
-        for (int i = 0; i < indexs.Count; i++)
+        for(int i = 0; i < indexs.Count; i++)
         {
             card.Add(_cards[indexs[i]]);
         }
@@ -721,9 +786,9 @@ public class Attacker : MonoBehaviour
         {
             for (int j = 0; j < i; j++)
             {
-                if (card[j].Num < card[j + 1].Num)
+                if (card[j].num < card[j + 1].num)
                 {
-                    AttackerTemplate temp = card[j];
+                    Card temp = card[j];
                     card[j] = card[j + 1];
                     card[j + 1] = temp;
                 }
@@ -733,8 +798,13 @@ public class Attacker : MonoBehaviour
         return card;
     }
 
-    private eRankings Rankings(List<AttackerTemplate> card, ref int highCardNum)
+    private eRankings Rankings(List<Card> card, ref int highCardNum)
     {
+        if(card.Count == 0)
+        {
+            return eRankings.Non;
+        }
+
         eRankings result = eRankings.HighCard;
 
         List<eRankings> results = new List<eRankings>();
@@ -760,30 +830,30 @@ public class Attacker : MonoBehaviour
 
         for (int i = 0; i < (card.Count - 1); i++)
         {
-            if (card[i].Num != card[i + 1].Num)
+            if (card[i].num != card[i + 1].num)
             {
                 isChange = true;
                 numSameCount = 0;
 
-                if ((card[i].Num - card[i + 1].Num) == 1)
+                if ((card[i].num - card[i + 1].num) == 1)
                 {
                     straightCount++;
 
                     if (straightCount >= 5)
                     {
-                        if (highCardNum < card[i].Num)
+                        if (highCardNum < card[i].num)
                         {
-                            highCardNum = card[i].Num;
+                            highCardNum = card[i].num;
                         }
 
                         straight = true;
                     }
 
-                    if (card[i].Num == 14)
+                    if (card[i].num == 14)
                     {
-                        if (highCardNum < card[i].Num)
+                        if (highCardNum < card[i].num)
                         {
-                            highCardNum = card[i].Num;
+                            highCardNum = card[i].num;
                         }
 
                         royal = true;
@@ -795,15 +865,15 @@ public class Attacker : MonoBehaviour
                 }
             }
 
-            if (card[i].Num == card[i + 1].Num)
+            if (card[i].num == card[i + 1].num)
             {
                 numSameCount++;
 
                 if(numSameCount == 1)
                 {
-                    if (highCardNum < card[i].Num)
+                    if (highCardNum < card[i].num)
                     {
-                        highCardNum = card[i].Num;
+                        highCardNum = card[i].num;
                     }
 
                     pairCount++;
@@ -811,9 +881,9 @@ public class Attacker : MonoBehaviour
 
                 if(isChange == true && pairCount == 2)
                 {
-                    if (highCardNum < card[i].Num)
+                    if (highCardNum < card[i].num)
                     {
-                        highCardNum = card[i].Num;
+                        highCardNum = card[i].num;
                     }
 
                     twoPair = true;
@@ -821,9 +891,9 @@ public class Attacker : MonoBehaviour
 
                 if(numSameCount == 2)
                 {
-                    if (highCardNum < card[i].Num)
+                    if (highCardNum < card[i].num)
                     {
-                        highCardNum = card[i].Num;
+                        highCardNum = card[i].num;
                     }
 
                     threeofaKind = true;
@@ -831,9 +901,9 @@ public class Attacker : MonoBehaviour
 
                 if(numSameCount == 3)
                 {
-                    if (highCardNum < card[i].Num)
+                    if (highCardNum < card[i].num)
                     {
-                        highCardNum = card[i].Num;
+                        highCardNum = card[i].num;
                     }
 
                     foreofaKind = true;
@@ -841,9 +911,9 @@ public class Attacker : MonoBehaviour
 
                 if (threeofaKind == true && isChange == true && pairCount >= 1)
                 {
-                    if(highCardNum < card[i].Num)
+                    if(highCardNum < card[i].num)
                     {
-                        highCardNum = card[i].Num;
+                        highCardNum = card[i].num;
                     }
 
                     fullHouse = true;
@@ -855,16 +925,16 @@ public class Attacker : MonoBehaviour
 
         for (int i = 0; i < card.Count; i++)
         {
-            if (card[i].Shape == eCardShape.Spade)
+            if (card[i].shape == eCardShape.Spade)
                 spadeCount++;
 
-            if (card[i].Shape == eCardShape.Heart)
+            if (card[i].shape == eCardShape.Heart)
                 heartCount++;
 
-            if (card[i].Shape == eCardShape.Diamond)
+            if (card[i].shape == eCardShape.Diamond)
                 diamondCount++;
 
-            if (card[i].Shape == eCardShape.Clob)
+            if (card[i].shape == eCardShape.Clob)
                 clobCount++;
         }
 
@@ -872,7 +942,7 @@ public class Attacker : MonoBehaviour
         {
             flush = true;
 
-            highCardNum = card[0].Num;
+            highCardNum = card[0].num;
         }
 
         if (royal == true) // RoyalStraightFlush
@@ -914,7 +984,7 @@ public class Attacker : MonoBehaviour
         else // HighCard
         {
             result = eRankings.HighCard;
-            highCardNum = card[0].Num;
+            highCardNum = card[0].num;
         }
 
         return result;
@@ -952,5 +1022,35 @@ public class Attacker : MonoBehaviour
     private void PlayBgm(eBgm type)
     {
         GameManager.instance.soundManager.PlayBgm(type);
+    }
+
+    private void PredictionViewRanking()
+    {
+        if(_fieldCardIndex.Count == 0)
+        {
+            return;
+        }
+
+        List<int> nums = new List<int>(6);
+
+        for(int i = 0; i < _fieldCardIndex.Count - 2; i++)
+        {
+            if(_cards[_fieldCardIndex[i]].isHide == true)
+            {
+                continue;
+            }
+
+            nums.Add(_fieldCardIndex[i]);
+        }
+
+        int highCardNum = 0;
+        eRankings pedigree = Rankings(Sort(nums), ref highCardNum);
+
+        if(pedigree == eRankings.Non)
+        {
+            return;
+        }
+
+        _textViewRanking.text = "ì˜ˆìƒ ì¡±ë³´ëŠ” " + pedigree + "ì…ë‹ˆë‹¤.";
     }
 }

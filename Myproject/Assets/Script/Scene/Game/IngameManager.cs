@@ -699,6 +699,11 @@ public class IngameManager : MonoBehaviour
         _mapController.UpdateMapData(_saveData, Vision(_saveData.userData.stats.vision.current, _saveData.userData.data.currentNodeIndex));
     }
 
+    public void ViewRanking()
+    {
+        _ingameUI.ViewRanking();
+    }
+
     public void UpdateData(string contnet = null)
     {
         _ingameUI.UpdatePlayerInfo(_saveData.userData);

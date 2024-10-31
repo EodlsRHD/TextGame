@@ -19,8 +19,8 @@ public class GameMenu : MonoBehaviour
 
     [Space(10)]
 
-    [SerializeField] private Button _buttonViewMap = null;
-    [SerializeField] private Button _buttonCredit = null;
+    [SerializeField] private Toggle _toggleViewMap = null;
+    [SerializeField] private Toggle _toggleViewCardRanking = null;
 
     private Action _onCloseCallback = null;
 
@@ -40,8 +40,8 @@ public class GameMenu : MonoBehaviour
         _buttonBgm.onClick.AddListener(OnBgm);
         _buttonSfx.onClick.AddListener(OnSfx);
 
-        _buttonViewMap.onClick.AddListener(OnViewMap);
-        _buttonCredit.onClick.AddListener(OnCredit);
+        _toggleViewMap.onValueChanged.AddListener(OnViewMap);
+        _toggleViewCardRanking.onValueChanged.AddListener(OnViewCardRanking);
 
         _objSfxMute.SetActive(GameManager.instance.soundManager.isMuteBGM);
         _objBgmMute.SetActive(GameManager.instance.soundManager.isMuteSFX);
@@ -52,6 +52,9 @@ public class GameMenu : MonoBehaviour
     public void Open()
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.MenuOpen);
+
+        _toggleViewMap.isOn = GameManager.instance.isMapBackgroundUpdate;
+        _toggleViewCardRanking.isOn = GameManager.instance.isViewRanking;
 
         this.gameObject.SetActive(true);
 
@@ -154,25 +157,19 @@ public class GameMenu : MonoBehaviour
         });
     }
 
-    private void OnViewMap()
+    private void OnViewMap(bool isTrue)
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
 
-        PlayerPrefs.SetInt("MAP_BACKGROUND", !GameManager.instance.isMapBackgroundUpdate == true ? 1 : 0);
-        GameManager.instance.isMapBackgroundUpdate = PlayerPrefs.GetInt("MAP_BACKGROUND") == 1 ? true : false;
-
+        GameManager.instance.isMapBackgroundUpdate = isTrue;
         IngameManager.instance.ViewMap();
     }
 
-    private void OnCredit()
+    private void OnViewCardRanking(bool isTrue)
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
 
-        GameManager.instance.googleAds.HideGameMenuAd();
-
-        UiManager.instance.OpenCradit(() =>
-        {
-            GameManager.instance.googleAds.ShowGameMenuAd();
-        });
+        GameManager.instance.isViewRanking  = isTrue;
+        IngameManager.instance.ViewRanking();
     }
 }
