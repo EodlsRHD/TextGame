@@ -841,22 +841,16 @@ public class Attacker : MonoBehaviour
 
                     if (straightCount >= 5)
                     {
-                        if (highCardNum < card[i].num)
-                        {
-                            highCardNum = card[i].num;
-                        }
-
                         straight = true;
+
+                        continue;
                     }
 
                     if (card[i].num == 14)
                     {
-                        if (highCardNum < card[i].num)
-                        {
-                            highCardNum = card[i].num;
-                        }
-
                         royal = true;
+
+                        continue;
                     }
                 }
                 else
@@ -868,81 +862,73 @@ public class Attacker : MonoBehaviour
             if (card[i].num == card[i + 1].num)
             {
                 numSameCount++;
+                isChange = false;
 
                 if(numSameCount == 1)
                 {
-                    if (highCardNum < card[i].num)
-                    {
-                        highCardNum = card[i].num;
-                    }
-
                     pairCount++;
+
+                    continue;
                 }
 
                 if(isChange == true && pairCount == 2)
                 {
-                    if (highCardNum < card[i].num)
-                    {
-                        highCardNum = card[i].num;
-                    }
-
                     twoPair = true;
+
+                    continue;
                 }
 
                 if(numSameCount == 2)
                 {
-                    if (highCardNum < card[i].num)
-                    {
-                        highCardNum = card[i].num;
-                    }
-
                     threeofaKind = true;
+
+                    continue;
                 }
 
                 if(numSameCount == 3)
                 {
-                    if (highCardNum < card[i].num)
-                    {
-                        highCardNum = card[i].num;
-                    }
-
                     foreofaKind = true;
+
+                    continue;
                 }
 
                 if (threeofaKind == true && isChange == true && pairCount >= 1)
                 {
-                    if(highCardNum < card[i].num)
-                    {
-                        highCardNum = card[i].num;
-                    }
-
                     fullHouse = true;
-                }
 
-                isChange = false;
+                    continue;
+                }
+            }
+
+            if(highCardNum < card[i].num)
+            {
+                highCardNum = card[i].num;
             }
         }
 
         for (int i = 0; i < card.Count; i++)
         {
             if (card[i].shape == eCardShape.Spade)
+            {
                 spadeCount++;
-
-            if (card[i].shape == eCardShape.Heart)
+            }
+            else if(card[i].shape == eCardShape.Heart)
+            {
                 heartCount++;
-
-            if (card[i].shape == eCardShape.Diamond)
+            }
+            else if(card[i].shape == eCardShape.Diamond)
+            {
                 diamondCount++;
-
-            if (card[i].shape == eCardShape.Clob)
+            }
+            else if(card[i].shape == eCardShape.Clob)
+            {
                 clobCount++;
+            }
         }
 
         if(spadeCount >= 5 || heartCount >= 5 || diamondCount >= 5 || clobCount >= 5)
         {
             flush = true;
-
-            highCardNum = card[0].num;
         }
 
         if (royal == true) // RoyalStraightFlush

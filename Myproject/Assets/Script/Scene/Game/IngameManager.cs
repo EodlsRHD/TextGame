@@ -1686,13 +1686,13 @@ public class CreatureGenerator
         }
 
         int monsterSpawnCount = 0;
-        if (_saveData.round < 3)
+        if (_saveData.round <= 3)
         {
             monsterSpawnCount = _saveData.round;
         }
         else
         {
-            monsterSpawnCount = Random.Range(3, openNodeCount / _saveData.mapData.mapSize);
+            monsterSpawnCount = Random.Range(2, openNodeCount / _saveData.mapData.mapSize);
         }
 
         for (int i = 0; i < monsterSpawnCount; i++)
@@ -1700,7 +1700,16 @@ public class CreatureGenerator
             DataManager.NodeData node = new DataManager.NodeData();
             SpawnMonsterNodeSelect(Random.Range(0, _saveData.mapData.nodeDatas.Count), ref node);
 
-            int id = Random.Range(0, GameManager.instance.dataManager.GetCreaturDataCount());
+            int id = 0;
+            if(_saveData.round == 1)
+            {
+                id = 0;
+            }
+            else
+            {
+                id = Random.Range(0, GameManager.instance.dataManager.GetCreaturDataCount());
+            }
+
             CreatureData creature = GameManager.instance.dataManager.GetCreatureData(id);
 
             if (creature != null)
