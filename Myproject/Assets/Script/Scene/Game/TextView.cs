@@ -12,6 +12,7 @@ public class TextView : MonoBehaviour
     [Header("Scroll View"), SerializeField] private ScrollRect _scrollRect = null;
 
     private RectTransform _rectTransform;
+    private int _maximumStrCount = 29;
 
     public void Initialize()
     {
@@ -112,6 +113,10 @@ public class TextView : MonoBehaviour
 
         switch(type)
         {
+            case eMapObject.Player:
+                findType = "플레이어";
+                break;
+
             case eMapObject.Monster:
                 findType = "몬스터";
                 break;
@@ -133,12 +138,16 @@ public class TextView : MonoBehaviour
                 break;
 
             case eMapObject.Exit:
-                findType = "아래로 가는 계단";
+                findType = "계단";
                 break;
 
             case eMapObject.Guide:
                 findType = "길잡이";
                 break;
+
+            case eMapObject.Stealth:
+                InstantiateTemplate("어딘가에서 이질감이 느껴집니다.");
+                return;
         }
 
         string content = "> " + dirStr + " 방향, " + distance + " 거리에 " + findType + "(이)가 있습니다.";
@@ -163,9 +172,27 @@ public class TextView : MonoBehaviour
 
     private void InstantiateTemplate(string content)
     {
-        var obj = Instantiate(_template, _trTemplateParant);
-        var com = obj.GetComponent<TextViewTemplate>();
+        char[] chars = content.ToCharArray();
+        int value = content.Length / _maximumStrCount;
+        int remain = content.Length % _maximumStrCount;
 
-        com.SetTemplate(content);
+        for(int i = 0; i < value + (remain > 0 ? 1 : 0); i++)
+        {
+            var obj = Instantiate(_template, _trTemplateParant);
+            var com = obj.GetComponent<TextViewTemplate>();
+            string newStr = string.Empty;
+
+            for(int j = i * _maximumStrCount; j < (i + 1) * _maximumStrCount; j++)
+            {
+                if(j >= chars.Length)
+                {
+                    break;
+                }
+
+                newStr += chars[j];
+            }
+
+            com.SetTemplate(newStr);
+        }
     }
 }
