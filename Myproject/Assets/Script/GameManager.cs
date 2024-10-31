@@ -28,8 +28,6 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject _objLoading = null;
     [SerializeField] private LoadSpinner _loadSpinner = null;
 
-    private bool _isMapBackgroundUpdate = false;
-
     #region GetSet
 
     public ToolProxy tools
@@ -59,8 +57,26 @@ public class GameManager : MonoBehaviour
 
     public bool isMapBackgroundUpdate 
     {
-        get { return _isMapBackgroundUpdate; }
-        set { _isMapBackgroundUpdate = value; }
+        get 
+        { 
+            return PlayerPrefs.GetInt("MAP_BACKGROUND", 0) == 1 ? true : false;
+        }
+        set 
+        {
+            PlayerPrefs.SetInt("MAP_BACKGROUND", value == true ? 1 : 0);
+        }
+    }
+
+    public bool isViewRanking
+    {
+        get 
+        { 
+            return PlayerPrefs.GetInt("VIEW_RANKINGS", 0) == 1 ? true : false; 
+        }
+        set
+        {
+            PlayerPrefs.SetInt("VIEW_RANKINGS", value == true ? 1 : 0);
+        }
     }
 
     #endregion
@@ -73,8 +89,6 @@ public class GameManager : MonoBehaviour
 #if UNITY_EDITOR
         PlayerPrefs.DeleteAll();
 #endif
-
-        _isMapBackgroundUpdate = PlayerPrefs.GetInt("MAP_BACKGROUND", 0) == 1 ? true : false;
 
         _toolProxy.Initialize(_soundManager.VolumeDown);
         _dataManager.Initialize();
