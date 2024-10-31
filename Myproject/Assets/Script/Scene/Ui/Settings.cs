@@ -12,10 +12,9 @@ public class Settings : MonoBehaviour
     [SerializeField] private Button _buttonLanguage = null;
     [SerializeField] private Button _buttonCradit = null;
 
-    [Header("Sound"), SerializeField] private Button _buttonBgm = null;
-    [SerializeField] private Button _buttonSfx = null;
-    [SerializeField] private GameObject _objSfxMute = null;
-    [SerializeField] private GameObject _objBgmMute = null;
+    [Header("Sound")]
+    [SerializeField] private Toggle _toggleBgm = null;
+    [SerializeField] private Toggle _toggleSfx = null;
 
     private Action _onCloseCallback = null;
 
@@ -31,11 +30,12 @@ public class Settings : MonoBehaviour
         _buttonRankings.onClick.AddListener(OnRankings);
         _buttonLanguage.onClick.AddListener(OnLanguage);
         _buttonCradit.onClick.AddListener(OnCradit);
-        _buttonBgm.onClick.AddListener(OnBgm);
-        _buttonSfx.onClick.AddListener(OnSfx);
 
-        _objSfxMute.SetActive(GameManager.instance.soundManager.isMuteBGM);
-        _objBgmMute.SetActive(GameManager.instance.soundManager.isMuteSFX);
+        _toggleBgm.isOn = GameManager.instance.soundManager.isMuteBGM;
+        _toggleSfx.isOn = GameManager.instance.soundManager.isMuteSFX;
+
+        _toggleBgm.onValueChanged.AddListener(OnBgm);
+        _toggleSfx.onValueChanged.AddListener(OnSfx);
 
         this.gameObject.SetActive(false);
     }
@@ -95,23 +95,17 @@ public class Settings : MonoBehaviour
         UiManager.instance.OpenCradit();
     }
 
-    private void OnBgm()
+    private void OnBgm(bool isTrue)
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
 
-        GameManager.instance.soundManager.MuteBgm((isMute) =>
-        {
-            _objBgmMute.SetActive(isMute);
-        });
+        GameManager.instance.soundManager.isMuteBGM = isTrue;
     }
 
-    private void OnSfx()
+    private void OnSfx(bool isTrue)
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
 
-        GameManager.instance.soundManager.MuteSfx((isMute) =>
-        {
-            _objSfxMute.SetActive(isMute);
-        });
+        GameManager.instance.soundManager.isMuteSFX = isTrue;
     }
 }

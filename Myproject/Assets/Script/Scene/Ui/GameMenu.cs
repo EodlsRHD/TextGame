@@ -12,10 +12,9 @@ public class GameMenu : MonoBehaviour
     [SerializeField] private Button _buttonGotoMainMenu = null;
     [SerializeField] private Button _buttonLanguage = null;
 
-    [Header("Sound"), SerializeField] private Button _buttonBgm = null;
-    [SerializeField] private Button _buttonSfx = null;
-    [SerializeField] private GameObject _objSfxMute = null;
-    [SerializeField] private GameObject _objBgmMute = null;
+    [Header("Sound")]
+    [SerializeField] private Toggle _toggleBgm = null;
+    [SerializeField] private Toggle _toggleSfx = null;
 
     [Space(10)]
 
@@ -37,14 +36,16 @@ public class GameMenu : MonoBehaviour
         _buttonGotoMainMenu.onClick.AddListener(OnGotoMainMenu);
         _buttonLanguage.onClick.AddListener(OnLanguage);
 
-        _buttonBgm.onClick.AddListener(OnBgm);
-        _buttonSfx.onClick.AddListener(OnSfx);
+        _toggleBgm.onValueChanged.AddListener(OnBgm);
+        _toggleSfx.onValueChanged.AddListener(OnSfx);
+
+        _toggleViewMap.isOn = GameManager.instance.isMapBackgroundUpdate;
+        _toggleViewCardRanking.isOn = GameManager.instance.isViewRanking;
+        _toggleBgm.isOn = GameManager.instance.soundManager.isMuteBGM;
+        _toggleSfx.isOn = GameManager.instance.soundManager.isMuteSFX;
 
         _toggleViewMap.onValueChanged.AddListener(OnViewMap);
         _toggleViewCardRanking.onValueChanged.AddListener(OnViewCardRanking);
-
-        _objSfxMute.SetActive(GameManager.instance.soundManager.isMuteBGM);
-        _objBgmMute.SetActive(GameManager.instance.soundManager.isMuteSFX);
 
         this.gameObject.SetActive(false);
     }
@@ -137,24 +138,18 @@ public class GameMenu : MonoBehaviour
         UiManager.instance.OpenPopup("시스템", "아직 준비중입니다.", string.Empty, null);
     }
 
-    private void OnBgm()
+    private void OnBgm(bool isTrue)
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
 
-        GameManager.instance.soundManager.MuteBgm((isMute) =>
-        {
-            _objBgmMute.SetActive(isMute);
-        });
+        GameManager.instance.soundManager.isMuteBGM = isTrue;
     }
 
-    private void OnSfx()
+    private void OnSfx(bool isTrue)
     {
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
 
-        GameManager.instance.soundManager.MuteSfx((isMute) => 
-        {
-            _objSfxMute.SetActive(isMute);
-        });
+        GameManager.instance.soundManager.isMuteSFX = isTrue;
     }
 
     private void OnViewMap(bool isTrue)
@@ -162,7 +157,11 @@ public class GameMenu : MonoBehaviour
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
 
         GameManager.instance.isMapBackgroundUpdate = isTrue;
-        IngameManager.instance.ViewMap();
+
+        if(IngameManager.instance != null)
+        {
+            IngameManager.instance.ViewMap();
+        }
     }
 
     private void OnViewCardRanking(bool isTrue)
@@ -170,6 +169,10 @@ public class GameMenu : MonoBehaviour
         GameManager.instance.soundManager.PlaySfx(eSfx.ButtonPress);
 
         GameManager.instance.isViewRanking  = isTrue;
-        IngameManager.instance.ViewRanking();
+
+        if(IngameManager.instance != null)
+        {
+            IngameManager.instance.ViewRanking();
+        }
     }
 }

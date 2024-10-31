@@ -25,21 +25,33 @@ public class SoundManager : MonoBehaviour
 
     public bool isMuteBGM
     {
-        get { return _audioBGM.mute; }
+        get 
+        {
+            return PlayerPrefs.GetInt("BGM", 1) == 1 ? true : false; 
+        }
+        set 
+        {
+            PlayerPrefs.SetInt("BGM", value == true ? 1 : 0);
+            _audioBGM.mute = !value;
+        }
     }
 
     public bool isMuteSFX
     {
-        get { return _audioSFX.mute; }
+        get 
+        {
+            return PlayerPrefs.GetInt("SFX", 1) == 1 ? true : false; 
+        }
+        set
+        {
+            PlayerPrefs.SetInt("SFX", value == true ? 1 : 0);
+            MuteSfx(!value);
+        }
     }
 
     public void Initialize()
     {
-        bool isSFX = PlayerPrefs.GetInt("SFX") == 0 ? true : false;
-        bool isBGM = PlayerPrefs.GetInt("BGM") == 0 ? true : false;
 
-        MuteSfx(!isSFX);
-        MuteBgm(!isBGM);
     }
 
     public void PlayBgm(eBgm type)
@@ -133,24 +145,7 @@ public class SoundManager : MonoBehaviour
         }
     }
 
-    public void MuteSfx(Action<bool> onCallback)
-    {
-        MuteSfx(_audioSFX.mute == true ? false : true);
-
-        PlayerPrefs.SetInt("SFX", _audioSFX.mute == true ? 0 : 1);
-
-        onCallback?.Invoke(_audioSFX.mute);
-    }
-
-    public void MuteBgm(Action<bool> onCallback)
-    {
-        _audioBGM.mute = _audioBGM.mute == true ? false : true;
-        PlayerPrefs.SetInt("BGM", _audioBGM.mute == true ? 0 : 1);
-
-        onCallback?.Invoke(_audioBGM.mute);
-    }
-
-    public void MuteSfx(bool isMute)
+    private void MuteSfx(bool isMute)
     {
         _audioSFX.mute = isMute;
         _audioButton.mute = isMute;
@@ -161,7 +156,7 @@ public class SoundManager : MonoBehaviour
         _audioOther.mute = isMute;
     }
 
-    public void MuteBgm(bool isMute)
+    private void MuteBgm(bool isMute)
     {
         _audioBGM.mute = isMute;
     }
