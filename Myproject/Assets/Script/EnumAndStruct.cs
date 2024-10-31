@@ -60,7 +60,6 @@ public enum eMapObject
     Ground
 }
 
-
 public enum eStats
 {
     Non = -1,
@@ -115,14 +114,6 @@ public enum eWinorLose
     Win,
     Lose,
     Draw
-}
-
-public enum eEffect_IncreaseDecrease
-{
-    Non = -1,
-    Increase,
-    Decrease,
-    ALLDecrease
 }
 
 public enum eSfx
