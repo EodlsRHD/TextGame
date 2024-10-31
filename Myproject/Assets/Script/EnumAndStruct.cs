@@ -57,7 +57,8 @@ public enum eMapObject
     Bonfire,
     UseBonfire,
     Guide,
-    Ground
+    Ground,
+    Stealth
 }
 
 public enum eStats

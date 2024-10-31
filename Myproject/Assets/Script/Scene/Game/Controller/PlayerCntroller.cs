@@ -297,7 +297,24 @@ public class PlayerCntroller : MonoBehaviour
             {
                 actions.Add(() =>
                 {
-                    IngameManager.instance.UpdateText(eMapObject.Monster, index);
+                    CreatureData monster = IngameManager.instance.saveData.mapData.monsterDatas.Find(x => x.currentNodeIndex == index);
+
+                    if(monster.defultStatus == eStrengtheningTool.Incubation)
+                    {
+                        return;
+                    }
+                    else if(monster.defultStatus == eStrengtheningTool.Camouflage)
+                    {
+                        IngameManager.instance.UpdateText(eMapObject.Player, index);
+                    }
+                    else if(monster.defultStatus == eStrengtheningTool.Stealth)
+                    {
+                        IngameManager.instance.UpdateText(eMapObject.Stealth, index);
+                    }
+                    else
+                    {
+                        IngameManager.instance.UpdateText(eMapObject.Monster, index);
+                    }
                 });
 
                 Non = true;

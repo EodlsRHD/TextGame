@@ -244,11 +244,8 @@ public class IngameManager : MonoBehaviour
 
     public void Attack(bool isMonster, int currentMonsterNodeIndex, Action onLastCallback = null)
     {
-        if(isMonster == true)
-        {
-            _saveData.mapData.monsterDatas.Find(x => x.currentNodeIndex == currentMonsterNodeIndex).defultStatus = eStrengtheningTool.Non;
-            _monsterController.UpdateData(_saveData.mapData.monsterDatas);
-        }
+        _saveData.mapData.monsterDatas.Find(x => x.currentNodeIndex == currentMonsterNodeIndex).defultStatus = eStrengtheningTool.Non;
+        UpdateData();
 
         _actionController.Attack(isMonster, currentMonsterNodeIndex, onLastCallback);
     }
@@ -1703,7 +1700,7 @@ public class CreatureGenerator
             int id = 0;
             if(_saveData.round == 1)
             {
-                id = 0;
+                id = 11;
             }
             else
             {

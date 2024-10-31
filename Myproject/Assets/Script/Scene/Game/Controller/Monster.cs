@@ -56,6 +56,11 @@ public class Monster : MonoBehaviour
             }
         }
 
+        if(_data.defultStatus == eStrengtheningTool.Incubation)
+        {
+            return;
+        }
+
         Move();
     }
 
@@ -78,6 +83,11 @@ public class Monster : MonoBehaviour
 
                 return;
             }
+        }
+
+        if(_data.defultStatus == eStrengtheningTool.Incubation)
+        {
+            return;
         }
 
         int result = IngameManager.instance.PathFinding(_data.currentNodeIndex, IngameManager.instance.saveData.userData.data.currentNodeIndex);

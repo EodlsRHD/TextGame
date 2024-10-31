@@ -79,26 +79,26 @@ public class BlockTemplate : MonoBehaviour
                 _imageBlock.enabled = true;
 
                 CreatureData monster = IngameManager.instance.saveData.mapData.monsterDatas.Find(x => x.currentNodeIndex == blockData.index);
-                _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eMapObject.Monster, monster.spriteIndex);
                 color = Color.white;
 
                 if(monster.defultStatus == eStrengtheningTool.Incubation)
                 {
-                    _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eMapObject.Monster, monster.spriteIndex);
-                    color.a = 0f;
+                    _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eMapObject.Ground);
+                    color.a = 1f;
                 }
                 else if(monster.defultStatus == eStrengtheningTool.Camouflage)
                 {
-                    _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eMapObject.Ground);
+                    _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eMapObject.Player);
                     color.a = 1f;
                 }
                 else if(monster.defultStatus == eStrengtheningTool.Stealth)
                 {
                     _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eMapObject.Monster, monster.spriteIndex);
-                    color.a = 0.1f;
+                    color.a = 0.05f;
                 }
                 else
                 {
+                    _imageBlock.sprite = GameManager.instance.dataManager.GetCreatureSprite(eMapObject.Monster, monster.spriteIndex);
                     color.a = 1f;
                 }
             }
