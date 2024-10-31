@@ -28,6 +28,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject _objLoading = null;
     [SerializeField] private LoadSpinner _loadSpinner = null;
 
+    private bool _loginFaild = false;
+
     #region GetSet
 
     public ToolProxy tools
@@ -79,6 +81,11 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public bool GpgsloginFaild
+    {
+        get { return _loginFaild; }
+    }
+
     #endregion
 
     private void Awake()
@@ -94,10 +101,15 @@ public class GameManager : MonoBehaviour
         _dataManager.Initialize();
         _soundManager.Initialize();
         _googleAds.Initialize();
-        _googlePlayGameServeice.Initialize();
+        _googlePlayGameServeice.Initialize(InstallGpgs);
         _loadSpinner.Initialize();
 
         _objLoading.SetActive(false);
+    }
+
+    private void InstallGpgs()
+    {
+        _loginFaild = true;
     }
 
     private void OnApplicationQuit()

@@ -36,9 +36,6 @@ public class GameMenu : MonoBehaviour
         _buttonGotoMainMenu.onClick.AddListener(OnGotoMainMenu);
         _buttonLanguage.onClick.AddListener(OnLanguage);
 
-        _toggleBgm.onValueChanged.AddListener(OnBgm);
-        _toggleSfx.onValueChanged.AddListener(OnSfx);
-
         _toggleViewMap.isOn = GameManager.instance.isMapBackgroundUpdate;
         _toggleViewCardRanking.isOn = GameManager.instance.isViewRanking;
         _toggleBgm.isOn = GameManager.instance.soundManager.isMuteBGM;
@@ -46,6 +43,8 @@ public class GameMenu : MonoBehaviour
 
         _toggleViewMap.onValueChanged.AddListener(OnViewMap);
         _toggleViewCardRanking.onValueChanged.AddListener(OnViewCardRanking);
+        _toggleBgm.onValueChanged.AddListener(OnBgm);
+        _toggleSfx.onValueChanged.AddListener(OnSfx);
 
         this.gameObject.SetActive(false);
     }

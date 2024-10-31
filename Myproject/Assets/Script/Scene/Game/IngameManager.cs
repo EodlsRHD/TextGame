@@ -138,7 +138,7 @@ public class IngameManager : MonoBehaviour
 
         if (type == eRoundClear.Load)
         {
-            RoundSet();
+            GenerateMap(_saveData.mapData);
 
             return;
         }
@@ -164,13 +164,7 @@ public class IngameManager : MonoBehaviour
             GameManager.instance.soundManager.PlaySfx(eSfx.TurnPage);
         }
 
-        GameManager.instance.dataManager.SaveDataToCloud(_saveData, (result) => 
-        {
-            _mapGenerator = new MapGenerator(GenerateMap, _saveData);
-
-            GameManager.instance.dataManager.ResetPlayerData();
-            UpdateData();
-        }); 
+        _mapGenerator = new MapGenerator(GenerateMap, _saveData);
     }
 
     private void GenerateMap(DataManager.MapData mapData)
@@ -180,6 +174,8 @@ public class IngameManager : MonoBehaviour
 
         _monsterController.CreateMonster(_saveData.mapData.monsterDatas);
         _mapController.SetMap(_saveData);
+
+        GameManager.instance.dataManager.SaveDataToCloud_Play(_saveData);
 
         RoundSet();
     }
@@ -644,11 +640,6 @@ public class IngameManager : MonoBehaviour
         _textView.UpdateText(message);
     }
 
-    public void UpdateText(int nearbyBlockIndex)
-    {
-        _textView.UpdateText(_saveData.mapData.nodeDatas[nearbyBlockIndex]);
-    }
-
     public void UpdateText(eMapObject type, int monsterNodeIndex)
     {
         _textView.UpdateText(type, _saveData.mapData.nodeDatas[monsterNodeIndex], _saveData.mapData.nodeDatas[_saveData.userData.data.currentNodeIndex]);
@@ -672,6 +663,11 @@ public class IngameManager : MonoBehaviour
     public void OpenNextRoundWindow(eRoundClear type)
     {
         _ingameUI.OpenNextRoundWindow(type);
+    }
+
+    public void UpdateTextViewHeight()
+    {
+        _textView.UpdateTextViewHeight();
     }
 
     public void ViewMap()
@@ -1700,7 +1696,7 @@ public class CreatureGenerator
             int id = 0;
             if(_saveData.round == 1)
             {
-                id = 11;
+                id = 0;
             }
             else
             {

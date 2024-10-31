@@ -376,10 +376,41 @@ public class DataManager : MonoBehaviour
         });
     }
 
+    public void SaveDataToCloud_Play(SaveData saveData = null, Action<bool> onSaveOrLoadCallback = null)
+    {
+        OrganizeEncyclopedia(saveData);
+
+        if(saveData != null)
+        {
+            _saveData = saveData;
+        }
+
+        var saveRequest = new
+        {
+            data = _saveData
+        };
+
+        string savejson = JsonConvert.SerializeObject(saveRequest);
+
+#if UNITY_EDITOR
+
+        PlayerPrefs.SetString("SAVE", savejson);
+
+        onSaveOrLoadCallback?.Invoke(true);
+
+        return;
+#endif
+
+        GameManager.instance.googlePlayGameServeice.SaveData(savejson, (result) =>
+        {
+            GameManager.instance.StopLoad();
+
+            onSaveOrLoadCallback?.Invoke(result);
+        });
+    }
+
     public void SaveEncyclopediaToCloud(EncyclopediaData data, Action<bool> onSaveOrLoadCallback = null)
     {
-        GameManager.instance.StartLoad();
-
         var enRequest = new
         {
             data = _encyclopediaData
@@ -390,8 +421,6 @@ public class DataManager : MonoBehaviour
 #if UNITY_EDITOR
 
         PlayerPrefs.SetString("SAVE_EncylopediaData", enjson);
-
-        GameManager.instance.StopLoad();
 
         onSaveOrLoadCallback?.Invoke(true);
 

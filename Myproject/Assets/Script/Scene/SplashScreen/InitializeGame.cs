@@ -11,10 +11,6 @@ public class InitializeGame : MonoBehaviour
     {
         Application.targetFrameRate = _targetFrameRate;
 
-#if !UNITY_EDITOR
-        GameManager.instance.googlePlayGameServeice.SignIn();
-#endif
-
         GameManager.instance.tools.SceneChange(eScene.Lobby);
     }
 }

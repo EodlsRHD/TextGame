@@ -60,6 +60,11 @@ public class UiManager : MonoBehaviour
         ActiveBlocker(false);
 
         this.gameObject.SetActive(true);
+
+        if(GameManager.instance.GpgsloginFaild == true)
+        {
+            OpenPopup("시스템", "Google Play Games에 로그인하시고 다시 시도해주세요.", "확인", () => { Application.Quit(); });
+        }
     }
 
     private void ActiveBlocker(bool isActive)

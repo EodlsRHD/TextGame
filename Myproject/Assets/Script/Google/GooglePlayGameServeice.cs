@@ -18,18 +18,26 @@ public class GooglePlayGameServeice : MonoBehaviour
 
     private string _saveJson = string.Empty;
 
-    public void Initialize()
+    public void Initialize(Action onInstallGpgsCallback)
     {
         PlayGamesPlatform.DebugLogEnabled = true;
         PlayGamesPlatform.Activate();
+
+#if UNITY_EDITOR
+        return;
+#endif
+
+        SignIn(onInstallGpgsCallback);
     }
 
-    public void SignIn()
+    public void SignIn(Action onInstallGpgsCallback)
     {
         PlayGamesPlatform.Instance.Authenticate((status) => 
         {
             if (status != SignInStatus.Success)
             {
+                onInstallGpgsCallback?.Invoke();
+
                 Debug.LogError("sign in Failed !");
 
                 return;

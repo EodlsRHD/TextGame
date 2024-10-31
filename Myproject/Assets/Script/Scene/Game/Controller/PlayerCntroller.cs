@@ -40,12 +40,11 @@ public class PlayerCntroller : MonoBehaviour
             return;
         }
 
-        IngameManager.instance.UpdateText(nearbyBlockIndex);
-
         IngameManager.instance.saveData.mapData.nodeDatas[IngameManager.instance.saveData.userData.data.currentNodeIndex].isUser = false;
         IngameManager.instance.saveData.mapData.nodeDatas[nearbyBlockIndex].isUser = true;
 
         IngameManager.instance.saveData.userData.data.currentNodeIndex = nearbyBlockIndex;
+        IngameManager.instance.UpdatePlayerCoord();
 
         IngameManager.instance.saveData.userData.stats.ap.MinusCurrnet(1);
         IngameManager.instance.UpdatePlayerInfo(eStats.AP);

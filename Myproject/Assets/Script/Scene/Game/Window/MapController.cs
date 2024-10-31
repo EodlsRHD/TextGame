@@ -78,6 +78,7 @@ public class MapController : MonoBehaviour
         RemoveTemplate();
 
         _trBack.gameObject.SetActive(GameManager.instance.isMapBackgroundUpdate);
+        IngameManager.instance.UpdateTextViewHeight();
 
         var blockData = saveData.mapData.nodeDatas;
 
