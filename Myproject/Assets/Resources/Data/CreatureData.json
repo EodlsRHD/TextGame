@@ -242,8 +242,8 @@
     },
     {
       "id": 112,
-      "name": "미믹",
-      "description": "보물 상자로 변장해 플레이어를 속이는 몬스터.",
+      "name": "마네킹",
+      "description": "플레이어로 변장하여 속이는 몬스터.",
       "spriteIndex": 112,
       "coin": 1,
       "hp": 9,
