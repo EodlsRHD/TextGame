@@ -118,6 +118,16 @@ public class Encyclopedia : MonoBehaviour
 
         GameManager.instance.dataManager.LoadEncyclopediaToCloud((result) =>
         {
+            if(result == false)
+            {
+                UiManager.instance.OpenPopup(string.Empty, "나중에 다시 시도해주세요.", "확인", () =>
+                {
+                    OnClose();
+                });
+
+                return;
+            }
+
             _data = GameManager.instance.dataManager.CopyEncyclopediaData();
             _templates = new Dictionary<int, List<EncyclopediaTemplate>>
             {
