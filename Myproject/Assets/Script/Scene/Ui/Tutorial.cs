@@ -130,6 +130,8 @@ public class Tutorial : MonoBehaviour
             GameManager.instance.soundManager.PlaySfx(eSfx.GotoLobby);
         }
 
+        DeleteTemplate();
+
         _isMenu = false;
 
         _textSpeechBubble.text = string.Empty;
@@ -211,6 +213,8 @@ public class Tutorial : MonoBehaviour
 
         if(next == -1)
         {
+            _buttonSkipGuide.gameObject.SetActive(false);
+
             _isDone = true;
             OnClose();
 
