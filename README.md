@@ -1,6 +1,6 @@
 # TextGame
 
-Unity Editor version 6000.0.11f1 Preview
+Unity Editor version 6000.0.23f1
 
 use Asset
 1. TMP
