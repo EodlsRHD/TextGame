@@ -279,12 +279,12 @@ public class DataManager : MonoBehaviour
         _saveData.userData.data = new CreatureData();
         _saveData.userData.data.stats = new CreatureStats();
         _saveData.userData.data.stats.coin = new CreatureStat(0, 1, 0, 0);
-        _saveData.userData.data.stats.hp = new CreatureStat(10, 1, 0, 0);
-        _saveData.userData.data.stats.mp = new CreatureStat(10, 1, 0, 0);
-        _saveData.userData.data.stats.ap = new CreatureStat(100, 1, 0, 0);
+        _saveData.userData.data.stats.hp = new CreatureStat(9, 1, 0, 0);
+        _saveData.userData.data.stats.mp = new CreatureStat(7, 1, 0, 0);
+        _saveData.userData.data.stats.ap = new CreatureStat(3, 1, 0, 0);
         _saveData.userData.data.stats.exp = new CreatureStat(20, 1, 0, 0);
         _saveData.userData.data.stats.exp.current = 0;
-        _saveData.userData.data.stats.attack = new CreatureStat(5, 1, 0, 0);
+        _saveData.userData.data.stats.attack = new CreatureStat(3, 1, 0, 0);
         _saveData.userData.data.stats.defence = new CreatureStat(0, 1, 0, 0);
         _saveData.userData.data.stats.vision = new CreatureStat(1, 1, 0, 0);
         _saveData.userData.data.stats.attackRange = new CreatureStat(1, 1, 0, 0);

@@ -332,7 +332,7 @@ public class CreatureStat
 
     public short maximum
     {
-        get { return (short)((defult * point) + ((defult * point) * 0.1f * percent) + plus); }
+        get { return (short)((defult * (point * 0.5f)) + ((defult * (point * 0.5f)) * 0.1f * percent) + plus); }
     }
 
     public CreatureStat(short defult, short point, short plus, short percent)
